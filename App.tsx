@@ -6,7 +6,8 @@ export default function App() {
 
   // Fetch data from the Node server
   useEffect(() => {
-    fetch('http://tough-islands-feel-173-34-49-205.loca.lt/api')
+    // This is gross but it works, always have to manually update for new link though
+    fetch('http://beige-peaches-eat-173-34-49-205.loca.lt/gas-prices')
       .then((res) => res.json())
       .then((json) => console.log(json))
       .catch((error) => console.log(error))
