@@ -8,7 +8,7 @@ This directory contains the code to host an Node.js server using Express
 
 For development run:
 ```
-  lt --port 3001
+  lt --port 3001 --subdomain carpoolcalc
 ```
 
 and then use that url in the client fetch requests to link the client to the server

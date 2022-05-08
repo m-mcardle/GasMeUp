@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "An app to make carpooling easier for everyone. A service to easily calculate your due gas-money and split easily to your riders. Just put in your riders, your route, and we will do the rest.",
   "main": "index.js",
+  "type": "module",
   "dependencies": {
     "axios": "^0.27.2",
     "axios-cache-adapter": "^2.7.3",
@@ -12,7 +13,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node index.js",
+    "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
