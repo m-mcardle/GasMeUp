@@ -31,21 +31,32 @@ const api = axios.create({
 app.get("/trip-cost", async (req, res) => {
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ??'Toronto';
+  const province = 'Ontario'; // This should end up being determined by the user's location
 
-  if (env === 'production') {
+  if (env === 'production' || process.env.ENABLE_GOOGLE_QUERIES) {
 
     try {
       // Make request to the Google Distance Matrix API
       const distanceResponse = await api(DistanceMatrix(startLocation, endLocation));
       const data = distanceResponse.data;
-      console.log(data.rows[0].elements);
+      console.log(data.rows[0])
+      console.log(data.rows[0].elements[0])
+
+      if (data?.rows[0]?.elements[0].status !== 'OK') {
+        throw 'Route not found';
+      }
       const distance = data.rows[0].elements[0].distance.value / 1000;
 
-      const priceResponse = await api(GasPrices('canada'));
-      console.log(priceResponse.data);
-      const gasPrice = priceResponse.data?.result[0].gasoline;
-      // Mock Version:
-      // const gasPrice = mockPrices[4].gasoline;
+      let gasPrice;
+      if (env === 'production' || process.env.ENABLE_COLLECTAPI_QUERIES == true) {
+        const priceResponse = await api(GasPrices('canada'));
+        console.log(priceResponse.data);
+        gasPrice = priceResponse.data?.result.find(el => el.name === province).gasoline;
+      } else {
+        // Mock Version:
+        gasPrice = mockPrices[6].gasoline;
+      }
+      console.log(`Distance: ${distance}km and Gas Price: $${gasPrice}`);
 
       const cost = GasCostForDistance(distance, gasPrice);
 
@@ -53,6 +64,7 @@ app.get("/trip-cost", async (req, res) => {
       res.json({ cost });
     } catch (err) {
       console.log(err);
+      res.status(500).send('An error occurred');
     }
   } else {
 
