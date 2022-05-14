@@ -6,6 +6,14 @@ export function DistanceMatrix (startLocation, endLocation) {
   }
 }
 
+export function LocationAutocomplete (input) {
+  return {
+    method: 'get',
+    url: `https://maps.googleapis.com/maps/api/place/queryautocomplete/json?input=${input}&key=${process.env.GOOGLE_API_KEY}`,
+    headers: { }
+  }
+}
+
 export const mockTrip = {
   destination_addresses: [
     "Toronto, ON, Canada"

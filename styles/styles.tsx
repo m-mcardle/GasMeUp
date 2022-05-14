@@ -9,7 +9,8 @@ export const colors = {
   gray: '#DDDDDD',
   lightGray: '#EEEEEE',
   teal: '#29A8AB',
-  black: '#1E1E1E'
+  black: '#1E1E1E',
+  green: '#118C4F'
 }
 
 export const font = 'Gotham-Black'

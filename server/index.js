@@ -8,7 +8,7 @@ import pkg from 'axios-cache-adapter';
 const { setupCache } = pkg;
 
 
-import { DistanceMatrix, mockTrip } from './queries/google.js';
+import { DistanceMatrix, LocationAutocomplete, mockTrip } from './queries/google.js';
 import { GasPrices, mockPrices } from './queries/collectapi.js';
 
 import { GasCostForDistance } from './calculations/fuel.js';
@@ -78,6 +78,31 @@ app.get("/trip-cost", async (req, res) => {
   }  
 });
 
+// Handle autocomplete for locations
+app.get("/location", async (req, res) => {
+  const input = req.query?.input ?? 'Toronto';
+
+  if (env === 'production' || process.env.ENABLE_GOOGLE_QUERIES) {
+    try {
+      const response = await api(LocationAutocomplete(input));
+      const data = response.data;
+      console.log(data);
+      if (data.status !== 'OK') {
+        throw `Error: ${data.error_message}`
+      }
+      const predictions = data.predictions;
+
+      res.set('Access-Control-Allow-Origin', '*');
+      res.json({ predictions });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({error: 'An error occurred'});
+    }
+  } else {
+    res.status(500).send({error: 'No mock data to supply'});
+  }
+});
+
 // Handle GET requests for distances between two locations
 app.get("/distances", (req, res) => {
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
@@ -99,6 +124,7 @@ app.get("/distances", (req, res) => {
       })
       .catch(function (error) {
         console.log(error);
+        res.status(500).send("An error occurred")
       });
   } else {
     res.set('Access-Control-Allow-Origin', '*');
