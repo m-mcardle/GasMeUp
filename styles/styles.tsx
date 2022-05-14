@@ -14,6 +14,7 @@ export const colors = {
 }
 
 export const font = 'Gotham-Black'
+export const italicFont = 'Gotham-ThinItalic'
 
 export const globalStyles = StyleSheet.create({
   text: {
@@ -27,7 +28,8 @@ export const globalStyles = StyleSheet.create({
     borderRadius: 5,
     margin: 5,
     padding: 5,
-    backgroundColor: colors.lightGray
+    backgroundColor: colors.lightGray,
+    fontSize: 10
   },
   button: {
     backgroundColor: colors.tertiary,

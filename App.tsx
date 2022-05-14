@@ -9,15 +9,8 @@ import { useFonts } from 'expo-font';
 import Text from './components/Text';
 import Button from './components/Button';
 import Input from './components/Input';
-import { colors, font } from './styles/styles';
+import { colors, font, italicFont } from './styles/styles';
 
-
-/*
-
-TODO:
-Fix the buggy inputs. This is unusable.
-
-*/
 
 
 interface GasPrice {
@@ -52,6 +45,11 @@ interface InputState {
   endLocation: string
 }
 
+interface Locations {
+  startLocation: string,
+  endLocation: string
+}
+
 enum ActiveInput {
   none,
   start,
@@ -62,16 +60,15 @@ const serverUrl = 'http://carpoolcalc.loca.lt';
 
 export default function App() {
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.none);
-  const [pickerOpen, setPickerOpen] = useState<boolean>(true);
   const [pickerValue, setPickerValue] = useState<string | null>(null);
   const [{cost, loading}, setCostRequest] = useState<CostRequest>({loading: false, cost: 0});
-  const [inputs, setInputs] = useState<InputState>({ suggestions: [], startLocation: '', endLocation: '' });
-
+  const [suggestions, setSuggestions] = useState<Array<ItemType<string>>>([]);
+  const [{startLocation, endLocation}, setLocations] = useState<Locations>({startLocation: '', endLocation: ''});
 
 
   const submit = useCallback(() => {
     setCostRequest({loading: true, cost: 0});
-    fetch(serverUrl + `/trip-cost/?start=${inputs.startLocation}&end=${inputs.endLocation}`)
+    fetch(serverUrl + `/trip-cost/?start=${startLocation}&end=${endLocation}`)
       .then((res) => {
         if (!res.ok) {
           throw `Request failed (${res.status})`;
@@ -83,14 +80,12 @@ export default function App() {
         alert(err);
         setCostRequest({loading: false, cost: 0});
       });
-  }, [inputs.startLocation, inputs.endLocation]);
+  }, [startLocation, endLocation]);
 
-  const inputChanged = useCallback((input: string, isStart: boolean) => {
+  const updateSuggestions = useCallback((input: string) => {
     // If empty then just clear the suggestions
     if (!input) {
-      isStart 
-        ? setInputs({ ...inputs, startLocation: input, suggestions: [] }) 
-        : setInputs({ ...inputs, endLocation: input, suggestions: [] })
+      setSuggestions([]);
       return;
     }
 
@@ -102,13 +97,12 @@ export default function App() {
         return res.json();
       })
       .then((data) => {
-        const suggestions =  data.predictions.map((el: Prediction) =>  {
+        const newSuggestions =  data.predictions.map((el: Prediction) =>  {
           const suggestion: ItemType<string> = { label: el.description, value: el.description };
           return suggestion;
         });
-        isStart 
-          ? setInputs((state) => ({ ...state, startLocation: input, suggestions: suggestions }))
-          : setInputs((state) => ({ ...state, endLocation: input, suggestions: suggestions }))
+
+        setSuggestions(newSuggestions);
       })
       .catch((err) => {
         alert(err);
@@ -116,33 +110,34 @@ export default function App() {
   }, []);
 
   const updateStartLocation = (input: string) => {
-    setInputs((state) => ({ ...state, startLocation: input }))
-    inputChanged(input, true);
+    setLocations((state) => ({ ...state, startLocation: input }))
+    updateSuggestions(input);
   }
 
   const updateEndLocation = (input: string) => {
-    setInputs((state) => ({ ...state, endLocation: input }))
-    inputChanged(input, false);
+    setLocations((state) => ({ ...state, endLocation: input }))
+    updateSuggestions(input);
   }
 
   const setInputToPickedLocation = (item: ItemType<string>) => {
-    setPickerOpen(false);
+    // setPickerOpen(false);
     if (activeInput === ActiveInput.start) {
-      setInputs((state) => ({...state, startLocation: item.label!.toString(), suggestions: []}))
+      setLocations((state) => ({...state, startLocation: item.label!.toString()}))
+      setSuggestions([]);
     } else if (activeInput === ActiveInput.end) {
-      setInputs((state) => ({...state, endLocation: item.label!.toString(), suggestions: []}))
+      setLocations((state) => ({...state, endLocation: item.label!.toString()}))
+      setSuggestions([]);
     }
   }
 
-  useEffect(() => {
-    if (activeInput !== ActiveInput.none && !pickerOpen) {
-      setPickerOpen(true);
-    }
-  }, [activeInput])
-  
+  const changeActiveInput = (input: ActiveInput) => {
+    setSuggestions([]);
+    setActiveInput(input);
+  }
 
   let [fontsLoaded] = useFonts({
     'Gotham-Black': require('./assets/fonts/Gotham-Black.otf'),
+    'Gotham-ThinItalic': require('./assets/fonts/Gotham-ThinItalic.otf')
   });
 
   if (!fontsLoaded) {
@@ -150,50 +145,80 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.costSection}>
-        {loading
-          ? <ActivityIndicator />
-          : <Text style={styles.costText}>${cost.toFixed(2)}</Text>
-        }
+    <View style={styles.main}>
+      {/* <View style={[{height: '20%'}, styles.container]}>
+        <Text style={styles.title}>CarpoolCalc</Text>
+      </View> */}
+      <View style={styles.container}>
+        <View style={styles.costSection}>
+          {loading
+            ? <ActivityIndicator size={'large'}/>
+            : <Text style={styles.costText}>${cost.toFixed(2)}</Text>
+          }
+        </View>
+        <Input
+          placeholder='Start location'
+          onChangeText={updateStartLocation}
+          onPressOut={() => changeActiveInput(ActiveInput.start)}
+          value={startLocation}
+        />
+        <Input
+          placeholder='End location'
+          onChangeText={updateEndLocation}
+          onPressOut={() => changeActiveInput(ActiveInput.end)}
+          value={endLocation}
+        />
+        <Button onPress={submit}>
+          <Text>Calculate</Text>
+        </Button>
+        <DropDownPicker
+          open={true}
+          value={pickerValue}
+          items={suggestions}
+          setOpen={() => {}}
+          setValue={setPickerValue}
+          setItems={() => {}}
+          onSelectItem={setInputToPickedLocation}
+          style={{display: 'none'}}
+          containerStyle={{width: '70%'}}
+          textStyle={{fontFamily: font}}
+          ListEmptyComponent={(props) =>
+            <Text style={styles.emptyList}>No suggestions</Text>
+          }
+        />
+        {/* <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation}/> */}
       </View>
-      <Input
-        placeholder='Start location'
-        onChangeText={updateStartLocation}
-        onPressOut={() => setActiveInput(ActiveInput.start)}
-        value={inputs?.startLocation}
-      />
-      <Input
-        placeholder='End location'
-        onChangeText={updateEndLocation}
-        onPressOut={() => setActiveInput(ActiveInput.end)}
-        value={inputs?.endLocation}
-      />
-      <Button onPress={submit}>
-        <Text>Calculate</Text>
-      </Button>
-      <DropDownPicker
-        open={pickerOpen}
-        value={pickerValue}
-        items={inputs.suggestions}
-        setOpen={() => {}}
-        setValue={setPickerValue}
-        setItems={() => {}}
-        onSelectItem={setInputToPickedLocation}
-        style={{display: 'none'}}
-        containerStyle={{width: '70%'}}
-        textStyle={{fontFamily: font}}
-      />
     </View>
   );
 }
 
+// function SuggestionsSection(
+//   items: Array<ItemType<string>>,
+//   onSelect: (arg0: string) => void
+// ) {
+//   return (
+//     <View style={{width: '70%'}}>
+//       {items?.map(el => {
+//         <Text onPress={() => { onSelect(el) }}>{el}</Text>
+//       })
+//       ?? <Text style={styles.emptyList}>No suggestions</Text>}
+//     </View>
+//   )
+// }
+
 const styles = StyleSheet.create({
+  title: {
+    fontSize: 60
+  },
   container: {
     flex: 1,
-    backgroundColor: colors.darkestGray,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  main: {
+    flex: 1,
+    paddingVertical: 20,
+    backgroundColor: colors.darkestGray,
   },
   costSection: {
     width: '70%',
@@ -207,5 +232,11 @@ const styles = StyleSheet.create({
   },
   picker: {
     fontFamily: font,
+  },
+  emptyList: {
+    padding: 5,
+    fontStyle: 'italic',
+    fontWeight: '200',
+    fontFamily: italicFont
   }
 });
