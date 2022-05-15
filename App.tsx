@@ -6,6 +6,9 @@ import { useFonts } from 'expo-font';
 import { useCallback, useState } from 'react';
 import { StyleSheet, View, ActivityIndicator } from 'react-native';
 
+// External Components
+import NumericInput from 'react-native-numeric-input';
+
 // Components
 import Text from './components/Text';
 import Button from './components/Button';
@@ -29,7 +32,7 @@ export default function App() {
   const [{cost, distance, gasPrice, loading}, setCostRequest] = useState<CostRequest>({loading: false, cost: 0, distance: 0, gasPrice: 0});
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{startLocation, endLocation}, setLocations] = useState<Locations>({startLocation: '', endLocation: ''});
-
+  const [riders, setRiders] = useState<number>(1);
 
   const submit = useCallback(() => {
     setCostRequest({loading: true, cost: 0, distance: 0, gasPrice: 0});
@@ -116,12 +119,26 @@ export default function App() {
         <View style={styles.costSection}>
           {loading
             ? <ActivityIndicator size={'large'}/>
-            : <Text style={styles.costText}>${cost.toFixed(2)}</Text>
+            : <Text style={styles.costText}>${(cost / riders ).toFixed(2)}</Text>
           }
         </View>
         <View style={styles.statsSection}>
           <Text>{distance.toFixed(2)}km</Text>
           <Text>${gasPrice.toFixed(2)}/L</Text>
+        </View>
+        <View style={styles.ridersSection}>
+          <Text>Riders:</Text>
+          <NumericInput
+            rounded
+            totalHeight={30}
+            totalWidth={120}
+            containerStyle={{backgroundColor: 'white'}}
+            minValue={1}
+            leftButtonBackgroundColor={colors.lightGray}
+            rightButtonBackgroundColor={colors.darkestGray}
+            value={riders}
+            onChange={setRiders}
+          />
         </View>
         <Input
           placeholder='Start location'
@@ -184,5 +201,15 @@ const styles = StyleSheet.create({
     flex: 2,
     alignItems: 'center',
     justifyContent: 'flex-start',
+  },
+  ridersSection: {
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    width: '70%', 
+    justifyContent: 'space-around', 
+    backgroundColor: colors.gray,
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 5,
   }
 });
