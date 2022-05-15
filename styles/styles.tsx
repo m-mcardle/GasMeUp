@@ -9,10 +9,12 @@ export const colors = {
   gray: '#DDDDDD',
   lightGray: '#EEEEEE',
   teal: '#29A8AB',
-  black: '#1E1E1E'
+  black: '#1E1E1E',
+  green: '#118C4F'
 }
 
 export const font = 'Gotham-Black'
+export const italicFont = 'Gotham-ThinItalic'
 
 export const globalStyles = StyleSheet.create({
   text: {
@@ -26,7 +28,8 @@ export const globalStyles = StyleSheet.create({
     borderRadius: 5,
     margin: 5,
     padding: 5,
-    backgroundColor: colors.lightGray
+    backgroundColor: colors.lightGray,
+    fontSize: 10
   },
   button: {
     backgroundColor: colors.tertiary,
