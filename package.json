@@ -21,6 +21,7 @@
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
     "react-native-dropdown-picker": "^5.4.2",
+    "react-native-numeric-input": "^1.9.1",
     "react-native-web": "0.17.1"
   },
   "devDependencies": {
