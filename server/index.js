@@ -1,6 +1,20 @@
 import dotenv from 'dotenv';
 dotenv.config()
 
+import localtunnel from 'localtunnel';
+var tunnel;
+
+// (async () => {
+//   tunnel = await localtunnel({ port: 3001, subdomain: 'carpoolcalc' });
+
+//   tunnel.url;
+//   console.log("Localtunnel at:,", tunnel.url);
+//   tunnel.on('close', () => {
+//     // tunnels are closed
+//   });
+// })();
+
+
 import express from 'express';
 
 import axios from 'axios';
@@ -31,7 +45,7 @@ const api = axios.create({
 app.get("/trip-cost", async (req, res) => {
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ??'Toronto';
-  const province = 'Ontario'; // This should end up being determined by the user's location
+  const province = 'Ontario'; // TODO - This should end up being determined by the user's location
 
   if (env === 'production' || process.env.ENABLE_GOOGLE_QUERIES) {
 
@@ -39,10 +53,9 @@ app.get("/trip-cost", async (req, res) => {
       // Make request to the Google Distance Matrix API
       const distanceResponse = await api(DistanceMatrix(startLocation, endLocation));
       const data = distanceResponse.data;
-      console.log(data.rows[0])
       console.log(data.rows[0].elements[0])
 
-      if (data?.rows[0]?.elements[0].status !== 'OK') {
+      if (data?.rows[0]?.elements[0]?.status !== 'OK') {
         throw 'Route not found';
       }
       const distance = data.rows[0].elements[0].distance.value / 1000;
@@ -51,17 +64,17 @@ app.get("/trip-cost", async (req, res) => {
       if (env === 'production' || process.env.ENABLE_COLLECTAPI_QUERIES == true) {
         const priceResponse = await api(GasPrices('canada'));
         console.log(priceResponse.data);
-        gasPrice = priceResponse.data?.result.find(el => el.name === province).gasoline;
+        gasPrice = Number(priceResponse.data?.result.find(el => el.name === province).gasoline);
       } else {
         // Mock Version:
-        gasPrice = mockPrices[6].gasoline;
+        gasPrice = Number(mockPrices[6].gasoline);
       }
       console.log(`Distance: ${distance}km and Gas Price: $${gasPrice}`);
 
       const cost = GasCostForDistance(distance, gasPrice);
 
       res.set('Access-Control-Allow-Origin', '*');
-      res.json({ cost });
+      res.json({ cost: cost, distance: distance, gasPrice: gasPrice });
     } catch (err) {
       console.log(err);
       res.status(500).send('An error occurred');
@@ -69,7 +82,7 @@ app.get("/trip-cost", async (req, res) => {
   } else {
 
     const distance = mockTrip.rows[0].elements[0].distance.value / 1000;
-    const gasPrice = mockPrices[0].gasoline;
+    const gasPrice = Number(mockPrices[0].gasoline);
 
     const cost = GasCostForDistance(distance, gasPrice);
 
@@ -86,12 +99,11 @@ app.get("/location", async (req, res) => {
     try {
       const response = await api(LocationAutocomplete(input));
       const data = response.data;
-      console.log(data);
       if (data.status !== 'OK') {
         throw `Error: ${data.error_message}`
       }
       const predictions = data.predictions;
-
+      // Probably should filter to only send the description
       res.set('Access-Control-Allow-Origin', '*');
       res.json({ predictions });
     } catch (err) {
