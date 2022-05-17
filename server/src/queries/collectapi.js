@@ -1,12 +1,12 @@
-export function GasPrices (location = 'canada') {
+export function GasPrices(location = 'canada') {
   return {
     method: 'get',
     url: `https://api.collectapi.com/gasPrice/${location}`,
     headers: {
-      "content-type": "application/json",
-      "authorization": `apikey ${process.env.COLLECT_API_KEY}`
-     }
-  }
+      'content-type': 'application/json',
+      authorization: `apikey ${process.env.COLLECT_API_KEY}`,
+    },
+  };
 }
 
 export const mockPrices = [
@@ -17,11 +17,11 @@ export const mockPrices = [
   {
     name: 'Newfoundland and Labrador',
     currency: 'usd',
-    gasoline: '2.06'
+    gasoline: '2.06',
   },
   { name: 'Nova Scotia', currency: 'usd', gasoline: '1.92' },
   { name: 'Ontario', currency: 'usd', gasoline: '1.95' },
   { name: 'Prince Edward Island', currency: 'usd', gasoline: '1.94' },
   { name: 'Quebec', currency: 'usd', gasoline: '2.00' },
-  { name: 'Saskatchewan', currency: 'usd', gasoline: '1.78' }
+  { name: 'Saskatchewan', currency: 'usd', gasoline: '1.78' },
 ];

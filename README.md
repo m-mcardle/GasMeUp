@@ -12,3 +12,11 @@ The client for this application is built using React Native. To start the Expo s
 ```
 npm run client
 ```
+
+## Server
+
+The server for this application hosts an api using Express and Node.js. It fetches from CollectAPI for current gas prices and the Google Maps API for locations and route distances. To start the Node server, go to the /server directory and run:
+
+```
+npm run start
+```

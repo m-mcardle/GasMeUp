@@ -1,0 +1,53 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "react-native/react-native": true
+    },
+    "extends": [
+        "plugin:react/recommended",
+        "airbnb",
+        "airbnb-typescript",
+        "plugin:import/typescript",
+        "plugin:react/jsx-runtime"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "project": "./tsconfig.json"
+    },
+    "plugins": [
+        "react",
+        "react-native",
+        "@typescript-eslint"
+    ],
+    "rules": {
+        "no-shadow": "off",
+        "@typescript-eslint/no-shadow": ["error"],
+        "import/extensions": [
+            "error",
+            "never",
+            {
+              "js": "never",
+              "jsx": "never",
+              "ts": "never",
+              "tsx": "never"
+            }
+        ]
+    },
+    "settings": {
+        "import/extensions": [
+            ".js",
+            ".jsx",
+            ".tsx",
+            ".ts"
+        ],
+        "import/parsers": {
+            "@typescript-eslint/parser": [".ts", ".tsx"]
+        }
+    }
+}
