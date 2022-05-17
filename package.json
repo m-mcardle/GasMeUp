@@ -5,12 +5,15 @@
   "scripts": {
     "start": "expo start",
     "client": "expo start",
-    "server": "node ./server/index.js",
+    "server": "cd server && npm run start-full",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "lint": "npx eslint './src/' './server/src' 'App.tsx' './server/index.js'"
+    "lint": "npx eslint './src/' 'App.tsx'",
+    "lint-client": "npx eslint './src/' 'App.tsx'",
+    "lint-server": "npx eslint './src/' 'index.js'",
+    "install-server": "cd server && npm install"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.2.2",

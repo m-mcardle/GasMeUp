@@ -15,7 +15,7 @@
   "scripts": {
     "start": "NODE_OPTIONS='--experimental-specifier-resolution=node' nodemon index.js",
     "tunnel": "lt --port 3001 --subdomain carpoolcalc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start-full": "NODE_OPTIONS='--experimental-specifier-resolution=node' START_TUNNEL='true' nodemon index.js"
   },
   "keywords": [],
   "author": "Matthew McArdle",

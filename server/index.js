@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-// import localtunnel from 'localtunnel';
+import localtunnel from 'localtunnel';
 
 import express from 'express';
 
@@ -14,16 +14,17 @@ import { GasCostForDistance } from './src/calculations/fuel';
 
 dotenv.config();
 
-// let tunnel;
-// (async () => {
-//   tunnel = await localtunnel({ port: 3001, subdomain: 'carpoolcalc' });
+if (process.env.START_TUNNEL) {
+  let tunnel;
+  (async () => {
+    tunnel = await localtunnel({ port: 3001, subdomain: 'carpoolcalc' });
 
-//   tunnel.url;
-//   console.log("Localtunnel at:,", tunnel.url);
-//   tunnel.on('close', () => {
-//     // tunnels are closed
-//   });
-// })();
+    console.log('Localtunnel at:,', tunnel.url);
+    tunnel.on('close', () => {
+      // tunnels are closed
+    });
+  })();
+}
 
 const { setupCache } = pkg;
 
