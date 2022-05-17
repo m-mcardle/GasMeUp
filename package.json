@@ -12,7 +12,7 @@
     "eject": "expo eject",
     "lint": "npx eslint './src/' 'App.tsx'",
     "lint-client": "npx eslint './src/' 'App.tsx'",
-    "lint-server": "npx eslint './src/' 'index.js'",
+    "lint-server": "npx eslint './server/src/' './server/index.js'",
     "install-server": "cd server && npm install"
   },
   "dependencies": {
