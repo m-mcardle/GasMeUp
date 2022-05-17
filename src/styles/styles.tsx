@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 export const colors = {
   primary: '#CCCCCC',
@@ -11,16 +11,16 @@ export const colors = {
   teal: '#29A8AB',
   black: '#1E1E1E',
   green: '#118C4F',
-  red: '#DC143C'
-}
+  red: '#DC143C',
+};
 
-export const font = 'Gotham-Black'
-export const italicFont = 'Gotham-ThinItalic'
+export const font = 'Gotham-Black';
+export const italicFont = 'Gotham-ThinItalic';
 
 export const globalStyles = StyleSheet.create({
   text: {
     fontFamily: font,
-    color: colors.black
+    color: colors.black,
   },
   input: {
     width: '70%',
@@ -30,7 +30,7 @@ export const globalStyles = StyleSheet.create({
     margin: 5,
     padding: 5,
     backgroundColor: colors.lightGray,
-    fontSize: 10
+    fontSize: 10,
   },
   button: {
     backgroundColor: colors.tertiary,
@@ -38,5 +38,5 @@ export const globalStyles = StyleSheet.create({
     margin: 10,
     padding: 5,
     paddingHorizontal: 20,
-  }
+  },
 });
