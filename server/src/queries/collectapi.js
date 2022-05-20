@@ -10,18 +10,18 @@ export function GasPrices(location = 'canada') {
 }
 
 export const mockPrices = [
-  { name: 'Alberta', currency: 'usd', gasoline: '1.61' },
-  { name: 'British Columbia', currency: 'usd', gasoline: '2.10' },
-  { name: 'Manitoba', currency: 'usd', gasoline: '1.79' },
-  { name: 'New Brunswick', currency: 'usd', gasoline: '1.88' },
+  { name: 'Alberta', currency: 'usd', gasoline: '1.70' },
+  { name: 'British Columbia', currency: 'usd', gasoline: '2.23' },
+  { name: 'Manitoba', currency: 'usd', gasoline: '1.87' },
+  { name: 'New Brunswick', currency: 'usd', gasoline: '1.99' },
   {
     name: 'Newfoundland and Labrador',
     currency: 'usd',
-    gasoline: '2.06',
+    gasoline: '2.17',
   },
-  { name: 'Nova Scotia', currency: 'usd', gasoline: '1.92' },
-  { name: 'Ontario', currency: 'usd', gasoline: '1.95' },
-  { name: 'Prince Edward Island', currency: 'usd', gasoline: '1.94' },
-  { name: 'Quebec', currency: 'usd', gasoline: '2.00' },
-  { name: 'Saskatchewan', currency: 'usd', gasoline: '1.78' },
+  { name: 'Nova Scotia', currency: 'usd', gasoline: '2.05' },
+  { name: 'Ontario', currency: 'usd', gasoline: '2.05' },
+  { name: 'Prince Edward Island', currency: 'usd', gasoline: '2.06' },
+  { name: 'Quebec', currency: 'usd', gasoline: '2.13' },
+  { name: 'Saskatchewan', currency: 'usd', gasoline: '1.87' },
 ];

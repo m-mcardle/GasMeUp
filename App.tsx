@@ -9,6 +9,7 @@ import {
   View,
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
 } from 'react-native';
 
 // External Components
@@ -107,7 +108,7 @@ export default function App() {
     });
     fetch(`${serverUrl}/trip-cost/?start=${startLocation}&end=${endLocation}`)
       .then((res) => {
-        if (!res.ok) {
+        if (!res?.ok) {
           throw Error(`Request failed (${res.status})`);
         }
         return res.json();
@@ -132,16 +133,12 @@ export default function App() {
 
     fetch(`${serverUrl}/location/?input=${input}`)
       .then((res) => {
-        if (!res.ok) {
+        if (!res?.ok) {
           throw Error(`Request failed (${res.status})`);
         }
         return res.json();
       })
-      .then((data) => {
-        const newSuggestions = data.predictions.map((el: Prediction) => el.description);
-
-        setSuggestions(newSuggestions);
-      })
+      .then((data) => { console.log(data); setSuggestions(data.predictions); })
       .catch((err) => {
         Alert.alert(err);
       });
@@ -182,7 +179,7 @@ export default function App() {
   }
 
   return (
-    <View style={styles.main}>
+    <KeyboardAvoidingView behavior="padding" style={styles.main}>
       <View style={styles.container}>
         <Text style={styles.title}>CarpoolCalc</Text>
       </View>
@@ -239,6 +236,6 @@ export default function App() {
           <Text>Calculate</Text>
         </Button>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

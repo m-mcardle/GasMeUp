@@ -14,7 +14,11 @@ import { GasCostForDistance } from './src/calculations/fuel';
 
 dotenv.config();
 
-if (process.env.START_TUNNEL) {
+console.log('Start Tunnel:', process.env.START_TUNNEL);
+console.log('CollectAPI Enabled:', process.env.ENABLE_COLLECTAPI_QUERIES);
+console.log('Google Enabled:', process.env.ENABLE_GOOGLE_QUERIES);
+
+if (process.env.START_TUNNEL === 'true') {
   let tunnel;
   (async () => {
     tunnel = await localtunnel({ port: 3001, subdomain: 'carpoolcalc' });
@@ -47,7 +51,7 @@ app.get('/trip-cost', async (req, res) => {
   const endLocation = req.query?.end ?? 'Toronto';
   const province = 'Ontario'; // TODO - This should end up being determined by the user's location
 
-  if (env === 'production' || process.env.ENABLE_GOOGLE_QUERIES) {
+  if (env === 'production' || process.env.ENABLE_GOOGLE_QUERIES === 'true') {
     try {
       // Make request to the Google Distance Matrix API
       const distanceResponse = await api(DistanceMatrix(startLocation, endLocation));
@@ -60,7 +64,7 @@ app.get('/trip-cost', async (req, res) => {
       const distance = data.rows[0].elements[0].distance.value / 1000;
 
       let gasPrice;
-      if (env === 'production' || process.env.ENABLE_COLLECTAPI_QUERIES === true) {
+      if (env === 'production' || process.env.ENABLE_COLLECTAPI_QUERIES === 'true') {
         const priceResponse = await api(GasPrices('canada'));
         console.log(priceResponse.data);
         gasPrice = Number(priceResponse.data?.result.find((el) => el.name === province).gasoline);
@@ -93,7 +97,7 @@ app.get('/trip-cost', async (req, res) => {
 app.get('/location', async (req, res) => {
   const input = req.query?.input ?? 'Toronto';
 
-  if (env === 'production' || process.env.ENABLE_GOOGLE_QUERIES) {
+  if (env === 'production' || process.env.ENABLE_GOOGLE_QUERIES === 'true') {
     try {
       const response = await api(LocationAutocomplete(input));
       const { data } = response;
@@ -103,7 +107,7 @@ app.get('/location', async (req, res) => {
       const { predictions } = data;
       // Probably should filter to only send the description
       res.set('Access-Control-Allow-Origin', '*');
-      res.json({ predictions });
+      res.json({ predictions: predictions.map((el) => el.description) });
     } catch (err) {
       console.log(err);
       res.status(500).send({ error: 'An error occurred' });
