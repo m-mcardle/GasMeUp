@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "An app to make carpooling easier for everyone. A service to easily calculate your due gas-money and split easily to your riders. Just put in your riders, your route, and we will do the rest.",
   "main": "index.js",
-  "type": "module",
   "dependencies": {
     "axios": "^0.27.2",
     "axios-cache-adapter": "^2.7.3",
@@ -11,11 +10,25 @@
     "express": "^4.18.1",
     "localtunnel": "^2.0.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@babel/cli": "^7.17.10",
+    "@babel/core": "^7.18.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.18.0",
+    "@babel/preset-env": "^7.18.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "chai": "^4.3.6",
+    "chai-http": "^4.3.0",
+    "jest": "^28.1.0",
+    "sinon-chai": "^3.7.0",
+    "superagent": "^7.1.3",
+    "supertest": "^6.2.3"
+  },
   "scripts": {
-    "start": "NODE_OPTIONS='--experimental-specifier-resolution=node' nodemon index.js",
+    "start": "nodemon ./src/index.js",
     "tunnel": "lt --port 3001 --subdomain carpoolcalc",
-    "start-full": "NODE_OPTIONS='--experimental-specifier-resolution=node' START_TUNNEL='true' nodemon index.js"
+    "start-full": "NODE_OPTIONS='--experimental-specifier-resolution=node' START_TUNNEL='true' nodemon ./src/index.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "Matthew McArdle",

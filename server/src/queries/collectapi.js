@@ -1,4 +1,4 @@
-export function GasPrices(location = 'canada') {
+function GasPrices(location = 'canada') {
   return {
     method: 'get',
     url: `https://api.collectapi.com/gasPrice/${location}`,
@@ -9,7 +9,7 @@ export function GasPrices(location = 'canada') {
   };
 }
 
-export const mockPrices = [
+const mockPrices = [
   { name: 'Alberta', currency: 'usd', gasoline: '1.70' },
   { name: 'British Columbia', currency: 'usd', gasoline: '2.23' },
   { name: 'Manitoba', currency: 'usd', gasoline: '1.87' },
@@ -25,3 +25,5 @@ export const mockPrices = [
   { name: 'Quebec', currency: 'usd', gasoline: '2.13' },
   { name: 'Saskatchewan', currency: 'usd', gasoline: '1.87' },
 ];
+
+module.exports = { GasPrices, mockPrices };
