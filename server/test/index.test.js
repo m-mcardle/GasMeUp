@@ -17,7 +17,7 @@ describe('Trip cost requests', () => {
 });
 
 describe('Location suggestion requests', () => {
-  const endpoint = '/location';
+  const endpoint = '/suggestions';
   it('should handle request', async () => {
     const searchedInput = 'Toronto';
 
@@ -29,6 +29,7 @@ describe('Location suggestion requests', () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body).not.toBeNull();
+    expect(response.body).toHaveProperty('suggestions');
   });
 });
 
@@ -40,16 +41,18 @@ describe('Distance requests', () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body).not.toBeNull();
+    expect(response.body).toHaveProperty('distance');
   });
 });
 
 describe('Gas price requests', () => {
-  const endpoint = '/gas-price';
+  const endpoint = '/gas-prices';
   it('should handle request', async () => {
     const response = await api
       .get(endpoint);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).not.toBeNull();
+    expect(response.body).toHaveProperty('prices');
   });
 });

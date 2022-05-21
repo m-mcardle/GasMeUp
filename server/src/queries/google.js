@@ -14,6 +14,14 @@ function LocationAutocomplete(input) {
   };
 }
 
+function Directions(startLocation, endLocation) {
+  return {
+    method: 'get',
+    url: `https://maps.googleapis.com/maps/api/directions/json?mode=driving&origin=${startLocation}&destination=${endLocation}&key=${process.env.GOOGLE_API_KEY}`,
+    headers: { },
+  };
+}
+
 const mockTrip = {
   destination_addresses: [
     'Toronto, ON, Canada',
@@ -95,6 +103,7 @@ const mockLocations = {
 module.exports = {
   DistanceMatrix,
   LocationAutocomplete,
+  Directions,
   mockTrip,
   mockLocations,
 };

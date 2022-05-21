@@ -131,7 +131,7 @@ export default function App() {
       return;
     }
 
-    fetch(`${serverUrl}/location/?input=${input}`)
+    fetch(`${serverUrl}/suggestions/?input=${input}`)
       .then((res) => {
         if (!res?.ok) {
           throw Error(`Request failed (${res.status})`);

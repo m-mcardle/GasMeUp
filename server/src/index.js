@@ -7,37 +7,39 @@ const axios = require('axios');
 const pkg = require('axios-cache-adapter');
 
 const {
-  DistanceMatrix,
   LocationAutocomplete,
-  mockTrip,
+  Directions,
   mockLocations,
 } = require('./queries/google');
 const { GasPrices, mockPrices } = require('./queries/collectapi');
 
 const { GasCostForDistance } = require('./calculations/fuel');
 
+const Log = require('./utils/console');
+
 dotenv.config();
 
 const PORT = process.env.PORT || 3001;
 const env = process.env.NODE_ENV || 'development';
 
-if (env === 'development') {
-  console.log('Start Tunnel:', process.env.START_TUNNEL);
-  console.log('CollectAPI Enabled:', process.env.ENABLE_COLLECTAPI_QUERIES);
-  console.log('Google Enabled:', process.env.ENABLE_GOOGLE_QUERIES);
-}
+Log('Start Tunnel:', process.env.START_TUNNEL);
+Log('CollectAPI Enabled:', process.env.ENABLE_COLLECTAPI_QUERIES);
+Log('Google Enabled:', process.env.ENABLE_GOOGLE_QUERIES);
 
-if (process.env.START_TUNNEL === 'true') {
+if (process.env.START_TUNNEL === 'true' && env !== 'test') {
   let tunnel;
   (async () => {
     tunnel = await localtunnel({ port: 3001, subdomain: 'carpoolcalc' });
 
-    console.log('Localtunnel at:,', tunnel.url);
+    Log('Localtunnel at:,', tunnel.url);
     tunnel.on('close', () => {
       // tunnels are closed
     });
   })();
 }
+
+const useGoogleAPI = (process.env.ENABLE_GOOGLE_QUERIES === 'true' || env === 'production');
+const useCollectAPI = (process.env.ENABLE_COLLECTAPI_QUERIES === 'true' || env === 'production');
 
 const { setupCache } = pkg;
 
@@ -51,132 +53,145 @@ const api = axios.create({
   adapter: cache.adapter,
 });
 
+/*
+Axios Request Functions (to Google and CollectAPI)
+*/
+async function GetDistance(startLocation, endLocation) {
+  if (useGoogleAPI) {
+    const response = await api(Directions(startLocation, endLocation));
+
+    const { data } = response;
+    if (data.status !== 'OK') {
+      throw Error(`Invalid Request to Google (${data.status})`);
+    }
+    const distance = data.routes[0].legs[0].distance.value / 1000;
+    return distance;
+  }
+
+  return 10;
+}
+
+async function GetSuggestions(input) {
+  if (useGoogleAPI) {
+    const response = await api(LocationAutocomplete(input));
+    const { data } = response;
+    if (data.status !== 'OK') {
+      throw Error(`Invalid Request to Google (${data.status})`);
+    }
+    const { predictions } = data;
+
+    const suggestions = predictions.map((el) => el.description);
+    return suggestions;
+  }
+
+  return mockLocations.map((el) => el.description);
+}
+
+// If no province is specified all price objects will be returned
+async function GetGasPrice(province) {
+  if (useCollectAPI) {
+    const response = await api(GasPrices('canada'));
+
+    if (response.status !== 200) {
+      throw Error(`Invalid Request to CollectAPI (${response.statusText})`);
+    }
+    const gasPrices = response.data?.result;
+
+    if (province) {
+      const price = Number(gasPrices.find((el) => el.name === province).gasoline);
+      return price;
+    }
+
+    return gasPrices;
+  }
+
+  if (province) {
+    return mockPrices.find((el) => el.name === province);
+  }
+
+  return mockPrices;
+}
+
+/*
+Express API Endpoints
+*/
+
 // Handle GET requests for total gas cost for a trip
 app.get('/trip-cost', async (req, res) => {
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ?? 'Toronto';
   const province = 'Ontario'; // TODO - This should end up being determined by the user's location
 
-  if (env === 'production' || process.env.ENABLE_GOOGLE_QUERIES === 'true') {
-    try {
-      // Make request to the Google Distance Matrix API
-      const distanceResponse = await api(DistanceMatrix(startLocation, endLocation));
-      const { data } = distanceResponse;
-      console.log(data.rows[0].elements[0]);
-
-      if (data?.rows[0]?.elements[0]?.status !== 'OK') {
-        throw Error('Route not found');
-      }
-      const distance = data.rows[0].elements[0].distance.value / 1000;
-
-      let gasPrice;
-      if (env === 'production' || process.env.ENABLE_COLLECTAPI_QUERIES === 'true') {
-        const priceResponse = await api(GasPrices('canada'));
-        console.log(priceResponse.data);
-        gasPrice = Number(priceResponse.data?.result.find((el) => el.name === province).gasoline);
-      } else {
-        // Mock Version:
-        gasPrice = Number(mockPrices[6].gasoline);
-      }
-      console.log(`Distance: ${distance}km and Gas Price: $${gasPrice}`);
-
-      const cost = GasCostForDistance(distance, gasPrice);
-
-      res.set('Access-Control-Allow-Origin', '*');
-      res.json({ cost, distance, gasPrice });
-    } catch (err) {
-      console.log(err);
-      res.status(500).send('An error occurred');
-    }
-  } else {
-    const distance = mockTrip.rows[0].elements[0].distance.value / 1000;
-    const gasPrice = Number(mockPrices[0].gasoline);
+  res.set('Access-Control-Allow-Origin', '*');
+  try {
+    const [distance, gasPrice] = await Promise.all([
+      GetDistance(startLocation, endLocation),
+      GetGasPrice(province),
+    ]);
+    Log(`[trip-cost] Distance: ${distance}km and Gas Price: $${gasPrice}`);
 
     const cost = GasCostForDistance(distance, gasPrice);
-
-    res.set('Access-Control-Allow-Origin', '*');
     res.json({ cost, distance, gasPrice });
+  } catch (exception) {
+    Log(exception);
+    res.status(500).send({ error: exception });
   }
 });
 
-// Handle autocomplete for locations
-app.get('/location', async (req, res) => {
+// Handle autocomplete suggestions for locations
+app.get('/suggestions', async (req, res) => {
   const input = req.query?.input ?? 'Toronto';
 
-  if (env === 'production' || env === 'test' || process.env.ENABLE_GOOGLE_QUERIES === 'true') {
-    try {
-      const response = await api(LocationAutocomplete(input));
-      const { data } = response;
-      if (data.status !== 'OK') {
-        throw Error(`Error: ${data.error_message}`);
-      }
-      const { predictions } = data;
-      res.set('Access-Control-Allow-Origin', '*');
-      res.json({ predictions: predictions.map((el) => el.description) });
-    } catch (err) {
-      console.log(err);
-      res.status(500).send({ error: 'An error occurred' });
-    }
-  } else {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.json(mockLocations);
+  res.set('Access-Control-Allow-Origin', '*');
+  try {
+    const suggestions = await GetSuggestions(input);
+    res.json({ suggestions });
+  } catch (err) {
+    Log(err);
+    res.status(500).send({ error: 'An error occurred' });
   }
 });
 
-// Handle GET requests for distances between two locations
-app.get('/distance', (req, res) => {
+// Handle autocomplete for distances
+app.get('/distance', async (req, res) => {
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ?? 'Toronto';
 
-  if (env === 'production') {
-    // Make request to the Google Distance Matrix API
-    api(DistanceMatrix(startLocation, endLocation))
-      .then((response) => {
-        const { data } = response;
-        console.log(JSON.stringify(data));
-        if (data.status === 'OK') {
-          res.set('Access-Control-Allow-Origin', '*');
-          res.json(data.rows[0].elements[0]);
-        } else {
-          res.status(500).send('An error occurred');
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        res.status(500).send('An error occurred');
-      });
-  } else {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.json(mockTrip.rows[0].elements[0]);
+  res.set('Access-Control-Allow-Origin', '*');
+  try {
+    const distance = await GetDistance(startLocation, endLocation);
+    res.json({ distance });
+  } catch (exception) {
+    res.status(500).send({ error: exception });
   }
 });
 
 // Handle GET requests to /gas-price route, provide list of gas prices of all provinces in Canada
-app.get('/gas-price', (req, res) => {
-  if (env === 'production') {
-    // Api request to fetch gas prices in Canada
-    api(GasPrices('canada'))
-      .then((response) => {
-        console.log(`statusCode: ${response.status}`);
-        console.log(response.data);
-        const gasPrices = response.data?.result;
-        res.set('Access-Control-Allow-Origin', '*');
-        res.json({ prices: gasPrices });
-      })
-      .catch((error) => {
-        console.error(error);
-        res.status(500).send('An error occurred');
-      });
-  } else {
-    // In dev just use mock data to save my limited requests to CollectAPI
-    res.set('Access-Control-Allow-Origin', '*');
-    res.json({ prices: mockPrices });
+app.get('/gas-prices', async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  try {
+    const gasPrices = await GetGasPrice();
+    res.json({ prices: gasPrices });
+  } catch (exception) {
+    res.status(500).send({ error: exception });
+  }
+});
+
+app.get('/gas', async (req, res) => {
+  const province = req.query?.province ?? 'Ontario';
+
+  res.set('Access-Control-Allow-Origin', '*');
+  try {
+    const gasPrice = await GetGasPrice(province);
+    res.json({ price: gasPrice });
+  } catch (exception) {
+    res.status(500).send({ error: exception });
   }
 });
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
-    console.log(`Server listening on ${PORT}`);
+    Log(`Server listening on ${PORT}`);
   });
 }
 
