@@ -20,3 +20,6 @@ The server for this application hosts an api using Express and Node.js. It fetch
 ```
 npm run start
 ```
+
+## Demo Video
+[![CarpoolCalc Thumbnail](https://i9.ytimg.com/vi/f7HYFjZmIgU/mq2.jpg?sqp=CPynpZQG&rs=AOn4CLCPXPHfnRCbJ3IIVczHiyFnU-qSSw)](https://youtube.com/shorts/f7HYFjZmIgU?feature=share)
