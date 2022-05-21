@@ -26,6 +26,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+      env:
+        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        COLLECT_API_KEY: ${{ secrets.COLLECT_API_KEY }}
     - run: npm install
     - run: npm run install-server
     - run: npm run lint
