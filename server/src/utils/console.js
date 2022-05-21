@@ -6,4 +6,8 @@ function Log(...message) {
   }
 }
 
-module.exports = Log;
+function LogError(...message) {
+  console.log(...message);
+}
+
+module.exports = { Log, LogError };

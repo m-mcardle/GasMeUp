@@ -15,7 +15,7 @@ const { GasPrices, mockPrices } = require('./queries/collectapi');
 
 const { GasCostForDistance } = require('./calculations/fuel');
 
-const Log = require('./utils/console');
+const { Log, LogError } = require('./utils/console');
 
 dotenv.config();
 
@@ -84,7 +84,7 @@ async function GetSuggestions(input) {
     return suggestions;
   }
 
-  return mockLocations.map((el) => el.description);
+  return mockLocations.predictions.map((el) => el.description);
 }
 
 // If no province is specified all price objects will be returned
@@ -133,7 +133,7 @@ app.get('/trip-cost', async (req, res) => {
     const cost = GasCostForDistance(distance, gasPrice);
     res.json({ cost, distance, gasPrice });
   } catch (exception) {
-    Log(exception);
+    LogError(exception);
     res.status(500).send({ error: exception });
   }
 });
@@ -147,7 +147,7 @@ app.get('/suggestions', async (req, res) => {
     const suggestions = await GetSuggestions(input);
     res.json({ suggestions });
   } catch (err) {
-    Log(err);
+    LogError(err);
     res.status(500).send({ error: 'An error occurred' });
   }
 });
@@ -173,6 +173,7 @@ app.get('/gas-prices', async (req, res) => {
     const gasPrices = await GetGasPrice();
     res.json({ prices: gasPrices });
   } catch (exception) {
+    LogError(exception);
     res.status(500).send({ error: exception });
   }
 });
@@ -185,6 +186,7 @@ app.get('/gas', async (req, res) => {
     const gasPrice = await GetGasPrice(province);
     res.json({ price: gasPrice });
   } catch (exception) {
+    LogError(exception);
     res.status(500).send({ error: exception });
   }
 });
