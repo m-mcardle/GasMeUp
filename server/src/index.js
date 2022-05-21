@@ -1,22 +1,31 @@
-import dotenv from 'dotenv';
+const dotenv = require('dotenv');
+const express = require('express');
 
-import localtunnel from 'localtunnel';
+const localtunnel = require('localtunnel');
 
-import express from 'express';
+const axios = require('axios');
+const pkg = require('axios-cache-adapter');
 
-import axios from 'axios';
-import pkg from 'axios-cache-adapter';
+const {
+  DistanceMatrix,
+  LocationAutocomplete,
+  mockTrip,
+  mockLocations,
+} = require('./queries/google');
+const { GasPrices, mockPrices } = require('./queries/collectapi');
 
-import { DistanceMatrix, LocationAutocomplete, mockTrip } from './src/queries/google';
-import { GasPrices, mockPrices } from './src/queries/collectapi';
-
-import { GasCostForDistance } from './src/calculations/fuel';
+const { GasCostForDistance } = require('./calculations/fuel');
 
 dotenv.config();
 
-console.log('Start Tunnel:', process.env.START_TUNNEL);
-console.log('CollectAPI Enabled:', process.env.ENABLE_COLLECTAPI_QUERIES);
-console.log('Google Enabled:', process.env.ENABLE_GOOGLE_QUERIES);
+const PORT = process.env.PORT || 3001;
+const env = process.env.NODE_ENV || 'development';
+
+if (env === 'development') {
+  console.log('Start Tunnel:', process.env.START_TUNNEL);
+  console.log('CollectAPI Enabled:', process.env.ENABLE_COLLECTAPI_QUERIES);
+  console.log('Google Enabled:', process.env.ENABLE_GOOGLE_QUERIES);
+}
 
 if (process.env.START_TUNNEL === 'true') {
   let tunnel;
@@ -31,9 +40,6 @@ if (process.env.START_TUNNEL === 'true') {
 }
 
 const { setupCache } = pkg;
-
-const PORT = process.env.PORT || 3001;
-const env = process.env.NODE_ENV || 'development';
 
 const app = express();
 
@@ -89,7 +95,7 @@ app.get('/trip-cost', async (req, res) => {
     const cost = GasCostForDistance(distance, gasPrice);
 
     res.set('Access-Control-Allow-Origin', '*');
-    res.json({ cost });
+    res.json({ cost, distance, gasPrice });
   }
 });
 
@@ -97,7 +103,7 @@ app.get('/trip-cost', async (req, res) => {
 app.get('/location', async (req, res) => {
   const input = req.query?.input ?? 'Toronto';
 
-  if (env === 'production' || process.env.ENABLE_GOOGLE_QUERIES === 'true') {
+  if (env === 'production' || env === 'test' || process.env.ENABLE_GOOGLE_QUERIES === 'true') {
     try {
       const response = await api(LocationAutocomplete(input));
       const { data } = response;
@@ -105,7 +111,6 @@ app.get('/location', async (req, res) => {
         throw Error(`Error: ${data.error_message}`);
       }
       const { predictions } = data;
-      // Probably should filter to only send the description
       res.set('Access-Control-Allow-Origin', '*');
       res.json({ predictions: predictions.map((el) => el.description) });
     } catch (err) {
@@ -113,12 +118,13 @@ app.get('/location', async (req, res) => {
       res.status(500).send({ error: 'An error occurred' });
     }
   } else {
-    res.status(500).send({ error: 'No mock data to supply' });
+    res.set('Access-Control-Allow-Origin', '*');
+    res.json(mockLocations);
   }
 });
 
 // Handle GET requests for distances between two locations
-app.get('/distances', (req, res) => {
+app.get('/distance', (req, res) => {
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ?? 'Toronto';
 
@@ -145,8 +151,8 @@ app.get('/distances', (req, res) => {
   }
 });
 
-// Handle GET requests to /gas-prices route, provide list of gas prices of all provinces in Canada
-app.get('/gas-prices', (req, res) => {
+// Handle GET requests to /gas-price route, provide list of gas prices of all provinces in Canada
+app.get('/gas-price', (req, res) => {
   if (env === 'production') {
     // Api request to fetch gas prices in Canada
     api(GasPrices('canada'))
@@ -164,10 +170,14 @@ app.get('/gas-prices', (req, res) => {
   } else {
     // In dev just use mock data to save my limited requests to CollectAPI
     res.set('Access-Control-Allow-Origin', '*');
-    res.json(mockPrices);
+    res.json({ prices: mockPrices });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server listening on ${PORT}`);
+  });
+}
+
+module.exports = app;

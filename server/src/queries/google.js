@@ -1,4 +1,4 @@
-export function DistanceMatrix(startLocation, endLocation) {
+function DistanceMatrix(startLocation, endLocation) {
   return {
     method: 'get',
     url: `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${startLocation}&destinations=${endLocation}&units=metric&key=${process.env.GOOGLE_API_KEY}`,
@@ -6,7 +6,7 @@ export function DistanceMatrix(startLocation, endLocation) {
   };
 }
 
-export function LocationAutocomplete(input) {
+function LocationAutocomplete(input) {
   return {
     method: 'get',
     url: `https://maps.googleapis.com/maps/api/place/queryautocomplete/json?input=${input}&key=${process.env.GOOGLE_API_KEY}`,
@@ -14,7 +14,7 @@ export function LocationAutocomplete(input) {
   };
 }
 
-export const mockTrip = {
+const mockTrip = {
   destination_addresses: [
     'Toronto, ON, Canada',
   ],
@@ -41,7 +41,7 @@ export const mockTrip = {
   status: 'OK',
 };
 
-export const mockLocations = {
+const mockLocations = {
   predictions: [
     {
       description: 'Cancún, Quintana Roo, Mexico',
@@ -90,4 +90,11 @@ export const mockLocations = {
     },
   ],
   status: 'OK',
+};
+
+module.exports = {
+  DistanceMatrix,
+  LocationAutocomplete,
+  mockTrip,
+  mockLocations,
 };

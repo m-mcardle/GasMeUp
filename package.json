@@ -12,8 +12,9 @@
     "eject": "expo eject",
     "lint": "npx eslint './src/' 'App.tsx'",
     "lint-client": "npx eslint './src/' 'App.tsx'",
-    "lint-server": "npx eslint './server/src/' './server/index.js'",
-    "install-server": "cd server && npm install"
+    "lint-server": "npx eslint './server/src/'",
+    "install-server": "cd server && npm install",
+    "test-server": "cd server && npm test"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.2.2",
