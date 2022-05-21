@@ -20,15 +20,17 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
+    - name: create env file
+      run: |
+        touch ./server/.env
+        echo GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }} >> ./server/.env
+        echo COLLECT_API_KEY=${{ secrets.COLLECT_API_KEY }} >> ./server/.env
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-      env:
-        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-        COLLECT_API_KEY: ${{ secrets.COLLECT_API_KEY }}
     - run: npm install
     - run: npm run install-server
     - run: npm run lint
