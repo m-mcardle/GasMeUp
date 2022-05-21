@@ -138,7 +138,7 @@ export default function App() {
         }
         return res.json();
       })
-      .then((data) => { console.log(data); setSuggestions(data.predictions); })
+      .then((data) => setSuggestions(data.suggestions))
       .catch((err) => {
         Alert.alert(err);
       });

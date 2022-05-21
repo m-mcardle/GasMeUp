@@ -33,7 +33,9 @@ export const globalStyles = StyleSheet.create({
     fontSize: 10,
   },
   button: {
-    backgroundColor: colors.tertiary,
+    backgroundColor: colors.lightGray,
+    borderColor: colors.black,
+    borderWidth: 1,
     borderRadius: 5,
     margin: 10,
     padding: 5,

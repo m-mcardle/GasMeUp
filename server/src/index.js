@@ -106,7 +106,7 @@ async function GetGasPrice(province) {
   }
 
   if (province) {
-    return mockPrices.find((el) => el.name === province);
+    return Number(mockPrices.find((el) => el.name === province).gasoline);
   }
 
   return mockPrices;
