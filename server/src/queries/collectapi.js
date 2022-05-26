@@ -1,7 +1,7 @@
 function GasPrices(location = 'canada') {
   return {
     method: 'get',
-    url: `https://api.collectapi.com/gasPrice/${location}`,
+    url: encodeURI(`https://api.collectapi.com/gasPrice/${location}`),
     headers: {
       'content-type': 'application/json',
       authorization: `apikey ${process.env.COLLECT_API_KEY}`,

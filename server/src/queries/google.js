@@ -1,23 +1,22 @@
 function DistanceMatrix(startLocation, endLocation) {
   return {
     method: 'get',
-    url: `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${startLocation}&destinations=${endLocation}&units=metric&key=${process.env.GOOGLE_API_KEY}`,
+    url: encodeURI(`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${startLocation}&destinations=${endLocation}&units=metric&key=${process.env.GOOGLE_API_KEY}`),
     headers: { },
   };
 }
 
-function LocationAutocomplete(input) {
+function LocationAutocomplete(input, sessionId) {
   return {
     method: 'get',
-    url: `https://maps.googleapis.com/maps/api/place/queryautocomplete/json?input=${input}&key=${process.env.GOOGLE_API_KEY}`,
-    headers: { },
+    url: encodeURI(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&key=${process.env.GOOGLE_API_KEY}&sessiontoken=${sessionId}`),
   };
 }
 
 function Directions(startLocation, endLocation) {
   return {
     method: 'get',
-    url: `https://maps.googleapis.com/maps/api/directions/json?mode=driving&origin=${startLocation}&destination=${endLocation}&key=${process.env.GOOGLE_API_KEY}`,
+    url: encodeURI(`https://maps.googleapis.com/maps/api/directions/json?mode=driving&origin=${startLocation}&destination=${endLocation}&key=${process.env.GOOGLE_API_KEY}`),
     headers: { },
   };
 }
