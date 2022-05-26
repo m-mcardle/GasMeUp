@@ -1,9 +1,9 @@
 import { StyleSheet } from 'react-native';
 
 export const colors = {
-  primary: '#CCCCCC',
-  secondary: '#DDDDDD',
-  tertiary: '#29A8AB',
+  primary: '#FFFBFE',
+  secondary: '#12130F',
+  tertiary: '#8FCB9B',
   darkestGray: '#BBBBBB',
   darkGray: '#CCCCCC',
   gray: '#DDDDDD',
@@ -14,31 +14,51 @@ export const colors = {
   red: '#DC143C',
 };
 
-export const font = 'Gotham-Black';
-export const italicFont = 'Gotham-ThinItalic';
+export const fonts = {
+  300: 'Rubik_300Light',
+  400: 'Rubik_400Regular',
+  500: 'Rubik_500Medium',
+  600: 'Rubik_600SemiBold',
+  700: 'Rubik_700Bold',
+  800: 'Rubik_800ExtraBold',
+  900: 'Rubik_900Black',
+  i300: 'Rubik_300Light_Italic',
+  i400: 'Rubik_400Regular_Italic',
+  i500: 'Rubik_500Medium_Italic',
+  i600: 'Rubik_600SemiBold_Italic',
+  i700: 'Rubik_700Bold_Italic',
+  i800: 'Rubik_800ExtraBold_Italic',
+  i900: 'Rubik_900Black_Italic',
+};
+
+export const font = fonts[400];
+export const italicFont = fonts.i400;
+export const boldFont = fonts[700];
+export const semiBoldFont = fonts[600];
 
 export const globalStyles = StyleSheet.create({
   text: {
     fontFamily: font,
-    color: colors.black,
+    color: colors.secondary,
   },
   input: {
-    width: '70%',
+    width: '75%',
     fontFamily: font,
     borderWidth: 1,
     borderRadius: 5,
     margin: 5,
-    padding: 5,
-    backgroundColor: colors.lightGray,
+    padding: 10,
+    backgroundColor: colors.tertiary,
     fontSize: 10,
   },
   button: {
-    backgroundColor: colors.lightGray,
-    borderColor: colors.black,
+    backgroundColor: colors.secondary,
+    borderColor: colors.primary,
+    color: colors.primary,
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 25,
     margin: 10,
-    padding: 5,
-    paddingHorizontal: 20,
+    padding: 10,
+    paddingHorizontal: 60,
   },
 });

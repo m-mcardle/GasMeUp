@@ -1,241 +1,81 @@
 // Expo imports
-import AppLoading from 'expo-app-loading';
-import { useFonts } from 'expo-font';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 // React imports
-import { useCallback, useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  ActivityIndicator,
-  Alert,
-  KeyboardAvoidingView,
-} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-// External Components
-import NumericInput from 'react-native-numeric-input';
-
-// Components
-import Text from './src/components/Text';
-import Button from './src/components/Button';
-import Input from './src/components/Input';
-import SuggestionsSection from './src/components/SuggestionSelection';
+// Screens
+import HomeScreen from './src/screens/HomeScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 
 // Styles
 import { colors } from './src/styles/styles';
 
-// Fonts
-// @ts-ignore
-import Font from './assets/fonts/Gotham-Black.otf';
-// @ts-ignore
-import ItalicFont from './assets/fonts/Gotham-ThinItalic.otf';
+const Tab = createBottomTabNavigator();
 
-const serverUrl = 'http://carpoolcalc.loca.lt';
-
-enum ActiveInput {
-  none,
-  start,
-  end,
+interface TabIconProps {
+  name: string,
+  focused: boolean,
+  color: string,
+  size: number
 }
 
-// Styles
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 60,
-  },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  main: {
-    flex: 1,
-    paddingVertical: 20,
-    backgroundColor: colors.darkestGray,
-  },
-  costSection: {
-    width: '70%',
-    backgroundColor: colors.green,
-    borderRadius: 5,
-    margin: 10,
-    padding: 5,
-  },
-  costText: {
-    fontSize: 52,
-    textAlign: 'center',
-  },
-  statsSection: {
-    flexDirection: 'row',
-    width: '70%',
-    justifyContent: 'space-evenly',
-    backgroundColor: colors.gray,
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 5,
-    marginBottom: 10,
-  },
-  dataContainer: {
-    flex: 2,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  ridersSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '70%',
-    justifyContent: 'space-around',
-    backgroundColor: colors.gray,
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 5,
-  },
-});
+function TabIcon({
+  name,
+  focused,
+  color,
+  size,
+} : TabIconProps) {
+  let iconName: 'ios-home' | 'ios-home-outline' | 'ios-settings' | 'ios-settings-outline' | 'ios-square' | 'ios-people' | 'ios-people-outline' = 'ios-square';
 
-export default function App() {
-  const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.none);
-  const [{
-    cost, distance, gasPrice, loading,
-  }, setCostRequest] = useState<CostRequest>({
-    loading: false, cost: 0, distance: 0, gasPrice: 0,
-  });
-  const [suggestions, setSuggestions] = useState<Array<string>>([]);
-  const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
-  const [riders, setRiders] = useState<number>(1);
-
-  const submit = useCallback(() => {
-    setCostRequest({
-      loading: true, cost: 0, distance: 0, gasPrice: 0,
-    });
-    fetch(`${serverUrl}/trip-cost/?start=${startLocation}&end=${endLocation}`)
-      .then((res) => {
-        if (!res?.ok) {
-          throw Error(`Request failed (${res.status})`);
-        }
-        return res.json();
-      })
-      .then((data) => setCostRequest({
-        loading: false, cost: data.cost, distance: data.distance, gasPrice: data.gasPrice,
-      }))
-      .catch((err) => {
-        Alert.alert(err);
-        setCostRequest({
-          loading: false, cost: 0, distance: 0, gasPrice: 0,
-        });
-      });
-  }, [startLocation, endLocation]);
-
-  const updateSuggestions = useCallback((input: string) => {
-    // If empty then just clear the suggestions
-    if (!input) {
-      setSuggestions([]);
-      return;
-    }
-
-    fetch(`${serverUrl}/suggestions/?input=${input}`)
-      .then((res) => {
-        if (!res?.ok) {
-          throw Error(`Request failed (${res.status})`);
-        }
-        return res.json();
-      })
-      .then((data) => setSuggestions(data.suggestions))
-      .catch((err) => {
-        Alert.alert(err);
-      });
-  }, []);
-
-  const updateStartLocation = (input: string) => {
-    setLocations((state) => ({ ...state, startLocation: input }));
-    updateSuggestions(input);
-  };
-
-  const updateEndLocation = (input: string) => {
-    setLocations((state) => ({ ...state, endLocation: input }));
-    updateSuggestions(input);
-  };
-
-  const setInputToPickedLocation = (item: string) => {
-    if (activeInput === ActiveInput.start) {
-      setLocations((state) => ({ ...state, startLocation: item }));
-      setSuggestions([]);
-    } else if (activeInput === ActiveInput.end) {
-      setLocations((state) => ({ ...state, endLocation: item }));
-      setSuggestions([]);
-    }
-  };
-
-  const changeActiveInput = (input: ActiveInput) => {
-    setSuggestions([]);
-    setActiveInput(input);
-  };
-
-  const [fontsLoaded] = useFonts({
-    'Gotham-Black': Font,
-    'Gotham-ThinItalic': ItalicFont,
-  });
-
-  if (!fontsLoaded) {
-    return <AppLoading />;
+  switch (name) {
+    case 'Home':
+      iconName = focused
+        ? 'ios-home'
+        : 'ios-home-outline';
+      break;
+    case 'Settings':
+      iconName = focused
+        ? 'ios-settings'
+        : 'ios-settings-outline';
+      break;
+    case 'Friends':
+      iconName = focused
+        ? 'ios-people'
+        : 'ios-people-outline';
+      break;
+    default:
+      iconName = 'ios-square';
   }
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.main}>
-      <View style={styles.container}>
-        <Text style={styles.title}>CarpoolCalc</Text>
-      </View>
-      <View style={styles.dataContainer}>
-        <View style={styles.costSection}>
-          {loading
-            ? <ActivityIndicator size="large" />
-            : (
-              <Text style={styles.costText}>
-                $
-                {(cost / riders).toFixed(2)}
-              </Text>
-            )}
-        </View>
-        <View style={styles.statsSection}>
-          <Text>
-            {distance.toFixed(2)}
-            km
-          </Text>
-          <Text>
-            $
-            {gasPrice.toFixed(2)}
-            /L
-          </Text>
-        </View>
-        <View style={styles.ridersSection}>
-          <Text>Riders:</Text>
-          <NumericInput
-            rounded
-            totalHeight={30}
-            totalWidth={120}
-            containerStyle={{ backgroundColor: 'white' }}
-            minValue={1}
-            leftButtonBackgroundColor={colors.lightGray}
-            rightButtonBackgroundColor={colors.darkestGray}
-            value={riders}
-            onChange={setRiders}
-          />
-        </View>
-        <Input
-          placeholder="Start location"
-          onChangeText={updateStartLocation}
-          onPressOut={() => changeActiveInput(ActiveInput.start)}
-          value={startLocation}
-        />
-        <Input
-          placeholder="End location"
-          onChangeText={updateEndLocation}
-          onPressOut={() => changeActiveInput(ActiveInput.end)}
-          value={endLocation}
-        />
-        <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-        <Button onPress={submit}>
-          <Text>Calculate</Text>
-        </Button>
-      </View>
-    </KeyboardAvoidingView>
+    <Ionicons name={iconName} size={size} color={color} />
+  );
+}
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Tab.Navigator
+        initialRouteName="Home"
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => TabIcon(
+            {
+              name: route.name,
+              focused,
+              color,
+              size,
+            },
+          ),
+          tabBarActiveTintColor: colors.tertiary,
+          tabBarInactiveTintColor: colors.secondary,
+        })}
+      >
+        <Tab.Screen name="Friends" component={SettingsScreen} />
+        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Settings" component={SettingsScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }

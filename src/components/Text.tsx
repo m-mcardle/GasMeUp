@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-props-no-spreading */
+
 import { ReactNode } from 'react';
 import { Text, TextStyle } from 'react-native';
 
@@ -8,13 +10,25 @@ import { globalStyles } from '../styles/styles';
 interface Props {
   children?: ReactNode[] | ReactNode,
   style?: object,
-  onPress?: () => void
+  onPress?: () => void,
+  numberOfLines?: number,
 }
 
 export default function AppText(props: Props) {
-  const { children, style, onPress } = props;
+  const {
+    children,
+    style,
+    numberOfLines,
+    onPress,
+  } = props;
+
   return (
-    <Text style={[globalStyles.text, style]} onPress={onPress}>
+    <Text
+      {...props}
+      style={[globalStyles.text, style]}
+      onPress={onPress}
+      numberOfLines={numberOfLines}
+    >
       {children}
     </Text>
   );
@@ -31,4 +45,5 @@ AppText.defaultProps = {
   onPress: undefined,
   children: undefined,
   style: undefined,
+  numberOfLines: undefined,
 };

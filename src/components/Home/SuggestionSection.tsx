@@ -1,8 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 
-import Text from './Text';
+import Text from '../Text';
 
-import { italicFont } from '../styles/styles';
+import { colors, italicFont } from '../../styles/styles';
 
 interface Props {
   items: Array<string>,
@@ -13,8 +13,8 @@ const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
     borderRadius: 5,
-    width: '70%',
-    backgroundColor: 'white',
+    width: '75%',
+    backgroundColor: colors.tertiary,
     margin: 5,
     padding: 5,
   },
@@ -25,6 +25,10 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: italicFont,
   },
+  text: {
+    fontSize: 10,
+    padding: 5,
+  },
 });
 
 export default function SuggestionsSection(props: Props) {
@@ -34,7 +38,12 @@ export default function SuggestionsSection(props: Props) {
     <View style={styles.container}>
       {items?.length > 0
         ? items.map((el) => (
-          <Text style={{ fontSize: 10 }} key={el} onPress={() => onSelect(el)}>
+          <Text
+            style={styles.text}
+            key={el}
+            onPress={() => onSelect(el)}
+            numberOfLines={1}
+          >
             {el}
           </Text>
         ))
