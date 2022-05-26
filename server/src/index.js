@@ -31,7 +31,7 @@ if (process.env.START_TUNNEL === 'true' && env !== 'test') {
   (async () => {
     tunnel = await localtunnel({ port: 3001, subdomain: 'carpoolcalc' });
 
-    Log('Localtunnel at:,', tunnel.url);
+    Log('Localtunnel at:', tunnel.url);
     tunnel.on('close', () => {
       // tunnels are closed
     });
@@ -47,6 +47,10 @@ const app = express();
 
 const cache = setupCache({
   maxAge: 24 * 60 * 60 * 1000,
+  exclude: {
+    // Store responses from requests with query parameters in cache
+    query: false,
+  },
 });
 
 const api = axios.create({
@@ -71,9 +75,10 @@ async function GetDistance(startLocation, endLocation) {
   return 10;
 }
 
-async function GetSuggestions(input) {
+async function GetSuggestions(input, sessionId) {
   if (useGoogleAPI) {
-    const response = await api(LocationAutocomplete(input));
+    const response = await api(LocationAutocomplete(input, sessionId));
+
     const { data } = response;
     if (data.status !== 'OK') {
       throw Error(`Invalid Request to Google (${data.status})`);
@@ -141,10 +146,10 @@ app.get('/trip-cost', async (req, res) => {
 // Handle autocomplete suggestions for locations
 app.get('/suggestions', async (req, res) => {
   const input = req.query?.input ?? 'Toronto';
-
+  const sessionId = req.query?.session;
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const suggestions = await GetSuggestions(input);
+    const suggestions = await GetSuggestions(input, sessionId);
     res.json({ suggestions });
   } catch (err) {
     LogError(err);

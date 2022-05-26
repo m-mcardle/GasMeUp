@@ -22,4 +22,4 @@ npm run start
 ```
 
 ## Demo Video
-[![CarpoolCalc Thumbnail](https://i9.ytimg.com/vi/f7HYFjZmIgU/mq2.jpg?sqp=CPynpZQG&rs=AOn4CLCPXPHfnRCbJ3IIVczHiyFnU-qSSw)](https://youtube.com/shorts/f7HYFjZmIgU?feature=share)
+[![CarpoolCalc Thumbnail](https://i.ytimg.com/vi/f7HYFjZmIgU/hqdefault.jpg)](https://youtube.com/shorts/f7HYFjZmIgU?feature=share)
