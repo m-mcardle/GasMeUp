@@ -53,7 +53,7 @@ import StatsSection from '../components/Home/StatsSection';
 
 // Styles
 import { colors } from '../styles/styles';
-import styles from '../styles/App.styles';
+import styles from '../styles/HomeScreen.styles';
 
 const serverUrl = 'http://carpoolcalc.loca.lt';
 

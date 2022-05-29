@@ -14,7 +14,7 @@ To publicly host the api for this server run:
 lt --port 3001 --subdomain carpoolcalc
 ```
 
-To star the Node server run:
+To start the Node server run:
 ```
 npm run start
 ```
