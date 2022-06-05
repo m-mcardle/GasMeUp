@@ -17,7 +17,7 @@ interface Props {
 
 export default function StatsSection(props: Props) {
   const {
-    loading, cost, riders, distance, gasPrice,
+    loading, cost = 0, riders = 0, distance = 0, gasPrice = 0,
   } = props;
 
   return (

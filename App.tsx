@@ -68,6 +68,7 @@ export default function App() {
               size,
             },
           ),
+          headerShown: false,
           tabBarActiveTintColor: colors.tertiary,
           tabBarInactiveTintColor: colors.secondary,
         })}

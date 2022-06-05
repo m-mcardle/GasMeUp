@@ -6,18 +6,22 @@ const localtunnel = require('localtunnel');
 const axios = require('axios');
 const pkg = require('axios-cache-adapter');
 
+const jsdom = require('jsdom');
+
 const {
   LocationAutocomplete,
   Directions,
   mockLocations,
 } = require('./queries/google');
 const { GasPrices, mockPrices } = require('./queries/collectapi');
+const { FetchWebpage, RetreiveAllPrices, RetrieveProvincePrice } = require('./queries/caa');
 
 const { GasCostForDistance } = require('./calculations/fuel');
 
 const { Log, LogError } = require('./utils/console');
 
 dotenv.config();
+const { JSDOM } = jsdom;
 
 const PORT = process.env.PORT || 3001;
 const env = process.env.NODE_ENV || 'development';
@@ -40,6 +44,7 @@ if (process.env.START_TUNNEL === 'true' && env !== 'test') {
 
 const useGoogleAPI = (process.env.ENABLE_GOOGLE_QUERIES === 'true' || env === 'production');
 const useCollectAPI = (process.env.ENABLE_COLLECTAPI_QUERIES === 'true' || env === 'production');
+const useCAAAPI = (process.env.ENABLE_CAA_QUERIES || env === 'production');
 
 const { setupCache } = pkg;
 
@@ -93,6 +98,8 @@ async function GetSuggestions(input, sessionId) {
 }
 
 // If no province is specified all price objects will be returned
+// Deprechiated - API no longer supported
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function GetGasPrice(province) {
   if (useCollectAPI) {
     const response = await api(GasPrices('canada'));
@@ -117,6 +124,31 @@ async function GetGasPrice(province) {
   return mockPrices;
 }
 
+// If no province is specified all price objects will be returned
+async function GetGasPriceV2(province) {
+  if (useCAAAPI) {
+    const response = await api(FetchWebpage());
+
+    const { data } = response;
+    const dom = new JSDOM(data);
+    const { document } = dom.window;
+
+    if (province) {
+      const price = RetrieveProvincePrice(document, province);
+      return price;
+    }
+
+    const prices = RetreiveAllPrices(document);
+    return prices;
+  }
+
+  if (province) {
+    return Number(mockPrices.find((el) => el.name === province).gasoline);
+  }
+
+  return mockPrices;
+}
+
 /*
 Express API Endpoints
 */
@@ -131,7 +163,7 @@ app.get('/trip-cost', async (req, res) => {
   try {
     const [distance, gasPrice] = await Promise.all([
       GetDistance(startLocation, endLocation),
-      GetGasPrice(province),
+      GetGasPriceV2(province),
     ]);
     Log(`[trip-cost] Distance: ${distance}km and Gas Price: $${gasPrice}`);
 
@@ -175,7 +207,7 @@ app.get('/distance', async (req, res) => {
 app.get('/gas-prices', async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const gasPrices = await GetGasPrice();
+    const gasPrices = await GetGasPriceV2();
     res.json({ prices: gasPrices });
   } catch (exception) {
     LogError(exception);
@@ -188,7 +220,7 @@ app.get('/gas', async (req, res) => {
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const gasPrice = await GetGasPrice(province);
+    const gasPrice = await GetGasPriceV2(province);
     res.json({ price: gasPrice });
   } catch (exception) {
     LogError(exception);
