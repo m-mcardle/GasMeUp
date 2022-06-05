@@ -9,6 +9,8 @@ const api = axios.create();
 describe('CAA requests', () => {
   describe('webpage', () => {
     let response;
+    jest.setTimeout(7000);
+
     beforeAll(async () => {
       response = await api(FetchWebpage());
     });
