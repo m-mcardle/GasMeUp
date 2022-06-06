@@ -4,6 +4,7 @@ const app = require('../src/index');
 const api = supertest(app);
 
 describe('Trip cost requests', () => {
+  jest.setTimeout(10000);
   const endpoint = '/trip-cost';
   it('should handle request', async () => {
     const response = await api
@@ -46,6 +47,7 @@ describe('Distance requests', () => {
 });
 
 describe('Gas price requests', () => {
+  jest.setTimeout(10000);
   const endpoint = '/gas-prices';
   it('should handle request', async () => {
     const response = await api
