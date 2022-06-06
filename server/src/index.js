@@ -23,7 +23,6 @@ const PORT = process.env.PORT || 3001;
 const env = process.env.NODE_ENV || 'development';
 
 Log('Start Tunnel:', process.env.START_TUNNEL);
-Log('CollectAPI Enabled:', process.env.ENABLE_COLLECTAPI_QUERIES);
 Log('Google Enabled:', process.env.ENABLE_GOOGLE_QUERIES);
 
 if (process.env.START_TUNNEL === 'true' && env !== 'test') {
