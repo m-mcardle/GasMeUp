@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     color: colors.primary,
     padding: 5,
-    marginBottom: 30,
+    marginBottom: 15,
   },
   statsSection: {
     flexDirection: 'column',
