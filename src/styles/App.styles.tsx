@@ -10,6 +10,11 @@ const styles = StyleSheet.create({
     fontSize: 60,
     fontFamily: boldFont,
   },
+  heading: {
+    fontSize: 18,
+    fontFamily: boldFont,
+    textAlign: 'center',
+  },
   container: {
     flex: 1,
     alignItems: 'center',

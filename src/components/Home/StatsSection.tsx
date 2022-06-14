@@ -13,11 +13,17 @@ interface Props {
   riders: number,
   distance: number,
   gasPrice: number,
+  openModal: () => void,
 }
 
 export default function StatsSection(props: Props) {
   const {
-    loading, cost = 0, riders = 0, distance = 0, gasPrice = 0,
+    loading,
+    cost = 0,
+    riders = 0,
+    distance = 0,
+    gasPrice = 0,
+    openModal,
   } = props;
 
   return (
@@ -40,7 +46,9 @@ export default function StatsSection(props: Props) {
           <Text style={styles.statBoxText}>
             {`Gas: $${gasPrice.toFixed(2)}/L`}
           </Text>
-          <Image source={AdjustIcon} style={styles.adjustButton} />
+          <View onTouchEnd={() => openModal()}>
+            <Image source={AdjustIcon} style={styles.adjustButton} />
+          </View>
         </View>
       </View>
     </View>

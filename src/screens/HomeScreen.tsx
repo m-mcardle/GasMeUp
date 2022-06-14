@@ -37,7 +37,6 @@ import {
   View,
   Alert,
   KeyboardAvoidingView,
-  Modal,
   Keyboard,
 } from 'react-native';
 
@@ -53,6 +52,7 @@ import Input from '../components/Input';
 
 import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
+import DataModal from '../components/Home/DataModal';
 
 // Styles
 import { colors } from '../styles/styles';
@@ -88,6 +88,10 @@ export default function HomeScreen() {
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
   const [riders, setRiders] = useState<number>(1);
   const [visible, setVisible] = useState<boolean>(false);
+
+  const setGasPrice = (newPrice: number) => {
+    setCostRequest((state) => ({ ...state, gasPrice: newPrice }));
+  };
 
   const submit = useCallback(() => {
     Keyboard.dismiss();
@@ -185,42 +189,14 @@ export default function HomeScreen() {
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.main}>
-      <Modal
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: 22,
-        }}
-        animationType="slide"
-        transparent
+      <DataModal
         visible={visible}
-        // onRequestClose={() => {
-        //   Alert.alert("Modal has been closed.");
-        //   setModalVisible(!modalVisible);
-        // }}
-      >
-        <View
-          style={{
-            margin: 20,
-            backgroundColor: 'white',
-            borderRadius: 20,
-            padding: 35,
-            alignItems: 'center',
-            shadowColor: '#000',
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-          }}
-        >
-          <Text>Hello world!</Text>
-          <Button onPress={() => setVisible(false)} />
-        </View>
-      </Modal>
+        setVisible={setVisible}
+        data={gasPrice}
+        setData={setGasPrice}
+      />
       <View style={styles.container}>
         <Text style={styles.title}>CarpoolCalc</Text>
-        <Button onPress={() => setVisible(true)} />
       </View>
       <View style={styles.dataContainer}>
         <StatsSection
@@ -229,6 +205,7 @@ export default function HomeScreen() {
           riders={riders}
           distance={distance}
           gasPrice={gasPrice}
+          openModal={() => setVisible(true)}
         />
         <View style={styles.ridersSection}>
           <Text style={styles.ridersText}>Riders:</Text>
