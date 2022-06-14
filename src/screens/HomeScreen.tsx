@@ -7,6 +7,7 @@
 * Highway vs City driving
 * User management / Friends
 * Navigation Bar
+* Add clear button to Input component
 *
 */
 
@@ -37,6 +38,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Modal,
+  Keyboard,
 } from 'react-native';
 
 // External Components
@@ -88,6 +90,7 @@ export default function HomeScreen() {
   const [visible, setVisible] = useState<boolean>(false);
 
   const submit = useCallback(() => {
+    Keyboard.dismiss();
     setCostRequest({
       loading: true, cost: 0, distance: 0, gasPrice: 0,
     });
