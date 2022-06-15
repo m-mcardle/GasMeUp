@@ -88,6 +88,7 @@ export default function HomeScreen() {
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
   const [riders, setRiders] = useState<number>(1);
   const [visible, setVisible] = useState<boolean>(false);
+  const [customGasPrice, setCustomGasPrice] = useState<boolean>(false);
 
   const setGasPrice = (newPrice: number) => {
     setCostRequest((state) => ({ ...state, gasPrice: newPrice }));
@@ -98,7 +99,9 @@ export default function HomeScreen() {
     setCostRequest({
       loading: true, cost: 0, distance: 0, gasPrice: 0,
     });
-    fetch(`${serverUrl}/trip-cost/?start=${startLocation}&end=${endLocation}`)
+
+    const extraParams = (customGasPrice && gasPrice) ? `&price=${gasPrice}` : '';
+    fetch(`${serverUrl}/trip-cost/?start=${startLocation}&end=${endLocation}${extraParams}`)
       .then((res) => {
         if (!res?.ok || !res) {
           console.log(`Request for trip cost failed (${res.status})`);
@@ -115,7 +118,7 @@ export default function HomeScreen() {
           loading: false, cost: 0, distance: 0, gasPrice: 0,
         });
       });
-  }, [startLocation, endLocation]);
+  }, [startLocation, endLocation, customGasPrice, gasPrice]);
 
   const updateSuggestions = useCallback((input: string) => {
     // If empty then just clear the suggestions
@@ -193,7 +196,7 @@ export default function HomeScreen() {
         visible={visible}
         setVisible={setVisible}
         data={gasPrice}
-        setData={setGasPrice}
+        setData={(data) => { setGasPrice(data); setCustomGasPrice(true); }}
       />
       <View style={styles.container}>
         <Text style={styles.title}>CarpoolCalc</Text>
