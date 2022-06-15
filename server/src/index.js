@@ -145,7 +145,7 @@ app.get('/suggestions', async (req, res) => {
   }
 });
 
-// Handle autocomplete for distances
+// Handle request for distances
 app.get('/distance', async (req, res) => {
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ?? 'Toronto';

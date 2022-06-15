@@ -9,22 +9,24 @@ import styles from '../../styles/App.styles';
 
 interface Props {
   loading: boolean,
-  cost: number,
   riders: number,
   distance: number,
   gasPrice: number,
   openModal: () => void,
 }
 
+const FUEL_EFFECIENCY = 10;
+
 export default function StatsSection(props: Props) {
   const {
     loading,
-    cost = 0,
     riders = 0,
     distance = 0,
     gasPrice = 0,
     openModal,
   } = props;
+
+  const cost = ((distance * FUEL_EFFECIENCY) / 100) * gasPrice;
 
   return (
     <View style={styles.statsSection}>

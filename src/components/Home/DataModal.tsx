@@ -2,6 +2,7 @@ import {
   View,
   Modal,
   TouchableOpacity,
+  Switch,
 } from 'react-native';
 
 import NumericInput from 'react-native-numeric-input';
@@ -16,6 +17,8 @@ interface Props {
   setVisible: (_: any) => void,
   data: number,
   setData: (_: any) => void,
+  useCustomValue: boolean,
+  setUseCustomValue: (_: any) => void,
 }
 
 export default function DataModal(props: Props) {
@@ -24,6 +27,8 @@ export default function DataModal(props: Props) {
     setVisible,
     data,
     setData,
+    useCustomValue,
+    setUseCustomValue,
   } = props;
 
   const value = data === 0 ? 2.00 : data;
@@ -64,6 +69,7 @@ export default function DataModal(props: Props) {
         <TouchableOpacity style={{ ...globalStyles.button, alignSelf: 'center' }} onPress={() => setVisible(false)}>
           <Text style={{ color: 'white' }}>Done</Text>
         </TouchableOpacity>
+        <Switch style={{ alignSelf: 'center' }} value={useCustomValue} onValueChange={setUseCustomValue} />
       </View>
     </Modal>
   );

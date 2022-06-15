@@ -71,7 +71,6 @@ let sessionToken = uuid.v4();
 export default function HomeScreen() {
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.none);
   const [{
-    cost,
     distance,
     gasPrice,
     loading,
@@ -94,30 +93,48 @@ export default function HomeScreen() {
     setCostRequest((state) => ({ ...state, gasPrice: newPrice }));
   };
 
-  const submit = useCallback(() => {
+  const submit = useCallback(async () => {
     Keyboard.dismiss();
     setCostRequest({
       loading: true, cost: 0, distance: 0, gasPrice: 0,
     });
 
-    const extraParams = (customGasPrice && gasPrice) ? `&price=${gasPrice}` : '';
-    fetch(`${serverUrl}/trip-cost/?start=${startLocation}&end=${endLocation}${extraParams}`)
-      .then((res) => {
-        if (!res?.ok || !res) {
-          console.log(`Request for trip cost failed (${res.status})`);
-          return Error(`Request failed (${res.status})`);
+    try {
+      const distanceResponse = await fetch(`${serverUrl}/distance/?start=${startLocation}&end=${endLocation}`);
+
+      if (!distanceResponse?.ok || !distanceResponse) {
+        console.log(`Request for distance failed (${distanceResponse.status})`);
+        return Error(`Request failed (${distanceResponse.status})`);
+      }
+
+      const { distance: newDistance } = await distanceResponse.json();
+      let newGasPrice = gasPrice;
+
+      if (!customGasPrice) {
+        const gasPriceResponse = await fetch(`${serverUrl}/gas`);
+
+        if (!gasPriceResponse?.ok || !gasPriceResponse) {
+          console.log(`Request for distance failed (${gasPriceResponse.status})`);
+          return Error(`Request failed (${gasPriceResponse.status})`);
         }
-        return res.json();
-      })
-      .then((data) => setCostRequest({
-        loading: false, cost: data.cost, distance: data.distance, gasPrice: data.gasPrice,
-      }))
-      .catch((err) => {
-        Alert.alert(err);
-        setCostRequest({
-          loading: false, cost: 0, distance: 0, gasPrice: 0,
-        });
+
+        const { price } = await gasPriceResponse.json();
+        newGasPrice = price;
+      }
+
+      setCostRequest((state) => ({
+        ...state,
+        loading: false,
+        distance: newDistance,
+        gasPrice: newGasPrice,
+      }));
+    } catch (err: any) {
+      Alert.alert(err);
+      setCostRequest({
+        loading: false, cost: 0, distance: 0, gasPrice: 0,
       });
+    }
+    return null;
   }, [startLocation, endLocation, customGasPrice, gasPrice]);
 
   const updateSuggestions = useCallback((input: string) => {
@@ -196,7 +213,9 @@ export default function HomeScreen() {
         visible={visible}
         setVisible={setVisible}
         data={gasPrice}
-        setData={(data) => { setGasPrice(data); setCustomGasPrice(true); }}
+        setData={setGasPrice}
+        useCustomValue={customGasPrice}
+        setUseCustomValue={setCustomGasPrice}
       />
       <View style={styles.container}>
         <Text style={styles.title}>CarpoolCalc</Text>
@@ -204,7 +223,6 @@ export default function HomeScreen() {
       <View style={styles.dataContainer}>
         <StatsSection
           loading={loading}
-          cost={cost}
           riders={riders}
           distance={distance}
           gasPrice={gasPrice}
