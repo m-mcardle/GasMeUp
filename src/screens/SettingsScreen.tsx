@@ -1,9 +1,16 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Settings, View } from 'react-native';
-import Button from '../components/Button';
+
+import {
+  KeyboardAvoidingView,
+  Settings,
+  View,
+  Switch,
+} from 'react-native';
 import Text from '../components/Text';
 
-import styles from '../styles/SettingsScreen.style';
+// Styles
+// import { colors } from '../styles/styles';
+import styles from '../styles/SettingsScreen.styles';
 
 export default function SettingsScreen() {
   const [data, setData] = useState<boolean>(Settings.get('data') ?? false);
@@ -15,14 +22,34 @@ export default function SettingsScreen() {
 
   console.log(data);
   return (
-    <KeyboardAvoidingView style={styles.main}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Settings</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text>Use Mock Data:</Text>
-          <Button onPress={storeData}>
-            <Text style={styles.statBoxText}>{data.toString()}</Text>
-          </Button>
+    <KeyboardAvoidingView behavior="padding" style={styles.main}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.title}> Settings</Text>
+      </View>
+      <View style={styles.mainContainer}>
+        <View style={styles.settingContainer}>
+          <Text style={styles.settingsText}>Setting 1:</Text>
+          <Switch value={data} onChange={storeData} />
+        </View>
+        <View style={styles.settingContainer}>
+          <Text style={styles.settingsText}>Setting 2:</Text>
+          <Switch />
+        </View>
+        <View style={styles.settingContainer}>
+          <Text style={styles.settingsText}>Setting 2:</Text>
+          <Switch />
+        </View>
+        <View style={styles.settingContainer}>
+          <Text style={styles.settingsText}>Setting 3:</Text>
+          <Switch />
+        </View>
+        <View style={styles.settingContainer}>
+          <Text style={styles.settingsText}>Setting 4:</Text>
+          <Switch />
+        </View>
+        <View style={styles.settingContainer}>
+          <Text style={styles.settingsText}>Setting 5:</Text>
+          <Switch />
         </View>
       </View>
     </KeyboardAvoidingView>
