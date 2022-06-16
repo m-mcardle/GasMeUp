@@ -153,6 +153,7 @@ app.get('/distance', async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   try {
     const distance = await GetDistance(startLocation, endLocation);
+    Log(`[distance] Distance: ${distance}km`);
     res.json({ distance });
   } catch (exception) {
     res.status(500).send({ error: exception });
@@ -177,6 +178,7 @@ app.get('/gas', async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   try {
     const gasPrice = await GetGasPrice(province);
+    Log(`[gas] Gas Price: $${gasPrice}`);
     res.json({ price: gasPrice });
   } catch (exception) {
     LogError(exception);

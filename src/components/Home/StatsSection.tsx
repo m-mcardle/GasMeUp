@@ -5,7 +5,7 @@ import AdjustIcon from '../../../assets/AdjustButton.png';
 
 import Text from '../Text';
 
-import styles from '../../styles/App.styles';
+import styles from '../../styles/HomeScreen.styles';
 
 interface Props {
   loading: boolean,
@@ -27,7 +27,7 @@ export default function StatsSection(props: Props) {
   } = props;
 
   const cost = ((distance * FUEL_EFFECIENCY) / 100) * gasPrice;
-
+  const safeRiders = riders < 1 ? 1 : riders;
   return (
     <View style={styles.statsSection}>
       <View style={styles.costSection}>
@@ -36,7 +36,7 @@ export default function StatsSection(props: Props) {
           : (
             <Text style={styles.costText}>
               $
-              {(cost / riders).toFixed(2)}
+              {(cost / safeRiders).toFixed(2)}
             </Text>
           )}
       </View>

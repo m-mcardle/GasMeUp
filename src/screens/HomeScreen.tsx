@@ -11,26 +11,6 @@
 *
 */
 
-// Expo imports
-import AppLoading from 'expo-app-loading';
-import {
-  useFonts,
-  Rubik_300Light,
-  Rubik_400Regular,
-  Rubik_500Medium,
-  Rubik_600SemiBold,
-  Rubik_700Bold,
-  Rubik_800ExtraBold,
-  Rubik_900Black,
-  Rubik_300Light_Italic,
-  Rubik_400Regular_Italic,
-  Rubik_500Medium_Italic,
-  Rubik_600SemiBold_Italic,
-  Rubik_700Bold_Italic,
-  Rubik_800ExtraBold_Italic,
-  Rubik_900Black_Italic,
-} from '@expo-google-fonts/rubik';
-
 // React imports
 import { useCallback, useState } from 'react';
 import {
@@ -56,7 +36,7 @@ import DataModal from '../components/Home/DataModal';
 
 // Styles
 import { colors } from '../styles/styles';
-import styles from '../styles/App.styles';
+import styles from '../styles/HomeScreen.styles';
 
 const serverUrl = 'http://carpoolcalc.loca.lt';
 
@@ -122,6 +102,11 @@ export default function HomeScreen() {
         newGasPrice = price;
       }
 
+      // console.log(`[Cost Request]
+      //   Custom Price = ${customGasPrice},
+      //   Price = ${newGasPrice},
+      //   Distance = ${newDistance}`);
+
       setCostRequest((state) => ({
         ...state,
         loading: false,
@@ -186,27 +171,6 @@ export default function HomeScreen() {
     setActiveInput(input);
   };
 
-  const [fontsLoaded] = useFonts({
-    Rubik_300Light,
-    Rubik_400Regular,
-    Rubik_500Medium,
-    Rubik_600SemiBold,
-    Rubik_700Bold,
-    Rubik_800ExtraBold,
-    Rubik_900Black,
-    Rubik_300Light_Italic,
-    Rubik_400Regular_Italic,
-    Rubik_500Medium_Italic,
-    Rubik_600SemiBold_Italic,
-    Rubik_700Bold_Italic,
-    Rubik_800ExtraBold_Italic,
-    Rubik_900Black_Italic,
-  });
-
-  if (!fontsLoaded) {
-    return <AppLoading />;
-  }
-
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.main}>
       <DataModal
@@ -218,7 +182,7 @@ export default function HomeScreen() {
         setUseCustomValue={setCustomGasPrice}
       />
       <View style={styles.container}>
-        <Text style={styles.title}>CarpoolCalc</Text>
+        <Text style={styles.title}> ⛽️ Gas Me Up 💸</Text>
       </View>
       <View style={styles.dataContainer}>
         <StatsSection
@@ -240,6 +204,7 @@ export default function HomeScreen() {
             leftButtonBackgroundColor={colors.lightGray}
             rightButtonBackgroundColor={colors.tertiary}
             value={riders}
+            editable={false}
             onChange={setRiders}
           />
         </View>

@@ -2,14 +2,14 @@ import {
   View,
   Modal,
   TouchableOpacity,
-  Switch,
 } from 'react-native';
+import CheckBox from 'expo-checkbox';
 
 import NumericInput from 'react-native-numeric-input';
 
 import Text from '../Text';
 
-import styles from '../../styles/App.styles';
+import styles from '../../styles/HomeScreen.styles';
 import { colors, globalStyles } from '../../styles/styles';
 
 interface Props {
@@ -38,17 +38,7 @@ export default function DataModal(props: Props) {
       transparent
       visible={visible}
     >
-      <View
-        style={{
-          backgroundColor: colors.primary,
-          borderRadius: 20,
-          paddingVertical: 35,
-          marginVertical: '75%',
-          width: '60%',
-          alignSelf: 'center',
-          borderWidth: 2,
-        }}
-      >
+      <View style={styles.modalContainer}>
         <Text style={styles.heading}>Configure Gas Price</Text>
         <View style={{ alignSelf: 'center', margin: 8 }}>
           <NumericInput
@@ -64,12 +54,22 @@ export default function DataModal(props: Props) {
             rightButtonBackgroundColor={colors.tertiary}
             value={value}
             onChange={setData}
+            isCurrency
+            editable={false}
+          />
+        </View>
+        <View style={styles.checkBoxSection}>
+          <Text style={{ color: 'black', fontSize: 12 }}>Use custom gas price:</Text>
+          <CheckBox
+            color={colors.tertiary}
+            value={useCustomValue}
+            onValueChange={setUseCustomValue}
+            style={styles.modalCheckBox}
           />
         </View>
         <TouchableOpacity style={{ ...globalStyles.button, alignSelf: 'center' }} onPress={() => setVisible(false)}>
           <Text style={{ color: 'white' }}>Done</Text>
         </TouchableOpacity>
-        <Switch style={{ alignSelf: 'center' }} value={useCustomValue} onValueChange={setUseCustomValue} />
       </View>
     </Modal>
   );
