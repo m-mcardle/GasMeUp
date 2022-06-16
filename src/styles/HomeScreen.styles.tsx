@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   main: {
-    flex: 2,
+    flex: 1,
     paddingVertical: 20,
     backgroundColor: colors.primary,
   },
