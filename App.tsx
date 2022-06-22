@@ -2,8 +2,12 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 // React imports
+import { useState, useMemo } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+// Global State
+import { GlobalContext, initialState } from './src/hooks/hooks';
 
 // Screens
 import HomeScreen from './src/screens/HomeScreen';
@@ -55,27 +59,44 @@ function TabIcon({
 }
 
 export default function App() {
+  const [globalState, setGlobalState] = useState(initialState);
+
+  const updateGlobalState = (key: string, newValue: any) => {
+    setGlobalState((oldState: any) => {
+      if (oldState[key] !== newValue) {
+        const newState = { ...oldState };
+        newState[key] = newValue;
+        return newState;
+      }
+      return oldState;
+    });
+  };
+
+  const state = useMemo(() => [globalState, updateGlobalState], [globalState]);
+
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        initialRouteName="Home"
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => TabIcon(
-            {
-              name: route.name,
-              focused,
-              color,
-              size,
-            },
-          ),
-          tabBarActiveTintColor: colors.tertiary,
-          tabBarInactiveTintColor: colors.secondary,
-        })}
-      >
-        <Tab.Screen name="Friends" component={SettingsScreen} />
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Settings" component={SettingsScreen} />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <GlobalContext.Provider value={state}>
+      <NavigationContainer>
+        <Tab.Navigator
+          initialRouteName="Home"
+          screenOptions={({ route }) => ({
+            tabBarIcon: ({ focused, color, size }) => TabIcon(
+              {
+                name: route.name,
+                focused,
+                color,
+                size,
+              },
+            ),
+            tabBarActiveTintColor: colors.tertiary,
+            tabBarInactiveTintColor: colors.secondary,
+          })}
+        >
+          <Tab.Screen name="Friends" component={SettingsScreen} />
+          <Tab.Screen name="Home" component={HomeScreen} />
+          <Tab.Screen name="Settings" component={SettingsScreen} />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </GlobalContext.Provider>
   );
 }

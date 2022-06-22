@@ -30,8 +30,13 @@ const styles = StyleSheet.create({
     fontFamily: boldFont,
   },
   settingsText: {
+    textAlign: 'right',
     fontSize: 16,
     padding: 4,
+    width: '60%',
+  },
+  settingsSwitch: {
+    width: '40%',
   },
 });
 
