@@ -37,16 +37,21 @@ export default function SuggestionsSection(props: Props) {
   return (
     <View style={styles.container}>
       {items?.length > 0
-        ? items.map((el) => (
-          <Text
-            style={styles.text}
-            key={el}
-            onPress={() => onSelect(el)}
-            numberOfLines={1}
-          >
-            {el}
-          </Text>
-        ))
+        ? items.map((el, i) => {
+          if (i < 3) {
+            return (
+              <Text
+                style={styles.text}
+                key={el}
+                onPress={() => onSelect(el)}
+                numberOfLines={1}
+              >
+                {el}
+              </Text>
+            );
+          }
+          return null;
+        })
         : <Text style={styles.emptyList}>No suggestions</Text>}
     </View>
   );

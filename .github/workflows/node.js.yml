@@ -25,7 +25,7 @@ jobs:
       run: |
         touch ./server/.env
         echo GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }} >> ./server/.env
-        echo COLLECT_API_KEY=${{ secrets.COLLECT_API_KEY }} >> ./server/.env
+        echo RAPID_API_KEY=${{ secrets.RAPID_API_KEY }} >> ./server/.env
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:

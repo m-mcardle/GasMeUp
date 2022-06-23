@@ -1,6 +1,6 @@
 import { TextInput } from 'react-native';
 
-import { globalStyles } from '../styles/styles';
+import { colors, globalStyles } from '../styles/styles';
 
 interface Props {
   value?: string,
@@ -23,6 +23,7 @@ export default function Input(props: Props) {
       value={value}
       style={[globalStyles.input, style]}
       placeholder={placeholder}
+      placeholderTextColor={colors.secondary}
       onChangeText={onChangeText}
       onPressOut={onPressOut}
     />

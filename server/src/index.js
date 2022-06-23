@@ -11,7 +11,7 @@ const {
   Directions,
   mockLocations,
 } = require('./queries/google');
-const { GasPrices, mockPrices } = require('./queries/collectapi');
+const { GasPriceRequest, GasPricesRequest } = require('./queries/gasprice');
 
 const { GasCostForDistance } = require('./calculations/fuel');
 
@@ -23,7 +23,6 @@ const PORT = process.env.PORT || 3001;
 const env = process.env.NODE_ENV || 'development';
 
 Log('Start Tunnel:', process.env.START_TUNNEL);
-Log('CollectAPI Enabled:', process.env.ENABLE_COLLECTAPI_QUERIES);
 Log('Google Enabled:', process.env.ENABLE_GOOGLE_QUERIES);
 
 if (process.env.START_TUNNEL === 'true' && env !== 'test') {
@@ -39,7 +38,6 @@ if (process.env.START_TUNNEL === 'true' && env !== 'test') {
 }
 
 const useGoogleAPI = (process.env.ENABLE_GOOGLE_QUERIES === 'true' || env === 'production');
-const useCollectAPI = (process.env.ENABLE_COLLECTAPI_QUERIES === 'true' || env === 'production');
 
 const { setupCache } = pkg;
 
@@ -92,29 +90,16 @@ async function GetSuggestions(input, sessionId) {
   return mockLocations.predictions.map((el) => el.description);
 }
 
-// If no province is specified all price objects will be returned
 async function GetGasPrice(province) {
-  if (useCollectAPI) {
-    const response = await api(GasPrices('canada'));
-
-    if (response.status !== 200) {
-      throw Error(`Invalid Request to CollectAPI (${response.statusText})`);
-    }
-    const gasPrices = response.data?.result;
-
-    if (province) {
-      const price = Number(gasPrices.find((el) => el.name === province).gasoline);
-      return price;
-    }
-
-    return gasPrices;
-  }
-
   if (province) {
-    return Number(mockPrices.find((el) => el.name === province).gasoline);
+    const { data } = await api(GasPriceRequest(province));
+    const { price } = data;
+    return price;
   }
 
-  return mockPrices;
+  const { data } = await api(GasPricesRequest());
+  const { prices } = data;
+  return prices;
 }
 
 /*
