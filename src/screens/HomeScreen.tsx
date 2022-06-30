@@ -225,7 +225,7 @@ export default function HomeScreen() {
           value={endLocation}
         />
         <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-        <Button onPress={submit} disabled={globalState['Enable Requests']}>
+        <Button onPress={submit} disabled={!globalState['Enable Requests']}>
           <Text style={{ color: colors.primary }}>Calculate</Text>
         </Button>
       </View>
