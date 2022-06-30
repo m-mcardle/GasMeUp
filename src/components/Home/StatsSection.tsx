@@ -9,17 +9,25 @@ import styles from '../../styles/HomeScreen.styles';
 
 interface Props {
   loading: boolean,
-  cost: number,
   riders: number,
   distance: number,
   gasPrice: number,
+  openModal: () => void,
 }
+
+const FUEL_EFFECIENCY = 10;
 
 export default function StatsSection(props: Props) {
   const {
-    loading, cost = 0, riders = 0, distance = 0, gasPrice = 0,
+    loading,
+    riders = 0,
+    distance = 0,
+    gasPrice = 0,
+    openModal,
   } = props;
 
+  const cost = ((distance * FUEL_EFFECIENCY) / 100) * gasPrice;
+  const safeRiders = riders < 1 ? 1 : riders;
   return (
     <View style={styles.statsSection}>
       <View style={styles.costSection}>
@@ -28,7 +36,7 @@ export default function StatsSection(props: Props) {
           : (
             <Text style={styles.costText}>
               $
-              {(cost / riders).toFixed(2)}
+              {(cost / safeRiders).toFixed(2)}
             </Text>
           )}
       </View>
@@ -40,7 +48,9 @@ export default function StatsSection(props: Props) {
           <Text style={styles.statBoxText}>
             {`Gas: $${gasPrice.toFixed(2)}/L`}
           </Text>
-          <Image source={AdjustIcon} style={styles.adjustButton} />
+          <View onTouchEnd={() => openModal()}>
+            <Image source={AdjustIcon} style={styles.adjustButton} />
+          </View>
         </View>
       </View>
     </View>

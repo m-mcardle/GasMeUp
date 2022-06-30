@@ -11,26 +11,6 @@
 *
 */
 
-// Expo imports
-import AppLoading from 'expo-app-loading';
-import {
-  useFonts,
-  Rubik_300Light,
-  Rubik_400Regular,
-  Rubik_500Medium,
-  Rubik_600SemiBold,
-  Rubik_700Bold,
-  Rubik_800ExtraBold,
-  Rubik_900Black,
-  Rubik_300Light_Italic,
-  Rubik_400Regular_Italic,
-  Rubik_500Medium_Italic,
-  Rubik_600SemiBold_Italic,
-  Rubik_700Bold_Italic,
-  Rubik_800ExtraBold_Italic,
-  Rubik_900Black_Italic,
-} from '@expo-google-fonts/rubik';
-
 // React imports
 import { useCallback, useState } from 'react';
 import {
@@ -55,6 +35,7 @@ import Input from '../components/Input';
 
 import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
+import DataModal from '../components/Home/DataModal';
 
 // Styles
 import { colors } from '../styles/styles';
@@ -73,7 +54,6 @@ let sessionToken = uuid.v4();
 export default function HomeScreen() {
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.none);
   const [{
-    cost,
     distance,
     gasPrice,
     loading,
@@ -89,31 +69,62 @@ export default function HomeScreen() {
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
   const [riders, setRiders] = useState<number>(1);
+  const [visible, setVisible] = useState<boolean>(false);
+  const [customGasPrice, setCustomGasPrice] = useState<boolean>(false);
   const [globalState] = useGlobalState();
 
-  const submit = useCallback(() => {
+  const setGasPrice = (newPrice: number) => {
+    setCostRequest((state) => ({ ...state, gasPrice: newPrice }));
+  };
+
+  const submit = useCallback(async () => {
     Keyboard.dismiss();
     setCostRequest({
       loading: true, cost: 0, distance: 0, gasPrice: 0,
     });
-    fetch(`${serverUrl}/trip-cost/?start=${startLocation}&end=${endLocation}`)
-      .then((res) => {
-        if (!res?.ok || !res) {
-          console.log(`Request for trip cost failed (${res.status})`);
-          return Error(`Request failed (${res.status})`);
+
+    try {
+      const distanceResponse = await fetch(`${serverUrl}/distance/?start=${startLocation}&end=${endLocation}`);
+
+      if (!distanceResponse?.ok || !distanceResponse) {
+        console.log(`Request for distance failed (${distanceResponse.status})`);
+        return Error(`Request failed (${distanceResponse.status})`);
+      }
+
+      const { distance: newDistance } = await distanceResponse.json();
+      let newGasPrice = gasPrice;
+
+      if (!customGasPrice) {
+        const gasPriceResponse = await fetch(`${serverUrl}/gas`);
+
+        if (!gasPriceResponse?.ok || !gasPriceResponse) {
+          console.log(`Request for distance failed (${gasPriceResponse.status})`);
+          return Error(`Request failed (${gasPriceResponse.status})`);
         }
-        return res.json();
-      })
-      .then((data) => setCostRequest({
-        loading: false, cost: data.cost, distance: data.distance, gasPrice: data.gasPrice,
-      }))
-      .catch((err) => {
-        Alert.alert(err);
-        setCostRequest({
-          loading: false, cost: 0, distance: 0, gasPrice: 0,
-        });
+
+        const { price } = await gasPriceResponse.json();
+        newGasPrice = price;
+      }
+
+      // console.log(`[Cost Request]
+      //   Custom Price = ${customGasPrice},
+      //   Price = ${newGasPrice},
+      //   Distance = ${newDistance}`);
+
+      setCostRequest((state) => ({
+        ...state,
+        loading: false,
+        distance: newDistance,
+        gasPrice: newGasPrice,
+      }));
+    } catch (err: any) {
+      Alert.alert(err);
+      setCostRequest({
+        loading: false, cost: 0, distance: 0, gasPrice: 0,
       });
-  }, [startLocation, endLocation]);
+    }
+    return null;
+  }, [startLocation, endLocation, customGasPrice, gasPrice]);
 
   const updateSuggestions = useCallback((input: string) => {
     // If empty then just clear the suggestions
@@ -164,39 +175,26 @@ export default function HomeScreen() {
     setActiveInput(input);
   };
 
-  const [fontsLoaded] = useFonts({
-    Rubik_300Light,
-    Rubik_400Regular,
-    Rubik_500Medium,
-    Rubik_600SemiBold,
-    Rubik_700Bold,
-    Rubik_800ExtraBold,
-    Rubik_900Black,
-    Rubik_300Light_Italic,
-    Rubik_400Regular_Italic,
-    Rubik_500Medium_Italic,
-    Rubik_600SemiBold_Italic,
-    Rubik_700Bold_Italic,
-    Rubik_800ExtraBold_Italic,
-    Rubik_900Black_Italic,
-  });
-
-  if (!fontsLoaded) {
-    return <AppLoading />;
-  }
-
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.main}>
+      <DataModal
+        visible={visible}
+        setVisible={setVisible}
+        data={gasPrice}
+        setData={setGasPrice}
+        useCustomValue={customGasPrice}
+        setUseCustomValue={setCustomGasPrice}
+      />
       <View style={styles.container}>
-        <Text style={styles.title}>CarpoolCalc</Text>
+        <Text style={styles.title}> ⛽️ Gas Me Up 💸</Text>
       </View>
       <View style={styles.dataContainer}>
         <StatsSection
           loading={loading}
-          cost={cost}
           riders={riders}
           distance={distance}
           gasPrice={gasPrice}
+          openModal={() => setVisible(true)}
         />
         <View style={styles.ridersSection}>
           <Text style={styles.ridersText}>Riders:</Text>
@@ -210,6 +208,7 @@ export default function HomeScreen() {
             leftButtonBackgroundColor={colors.lightGray}
             rightButtonBackgroundColor={colors.tertiary}
             value={riders}
+            editable={false}
             onChange={setRiders}
           />
         </View>
@@ -226,7 +225,7 @@ export default function HomeScreen() {
           value={endLocation}
         />
         <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-        <Button onPress={submit} disabled={globalState['Enable Requests']}>
+        <Button onPress={submit} disabled={!globalState['Enable Requests']}>
           <Text style={{ color: colors.primary }}>Calculate</Text>
         </Button>
       </View>
