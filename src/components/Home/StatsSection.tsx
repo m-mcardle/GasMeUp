@@ -5,7 +5,7 @@ import AdjustIcon from '../../../assets/AdjustButton.png';
 
 import Text from '../Text';
 
-import styles from '../../styles/App.styles';
+import styles from '../../styles/HomeScreen.styles';
 
 interface Props {
   loading: boolean,

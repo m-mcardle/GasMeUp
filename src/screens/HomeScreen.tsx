@@ -45,6 +45,9 @@ import NumericInput from 'react-native-numeric-input';
 
 import uuid from 'react-native-uuid';
 
+// Global State Stuff
+import { useGlobalState } from '../hooks/hooks';
+
 // Components
 import Text from '../components/Text';
 import Button from '../components/Button';
@@ -55,7 +58,7 @@ import StatsSection from '../components/Home/StatsSection';
 
 // Styles
 import { colors } from '../styles/styles';
-import styles from '../styles/App.styles';
+import styles from '../styles/HomeScreen.styles';
 
 const serverUrl = 'http://carpoolcalc.loca.lt';
 
@@ -86,6 +89,7 @@ export default function HomeScreen() {
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
   const [riders, setRiders] = useState<number>(1);
+  const [globalState] = useGlobalState();
 
   const submit = useCallback(() => {
     Keyboard.dismiss();
@@ -222,7 +226,7 @@ export default function HomeScreen() {
           value={endLocation}
         />
         <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-        <Button onPress={submit}>
+        <Button onPress={submit} disabled={globalState['Enable Requests']}>
           <Text style={{ color: colors.primary }}>Calculate</Text>
         </Button>
       </View>
