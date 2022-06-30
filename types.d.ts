@@ -36,7 +36,3 @@ interface Locations {
   startLocation: string,
   endLocation: string
 }
-
-interface SettingsObject {
-  [key: string]: boolean,
-}

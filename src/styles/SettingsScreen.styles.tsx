@@ -1,7 +1,8 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  colors, boldFont, // semiBoldFont, font,
+  colors,
+  boldFont,
 } from './styles';
 
 // Styles

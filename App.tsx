@@ -12,6 +12,7 @@ import { GlobalContext, initialState } from './src/hooks/hooks';
 // Screens
 import HomeScreen from './src/screens/HomeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import FriendsScreen from './src/screens/FriendsScreen';
 
 // Styles
 import { colors } from './src/styles/styles';
@@ -92,7 +93,7 @@ export default function App() {
             tabBarInactiveTintColor: colors.secondary,
           })}
         >
-          <Tab.Screen name="Friends" component={SettingsScreen} />
+          <Tab.Screen name="Friends" component={FriendsScreen} />
           <Tab.Screen name="Home" component={HomeScreen} />
           <Tab.Screen name="Settings" component={SettingsScreen} />
         </Tab.Navigator>
