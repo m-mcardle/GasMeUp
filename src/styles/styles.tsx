@@ -61,4 +61,7 @@ export const globalStyles = StyleSheet.create({
     padding: 10,
     paddingHorizontal: 30,
   },
+  disabledButton: {
+    backgroundColor: colors.red,
+  },
 });

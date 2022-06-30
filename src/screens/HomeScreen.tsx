@@ -25,6 +25,9 @@ import NumericInput from 'react-native-numeric-input';
 
 import uuid from 'react-native-uuid';
 
+// Global State Stuff
+import { useGlobalState } from '../hooks/hooks';
+
 // Components
 import Text from '../components/Text';
 import Button from '../components/Button';
@@ -68,6 +71,7 @@ export default function HomeScreen() {
   const [riders, setRiders] = useState<number>(1);
   const [visible, setVisible] = useState<boolean>(false);
   const [customGasPrice, setCustomGasPrice] = useState<boolean>(false);
+  const [globalState] = useGlobalState();
 
   const setGasPrice = (newPrice: number) => {
     setCostRequest((state) => ({ ...state, gasPrice: newPrice }));
@@ -221,7 +225,7 @@ export default function HomeScreen() {
           value={endLocation}
         />
         <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-        <Button onPress={submit}>
+        <Button onPress={submit} disabled={globalState['Enable Requests']}>
           <Text style={{ color: colors.primary }}>Calculate</Text>
         </Button>
       </View>
