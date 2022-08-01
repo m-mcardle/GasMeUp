@@ -1,5 +1,5 @@
 {
-  "name": "carpool-calc",
+  "name": "gas-me-up-server",
   "version": "1.0.0",
   "description": "An app to make carpooling easier for everyone. A service to easily calculate your due gas-money and split easily to your riders. Just put in your riders, your route, and we will do the rest.",
   "main": "index.js",
