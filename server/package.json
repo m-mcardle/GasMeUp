@@ -28,7 +28,7 @@
   },
   "scripts": {
     "start": "nodemon ./src/index.js",
-    "tunnel": "lt --port 3001 --subdomain carpoolcalc",
+    "tunnel": "lt --port 3001 --subdomain gas-me-up",
     "start-full": "NODE_OPTIONS='--experimental-specifier-resolution=node' START_TUNNEL='true' nodemon ./src/index.js",
     "test": "jest"
   },

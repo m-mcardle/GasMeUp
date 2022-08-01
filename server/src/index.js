@@ -28,7 +28,7 @@ Log('Google Enabled:', process.env.ENABLE_GOOGLE_QUERIES);
 if (process.env.START_TUNNEL === 'true' && env !== 'test') {
   let tunnel;
   (async () => {
-    tunnel = await localtunnel({ port: 3001, subdomain: 'carpoolcalc' });
+    tunnel = await localtunnel({ port: 3001, subdomain: 'gas-me-up' });
 
     Log('Localtunnel at:', tunnel.url);
     tunnel.on('close', () => {
