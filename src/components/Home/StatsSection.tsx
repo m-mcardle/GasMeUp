@@ -1,3 +1,4 @@
+import React from 'react';
 import { ActivityIndicator, Image, View } from 'react-native';
 
 // @ts-ignore
