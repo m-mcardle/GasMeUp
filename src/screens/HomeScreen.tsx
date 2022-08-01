@@ -11,26 +11,6 @@
 *
 */
 
-// Expo imports
-import AppLoading from 'expo-app-loading';
-import {
-  useFonts,
-  Rubik_300Light,
-  Rubik_400Regular,
-  Rubik_500Medium,
-  Rubik_600SemiBold,
-  Rubik_700Bold,
-  Rubik_800ExtraBold,
-  Rubik_900Black,
-  Rubik_300Light_Italic,
-  Rubik_400Regular_Italic,
-  Rubik_500Medium_Italic,
-  Rubik_600SemiBold_Italic,
-  Rubik_700Bold_Italic,
-  Rubik_800ExtraBold_Italic,
-  Rubik_900Black_Italic,
-} from '@expo-google-fonts/rubik';
-
 // React imports
 import React, { useCallback, useState } from 'react';
 import {
@@ -164,27 +144,6 @@ export default function HomeScreen() {
     setActiveInput(input);
   };
 
-  const [fontsLoaded] = useFonts({
-    Rubik_300Light,
-    Rubik_400Regular,
-    Rubik_500Medium,
-    Rubik_600SemiBold,
-    Rubik_700Bold,
-    Rubik_800ExtraBold,
-    Rubik_900Black,
-    Rubik_300Light_Italic,
-    Rubik_400Regular_Italic,
-    Rubik_500Medium_Italic,
-    Rubik_600SemiBold_Italic,
-    Rubik_700Bold_Italic,
-    Rubik_800ExtraBold_Italic,
-    Rubik_900Black_Italic,
-  });
-
-  if (!fontsLoaded) {
-    return <AppLoading />;
-  }
-
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.main}>
       <View style={styles.container}>
@@ -226,7 +185,7 @@ export default function HomeScreen() {
           value={endLocation}
         />
         <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-        <Button onPress={submit} disabled={globalState['Enable Requests']}>
+        <Button onPress={submit} disabled={!globalState['Enable Requests']}>
           <Text style={{ color: colors.primary }}>Calculate</Text>
         </Button>
       </View>
