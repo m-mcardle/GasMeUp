@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { TextInput } from 'react-native';
 
 import { colors, globalStyles } from '../styles/styles';
@@ -6,7 +8,7 @@ interface Props {
   value?: string,
   placeholder?: string,
   style?: object,
-  onChangeText: (arg: string) => void
+  onChangeText: (arg: string) => void,
   onPressOut?: () => void
 }
 

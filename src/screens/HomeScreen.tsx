@@ -11,28 +11,8 @@
 *
 */
 
-// Expo imports
-import AppLoading from 'expo-app-loading';
-import {
-  useFonts,
-  Rubik_300Light,
-  Rubik_400Regular,
-  Rubik_500Medium,
-  Rubik_600SemiBold,
-  Rubik_700Bold,
-  Rubik_800ExtraBold,
-  Rubik_900Black,
-  Rubik_300Light_Italic,
-  Rubik_400Regular_Italic,
-  Rubik_500Medium_Italic,
-  Rubik_600SemiBold_Italic,
-  Rubik_700Bold_Italic,
-  Rubik_800ExtraBold_Italic,
-  Rubik_900Black_Italic,
-} from '@expo-google-fonts/rubik';
-
 // React imports
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Alert,
@@ -60,18 +40,18 @@ import StatsSection from '../components/Home/StatsSection';
 import { colors } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
 
-const serverUrl = 'http://carpoolcalc.loca.lt';
+const serverUrl = 'http://gas-me-up.loca.lt';
 
 enum ActiveInput {
-  none,
-  start,
-  end,
+  None,
+  Start,
+  End,
 }
 
 let sessionToken = uuid.v4();
 
 export default function HomeScreen() {
-  const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.none);
+  const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
   const [{
     cost,
     distance,
@@ -150,10 +130,10 @@ export default function HomeScreen() {
     // Create new session token after selecting an autocomplete result
     sessionToken = uuid.v4();
 
-    if (activeInput === ActiveInput.start) {
+    if (activeInput === ActiveInput.Start) {
       setLocations((state) => ({ ...state, startLocation: item }));
       setSuggestions([]);
-    } else if (activeInput === ActiveInput.end) {
+    } else if (activeInput === ActiveInput.End) {
       setLocations((state) => ({ ...state, endLocation: item }));
       setSuggestions([]);
     }
@@ -164,31 +144,10 @@ export default function HomeScreen() {
     setActiveInput(input);
   };
 
-  const [fontsLoaded] = useFonts({
-    Rubik_300Light,
-    Rubik_400Regular,
-    Rubik_500Medium,
-    Rubik_600SemiBold,
-    Rubik_700Bold,
-    Rubik_800ExtraBold,
-    Rubik_900Black,
-    Rubik_300Light_Italic,
-    Rubik_400Regular_Italic,
-    Rubik_500Medium_Italic,
-    Rubik_600SemiBold_Italic,
-    Rubik_700Bold_Italic,
-    Rubik_800ExtraBold_Italic,
-    Rubik_900Black_Italic,
-  });
-
-  if (!fontsLoaded) {
-    return <AppLoading />;
-  }
-
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.main}>
       <View style={styles.container}>
-        <Text style={styles.title}>CarpoolCalc</Text>
+        <Text style={styles.title}>⛽️ Gas Me Up 💸</Text>
       </View>
       <View style={styles.dataContainer}>
         <StatsSection
@@ -216,17 +175,17 @@ export default function HomeScreen() {
         <Input
           placeholder="Start location"
           onChangeText={updateStartLocation}
-          onPressOut={() => changeActiveInput(ActiveInput.start)}
+          onPressOut={() => changeActiveInput(ActiveInput.Start)}
           value={startLocation}
         />
         <Input
           placeholder="End location"
           onChangeText={updateEndLocation}
-          onPressOut={() => changeActiveInput(ActiveInput.end)}
+          onPressOut={() => changeActiveInput(ActiveInput.Start)}
           value={endLocation}
         />
         <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-        <Button onPress={submit} disabled={globalState['Enable Requests']}>
+        <Button onPress={submit} disabled={!globalState['Enable Requests']}>
           <Text style={{ color: colors.primary }}>Calculate</Text>
         </Button>
       </View>

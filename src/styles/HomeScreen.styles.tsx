@@ -7,7 +7,7 @@ import {
 // Styles
 const styles = StyleSheet.create({
   title: {
-    fontSize: 60,
+    fontSize: 48,
     fontFamily: boldFont,
   },
   container: {

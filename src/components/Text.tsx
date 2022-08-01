@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { Text, TextStyle } from 'react-native';
 
 import PropTypes from 'prop-types';
