@@ -2,7 +2,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 // React imports
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
