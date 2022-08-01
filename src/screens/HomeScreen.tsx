@@ -110,7 +110,7 @@ export default function HomeScreen() {
         }
         return res.json();
       })
-      .then((data) => setSuggestions(data.suggestions))
+      .then((data) => setSuggestions(data.suggestions ?? []))
       .catch((err) => {
         Alert.alert(err);
       });
