@@ -24,6 +24,8 @@ import React, { useState, useMemo } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+import firebase from './firebase';
+
 // Global State
 import { GlobalContext, initialState } from './src/hooks/hooks';
 
@@ -76,6 +78,8 @@ function TabIcon({
     <Ionicons name={iconName} size={size} color={color} />
   );
 }
+
+console.log(firebase.auth.currentUser);
 
 export default function App() {
   const [globalState, setGlobalState] = useState(initialState);
