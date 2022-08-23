@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -22,9 +23,11 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
-const auth = getAuth();
+export const auth = getAuth();
+
+export const db = getFirestore();
 
 // Listen for authentication state to change.
 onAuthStateChanged(auth, (user) => {
@@ -38,6 +41,7 @@ onAuthStateChanged(auth, (user) => {
 export default {
   app,
   auth,
+  db,
   getAuth,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
