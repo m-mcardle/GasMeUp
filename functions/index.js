@@ -8,14 +8,10 @@ const db = admin.firestore();
 exports.aggregateBalances = functions.firestore
     .document("Transactions/{transcationUI}")
     .onWrite(async (change, context) => {
-      console.log("Hello world!");
       // Get value of the newly added transaction
       const payeeUID = change.after.data().payeeUID;
       const payerUID = change.after.data().payerUID;
       const amount = change.after.data().amount;
-      console.log("Amount:", amount);
-      console.log("payeeUID:", payeeUID);
-      console.log("payerUID:", payerUID);
 
       // Get a reference to the payee
       const payeeRef = db.collection("Users").doc(payeeUID);
@@ -35,17 +31,15 @@ exports.aggregateBalances = functions.firestore
         const payeeTransactions = payeeDoc.data().transactions;
         const payerTransactions = payerDoc.data().transactions;
 
-        payeeTransactions.push(change.id);
-        payerTransactions.push(change.id);
+        payeeTransactions.push(change.after.id);
+        payerTransactions.push(change.after.id);
 
         const oldPayeeFriends = payeeDoc.data().friends;
         const oldPayerFriends = payerDoc.data().friends;
 
-        console.log(newPayeeBalance, newPayerBalance);
-        console.log(payeeTransactions, payerTransactions);
         // Update payee info
         transaction.update(payeeRef, {
-          transactions: payeeTransactions,
+          transactions: [...payerTransactions],
           friends: {
             ...oldPayeeFriends,
             [payerDoc.id]: newPayeeBalance,
@@ -54,7 +48,7 @@ exports.aggregateBalances = functions.firestore
 
         // Update payer info
         transaction.update(payerRef, {
-          transactions: payerTransactions,
+          transactions: [...payerTransactions],
           friends: {
             ...oldPayerFriends,
             [payeeDoc.id]: newPayerBalance,
