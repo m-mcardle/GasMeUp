@@ -40,7 +40,7 @@ import StatsSection from '../components/Home/StatsSection';
 import { colors } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
 
-const serverUrl = 'http://gas-me-up.loca.lt';
+const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
 
 enum ActiveInput {
   None,
@@ -175,13 +175,13 @@ export default function HomeScreen() {
         <Input
           placeholder="Start location"
           onChangeText={updateStartLocation}
-          onPressOut={() => changeActiveInput(ActiveInput.Start)}
+          onPressIn={() => changeActiveInput(ActiveInput.Start)}
           value={startLocation}
         />
         <Input
           placeholder="End location"
           onChangeText={updateEndLocation}
-          onPressOut={() => changeActiveInput(ActiveInput.Start)}
+          onPressIn={() => changeActiveInput(ActiveInput.End)}
           value={endLocation}
         />
         <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
