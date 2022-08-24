@@ -3,10 +3,10 @@ import { View } from 'react-native';
 
 import { getAuth, signOut, signInWithEmailAndPassword } from 'firebase/auth';
 import {
-  collection, getFirestore, query, where,
+  collection, doc, getFirestore, query, where,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useCollectionData } from 'react-firebase-hooks/firestore';
+import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
 import { DataTable } from 'react-native-paper';
 
@@ -41,16 +41,19 @@ export default function FriendsScreen() {
   const [password, setPassword] = useState('');
   const [user, loading, error] = useAuthState(auth);
 
-  const payerQuery = query(transactionsRef, where('payerUID', '==', user?.uid ?? ''));
-  const [payerDocuments, , errorPayerDB] = useCollectionData(payerQuery);
+  const userDoc = user ? doc(db, 'Users', user.uid) : undefined;
+  const [userDocument, , errorUserDB] = useDocumentData(userDoc);
 
-  const payeeQuery = query(transactionsRef, where('payeeUID', '==', user?.uid ?? ''));
-  const [payeeDocuments, , errorPayeeDB] = useCollectionData(payeeQuery);
+  const transactionQuery = userDocument ? query(transactionsRef, where('__name__', 'in', userDocument.transactions)) : undefined;
+  const [transactionDocuments, , errorTransactionDB] = useCollectionData(transactionQuery);
 
+  if (errorUserDB || errorTransactionDB || error) {
+    console.log(errorUserDB, errorTransactionDB, error);
+  }
   return (
     <View>
       {
-        user && !loading && !error && !errorPayeeDB && !errorPayerDB
+        user && !loading && !error
           ? (
             <View style={styles.main}>
               <DataTable>
@@ -61,22 +64,11 @@ export default function FriendsScreen() {
                 </DataTable.Header>
 
                 {
-                  payerDocuments?.map((document) => (
+                  transactionDocuments?.map((document) => (
                     <DataTable.Row key={document.amount}>
                       <DataTable.Cell>{document.payeeName}</DataTable.Cell>
                       <DataTable.Cell numeric>
                         $
-                        {document.amount}
-                      </DataTable.Cell>
-                    </DataTable.Row>
-                  ))
-                }
-                {
-                  payeeDocuments?.map((document) => (
-                    <DataTable.Row key={document.amount}>
-                      <DataTable.Cell>{document.payerName}</DataTable.Cell>
-                      <DataTable.Cell numeric>
-                        - $
                         {document.amount}
                       </DataTable.Cell>
                     </DataTable.Row>
