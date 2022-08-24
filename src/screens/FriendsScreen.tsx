@@ -20,7 +20,7 @@ import styles from '../styles/FriendsScreen.styles';
 const auth = getAuth();
 const db = getFirestore();
 
-const transactionsRef = collection(db, 'Transactions');
+const usersRef = collection(db, 'Users');
 
 const login = (email: string, password: string) => {
   signInWithEmailAndPassword(auth, email, password)
@@ -41,14 +41,24 @@ export default function FriendsScreen() {
   const [password, setPassword] = useState('');
   const [user, loading, error] = useAuthState(auth);
 
-  const userDoc = user ? doc(db, 'Users', user.uid) : undefined;
+  const userDoc = user?.uid ? doc(db, 'Users', user.uid) : undefined;
   const [userDocument, , errorUserDB] = useDocumentData(userDoc);
 
-  const transactionQuery = userDocument ? query(transactionsRef, where('__name__', 'in', userDocument.transactions)) : undefined;
-  const [transactionDocuments, , errorTransactionDB] = useCollectionData(transactionQuery);
+  const balances = userDocument ? userDocument.friends : undefined;
+  const friendsUIDs = balances ? Object.keys(balances) : undefined;
 
-  if (errorUserDB || errorTransactionDB || error) {
-    console.log(errorUserDB, errorTransactionDB, error);
+  const friendsQuery = friendsUIDs ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
+  const [friendsData, , errorFriendsDB] = useCollectionData(friendsQuery);
+
+  const formattedBalances = friendsData ? friendsUIDs?.map((uid: string) => {
+    const currentFriend = friendsData?.find((friend) => friend.uid === uid);
+    return {
+      name: `${currentFriend?.firstName} ${currentFriend?.lastName}`, amount: balances[uid],
+    };
+  }) : undefined;
+
+  if (errorUserDB || errorFriendsDB || error) {
+    console.log(errorUserDB, errorFriendsDB, error);
   }
   return (
     <View>
@@ -64,12 +74,12 @@ export default function FriendsScreen() {
                 </DataTable.Header>
 
                 {
-                  transactionDocuments?.map((document) => (
-                    <DataTable.Row key={document.amount}>
-                      <DataTable.Cell>{document.payeeName}</DataTable.Cell>
+                  formattedBalances?.map((balance) => (
+                    <DataTable.Row key={balance.name}>
+                      <DataTable.Cell>{balance.name}</DataTable.Cell>
                       <DataTable.Cell numeric>
                         $
-                        {document.amount}
+                        {balance.amount}
                       </DataTable.Cell>
                     </DataTable.Row>
                   ))
