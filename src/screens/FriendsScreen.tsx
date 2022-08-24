@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
+import PropTypes from 'prop-types';
 
 import { getAuth, signOut, signInWithEmailAndPassword } from 'firebase/auth';
 import {
@@ -9,6 +10,10 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
 import { DataTable } from 'react-native-paper';
+
+import { createStackNavigator } from '@react-navigation/stack';
+
+import SignUpScreen from './SignUpScreen';
 
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -36,7 +41,13 @@ const logout = () => {
     });
 };
 
-export default function FriendsScreen() {
+interface Props {
+  navigation: {
+    navigate: (str: string) => {}
+  },
+}
+
+function FriendsPage({ navigation }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [user, loading, error] = useAuthState(auth);
@@ -47,7 +58,7 @@ export default function FriendsScreen() {
   const balances = userDocument ? userDocument.friends : undefined;
   const friendsUIDs = balances ? Object.keys(balances) : undefined;
 
-  const friendsQuery = friendsUIDs ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
+  const friendsQuery = friendsUIDs?.length ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
   const [friendsData, , errorFriendsDB] = useCollectionData(friendsQuery);
 
   const formattedBalances = friendsData ? friendsUIDs?.map((uid: string) => {
@@ -115,9 +126,34 @@ export default function FriendsScreen() {
               <Button onPress={() => login(email, password)}>
                 <Text style={{ color: colors.primary, textAlign: 'center' }}>Login</Text>
               </Button>
+              <TouchableOpacity style={{ flexDirection: 'row' }} onPress={() => navigation.navigate('Sign Up')}>
+                <Text>Need an account?</Text>
+                <Text style={{ textDecorationLine: 'underline' }}> Sign up here!</Text>
+              </TouchableOpacity>
             </View>
           )
       }
     </View>
+  );
+}
+
+FriendsPage.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
+};
+
+const RootStack = createStackNavigator();
+
+export default function FriendsScreen() {
+  return (
+    <RootStack.Navigator>
+      <RootStack.Group screenOptions={{ headerShown: false }}>
+        <RootStack.Screen name="Friends Page" component={FriendsPage} />
+      </RootStack.Group>
+      <RootStack.Group>
+        <RootStack.Screen name="Sign Up" component={SignUpScreen} />
+      </RootStack.Group>
+    </RootStack.Navigator>
   );
 }
