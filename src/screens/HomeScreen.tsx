@@ -25,6 +25,13 @@ import NumericInput from 'react-native-numeric-input';
 
 import uuid from 'react-native-uuid';
 
+// Firebase
+import { getAuth } from 'firebase/auth';
+import {
+  collection, getFirestore, addDoc,
+} from 'firebase/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
+
 // Global State Stuff
 import { useGlobalState } from '../hooks/hooks';
 
@@ -40,6 +47,9 @@ import StatsSection from '../components/Home/StatsSection';
 import { colors } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
 
+const db = getFirestore();
+const auth = getAuth();
+
 const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
 
 enum ActiveInput {
@@ -51,6 +61,7 @@ enum ActiveInput {
 let sessionToken = uuid.v4();
 
 export default function HomeScreen() {
+  const [user] = useAuthState(auth);
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
   const [{
     cost,
@@ -94,6 +105,17 @@ export default function HomeScreen() {
         });
       });
   }, [startLocation, endLocation]);
+
+  const addToFriend = useCallback(async () => {
+    await addDoc(collection(db, 'Transactions'), {
+      amount: Number(cost.toFixed(2)),
+      payeeUID: user?.uid ?? '',
+      // TODO: Set this based on the user's friends list
+      payerUID: 'UIrBmJyi31hxTEt52MkqCF7Vjgg1',
+      distance,
+      gasPrice,
+    });
+  }, [cost]);
 
   const updateSuggestions = useCallback((input: string) => {
     // If empty then just clear the suggestions
@@ -188,6 +210,15 @@ export default function HomeScreen() {
         <Button onPress={submit} disabled={!globalState['Enable Requests']}>
           <Text style={{ color: colors.primary }}>Calculate</Text>
         </Button>
+        {
+          cost && user
+            ? (
+              <Button onPress={addToFriend}>
+                <Text style={{ color: colors.primary }}>Add to Friend</Text>
+              </Button>
+            )
+            : undefined
+        }
       </View>
     </KeyboardAvoidingView>
   );
