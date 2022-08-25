@@ -5,8 +5,6 @@
 * Add modal for adjusting gas price manually
 * Fuel Efficiency Configuration
 * Highway vs City driving
-* User management / Friends
-* Navigation Bar
 * Add clear button to Input component
 *
 */

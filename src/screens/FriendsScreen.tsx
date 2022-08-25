@@ -1,9 +1,10 @@
 // React
-import React from 'react';
-import { View } from 'react-native';
-import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import { TouchableOpacity, View } from 'react-native';
 
-import { DataTable } from 'react-native-paper';
+import {
+  DataTable, Provider, Portal, Modal,
+} from 'react-native-paper';
 
 // Firebase
 import {
@@ -15,6 +16,8 @@ import { auth, db } from '../../firebase';
 
 // Screens
 import LoginScreen from './LoginScreen';
+import Text from '../components/Text';
+import AddFriendsTable from '../components/Friends/AddFriendsTable';
 
 const usersRef = collection(db, 'Users');
 
@@ -37,6 +40,8 @@ export default function FriendsScreen() {
     };
   }) : undefined;
 
+  const [visible, setVisible] = useState(false);
+
   if (errorUserDB || errorFriendsDB || error) {
     console.log(errorUserDB, errorFriendsDB, error);
   }
@@ -48,41 +53,50 @@ export default function FriendsScreen() {
   }
 
   return (
-    <View>
-      <DataTable style={{ height: '70%' }}>
+    <Provider>
+      <View>
+        <Portal>
+          <Modal visible={visible} onDismiss={() => setVisible((state) => !state)} contentContainerStyle={{ backgroundColor: 'white', padding: 20 }}>
+            <AddFriendsTable />
+          </Modal>
+        </Portal>
+        <DataTable style={{ height: '70%' }}>
 
-        <DataTable.Header>
-          <DataTable.Title>Friend</DataTable.Title>
-          <DataTable.Title numeric>Amount Owed</DataTable.Title>
-        </DataTable.Header>
+          <DataTable.Header>
+            <DataTable.Title>Friend</DataTable.Title>
+            <DataTable.Title numeric>Amount Owed</DataTable.Title>
+          </DataTable.Header>
 
-        {
-          formattedBalances?.map((balance) => (
-            <DataTable.Row key={balance.name}>
-              <DataTable.Cell>{balance.name}</DataTable.Cell>
-              <DataTable.Cell numeric>
-                $
-                {balance.amount}
-              </DataTable.Cell>
-            </DataTable.Row>
-          ))
-        }
+          {
+            formattedBalances?.map((balance) => (
+              <DataTable.Row key={balance.name}>
+                <DataTable.Cell>{balance.name}</DataTable.Cell>
+                <DataTable.Cell numeric>
+                  $
+                  {balance.amount}
+                </DataTable.Cell>
+              </DataTable.Row>
+            ))
+          }
+          <DataTable.Row>
+            <DataTable.Cell>Add Friend</DataTable.Cell>
+            <DataTable.Cell numeric>
+              <TouchableOpacity onPress={() => setVisible((state) => !state)}>
+                <Text>+</Text>
+              </TouchableOpacity>
+            </DataTable.Cell>
+          </DataTable.Row>
 
-        <DataTable.Pagination
-          page={0}
-          numberOfPages={2}
-          onPageChange={() => {}}
-          label="1-4 of 4"
-          selectPageDropdownLabel="Rows per page"
-        />
+          <DataTable.Pagination
+            page={0}
+            numberOfPages={2}
+            onPageChange={() => {}}
+            label="1-4 of 4"
+            selectPageDropdownLabel="Rows per page"
+          />
 
-      </DataTable>
-    </View>
+        </DataTable>
+      </View>
+    </Provider>
   );
 }
-
-FriendsScreen.propTypes = {
-  navigation: PropTypes.shape({
-    navigate: PropTypes.func.isRequired,
-  }).isRequired,
-};

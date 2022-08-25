@@ -10,6 +10,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
+    "publish-functions": "firebase deploy",
     "lint": "npx eslint './src/' 'App.tsx'",
     "lint-client": "npx eslint './src/' 'App.tsx'",
     "lint-server": "npx eslint './server/src/'",
