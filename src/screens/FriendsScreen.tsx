@@ -2,7 +2,6 @@ import React from 'react';
 import { View } from 'react-native';
 import PropTypes from 'prop-types';
 
-import { signOut } from 'firebase/auth';
 import {
   collection, doc, query, where,
 } from 'firebase/firestore';
@@ -15,19 +14,8 @@ import { auth, db } from '../../firebase';
 
 import LoginScreen from './LoginScreen';
 
-import Button from '../components/Button';
-import Text from '../components/Text';
-
-import { colors } from '../styles/styles';
-
 const usersRef = collection(db, 'Users');
 
-const logout = () => {
-  signOut(auth)
-    .then(() => {
-      console.log('signed out!');
-    });
-};
 export default function FriendsScreen() {
   const [user, loading, error] = useAuthState(auth);
 
@@ -87,9 +75,6 @@ export default function FriendsScreen() {
         />
 
       </DataTable>
-      <Button onPress={logout}>
-        <Text style={{ color: colors.primary, textAlign: 'center' }}>Log Out</Text>
-      </Button>
     </View>
   );
 }

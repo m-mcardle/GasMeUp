@@ -63,7 +63,7 @@ export const globalStyles = StyleSheet.create({
     textAlign: 'center',
   },
   disabledButton: {
-    backgroundColor: colors.red,
+    backgroundColor: colors.darkestGray,
   },
   centered: {
     alignItems: 'center',

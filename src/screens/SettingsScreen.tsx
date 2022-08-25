@@ -1,11 +1,16 @@
 import React, { useMemo } from 'react';
-
 import {
   KeyboardAvoidingView,
   Settings,
   View,
   Switch,
 } from 'react-native';
+
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../firebase';
+
+import Button from '../components/Button';
 import Text from '../components/Text';
 
 // Global state stuff
@@ -15,7 +20,16 @@ import { useGlobalState, SETTINGS } from '../hooks/hooks';
 import styles from '../styles/SettingsScreen.styles';
 import { colors } from '../styles/styles';
 
+const logout = () => {
+  signOut(auth)
+    .then(() => {
+      console.log('signed out!');
+    });
+};
+
 export default function SettingsScreen() {
+  const [user] = useAuthState(auth);
+
   const initialSettingsObject: any = {};
   SETTINGS.forEach((setting) => {
     initialSettingsObject[setting] = !!Settings.get(setting);
@@ -53,6 +67,15 @@ export default function SettingsScreen() {
             <SettingsSwitch name={setting} value={globalState[setting]} />
           </View>
         ))}
+        {
+          user
+            ? (
+              <Button onPress={logout}>
+                <Text style={{ color: colors.primary, textAlign: 'center' }}>Log Out</Text>
+              </Button>
+            )
+            : undefined
+        }
       </View>
     </KeyboardAvoidingView>
   );
