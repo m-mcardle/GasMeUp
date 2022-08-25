@@ -75,8 +75,8 @@ function FriendsPage({ navigation }: Props) {
       {
         user && !loading && !error
           ? (
-            <View style={styles.main}>
-              <DataTable>
+            <View>
+              <DataTable style={{ height: '70%' }}>
 
                 <DataTable.Header>
                   <DataTable.Title>Friend</DataTable.Title>
