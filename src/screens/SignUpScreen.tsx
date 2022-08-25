@@ -39,7 +39,7 @@ export default function SignUpScreen({ navigation }: Props) {
           });
       })
       .catch((exception) => {
-        Alert.alert(exception);
+        Alert.alert('Error', exception.message);
       });
   };
 

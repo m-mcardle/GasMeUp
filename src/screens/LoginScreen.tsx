@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View, Alert } from 'react-native';
 import PropTypes from 'prop-types';
 
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -21,6 +21,9 @@ const login = (email: string, password: string) => {
   signInWithEmailAndPassword(auth, email, password)
     .then(() => {
       console.log('signed in!');
+    })
+    .catch((exception) => {
+      Alert.alert('Error', exception.message);
     });
 };
 

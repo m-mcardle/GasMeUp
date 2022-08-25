@@ -4,6 +4,7 @@ import {
   Settings,
   View,
   Switch,
+  Alert,
 } from 'react-native';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -24,6 +25,9 @@ const logout = () => {
   signOut(auth)
     .then(() => {
       console.log('signed out!');
+    })
+    .catch((exception) => {
+      Alert.alert('Error', exception.message);
     });
 };
 
