@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import PropTypes from 'prop-types';
 
-import { getAuth, signOut, signInWithEmailAndPassword } from 'firebase/auth';
+import { signOut, signInWithEmailAndPassword } from 'firebase/auth';
 import {
-  collection, doc, getFirestore, query, where,
+  collection, doc, query, where,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
@@ -12,6 +12,8 @@ import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firesto
 import { DataTable } from 'react-native-paper';
 
 import { createStackNavigator } from '@react-navigation/stack';
+
+import { auth, db } from '../../firebase';
 
 import SignUpScreen from './SignUpScreen';
 
@@ -21,9 +23,6 @@ import Text from '../components/Text';
 
 import { colors } from '../styles/styles';
 import styles from '../styles/FriendsScreen.styles';
-
-const auth = getAuth();
-const db = getFirestore();
 
 const usersRef = collection(db, 'Users');
 

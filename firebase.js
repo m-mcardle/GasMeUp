@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
 import {
@@ -6,6 +8,8 @@ import {
   createUserWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
+import { getReactNativePersistence, initializeAuth } from 'firebase/auth/react-native';
+
 import { getFirestore } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -25,7 +29,10 @@ const firebaseConfig = {
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 
-export const auth = getAuth();
+// Needed to fix `AsyncStorage has been extracted from react-native core` warning
+export const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
+});
 
 export const db = getFirestore();
 
@@ -34,7 +41,6 @@ onAuthStateChanged(auth, (user) => {
   if (user != null) {
     console.log('We are authenticated now!');
   }
-
   // Do other things
 });
 

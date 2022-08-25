@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { View, Alert } from 'react-native';
 import PropTypes from 'prop-types';
 
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import {
-  setDoc, getFirestore, doc,
-} from 'firebase/firestore';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { setDoc, doc } from 'firebase/firestore';
+import { auth, db } from '../../firebase';
 
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -13,9 +12,6 @@ import Text from '../components/Text';
 
 import { colors } from '../styles/styles';
 import styles from '../styles/FriendsScreen.styles';
-
-const auth = getAuth();
-const db = getFirestore();
 
 interface Props {
   navigation: {

@@ -26,11 +26,9 @@ import NumericInput from 'react-native-numeric-input';
 import uuid from 'react-native-uuid';
 
 // Firebase
-import { getAuth } from 'firebase/auth';
-import {
-  collection, getFirestore, addDoc,
-} from 'firebase/firestore';
+import { collection, addDoc } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, db } from '../../firebase';
 
 // Global State Stuff
 import { useGlobalState } from '../hooks/hooks';
@@ -46,9 +44,6 @@ import StatsSection from '../components/Home/StatsSection';
 // Styles
 import { colors } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
-
-const db = getFirestore();
-const auth = getAuth();
 
 const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
 
