@@ -10,8 +10,7 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import Text from '../components/Text';
 
-import { colors } from '../styles/styles';
-import styles from '../styles/FriendsScreen.styles';
+import { colors, globalStyles } from '../styles/styles';
 
 interface Props {
   navigation: {
@@ -51,7 +50,7 @@ export default function SignUpScreen({ navigation }: Props) {
 
   return (
     <View>
-      <View style={styles.main}>
+      <View style={globalStyles.centered}>
         <Input
           placeholder="First Name"
           onChangeText={setFirstName}

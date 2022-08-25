@@ -79,7 +79,9 @@ function TabIcon({
   );
 }
 
-console.log(firebase.auth.currentUser);
+// This is just to ensure that firebase is initialized on first rendering
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { auth } = firebase;
 
 export default function App() {
   const [globalState, setGlobalState] = useState(initialState);

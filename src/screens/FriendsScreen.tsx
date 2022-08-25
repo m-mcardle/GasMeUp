@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import PropTypes from 'prop-types';
 
@@ -11,18 +11,14 @@ import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firesto
 
 import { DataTable } from 'react-native-paper';
 
-import { createStackNavigator } from '@react-navigation/stack';
-
 import { auth, db } from '../../firebase';
 
-import SignUpScreen from './SignUpScreen';
 import LoginScreen from './LoginScreen';
 
 import Button from '../components/Button';
 import Text from '../components/Text';
 
 import { colors } from '../styles/styles';
-import styles from '../styles/FriendsScreen.styles';
 
 const usersRef = collection(db, 'Users');
 
@@ -32,14 +28,7 @@ const logout = () => {
       console.log('signed out!');
     });
 };
-
-interface Props {
-  navigation: {
-    navigate: (str: string) => {}
-  },
-}
-
-function FriendsPage({ navigation }: Props) {
+export default function FriendsScreen() {
   const [user, loading, error] = useAuthState(auth);
 
   const userDoc = user?.uid ? doc(db, 'Users', user.uid) : undefined;
@@ -62,11 +51,11 @@ function FriendsPage({ navigation }: Props) {
     console.log(errorUserDB, errorFriendsDB, error);
   }
 
-  useEffect(() => {
-    if (!user || loading || error) {
-      navigation.navigate('Login');
-    }
-  }, [user, loading, error]);
+  if (!user || loading || error) {
+    return (
+      <LoginScreen />
+    );
+  }
 
   return (
     <View>
@@ -105,24 +94,8 @@ function FriendsPage({ navigation }: Props) {
   );
 }
 
-FriendsPage.propTypes = {
+FriendsScreen.propTypes = {
   navigation: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
   }).isRequired,
 };
-
-const RootStack = createStackNavigator();
-
-export default function FriendsScreen() {
-  return (
-    <RootStack.Navigator>
-      <RootStack.Group screenOptions={{ headerShown: false }}>
-        <RootStack.Screen name="Friends Page" component={FriendsPage} />
-        <RootStack.Screen name="Login" component={LoginScreen} />
-      </RootStack.Group>
-      <RootStack.Group>
-        <RootStack.Screen name="Sign Up" component={SignUpScreen} />
-      </RootStack.Group>
-    </RootStack.Navigator>
-  );
-}

@@ -65,4 +65,10 @@ export const globalStyles = StyleSheet.create({
   disabledButton: {
     backgroundColor: colors.red,
   },
+  centered: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 'auto',
+    height: '100%',
+  },
 });
