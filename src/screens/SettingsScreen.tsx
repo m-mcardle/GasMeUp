@@ -1,3 +1,4 @@
+// React
 import React, { useMemo } from 'react';
 import {
   KeyboardAvoidingView,
@@ -7,10 +8,12 @@ import {
   Alert,
 } from 'react-native';
 
+// Firebase
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
 
+// Components
 import Button from '../components/Button';
 import Text from '../components/Text';
 

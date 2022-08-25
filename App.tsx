@@ -24,6 +24,7 @@ import React, { useState, useMemo } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+// Firebase
 import firebase from './firebase';
 
 // Global State

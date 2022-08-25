@@ -1,17 +1,19 @@
+// React
 import React from 'react';
 import { View } from 'react-native';
 import PropTypes from 'prop-types';
 
+import { DataTable } from 'react-native-paper';
+
+// Firebase
 import {
   collection, doc, query, where,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
-
-import { DataTable } from 'react-native-paper';
-
 import { auth, db } from '../../firebase';
 
+// Screens
 import LoginScreen from './LoginScreen';
 
 const usersRef = collection(db, 'Users');

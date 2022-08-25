@@ -1,15 +1,19 @@
+// React
 import React, { useState } from 'react';
 import { View, Alert } from 'react-native';
 import PropTypes from 'prop-types';
 
+// Firebase
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 
+// Components
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Text from '../components/Text';
 
+// Styles
 import { colors, globalStyles } from '../styles/styles';
 
 interface Props {

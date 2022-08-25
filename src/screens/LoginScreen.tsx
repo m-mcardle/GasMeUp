@@ -1,20 +1,23 @@
+// React
 import React, { useState } from 'react';
 import { TouchableOpacity, View, Alert } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
 import PropTypes from 'prop-types';
 
+// Firebase
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
-
-import { createStackNavigator } from '@react-navigation/stack';
-
 import { auth } from '../../firebase';
 
+// Screen
 import SignUpScreen from './SignUpScreen';
 
+// Components
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Text from '../components/Text';
 
+// Styles
 import { colors, globalStyles } from '../styles/styles';
 
 const login = (email: string, password: string) => {
