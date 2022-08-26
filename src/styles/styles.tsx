@@ -71,4 +71,7 @@ export const globalStyles = StyleSheet.create({
     marginVertical: 'auto',
     height: '100%',
   },
+  table: {
+    height: '70%',
+  },
 });

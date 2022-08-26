@@ -15,6 +15,9 @@ import { db, auth } from '../../../firebase';
 // Screens
 import Text from '../Text';
 
+// Styles
+import { globalStyles } from '../../styles/styles';
+
 const usersRef = collection(db, 'Users');
 
 export default function AddFriendsTable() {
@@ -64,7 +67,7 @@ export default function AddFriendsTable() {
 
   return (
     <View>
-      <DataTable style={{ height: '70%' }}>
+      <DataTable style={globalStyles.table}>
 
         <DataTable.Header>
           <DataTable.Title>Friend</DataTable.Title>

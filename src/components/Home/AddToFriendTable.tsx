@@ -15,17 +15,21 @@ import { db, auth } from '../../../firebase';
 // Screens
 import Text from '../Text';
 
+// Styles
+import { globalStyles } from '../../styles/styles';
+
 const usersRef = collection(db, 'Users');
 
 interface Props {
-  cost: Number,
-  gasPrice: Number,
-  distance: Number,
+  cost: number,
+  gasPrice: number,
+  distance: number,
+  riders: number,
   closeModal: Function,
 }
 
 export default function AddToFriendTable({
-  cost, gasPrice, distance, closeModal,
+  cost, gasPrice, distance, riders, closeModal,
 }: Props) {
   const itemsPerPage = 5;
   const [page, setPage] = useState(0);
@@ -46,11 +50,13 @@ export default function AddToFriendTable({
     }
     try {
       await addDoc(collection(db, 'Transactions'), {
-        amount: Number(cost.toFixed(2)),
+        cost: Number(cost.toFixed(2)),
+        amount: Number(cost.toFixed(2)) / riders,
         payeeUID: currentUser.uid,
         payerUID: friend.uid,
         distance,
         gasPrice,
+        riders,
       });
       closeModal();
     } catch (exception) {
@@ -58,21 +64,21 @@ export default function AddToFriendTable({
     }
   }, [currentUser, cost, distance, gasPrice]);
 
+  const pageStart = page * itemsPerPage + 1;
+  const pageEnd = (page + 1) * itemsPerPage;
+  const numberOfPages = Number(((usersData.length) / itemsPerPage).toFixed(0));
+
   const pageUserData = usersData.length
-    ? usersData.slice((page * itemsPerPage), ((page + 1) * itemsPerPage))
+    ? usersData.slice((pageStart - 1), (pageEnd))
     : [];
 
   if (errorUsersDB) {
     console.log(errorUsersDB);
   }
 
-  const pageStart = page * itemsPerPage + 1;
-  const pageEnd = (page + 1) * itemsPerPage;
-  const numberOfPages = Number(((usersData.length) / itemsPerPage).toFixed(0));
-
   return (
     <View>
-      <DataTable style={{ height: '70%' }}>
+      <DataTable style={globalStyles.table}>
 
         <DataTable.Header>
           <DataTable.Title>Friend</DataTable.Title>

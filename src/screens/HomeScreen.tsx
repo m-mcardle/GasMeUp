@@ -212,6 +212,7 @@ export default function HomeScreen() {
                         cost={cost}
                         distance={distance}
                         gasPrice={gasPrice}
+                        riders={riders}
                         closeModal={() => setModalVisible(false)}
                       />
                     </Modal>
