@@ -88,7 +88,7 @@ export default function HomeScreen() {
     fetch(`${serverUrl}/trip-cost/?start=${startLocation}&end=${endLocation}`)
       .then((res) => {
         if (!res?.ok || !res) {
-          console.log(`Request for trip cost failed (${res.status})`);
+          Alert.alert('Error', `Request for trip cost failed (${res.status})`);
           return Error(`Request failed (${res.status})`);
         }
         return res.json();
@@ -97,7 +97,7 @@ export default function HomeScreen() {
         loading: false, cost: data.cost, distance: data.distance, gasPrice: data.gasPrice,
       }))
       .catch((err) => {
-        Alert.alert(err);
+        Alert.alert('Error', err.message);
         setCostRequest({
           loading: false, cost: 0, distance: 0, gasPrice: 0,
         });
@@ -155,7 +155,11 @@ export default function HomeScreen() {
 
   return (
     <Provider>
-      <KeyboardAvoidingView behavior="padding" style={styles.main}>
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={160}
+        style={styles.main}
+      >
         <View style={styles.container}>
           <Text style={styles.title}>⛽️ Gas Me Up 💸</Text>
         </View>

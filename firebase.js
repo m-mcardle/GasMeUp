@@ -1,21 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-import {
-  getAuth,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signOut,
-} from 'firebase/auth';
 import { getReactNativePersistence, initializeAuth } from 'firebase/auth/react-native';
 
 import { getFirestore } from 'firebase/firestore';
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: 'AIzaSyDxBb15kMpTmnBMr1tSIa7bAPMO7UJY8AY',
   authDomain: 'northern-bot-301518.firebaseapp.com',
@@ -36,20 +25,8 @@ export const auth = initializeAuth(app, {
 
 export const db = getFirestore();
 
-// Listen for authentication state to change.
-onAuthStateChanged(auth, (user) => {
-  if (user != null) {
-    console.log('We are authenticated now!');
-  }
-  // Do other things
-});
-
 export default {
   app,
   auth,
   db,
-  getAuth,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signOut,
 };

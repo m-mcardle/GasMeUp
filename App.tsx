@@ -127,6 +127,7 @@ export default function App() {
         <Tab.Navigator
           initialRouteName="Home"
           screenOptions={({ route }) => ({
+            headerShown: false,
             tabBarIcon: ({ focused, color, size }) => TabIcon(
               {
                 name: route.name,

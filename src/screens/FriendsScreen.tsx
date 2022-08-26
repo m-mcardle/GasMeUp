@@ -16,12 +16,17 @@ import { auth, db } from '../../firebase';
 
 // Screens
 import LoginScreen from './LoginScreen';
+
+// Components
 import Text from '../components/Text';
+
 import AddFriendsTable from '../components/Friends/AddFriendsTable';
 
 const usersRef = collection(db, 'Users');
 
 export default function FriendsScreen() {
+  const itemsPerPage = 5;
+  const [page, setPage] = useState(0);
   const [user, loading, error] = useAuthState(auth);
 
   const userDoc = user?.uid ? doc(db, 'Users', user.uid) : undefined;
@@ -33,18 +38,22 @@ export default function FriendsScreen() {
   const friendsQuery = friendsUIDs?.length ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
   const [friendsData, , errorFriendsDB] = useCollectionData(friendsQuery);
 
-  const formattedBalances = friendsData ? friendsUIDs?.map((uid: string) => {
-    const currentFriend = friendsData?.find((friend) => friend.uid === uid);
+  const formattedBalances = friendsData && friendsUIDs ? friendsUIDs.map((uid: string) => {
+    const currentFriend = friendsData.find((friend) => friend.uid === uid);
     return {
       name: `${currentFriend?.firstName} ${currentFriend?.lastName}`, amount: balances[uid],
     };
-  }) : undefined;
+  }) : [];
 
   const [visible, setVisible] = useState(false);
 
   if (errorUserDB || errorFriendsDB || error) {
     console.log(errorUserDB, errorFriendsDB, error);
   }
+
+  const pageStart = page * itemsPerPage + 1;
+  const pageEnd = (page + 1) * itemsPerPage;
+  const numberOfPages = Number(((formattedBalances.length) / itemsPerPage).toFixed(0));
 
   if (!user || loading || error) {
     return (
@@ -60,7 +69,7 @@ export default function FriendsScreen() {
             <AddFriendsTable />
           </Modal>
         </Portal>
-        <DataTable style={{ height: '70%' }}>
+        <DataTable style={{ height: '70%', paddingVertical: 48 }}>
 
           <DataTable.Header>
             <DataTable.Title>Friend</DataTable.Title>
@@ -68,7 +77,7 @@ export default function FriendsScreen() {
           </DataTable.Header>
 
           {
-            formattedBalances?.map((balance) => (
+            formattedBalances.map((balance) => (
               <DataTable.Row key={balance.name}>
                 <DataTable.Cell>{balance.name}</DataTable.Cell>
                 <DataTable.Cell textStyle={balance.amount < 0 ? { color: 'red' } : undefined} numeric>
@@ -88,11 +97,12 @@ export default function FriendsScreen() {
           </DataTable.Row>
 
           <DataTable.Pagination
-            page={0}
-            numberOfPages={2}
-            onPageChange={() => {}}
-            label="1-4 of 4"
+            page={page}
+            numberOfPages={numberOfPages}
+            onPageChange={setPage}
+            label={`${pageStart}-${Math.min(pageEnd, formattedBalances.length)} of ${formattedBalances.length}`}
             selectPageDropdownLabel="Rows per page"
+            numberOfItemsPerPage={itemsPerPage}
           />
 
         </DataTable>

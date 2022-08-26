@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.tertiary,
     margin: 5,
     padding: 5,
+    minHeight: 72,
   },
   emptyList: {
     padding: 5,

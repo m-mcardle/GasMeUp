@@ -38,7 +38,7 @@ export default function AddToFriendTable({
   const friendsUIDs = Object.keys(userFriends);
 
   const usersQuery = friendsUIDs.length ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
-  const [usersData, , errorUsersDB] = useCollectionData(usersQuery);
+  const [usersData = [], , errorUsersDB] = useCollectionData(usersQuery);
 
   const addCostToFriend = useCallback(async (friend) => {
     if (!currentUser?.uid) {
@@ -58,13 +58,17 @@ export default function AddToFriendTable({
     }
   }, [currentUser, cost, distance, gasPrice]);
 
-  const pageUserData = usersData?.length
+  const pageUserData = usersData.length
     ? usersData.slice((page * itemsPerPage), ((page + 1) * itemsPerPage))
     : [];
 
   if (errorUsersDB) {
     console.log(errorUsersDB);
   }
+
+  const pageStart = page * itemsPerPage + 1;
+  const pageEnd = (page + 1) * itemsPerPage;
+  const numberOfPages = Number(((usersData.length) / itemsPerPage).toFixed(0));
 
   return (
     <View>
@@ -92,9 +96,9 @@ export default function AddToFriendTable({
 
         <DataTable.Pagination
           page={page}
-          numberOfPages={(usersData?.length ?? 1) / itemsPerPage}
+          numberOfPages={numberOfPages}
           onPageChange={setPage}
-          label={`${page * itemsPerPage + 1}-${(page + 1) * itemsPerPage} of ${usersData?.length}`}
+          label={`${pageStart}-${Math.min(pageEnd, usersData.length)} of ${usersData.length}`}
           selectPageDropdownLabel="Rows per page"
           numberOfItemsPerPage={itemsPerPage}
         />
