@@ -21,12 +21,15 @@ import {
 // External Components
 import NumericInput from 'react-native-numeric-input';
 
+import {
+  Provider, Portal, Modal,
+} from 'react-native-paper';
+
 import uuid from 'react-native-uuid';
 
 // Firebase
-import { collection, addDoc } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, db } from '../../firebase';
+import { auth } from '../../firebase';
 
 // Global State Stuff
 import { useGlobalState } from '../hooks/hooks';
@@ -38,6 +41,7 @@ import Input from '../components/Input';
 
 import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
+import AddFriendsTable from '../components/Home/AddToFriendTable';
 
 // Styles
 import { colors } from '../styles/styles';
@@ -74,6 +78,7 @@ export default function HomeScreen() {
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
   const [riders, setRiders] = useState<number>(1);
   const [globalState] = useGlobalState();
+  const [modalVisible, setModalVisible] = useState(false);
 
   const submit = useCallback(() => {
     Keyboard.dismiss();
@@ -98,17 +103,6 @@ export default function HomeScreen() {
         });
       });
   }, [startLocation, endLocation]);
-
-  const addToFriend = useCallback(async () => {
-    await addDoc(collection(db, 'Transactions'), {
-      amount: Number(cost.toFixed(2)),
-      payeeUID: user?.uid ?? '',
-      // TODO: Set this based on the user's friends list
-      payerUID: 'UIrBmJyi31hxTEt52MkqCF7Vjgg1',
-      distance,
-      gasPrice,
-    });
-  }, [cost]);
 
   const updateSuggestions = useCallback((input: string) => {
     // If empty then just clear the suggestions
@@ -160,59 +154,73 @@ export default function HomeScreen() {
   };
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.main}>
-      <View style={styles.container}>
-        <Text style={styles.title}>⛽️ Gas Me Up 💸</Text>
-      </View>
-      <View style={styles.dataContainer}>
-        <StatsSection
-          loading={loading}
-          cost={cost}
-          riders={riders}
-          distance={distance}
-          gasPrice={gasPrice}
-        />
-        <View style={styles.ridersSection}>
-          <Text style={styles.ridersText}>Riders:</Text>
-          <NumericInput
-            rounded
-            totalHeight={18}
-            totalWidth={120}
-            containerStyle={{ backgroundColor: 'white' }}
-            inputStyle={styles.numericInput}
-            minValue={1}
-            leftButtonBackgroundColor={colors.lightGray}
-            rightButtonBackgroundColor={colors.tertiary}
-            value={riders}
-            onChange={setRiders}
-          />
+    <Provider>
+      <KeyboardAvoidingView behavior="padding" style={styles.main}>
+        <View style={styles.container}>
+          <Text style={styles.title}>⛽️ Gas Me Up 💸</Text>
         </View>
-        <Input
-          placeholder="Start location"
-          onChangeText={updateStartLocation}
-          onPressIn={() => changeActiveInput(ActiveInput.Start)}
-          value={startLocation}
-        />
-        <Input
-          placeholder="End location"
-          onChangeText={updateEndLocation}
-          onPressIn={() => changeActiveInput(ActiveInput.End)}
-          value={endLocation}
-        />
-        <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-        <Button onPress={submit} disabled={!globalState['Enable Requests']}>
-          <Text style={{ color: colors.primary }}>Calculate</Text>
-        </Button>
-        {
-          cost && user
-            ? (
-              <Button onPress={addToFriend}>
-                <Text style={{ color: colors.primary }}>Add to Friend</Text>
-              </Button>
-            )
-            : undefined
-        }
-      </View>
-    </KeyboardAvoidingView>
+        <View style={styles.dataContainer}>
+          <StatsSection
+            loading={loading}
+            cost={cost}
+            riders={riders}
+            distance={distance}
+            gasPrice={gasPrice}
+          />
+          <View style={styles.ridersSection}>
+            <Text style={styles.ridersText}>Riders:</Text>
+            <NumericInput
+              rounded
+              totalHeight={18}
+              totalWidth={120}
+              containerStyle={{ backgroundColor: 'white' }}
+              inputStyle={styles.numericInput}
+              minValue={1}
+              leftButtonBackgroundColor={colors.lightGray}
+              rightButtonBackgroundColor={colors.tertiary}
+              value={riders}
+              onChange={setRiders}
+            />
+          </View>
+          <Input
+            placeholder="Start location"
+            onChangeText={updateStartLocation}
+            onPressIn={() => changeActiveInput(ActiveInput.Start)}
+            value={startLocation}
+          />
+          <Input
+            placeholder="End location"
+            onChangeText={updateEndLocation}
+            onPressIn={() => changeActiveInput(ActiveInput.End)}
+            value={endLocation}
+          />
+          <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
+          <Button onPress={submit} disabled={!globalState['Enable Requests']}>
+            <Text style={{ color: colors.primary }}>Calculate</Text>
+          </Button>
+          {
+            cost && user
+              ? (
+                <View>
+                  <Portal>
+                    <Modal visible={modalVisible} onDismiss={() => setModalVisible(false)} contentContainerStyle={{ backgroundColor: 'white', padding: 20 }}>
+                      <AddFriendsTable
+                        cost={cost}
+                        distance={distance}
+                        gasPrice={gasPrice}
+                        closeModal={() => setModalVisible(false)}
+                      />
+                    </Modal>
+                  </Portal>
+                  <Button onPress={() => setModalVisible(true)}>
+                    <Text style={{ color: colors.primary }}>Assign to Friend</Text>
+                  </Button>
+                </View>
+              )
+              : undefined
+          }
+        </View>
+      </KeyboardAvoidingView>
+    </Provider>
   );
 }

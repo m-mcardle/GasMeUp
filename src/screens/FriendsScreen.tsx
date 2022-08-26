@@ -71,7 +71,7 @@ export default function FriendsScreen() {
             formattedBalances?.map((balance) => (
               <DataTable.Row key={balance.name}>
                 <DataTable.Cell>{balance.name}</DataTable.Cell>
-                <DataTable.Cell numeric>
+                <DataTable.Cell textStyle={balance.amount < 0 ? { color: 'red' } : undefined} numeric>
                   $
                   {balance.amount}
                 </DataTable.Cell>

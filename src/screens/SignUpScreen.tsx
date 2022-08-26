@@ -32,6 +32,7 @@ export default function SignUpScreen({ navigation }: Props) {
 
         setDoc(doc(db, 'Users', user.uid), {
           uid: user.uid,
+          email,
           firstName,
           lastName,
           transactions: [],
