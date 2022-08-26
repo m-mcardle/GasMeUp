@@ -130,6 +130,8 @@ export default function App() {
             ),
             tabBarActiveTintColor: colors.tertiary,
             tabBarInactiveTintColor: colors.secondary,
+            headerShown: false,
+            tabBarStyle: { backgroundColor: colors.primary },
           })}
         >
           <Tab.Screen name="Friends" component={FriendsScreen} />
