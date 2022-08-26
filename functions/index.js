@@ -97,9 +97,6 @@ exports.updateFriendsList = functions.firestore
 
         const friendsFriendsList = friendDoc.data().friends;
 
-        console.log(`Updating ${friendUID} to have list:
-          ${{...friendsFriendsList, [uid]: 0}}
-        `);
         // Update friend's friends list
         transaction.update(friendRef, {
           friends: {

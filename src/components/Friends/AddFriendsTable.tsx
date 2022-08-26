@@ -35,25 +35,16 @@ export default function AddFriendsTable() {
   const [usersData, , errorUsersDB] = useCollectionData(usersQuery);
 
   const addToFriendsList = useCallback(async (newFriend) => {
-    console.log(newFriend);
-    console.log(userFriends);
-    console.log(userDocument);
-    console.log({
-      ...userFriends,
-      [newFriend.uid]: 0,
-    });
-    console.log(currentUser?.uid);
     if (!currentUser?.uid) {
       return;
     }
     try {
-      const response = await updateDoc(doc(db, 'Users', currentUser.uid), {
+      await updateDoc(doc(db, 'Users', currentUser.uid), {
         friends: {
           ...userFriends,
           [newFriend.uid]: 0,
         },
       });
-      console.log('Response:', response);
     } catch (exception) {
       console.log(exception);
     }
