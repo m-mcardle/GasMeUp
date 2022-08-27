@@ -22,6 +22,9 @@ import Text from '../components/Text';
 
 import AddFriendsTable from '../components/Friends/AddFriendsTable';
 
+// Styles
+import { colors, globalStyles } from '../styles/styles';
+
 const usersRef = collection(db, 'Users');
 
 export default function FriendsScreen() {
@@ -63,9 +66,13 @@ export default function FriendsScreen() {
 
   return (
     <Provider>
-      <View>
+      <View style={{ backgroundColor: colors.primary, height: '100%' }}>
         <Portal>
-          <Modal visible={visible} onDismiss={() => setVisible((state) => !state)} contentContainerStyle={{ backgroundColor: 'white', padding: 20 }}>
+          <Modal
+            visible={visible}
+            onDismiss={() => setVisible((state) => !state)}
+            contentContainerStyle={globalStyles.modal}
+          >
             <AddFriendsTable />
           </Modal>
         </Portal>

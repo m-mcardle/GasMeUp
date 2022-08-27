@@ -46,7 +46,7 @@ function LoginPage({ navigation }: Props) {
   }
 
   return (
-    <View style={globalStyles.centered}>
+    <View style={{ ...globalStyles.centered, backgroundColor: colors.primary }}>
       <Input
         placeholder="Email"
         onChangeText={setEmail}

@@ -41,10 +41,10 @@ import Input from '../components/Input';
 
 import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
-import AddFriendsTable from '../components/Home/AddToFriendTable';
+import AddToFriendsTable from '../components/Home/AddToFriendTable';
 
 // Styles
-import { colors } from '../styles/styles';
+import { colors, globalStyles } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
 
 const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
@@ -207,8 +207,12 @@ export default function HomeScreen() {
               ? (
                 <View>
                   <Portal>
-                    <Modal visible={modalVisible} onDismiss={() => setModalVisible(false)} contentContainerStyle={{ backgroundColor: 'white', padding: 20 }}>
-                      <AddFriendsTable
+                    <Modal
+                      visible={modalVisible}
+                      onDismiss={() => setModalVisible(false)}
+                      contentContainerStyle={globalStyles.modal}
+                    >
+                      <AddToFriendsTable
                         cost={cost}
                         distance={distance}
                         gasPrice={gasPrice}

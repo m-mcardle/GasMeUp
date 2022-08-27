@@ -55,7 +55,7 @@ export default function SignUpScreen({ navigation }: Props) {
 
   return (
     <View>
-      <View style={globalStyles.centered}>
+      <View style={{ ...globalStyles.centered, backgroundColor: colors.primary }}>
         <Input
           placeholder="First Name"
           onChangeText={setFirstName}

@@ -76,4 +76,10 @@ export const globalStyles = StyleSheet.create({
   table: {
     height: '70%',
   },
+  modal: {
+    backgroundColor: colors.primary,
+    borderWidth: 4,
+    borderColor: colors.secondary,
+    padding: 20,
+  },
 });
