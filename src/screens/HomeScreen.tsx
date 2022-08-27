@@ -5,8 +5,6 @@
 * Add modal for adjusting gas price manually
 * Fuel Efficiency Configuration
 * Highway vs City driving
-* User management / Friends
-* Navigation Bar
 * Add clear button to Input component
 *
 */
@@ -23,7 +21,15 @@ import {
 // External Components
 import NumericInput from 'react-native-numeric-input';
 
+import {
+  Provider, Portal, Modal,
+} from 'react-native-paper';
+
 import uuid from 'react-native-uuid';
+
+// Firebase
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../../firebase';
 
 // Global State Stuff
 import { useGlobalState } from '../hooks/hooks';
@@ -35,12 +41,13 @@ import Input from '../components/Input';
 
 import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
+import AddToFriendsTable from '../components/Home/AddToFriendTable';
 
 // Styles
-import { colors } from '../styles/styles';
+import { colors, globalStyles } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
 
-const serverUrl = 'http://gas-me-up.loca.lt';
+const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
 
 enum ActiveInput {
   None,
@@ -51,6 +58,7 @@ enum ActiveInput {
 let sessionToken = uuid.v4();
 
 export default function HomeScreen() {
+  const [user] = useAuthState(auth);
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
   const [{
     cost,
@@ -70,6 +78,7 @@ export default function HomeScreen() {
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
   const [riders, setRiders] = useState<number>(1);
   const [globalState] = useGlobalState();
+  const [modalVisible, setModalVisible] = useState(false);
 
   const submit = useCallback(() => {
     Keyboard.dismiss();
@@ -79,7 +88,7 @@ export default function HomeScreen() {
     fetch(`${serverUrl}/trip-cost/?start=${startLocation}&end=${endLocation}`)
       .then((res) => {
         if (!res?.ok || !res) {
-          console.log(`Request for trip cost failed (${res.status})`);
+          Alert.alert('Error', `Request for trip cost failed (${res.status})`);
           return Error(`Request failed (${res.status})`);
         }
         return res.json();
@@ -88,7 +97,7 @@ export default function HomeScreen() {
         loading: false, cost: data.cost, distance: data.distance, gasPrice: data.gasPrice,
       }))
       .catch((err) => {
-        Alert.alert(err);
+        Alert.alert('Error', err.message);
         setCostRequest({
           loading: false, cost: 0, distance: 0, gasPrice: 0,
         });
@@ -145,50 +154,82 @@ export default function HomeScreen() {
   };
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.main}>
-      <View style={styles.container}>
-        <Text style={styles.title}>⛽️ Gas Me Up 💸</Text>
-      </View>
-      <View style={styles.dataContainer}>
-        <StatsSection
-          loading={loading}
-          cost={cost}
-          riders={riders}
-          distance={distance}
-          gasPrice={gasPrice}
-        />
-        <View style={styles.ridersSection}>
-          <Text style={styles.ridersText}>Riders:</Text>
-          <NumericInput
-            rounded
-            totalHeight={18}
-            totalWidth={120}
-            containerStyle={{ backgroundColor: 'white' }}
-            inputStyle={styles.numericInput}
-            minValue={1}
-            leftButtonBackgroundColor={colors.lightGray}
-            rightButtonBackgroundColor={colors.tertiary}
-            value={riders}
-            onChange={setRiders}
-          />
+    <Provider>
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={160}
+        style={styles.main}
+      >
+        <View style={styles.container}>
+          <Text style={globalStyles.title}>⛽️ Gas Me Up 💸</Text>
         </View>
-        <Input
-          placeholder="Start location"
-          onChangeText={updateStartLocation}
-          onPressOut={() => changeActiveInput(ActiveInput.Start)}
-          value={startLocation}
-        />
-        <Input
-          placeholder="End location"
-          onChangeText={updateEndLocation}
-          onPressOut={() => changeActiveInput(ActiveInput.Start)}
-          value={endLocation}
-        />
-        <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-        <Button onPress={submit} disabled={!globalState['Enable Requests']}>
-          <Text style={{ color: colors.primary }}>Calculate</Text>
-        </Button>
-      </View>
-    </KeyboardAvoidingView>
+        <View style={styles.dataContainer}>
+          <StatsSection
+            loading={loading}
+            cost={cost}
+            riders={riders}
+            distance={distance}
+            gasPrice={gasPrice}
+          />
+          <View style={styles.ridersSection}>
+            <Text style={styles.ridersText}>Riders:</Text>
+            <NumericInput
+              rounded
+              totalHeight={18}
+              totalWidth={120}
+              containerStyle={{ backgroundColor: 'white' }}
+              inputStyle={styles.numericInput}
+              minValue={1}
+              leftButtonBackgroundColor={colors.lightGray}
+              rightButtonBackgroundColor={colors.tertiary}
+              value={riders}
+              onChange={setRiders}
+            />
+          </View>
+          <Input
+            placeholder="Start location"
+            onChangeText={updateStartLocation}
+            onPressIn={() => changeActiveInput(ActiveInput.Start)}
+            value={startLocation}
+          />
+          <Input
+            placeholder="End location"
+            onChangeText={updateEndLocation}
+            onPressIn={() => changeActiveInput(ActiveInput.End)}
+            value={endLocation}
+          />
+          <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
+          <Button onPress={submit} disabled={!globalState['Enable Requests']}>
+            <Text style={{ color: colors.primary }}>Calculate</Text>
+          </Button>
+          {
+            cost && user
+              ? (
+                <View>
+                  <Portal>
+                    <Modal
+                      visible={modalVisible}
+                      onDismiss={() => setModalVisible(false)}
+                      contentContainerStyle={globalStyles.modal}
+                    >
+                      <AddToFriendsTable
+                        cost={cost}
+                        distance={distance}
+                        gasPrice={gasPrice}
+                        riders={riders}
+                        closeModal={() => setModalVisible(false)}
+                      />
+                    </Modal>
+                  </Portal>
+                  <Button onPress={() => setModalVisible(true)}>
+                    <Text style={{ color: colors.primary }}>Assign to Friend</Text>
+                  </Button>
+                </View>
+              )
+              : undefined
+          }
+        </View>
+      </KeyboardAvoidingView>
+    </Provider>
   );
 }

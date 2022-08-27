@@ -9,7 +9,7 @@
     "dotenv": "^16.0.0",
     "express": "^4.18.1",
     "jsdom": "^19.0.0",
-    "localtunnel": "^2.0.2"
+    "nodemon": "^2.0.19"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",
@@ -29,7 +29,7 @@
   "scripts": {
     "start": "nodemon ./src/index.js",
     "tunnel": "lt --port 3001 --subdomain gas-me-up",
-    "start-full": "NODE_OPTIONS='--experimental-specifier-resolution=node' START_TUNNEL='true' nodemon ./src/index.js",
+    "start-full": "NODE_OPTIONS='--experimental-specifier-resolution=node' nodemon ./src/index.js",
     "test": "jest"
   },
   "keywords": [],

@@ -6,10 +6,6 @@ import {
 
 // Styles
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 48,
-    fontFamily: boldFont,
-  },
   container: {
     flex: 1,
     alignItems: 'center',

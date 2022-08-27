@@ -1,9 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-import {
-  colors,
-  boldFont,
-} from './styles';
+import { colors } from './styles';
 
 // Styles
 const styles = StyleSheet.create({
@@ -25,10 +22,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     margin: 8,
-  },
-  title: {
-    fontSize: 50,
-    fontFamily: boldFont,
   },
   settingsText: {
     textAlign: 'right',

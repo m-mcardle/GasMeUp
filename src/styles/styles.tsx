@@ -62,8 +62,30 @@ export const globalStyles = StyleSheet.create({
     margin: 10,
     padding: 10,
     paddingHorizontal: 60,
+    textAlign: 'center',
   },
   disabledButton: {
-    backgroundColor: colors.red,
+    backgroundColor: colors.darkestGray,
+  },
+  centered: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 'auto',
+    height: '100%',
+  },
+  table: {
+    height: '70%',
+  },
+  modal: {
+    backgroundColor: colors.primary,
+    borderWidth: 4,
+    borderColor: colors.secondary,
+    padding: 20,
+  },
+  title: {
+    fontSize: 48,
+    fontFamily: boldFont,
+    textAlign: 'center',
+    padding: 10,
   },
 });
