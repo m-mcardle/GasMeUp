@@ -18,10 +18,13 @@ import { auth, db } from '../../firebase';
 import LoginScreen from './LoginScreen';
 
 // Components
+import Text from '../components/Text';
+
 import AddFriendsTable from '../components/Friends/AddFriendsTable';
 
 // Styles
-import { colors, globalStyles } from '../styles/styles';
+import styles from '../styles/FriendsScreen.styles';
+import { globalStyles } from '../styles/styles';
 
 const usersRef = collection(db, 'Users');
 
@@ -72,7 +75,7 @@ export default function FriendsScreen() {
 
   return (
     <Provider>
-      <View style={{ backgroundColor: colors.primary, height: '100%' }}>
+      <View style={styles.main}>
         <Portal>
           <Modal
             visible={visible}
@@ -82,7 +85,8 @@ export default function FriendsScreen() {
             <AddFriendsTable />
           </Modal>
         </Portal>
-        <DataTable style={{ height: '70%', paddingVertical: 48 }}>
+        <Text style={globalStyles.title}>Friends</Text>
+        <DataTable style={styles.table}>
 
           <DataTable.Header>
             <DataTable.Title>Friend</DataTable.Title>
