@@ -1,8 +1,10 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Appearance } from 'react-native';
+
+export const isDarkMode = Appearance.getColorScheme() === 'dark';
 
 export const colors = {
-  primary: '#FFFBFE',
-  secondary: '#12130F',
+  primary: isDarkMode ? '#12130F' : '#FFFBFE',
+  secondary: isDarkMode ? '#FFFBFE' : '#12130F',
   tertiary: '#8FCB9B',
   darkestGray: '#BBBBBB',
   darkGray: '#CCCCCC',
