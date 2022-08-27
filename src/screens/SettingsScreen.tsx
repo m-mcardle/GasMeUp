@@ -22,7 +22,7 @@ import { useGlobalState, SETTINGS } from '../hooks/hooks';
 
 // Styles
 import styles from '../styles/SettingsScreen.styles';
-import { colors } from '../styles/styles';
+import { colors, globalStyles } from '../styles/styles';
 
 const logout = () => {
   signOut(auth)
@@ -65,7 +65,7 @@ export default function SettingsScreen() {
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.main}>
       <View style={styles.headerContainer}>
-        <Text style={styles.title}> Settings</Text>
+        <Text style={globalStyles.title}> Settings</Text>
       </View>
       <View style={styles.mainContainer}>
         {SETTINGS.map((setting) => (

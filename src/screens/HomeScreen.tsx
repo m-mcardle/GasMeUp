@@ -161,7 +161,7 @@ export default function HomeScreen() {
         style={styles.main}
       >
         <View style={styles.container}>
-          <Text style={styles.title}>⛽️ Gas Me Up 💸</Text>
+          <Text style={globalStyles.title}>⛽️ Gas Me Up 💸</Text>
         </View>
         <View style={styles.dataContainer}>
           <StatsSection

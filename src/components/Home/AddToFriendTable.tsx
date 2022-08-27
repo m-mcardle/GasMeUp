@@ -1,6 +1,6 @@
 // React
 import React, { useState, useCallback } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 
 import { DataTable } from 'react-native-paper';
 
@@ -12,7 +12,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 import { db, auth } from '../../../firebase';
 
-// Screens
+// Components
 import Text from '../Text';
 
 // Styles
@@ -78,6 +78,7 @@ export default function AddToFriendTable({
 
   return (
     <View>
+      <Text style={globalStyles.title}>Assign Cost</Text>
       <DataTable style={globalStyles.table}>
 
         <DataTable.Header>
@@ -88,12 +89,13 @@ export default function AddToFriendTable({
         {
           userDocument
             ? pageUserData.map((user) => (
-              <DataTable.Row key={user.firstName + user.lastName + user.uid}>
+              <DataTable.Row
+                key={user.firstName + user.lastName + user.uid}
+                onPress={() => { addCostToFriend(user); }}
+              >
                 <DataTable.Cell>{`${user.firstName} ${user.lastName}`}</DataTable.Cell>
                 <DataTable.Cell numeric>
-                  <TouchableOpacity onPress={() => { addCostToFriend(user); }}>
-                    <Text>+</Text>
-                  </TouchableOpacity>
+                  +
                 </DataTable.Cell>
               </DataTable.Row>
             ))

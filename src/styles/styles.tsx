@@ -82,4 +82,10 @@ export const globalStyles = StyleSheet.create({
     borderColor: colors.secondary,
     padding: 20,
   },
+  title: {
+    fontSize: 48,
+    fontFamily: boldFont,
+    textAlign: 'center',
+    padding: 10,
+  },
 });

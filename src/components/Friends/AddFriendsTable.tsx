@@ -1,6 +1,6 @@
 // React
 import React, { useState, useCallback } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 
 import { DataTable } from 'react-native-paper';
 
@@ -67,6 +67,7 @@ export default function AddFriendsTable() {
 
   return (
     <View>
+      <Text style={globalStyles.title}>Add Friends</Text>
       <DataTable style={globalStyles.table}>
 
         <DataTable.Header>
@@ -77,12 +78,13 @@ export default function AddFriendsTable() {
         {
           userDocument
             ? pageUserData.map((user) => (
-              <DataTable.Row key={user.firstName + user.lastName + user.uid}>
+              <DataTable.Row
+                key={user.firstName + user.lastName + user.uid}
+                onPress={() => { addToFriendsList(user); }}
+              >
                 <DataTable.Cell>{`${user.firstName} ${user.lastName}`}</DataTable.Cell>
                 <DataTable.Cell numeric>
-                  <TouchableOpacity onPress={() => { addToFriendsList(user); }}>
-                    <Text>+</Text>
-                  </TouchableOpacity>
+                  +
                 </DataTable.Cell>
               </DataTable.Row>
             ))

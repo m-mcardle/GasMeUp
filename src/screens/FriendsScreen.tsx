@@ -1,6 +1,6 @@
 // React
 import React, { useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 
 import {
   DataTable, Provider, Portal, Modal,
@@ -18,8 +18,6 @@ import { auth, db } from '../../firebase';
 import LoginScreen from './LoginScreen';
 
 // Components
-import Text from '../components/Text';
-
 import AddFriendsTable from '../components/Friends/AddFriendsTable';
 
 // Styles
@@ -39,14 +37,22 @@ export default function FriendsScreen() {
   const friendsUIDs = balances ? Object.keys(balances) : undefined;
 
   const friendsQuery = friendsUIDs?.length ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
-  const [friendsData, , errorFriendsDB] = useCollectionData(friendsQuery);
+  const [friendsData, friendsDataLoading, errorFriendsDB] = useCollectionData(friendsQuery);
 
-  const formattedBalances = friendsData && friendsUIDs ? friendsUIDs.map((uid: string) => {
-    const currentFriend = friendsData.find((friend) => friend.uid === uid);
-    return {
-      name: `${currentFriend?.firstName} ${currentFriend?.lastName}`, amount: balances[uid],
-    };
-  }) : [];
+  const formattedBalances = friendsData && !friendsDataLoading && friendsUIDs
+    ? friendsUIDs.map((uid: string) => {
+      const currentFriend = friendsData.find((friend) => friend.uid === uid);
+
+      // If the current friend cannot be found then set as an empty element
+      // This occurs when a new friend is added for some reason...
+      // We filter these elements out after the map() with filter()
+      if (!currentFriend?.firstName) {
+        return null;
+      }
+      return {
+        name: `${currentFriend?.firstName} ${currentFriend?.lastName}`, amount: balances[uid],
+      };
+    }).filter((el) => el) : [];
 
   const [visible, setVisible] = useState(false);
 
@@ -84,7 +90,8 @@ export default function FriendsScreen() {
           </DataTable.Header>
 
           {
-            formattedBalances.map((balance) => (
+          !friendsDataLoading && userDocument
+            ? formattedBalances.map((balance) => (balance ? (
               <DataTable.Row key={balance.name}>
                 <DataTable.Cell>{balance.name}</DataTable.Cell>
                 <DataTable.Cell textStyle={balance.amount < 0 ? { color: 'red' } : undefined} numeric>
@@ -92,14 +99,13 @@ export default function FriendsScreen() {
                   {balance.amount}
                 </DataTable.Cell>
               </DataTable.Row>
-            ))
+            ) : undefined))
+            : undefined
           }
-          <DataTable.Row>
+          <DataTable.Row onPress={() => setVisible((state) => !state)}>
             <DataTable.Cell>Add Friend</DataTable.Cell>
             <DataTable.Cell numeric>
-              <TouchableOpacity onPress={() => setVisible((state) => !state)}>
-                <Text>+</Text>
-              </TouchableOpacity>
+              +
             </DataTable.Cell>
           </DataTable.Row>
 
