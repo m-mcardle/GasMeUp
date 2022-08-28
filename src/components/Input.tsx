@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { TextInput } from 'react-native';
 
 import { colors, globalStyles } from '../styles/styles';
@@ -6,17 +8,19 @@ interface Props {
   value?: string,
   placeholder?: string,
   style?: object,
-  onChangeText: (arg: string) => void
-  onPressOut?: () => void
+  password?: boolean,
+  onChangeText: (arg: string) => void,
+  onPressIn?: () => void
 }
 
 export default function Input(props: Props) {
   const {
     onChangeText,
-    onPressOut,
+    onPressIn,
     placeholder,
     style,
     value,
+    password,
   } = props;
   return (
     <TextInput
@@ -25,7 +29,8 @@ export default function Input(props: Props) {
       placeholder={placeholder}
       placeholderTextColor={colors.secondary}
       onChangeText={onChangeText}
-      onPressOut={onPressOut}
+      onPressIn={onPressIn}
+      secureTextEntry={password}
     />
   );
 }
@@ -34,5 +39,6 @@ Input.defaultProps = {
   value: undefined,
   placeholder: undefined,
   style: undefined,
-  onPressOut: undefined,
+  onPressIn: undefined,
+  password: false,
 };

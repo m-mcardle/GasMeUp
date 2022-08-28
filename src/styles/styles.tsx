@@ -1,8 +1,10 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Appearance } from 'react-native';
+
+export const isDarkMode = Appearance.getColorScheme() === 'dark';
 
 export const colors = {
-  primary: '#FFFBFE',
-  secondary: '#12130F',
+  primary: isDarkMode ? '#12130F' : '#FFFBFE',
+  secondary: isDarkMode ? '#FFFBFE' : '#12130F',
   tertiary: '#8FCB9B',
   darkestGray: '#BBBBBB',
   darkGray: '#CCCCCC',
@@ -59,9 +61,31 @@ export const globalStyles = StyleSheet.create({
     borderRadius: 25,
     margin: 10,
     padding: 10,
-    paddingHorizontal: 30,
+    paddingHorizontal: 60,
+    textAlign: 'center',
   },
   disabledButton: {
-    backgroundColor: colors.red,
+    backgroundColor: colors.darkestGray,
+  },
+  centered: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 'auto',
+    height: '100%',
+  },
+  table: {
+    height: '70%',
+  },
+  modal: {
+    backgroundColor: colors.primary,
+    borderWidth: 4,
+    borderColor: colors.secondary,
+    padding: 20,
+  },
+  title: {
+    fontSize: 48,
+    fontFamily: boldFont,
+    textAlign: 'center',
+    padding: 10,
   },
 });

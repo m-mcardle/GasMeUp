@@ -20,9 +20,12 @@ import {
 } from '@expo-google-fonts/rubik';
 
 // React imports
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+// Firebase
+import firebase from './firebase';
 
 // Global State
 import { GlobalContext, initialState } from './src/hooks/hooks';
@@ -77,6 +80,10 @@ function TabIcon({
   );
 }
 
+// This is just to ensure that firebase is initialized on first rendering
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { auth } = firebase;
+
 export default function App() {
   const [globalState, setGlobalState] = useState(initialState);
 
@@ -110,6 +117,23 @@ export default function App() {
 
   const state = useMemo(() => [globalState, updateGlobalState], [globalState]);
 
+  const [fontsLoaded] = useFonts({
+    Rubik_300Light,
+    Rubik_400Regular,
+    Rubik_500Medium,
+    Rubik_600SemiBold,
+    Rubik_700Bold,
+    Rubik_800ExtraBold,
+    Rubik_900Black,
+    Rubik_300Light_Italic,
+    Rubik_400Regular_Italic,
+    Rubik_500Medium_Italic,
+    Rubik_600SemiBold_Italic,
+    Rubik_700Bold_Italic,
+    Rubik_800ExtraBold_Italic,
+    Rubik_900Black_Italic,
+  });
+
   if (!fontsLoaded) {
     return <AppLoading />;
   }
@@ -120,6 +144,7 @@ export default function App() {
         <Tab.Navigator
           initialRouteName="Home"
           screenOptions={({ route }) => ({
+            headerShown: false,
             tabBarIcon: ({ focused, color, size }) => TabIcon(
               {
                 name: route.name,
@@ -130,6 +155,7 @@ export default function App() {
             ),
             tabBarActiveTintColor: colors.tertiary,
             tabBarInactiveTintColor: colors.secondary,
+            tabBarStyle: { backgroundColor: colors.primary },
           })}
         >
           <Tab.Screen name="Friends" component={FriendsScreen} />

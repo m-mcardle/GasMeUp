@@ -1,15 +1,15 @@
 {
-  "name": "carpool-calc",
+  "name": "gas-me-up-server",
   "version": "1.0.0",
   "description": "An app to make carpooling easier for everyone. A service to easily calculate your due gas-money and split easily to your riders. Just put in your riders, your route, and we will do the rest.",
   "main": "index.js",
   "dependencies": {
-    "axios": "^0.27.2",
+    "axios": "~0.21.1",
     "axios-cache-adapter": "^2.7.3",
     "dotenv": "^16.0.0",
     "express": "^4.18.1",
     "jsdom": "^19.0.0",
-    "localtunnel": "^2.0.2"
+    "nodemon": "^2.0.19"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",
@@ -28,8 +28,8 @@
   },
   "scripts": {
     "start": "nodemon ./src/index.js",
-    "tunnel": "lt --port 3001 --subdomain carpoolcalc",
-    "start-full": "NODE_OPTIONS='--experimental-specifier-resolution=node' START_TUNNEL='true' nodemon ./src/index.js",
+    "tunnel": "lt --port 3001 --subdomain gas-me-up",
+    "start-full": "NODE_OPTIONS='--experimental-specifier-resolution=node' nodemon ./src/index.js",
     "test": "jest"
   },
   "keywords": [],

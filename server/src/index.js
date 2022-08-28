@@ -1,8 +1,6 @@
 const dotenv = require('dotenv');
 const express = require('express');
 
-const localtunnel = require('localtunnel');
-
 const axios = require('axios');
 const pkg = require('axios-cache-adapter');
 
@@ -22,20 +20,7 @@ dotenv.config();
 const PORT = process.env.PORT || 3001;
 const env = process.env.NODE_ENV || 'development';
 
-Log('Start Tunnel:', process.env.START_TUNNEL);
 Log('Google Enabled:', process.env.ENABLE_GOOGLE_QUERIES);
-
-if (process.env.START_TUNNEL === 'true' && env !== 'test') {
-  let tunnel;
-  (async () => {
-    tunnel = await localtunnel({ port: 3001, subdomain: 'carpoolcalc' });
-
-    Log('Localtunnel at:', tunnel.url);
-    tunnel.on('close', () => {
-      // tunnels are closed
-    });
-  })();
-}
 
 const useGoogleAPI = (process.env.ENABLE_GOOGLE_QUERIES === 'true' || env === 'production');
 

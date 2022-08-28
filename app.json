@@ -1,10 +1,11 @@
 {
   "expo": {
-    "name": "CarpoolCalc",
-    "slug": "CarpoolCalc",
+    "name": "GasMeUp",
+    "slug": "gas-me-up",
+    "owner": "mmcardle",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/CarpoolCalc.png",
+    "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -17,7 +18,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mmcardle.gas-me-up"
     },
     "android": {
       "adaptiveIcon": {

@@ -1,4 +1,4 @@
-# CarpoolCalc
+# GasMeUp
 
 An app to make carpooling easier for everyone. A service to easily calculate your due gas-money and split easily to your riders. Just put in your riders, your route, and we will do the rest.
 
@@ -11,7 +11,7 @@ This directory contains the code to host an Node.js server using Express
 
 To publicly host the api for this server run:
 ```
-lt --port 3001 --subdomain carpoolcalc
+lt --port 3001 --subdomain gas-me-up
 ```
 
 To start the Node server run:

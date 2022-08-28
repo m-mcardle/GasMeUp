@@ -1,3 +1,4 @@
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import Text from '../Text';
@@ -17,6 +18,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.tertiary,
     margin: 5,
     padding: 5,
+    minHeight: 72,
   },
   emptyList: {
     padding: 5,

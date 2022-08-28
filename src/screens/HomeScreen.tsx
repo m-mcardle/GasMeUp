@@ -5,14 +5,12 @@
 * Add modal for adjusting gas price manually
 * Fuel Efficiency Configuration
 * Highway vs City driving
-* User management / Friends
-* Navigation Bar
 * Add clear button to Input component
 *
 */
 
 // React imports
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Alert,
@@ -23,7 +21,15 @@ import {
 // External Components
 import NumericInput from 'react-native-numeric-input';
 
+import {
+  Provider, Portal, Modal,
+} from 'react-native-paper';
+
 import uuid from 'react-native-uuid';
+
+// Firebase
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../../firebase';
 
 // Global State Stuff
 import { useGlobalState } from '../hooks/hooks';
@@ -35,25 +41,28 @@ import Input from '../components/Input';
 
 import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
+import AddToFriendsTable from '../components/Home/AddToFriendTable';
 import DataModal from '../components/Home/DataModal';
 
 // Styles
-import { colors } from '../styles/styles';
+import { colors, globalStyles } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
 
-const serverUrl = 'http://carpoolcalc.loca.lt';
+const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
 
 enum ActiveInput {
-  none,
-  start,
-  end,
+  None,
+  Start,
+  End,
 }
 
 let sessionToken = uuid.v4();
 
 export default function HomeScreen() {
-  const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.none);
+  const [user] = useAuthState(auth);
+  const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
   const [{
+    cost,
     distance,
     gasPrice,
     loading,
@@ -72,6 +81,7 @@ export default function HomeScreen() {
   const [visible, setVisible] = useState<boolean>(false);
   const [customGasPrice, setCustomGasPrice] = useState<boolean>(false);
   const [globalState] = useGlobalState();
+  const [modalVisible, setModalVisible] = useState(false);
 
   const setGasPrice = (newPrice: number) => {
     setCostRequest((state) => ({ ...state, gasPrice: newPrice }));
@@ -141,7 +151,7 @@ export default function HomeScreen() {
         }
         return res.json();
       })
-      .then((data) => setSuggestions(data.suggestions))
+      .then((data) => setSuggestions(data.suggestions ?? []))
       .catch((err) => {
         Alert.alert(err);
       });
@@ -161,10 +171,10 @@ export default function HomeScreen() {
     // Create new session token after selecting an autocomplete result
     sessionToken = uuid.v4();
 
-    if (activeInput === ActiveInput.start) {
+    if (activeInput === ActiveInput.Start) {
       setLocations((state) => ({ ...state, startLocation: item }));
       setSuggestions([]);
-    } else if (activeInput === ActiveInput.end) {
+    } else if (activeInput === ActiveInput.End) {
       setLocations((state) => ({ ...state, endLocation: item }));
       setSuggestions([]);
     }
@@ -176,59 +186,92 @@ export default function HomeScreen() {
   };
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.main}>
-      <DataModal
-        visible={visible}
-        setVisible={setVisible}
-        data={gasPrice}
-        setData={setGasPrice}
-        useCustomValue={customGasPrice}
-        setUseCustomValue={setCustomGasPrice}
-      />
-      <View style={styles.container}>
-        <Text style={styles.title}> ⛽️ Gas Me Up 💸</Text>
-      </View>
-      <View style={styles.dataContainer}>
-        <StatsSection
-          loading={loading}
-          riders={riders}
-          distance={distance}
-          gasPrice={gasPrice}
-          openModal={() => setVisible(true)}
+    <Provider>
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={160}
+        style={styles.main}
+      >
+        <DataModal
+          visible={visible}
+          setVisible={setVisible}
+          data={gasPrice}
+          setData={setGasPrice}
+          useCustomValue={customGasPrice}
+          setUseCustomValue={setCustomGasPrice}
         />
-        <View style={styles.ridersSection}>
-          <Text style={styles.ridersText}>Riders:</Text>
-          <NumericInput
-            rounded
-            totalHeight={18}
-            totalWidth={120}
-            containerStyle={{ backgroundColor: 'white' }}
-            inputStyle={styles.numericInput}
-            minValue={1}
-            leftButtonBackgroundColor={colors.lightGray}
-            rightButtonBackgroundColor={colors.tertiary}
-            value={riders}
-            editable={false}
-            onChange={setRiders}
-          />
+        <View style={styles.container}>
+          <Text style={globalStyles.title}>⛽️ Gas Me Up 💸</Text>
         </View>
-        <Input
-          placeholder="Start location"
-          onChangeText={updateStartLocation}
-          onPressOut={() => changeActiveInput(ActiveInput.start)}
-          value={startLocation}
-        />
-        <Input
-          placeholder="End location"
-          onChangeText={updateEndLocation}
-          onPressOut={() => changeActiveInput(ActiveInput.end)}
-          value={endLocation}
-        />
-        <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-        <Button onPress={submit} disabled={!globalState['Enable Requests']}>
-          <Text style={{ color: colors.primary }}>Calculate</Text>
-        </Button>
-      </View>
-    </KeyboardAvoidingView>
+        <View style={styles.dataContainer}>
+          <StatsSection
+            loading={loading}
+            cost={cost}
+            riders={riders}
+            distance={distance}
+            gasPrice={gasPrice}
+            openModal={() => setVisible(true)}
+          />
+          <View style={styles.ridersSection}>
+            <Text style={styles.ridersText}>Riders:</Text>
+            <NumericInput
+              rounded
+              totalHeight={18}
+              totalWidth={120}
+              containerStyle={{ backgroundColor: 'white' }}
+              inputStyle={styles.numericInput}
+              minValue={1}
+              leftButtonBackgroundColor={colors.lightGray}
+              rightButtonBackgroundColor={colors.tertiary}
+              value={riders}
+              editable={false}
+              onChange={setRiders}
+            />
+          </View>
+          <Input
+            placeholder="Start location"
+            onChangeText={updateStartLocation}
+            onPressIn={() => changeActiveInput(ActiveInput.Start)}
+            value={startLocation}
+          />
+          <Input
+            placeholder="End location"
+            onChangeText={updateEndLocation}
+            onPressIn={() => changeActiveInput(ActiveInput.End)}
+            value={endLocation}
+          />
+          <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
+          <Button onPress={submit} disabled={!globalState['Enable Requests']}>
+            <Text style={{ color: colors.primary }}>Calculate</Text>
+          </Button>
+          {
+            cost && user
+              ? (
+                <View>
+                  <Portal>
+                    <Modal
+                      visible={modalVisible}
+                      onDismiss={() => setModalVisible(false)}
+                      contentContainerStyle={globalStyles.modal}
+                    >
+                      <AddToFriendsTable
+                        cost={cost}
+                        distance={distance}
+                        gasPrice={gasPrice}
+                        riders={riders}
+                        closeModal={() => setModalVisible(false)}
+                      />
+                    </Modal>
+                  </Portal>
+                  <Button onPress={() => setModalVisible(true)}>
+                    <Text style={{ color: colors.primary }}>Assign to Friend</Text>
+                  </Button>
+                </View>
+              )
+              : undefined
+          }
+        </View>
+      </KeyboardAvoidingView>
+    </Provider>
   );
 }
