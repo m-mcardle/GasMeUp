@@ -59,7 +59,7 @@ export default function DataModal(props: Props) {
           />
         </View>
         <View style={styles.checkBoxSection}>
-          <Text style={{ color: 'black', fontSize: 12 }}>Use custom gas price:</Text>
+          <Text style={{ color: colors.secondary, fontSize: 12 }}>Use custom gas price:</Text>
           <CheckBox
             color={colors.tertiary}
             value={useCustomValue}
@@ -68,7 +68,7 @@ export default function DataModal(props: Props) {
           />
         </View>
         <TouchableOpacity style={{ ...globalStyles.button, alignSelf: 'center' }} onPress={() => setVisible(false)}>
-          <Text style={{ color: 'white' }}>Done</Text>
+          <Text style={{ color: colors.primary }}>Done</Text>
         </TouchableOpacity>
       </View>
     </Modal>
