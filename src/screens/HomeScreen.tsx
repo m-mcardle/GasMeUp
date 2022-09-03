@@ -108,7 +108,7 @@ export default function HomeScreen() {
         const gasPriceResponse = await fetch(`${serverUrl}/gas`);
 
         if (!gasPriceResponse?.ok || !gasPriceResponse) {
-          console.log(`Request for distance failed (${gasPriceResponse.status})`);
+          console.log(`Request for gas price failed (${gasPriceResponse.status})`);
           return Error(`Request failed (${gasPriceResponse.status})`);
         }
 
@@ -206,7 +206,6 @@ export default function HomeScreen() {
         <View style={styles.dataContainer}>
           <StatsSection
             loading={loading}
-            cost={cost}
             riders={riders}
             distance={distance}
             gasPrice={gasPrice}
@@ -245,7 +244,7 @@ export default function HomeScreen() {
             <Text style={{ color: colors.primary }}>Calculate</Text>
           </Button>
           {
-            cost && user
+            distance && user
               ? (
                 <View>
                   <Portal>

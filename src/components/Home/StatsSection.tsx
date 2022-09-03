@@ -45,11 +45,11 @@ export default function StatsSection(props: Props) {
         <Text style={{ ...styles.statBox, ...styles.statBoxText }}>
           {`Distance: ${distance.toFixed(2)} km`}
         </Text>
-        <View style={styles.statBox}>
+        <View style={styles.statBox} onTouchEnd={() => openModal()}>
           <Text style={styles.statBoxText}>
             {`Gas: $${gasPrice.toFixed(2)}/L`}
           </Text>
-          <View onTouchEnd={() => openModal()}>
+          <View>
             <Image source={AdjustIcon} style={styles.adjustButton} />
           </View>
         </View>
