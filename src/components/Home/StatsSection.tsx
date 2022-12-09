@@ -16,7 +16,7 @@ interface Props {
   openModal: () => void,
 }
 
-const FUEL_EFFECIENCY = 10;
+const FUEL_EFFICIENCY = 10;
 
 export default function StatsSection(props: Props) {
   const {
@@ -27,7 +27,7 @@ export default function StatsSection(props: Props) {
     openModal,
   } = props;
 
-  const cost = ((distance * FUEL_EFFECIENCY) / 100) * gasPrice;
+  const cost = ((distance * FUEL_EFFICIENCY) / 100) * gasPrice;
   const safeRiders = riders < 1 ? 1 : riders;
   return (
     <View style={styles.statsSection}>
