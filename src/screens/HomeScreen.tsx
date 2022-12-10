@@ -47,6 +47,9 @@ import AddToFriendsTable from '../components/Home/AddToFriendTable';
 import { colors, globalStyles } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
 
+// Mock Data
+import { mockData, mockSuggestions } from '../data/data';
+
 const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
 
 enum ActiveInput {
@@ -56,6 +59,21 @@ enum ActiveInput {
 }
 
 let sessionToken = uuid.v4();
+
+async function fetchData(url: string, mock = false) {
+  if (mock) {
+    const resp = new Response();
+    resp.json = () => new Promise((resolve) => {
+      if (url.includes('suggestion')) {
+        resolve(mockSuggestions);
+      } else {
+        resolve(mockData);
+      }
+    });
+    return resp;
+  }
+  return fetch(url);
+}
 
 export default function HomeScreen() {
   const [user] = useAuthState(auth);
@@ -85,7 +103,7 @@ export default function HomeScreen() {
     setCostRequest({
       loading: true, cost: 0, distance: 0, gasPrice: 0,
     });
-    fetch(`${serverUrl}/trip-cost/?start=${startLocation}&end=${endLocation}`)
+    fetchData(`${serverUrl}/trip-cost/?start=${startLocation}&end=${endLocation}`, globalState['Enable Requests'])
       .then((res) => {
         if (!res?.ok || !res) {
           Alert.alert('Error', `Request for trip cost failed (${res.status})`);
@@ -111,7 +129,7 @@ export default function HomeScreen() {
       return;
     }
 
-    fetch(`${serverUrl}/suggestions/?input=${input}&session=${sessionToken}`)
+    fetchData(`${serverUrl}/suggestions/?input=${input}&session=${sessionToken}`, globalState['Enable Requests'])
       .then((res) => {
         if (!res?.ok || !res) {
           console.log(`Request for suggestions failed (${res.status})`);
