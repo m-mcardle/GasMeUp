@@ -16,6 +16,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Keyboard,
+  ViewStyle,
 } from 'react-native';
 
 // External Components
@@ -48,7 +49,7 @@ import { colors, globalStyles } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
 
 // Mock Data
-import { mockData, mockSuggestions } from '../data/data';
+import { mockTripCost, mockSuggestions } from '../data/data';
 
 const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
 
@@ -67,7 +68,7 @@ async function fetchData(url: string, mock = false) {
       if (url.includes('suggestion')) {
         resolve(mockSuggestions);
       } else {
-        resolve(mockData);
+        resolve(mockTripCost);
       }
     });
     return resp;
@@ -103,7 +104,7 @@ export default function HomeScreen() {
     setCostRequest({
       loading: true, cost: 0, distance: 0, gasPrice: 0,
     });
-    fetchData(`${serverUrl}/trip-cost/?start=${startLocation}&end=${endLocation}`, globalState['Enable Requests'])
+    fetchData(`${serverUrl}/trip-cost/?start=${startLocation}&end=${endLocation}`, !globalState['Enable Requests'])
       .then((res) => {
         if (!res?.ok || !res) {
           Alert.alert('Error', `Request for trip cost failed (${res.status})`);
@@ -120,7 +121,7 @@ export default function HomeScreen() {
           loading: false, cost: 0, distance: 0, gasPrice: 0,
         });
       });
-  }, [startLocation, endLocation]);
+  }, [startLocation, endLocation, globalState['Enable Requests']]);
 
   const updateSuggestions = useCallback((input: string) => {
     // If empty then just clear the suggestions
@@ -129,7 +130,7 @@ export default function HomeScreen() {
       return;
     }
 
-    fetchData(`${serverUrl}/suggestions/?input=${input}&session=${sessionToken}`, globalState['Enable Requests'])
+    fetchData(`${serverUrl}/suggestions/?input=${input}&session=${sessionToken}`, !globalState['Enable Requests'])
       .then((res) => {
         if (!res?.ok || !res) {
           console.log(`Request for suggestions failed (${res.status})`);
@@ -141,7 +142,7 @@ export default function HomeScreen() {
       .catch((err) => {
         Alert.alert(err);
       });
-  }, []);
+  }, [globalState['Enable Requests']]);
 
   const updateStartLocation = (input: string) => {
     setLocations((state) => ({ ...state, startLocation: input }));
@@ -196,7 +197,7 @@ export default function HomeScreen() {
               totalHeight={18}
               totalWidth={120}
               containerStyle={{ backgroundColor: 'white' }}
-              inputStyle={styles.numericInput}
+              inputStyle={styles.numericInput as ViewStyle}
               minValue={1}
               leftButtonBackgroundColor={colors.lightGray}
               rightButtonBackgroundColor={colors.tertiary}
@@ -209,15 +210,17 @@ export default function HomeScreen() {
             onChangeText={updateStartLocation}
             onPressIn={() => changeActiveInput(ActiveInput.Start)}
             value={startLocation}
+            clearButton
           />
           <Input
             placeholder="End location"
             onChangeText={updateEndLocation}
             onPressIn={() => changeActiveInput(ActiveInput.End)}
             value={endLocation}
+            clearButton
           />
           <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-          <Button onPress={submit} disabled={!globalState['Enable Requests']}>
+          <Button onPress={submit}>
             <Text style={{ color: colors.primary }}>Calculate</Text>
           </Button>
           {

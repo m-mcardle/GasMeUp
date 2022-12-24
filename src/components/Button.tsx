@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
-import { TouchableOpacity, ViewPropTypes } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 
-import PropTypes from 'prop-types';
+import PropTypes, { object } from 'prop-types';
 
 import { globalStyles } from '../styles/styles';
 
@@ -33,7 +33,8 @@ export default function Button(props: Props) {
 Button.propTypes = {
   onPress: PropTypes.func.isRequired,
   children: PropTypes.node,
-  style: ViewPropTypes.style,
+  // eslint-disable-next-line react/forbid-prop-types
+  style: object,
 };
 
 Button.defaultProps = {
