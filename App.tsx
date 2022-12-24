@@ -1,6 +1,6 @@
 // Expo imports
 import Ionicons from '@expo/vector-icons/Ionicons';
-import AppLoading from 'expo-app-loading';
+import * as SplashScreen from 'expo-splash-screen';
 import {
   useFonts,
   Rubik_300Light,
@@ -20,7 +20,7 @@ import {
 } from '@expo-google-fonts/rubik';
 
 // React imports
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -37,6 +37,8 @@ import FriendsScreen from './src/screens/FriendsScreen';
 
 // Styles
 import { colors } from './src/styles/styles';
+
+SplashScreen.preventAutoHideAsync();
 
 const Tab = createBottomTabNavigator();
 
@@ -117,8 +119,18 @@ export default function App() {
     Rubik_900Black_Italic,
   });
 
+  useEffect(() => {
+    async function hideSplashScreen() {
+      await SplashScreen.hideAsync();
+    }
+
+    if (fontsLoaded) {
+      hideSplashScreen();
+    }
+  }, [fontsLoaded]);
+
   if (!fontsLoaded) {
-    return <AppLoading />;
+    return null;
   }
 
   return (
@@ -126,9 +138,10 @@ export default function App() {
       <NavigationContainer>
         <Tab.Navigator
           initialRouteName="Home"
-          screenOptions={({ route }) => ({
+          screenOptions={({ route }: { route: any }) => ({
             headerShown: false,
-            tabBarIcon: ({ focused, color, size }) => TabIcon(
+            tabBarIcon: ({ focused, color, size }:
+            { focused: boolean, color: string, size: number }) => TabIcon(
               {
                 name: route.name,
                 focused,
