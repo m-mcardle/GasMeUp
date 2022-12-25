@@ -34,5 +34,11 @@ The server for this application hosts an api using Express and Node.js. It fetch
 npm run start
 ```
 
+The server is hosted through Google Cloud's App Engine. To deploy a new version to production run the following command in the `/server` directory:
+
+```
+npm run deploy
+```
+
 ## Demo Video
 [![GasMeUp Thumbnail](https://i.ytimg.com/vi/z6_Ajiv4UBw/hqdefault.jpg)](https://youtube.com/shorts/z6_Ajiv4UBw?feature=share)

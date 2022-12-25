@@ -1,6 +1,6 @@
-# GasMeUp
+# GasMeUp - Server
 
-An app to make carpooling easier for everyone. A service to easily calculate your due gas-money and split easily to your riders. Just put in your riders, your route, and we will do the rest.
+This directory contains the code for the Node.js server for the application. It will return data for the current gas prices and data from Google's APIs.
 
 <hr>
 <br>
@@ -9,14 +9,16 @@ An app to make carpooling easier for everyone. A service to easily calculate you
 
 This directory contains the code to host an Node.js server using Express
 
-To publicly host the api for this server run:
-```
-lt --port 3001 --subdomain gas-me-up
-```
-
 To start the Node server run:
+
 ```
 npm run start
+```
+
+To deploy to Google App Engine:
+
+```
+npm run deploy
 ```
 
 <hr>
@@ -24,6 +26,6 @@ npm run start
 
 ## Dependencies
 
-Using requests to CollectAPI for current gas prices. ([Docs](https://collectapi.com/api/gasPrice/))
+Using requests to my Gas Price API for current gas prices. ([Docs](https://rapidapi.com/mmcardle-drx9FYQNK/api/canadian-gas-prices/))
 
-Using requests to Google's Distance Matrix API to calculate the distance of a route. ([Docs](https://developers.google.com/maps/documentation/distance-matrix/))
+Using requests to Google's Distance Matrix API to calculate the distance of a route. ([Docs](https://developers.google.com/maps/documentation/distance-matrix/)) and Google's Place Autocomplete to return suggestions to the user ([Docs](https://developers.google.com/maps/documentation/places/web-service/autocomplete)).
