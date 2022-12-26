@@ -5,7 +5,6 @@
 * Add modal for adjusting gas price manually
 * Fuel Efficiency Configuration
 * Highway vs City driving
-* Add clear button to Input component
 *
 */
 
@@ -20,6 +19,7 @@ import {
 } from 'react-native';
 
 // External Components
+import AntDesign from '@expo/vector-icons/AntDesign';
 import NumericInput from 'react-native-numeric-input';
 
 import {
@@ -172,6 +172,9 @@ export default function HomeScreen() {
     setActiveInput(input);
   };
 
+  // Represents if the user has entered all the required data to save a trip's cost
+  const canSaveTrip = !!cost && !!user;
+
   return (
     <Provider>
       <KeyboardAvoidingView
@@ -220,35 +223,46 @@ export default function HomeScreen() {
             clearButton
           />
           <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-          <Button onPress={submit}>
-            <Text style={{ color: colors.primary }}>Calculate</Text>
-          </Button>
-          {
-            cost && user
+          {/*
+            TODO - This next section is a little messy with the `canSaveTrip` logic
+            it essentially just hides the save button if the user isn't logged in
+            or the trip cost hasn't been calculated yet
+          */}
+          <View style={canSaveTrip ? styles.buttonSection : undefined}>
+            <Button style={canSaveTrip ? styles.calculateButton : undefined} onPress={submit}>
+              <Text style={{ color: colors.primary }}>Calculate</Text>
+            </Button>
+            {canSaveTrip
               ? (
-                <View>
-                  <Portal>
-                    <Modal
-                      visible={modalVisible}
-                      onDismiss={() => setModalVisible(false)}
-                      contentContainerStyle={globalStyles.modal}
-                    >
-                      <AddToFriendsTable
-                        cost={cost}
-                        distance={distance}
-                        gasPrice={gasPrice}
-                        riders={riders}
-                        closeModal={() => setModalVisible(false)}
-                      />
-                    </Modal>
-                  </Portal>
-                  <Button onPress={() => setModalVisible(true)}>
-                    <Text style={{ color: colors.primary }}>Assign to Friend</Text>
-                  </Button>
-                </View>
-              )
-              : undefined
-          }
+                <Button
+                  style={[styles.saveButton, (canSaveTrip ? { width: '30%' } : undefined)]}
+                  onPress={() => setModalVisible(true)}
+                >
+                  <Text style={{ color: colors.primary, marginHorizontal: 2 }}>Save</Text>
+                  <AntDesign name="contacts" size={20} color={colors.primary} />
+                </Button>
+              ) : undefined}
+          </View>
+          {canSaveTrip
+            ? (
+              <View>
+                <Portal>
+                  <Modal
+                    visible={modalVisible}
+                    onDismiss={() => setModalVisible(false)}
+                    contentContainerStyle={globalStyles.modal}
+                  >
+                    <AddToFriendsTable
+                      cost={cost}
+                      distance={distance}
+                      gasPrice={gasPrice}
+                      riders={riders}
+                      closeModal={() => setModalVisible(false)}
+                    />
+                  </Modal>
+                </Portal>
+              </View>
+            ) : undefined}
         </View>
       </KeyboardAvoidingView>
     </Provider>

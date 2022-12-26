@@ -90,6 +90,20 @@ const styles = StyleSheet.create({
     height: 16,
     width: 16,
   },
+  saveButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 30,
+  },
+  buttonSection: {
+    flexDirection: 'row',
+    width: '90%',
+    justifyContent: 'center',
+  },
+  calculateButton: {
+    width: '45%',
+    paddingHorizontal: 50,
+  },
 });
 
 export default styles;

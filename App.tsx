@@ -55,7 +55,7 @@ function TabIcon({
   color,
   size,
 } : TabIconProps) {
-  let iconName: 'ios-home' | 'ios-home-outline' | 'ios-settings' | 'ios-settings-outline' | 'ios-square' | 'ios-people' | 'ios-people-outline' = 'ios-square';
+  let iconName: React.ComponentProps<typeof Ionicons>['name'] = 'ios-square';
 
   switch (name) {
     case 'Home':

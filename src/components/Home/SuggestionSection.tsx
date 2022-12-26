@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import Text from '../Text';
 
-import { colors, italicFont } from '../../styles/styles';
+import { colors, boldItalicFont } from '../../styles/styles';
 
 interface Props {
   items: Array<string>,
@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     width: '75%',
-    backgroundColor: colors.tertiary,
+    backgroundColor: colors.lightTertiary,
     margin: 5,
     padding: 5,
     minHeight: 72,
@@ -25,11 +25,13 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     fontWeight: '200',
     fontSize: 10,
-    fontFamily: italicFont,
+    fontFamily: boldItalicFont,
+    color: colors.black,
   },
   text: {
     fontSize: 10,
     padding: 5,
+    color: colors.black,
   },
 });
 

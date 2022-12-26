@@ -1,7 +1,9 @@
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+
 import React from 'react';
 
 import {
-  Text, TextInput, TouchableOpacity, View,
+  TextInput, TouchableOpacity, View,
 } from 'react-native';
 
 import { colors, globalStyles } from '../styles/styles';
@@ -34,7 +36,7 @@ export default function Input(props: Props) {
         value={value}
         style={[globalStyles.input, (clearButton ? { width: '90%' } : { width: '100%' }), style]}
         placeholder={placeholder}
-        placeholderTextColor={colors.secondary}
+        placeholderTextColor={colors.black}
         onChangeText={onChangeText}
         onPressIn={onPressIn}
         secureTextEntry={password}
@@ -42,7 +44,7 @@ export default function Input(props: Props) {
       />
       {clearButton && (
         <TouchableOpacity style={globalStyles.clearInputButton} onPress={() => onChangeText('')}>
-          <Text style={{ color: colors.primary }}>X</Text>
+          <MaterialIcons name="clear" size={15} color={colors.primary} />
         </TouchableOpacity>
       )}
     </View>
