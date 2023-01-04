@@ -1,6 +1,6 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-import React from 'react';
+import React, { ReactComponentElement } from 'react';
 
 import {
   TextInput, TouchableOpacity, View,
@@ -15,6 +15,7 @@ interface Props {
   password?: boolean,
   autoComplete?: TextInput['props']['autoComplete'],
   clearButton?: boolean,
+  icon?: ReactComponentElement<typeof MaterialIcons>,
   onChangeText: (arg: string) => void,
   onPressIn?: () => void
 }
@@ -28,13 +29,23 @@ export default function Input(props: Props) {
     value,
     password,
     clearButton,
+    icon,
     autoComplete = 'off',
   } = props;
+
+  // Logic to resize the input based on the presence of an icon and clear button
+  let numWidth = clearButton ? 90 : 100;
+  if (icon) {
+    numWidth -= 10;
+  }
+  const width = `${numWidth}%`;
+
   return (
     <View style={globalStyles.inputView}>
+      {icon}
       <TextInput
         value={value}
-        style={[globalStyles.input, (clearButton ? { width: '90%' } : { width: '100%' }), style]}
+        style={[globalStyles.input, { width }, style]}
         placeholder={placeholder}
         placeholderTextColor={colors.black}
         onChangeText={onChangeText}
@@ -59,4 +70,5 @@ Input.defaultProps = {
   password: false,
   autoComplete: 'off',
   clearButton: false,
+  icon: undefined,
 };

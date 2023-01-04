@@ -20,6 +20,7 @@ import {
 
 // External Components
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import NumericInput from 'react-native-numeric-input';
 
 import {
@@ -175,6 +176,9 @@ export default function HomeScreen() {
   // Represents if the user has entered all the required data to save a trip's cost
   const canSaveTrip = !!cost && !!user;
 
+  // Represents if the user has selected a start and end location
+  const canSubmit = !!startLocation && !!endLocation;
+
   return (
     <Provider>
       <KeyboardAvoidingView
@@ -213,6 +217,7 @@ export default function HomeScreen() {
             onChangeText={updateStartLocation}
             onPressIn={() => changeActiveInput(ActiveInput.Start)}
             value={startLocation}
+            icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
             clearButton
           />
           <Input
@@ -220,6 +225,7 @@ export default function HomeScreen() {
             onChangeText={updateEndLocation}
             onPressIn={() => changeActiveInput(ActiveInput.End)}
             value={endLocation}
+            icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
             clearButton
           />
           <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
@@ -229,7 +235,11 @@ export default function HomeScreen() {
             or the trip cost hasn't been calculated yet
           */}
           <View style={canSaveTrip ? styles.buttonSection : undefined}>
-            <Button style={canSaveTrip ? styles.calculateButton : undefined} onPress={submit}>
+            <Button
+              disabled={!canSubmit}
+              style={canSaveTrip ? styles.calculateButton : undefined}
+              onPress={submit}
+            >
               <Text style={{ color: colors.primary }}>Calculate</Text>
             </Button>
             {canSaveTrip

@@ -26,8 +26,9 @@ const styles = StyleSheet.create({
       width: 3,
       height: 3,
     },
+    shadowColor: colors.secondary,
     shadowOpacity: 0.5,
-    shadowRadius: 2,
+    shadowRadius: 10,
   },
   costText: {
     fontSize: 52,
