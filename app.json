@@ -5,7 +5,7 @@
     "owner": "mmcardle",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/car.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -19,7 +19,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mmcardle.gas-me-up"
+      "bundleIdentifier": "com.Virintus.GasMeUp"
     },
     "android": {
       "adaptiveIcon": {
@@ -29,6 +29,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ca421c93-c21f-4e6b-a62c-52b626a5bbac"
+      }
     }
   }
 }
