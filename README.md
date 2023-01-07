@@ -14,6 +14,9 @@ The front end of this app was written in React Native and built using the Expo p
 
 * React Native
 * Expo
+* Node.js
+* Mobile Development
+* Consuming APIs
 
 <hr>
 <br>
@@ -39,6 +42,10 @@ The server is hosted through Google Cloud's App Engine. To deploy a new version 
 ```
 npm run deploy
 ```
+
+## Build
+
+To build the application for iOS, run `npm run build` to use the `eas` CLI to compiled app to Expo. Once built, we can then run `npm run publish` to update the app on `App Store Connect`. 
 
 ## Demo Video
 [![GasMeUp Thumbnail](https://i.ytimg.com/vi/z6_Ajiv4UBw/hqdefault.jpg)](https://youtube.com/shorts/z6_Ajiv4UBw?feature=share)
