@@ -1,26 +1,48 @@
 // React
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { View } from 'react-native';
 
 import { DataTable } from 'react-native-paper';
 
 // Firebase
 import {
-  collection, doc, query, where, addDoc,
+  collection, doc, query, where, addDoc, DocumentData,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 import { db, auth } from '../../../firebase';
 
 // Components
+import Table from '../Table';
 import Text from '../Text';
 
 // Styles
+import styles from '../../styles/HomeScreen.styles';
 import { globalStyles } from '../../styles/styles';
+
+function RowBuilder(addCostToFriend: Function) {
+  function Row({ firstName, lastName, uid }: DocumentData) {
+    return (
+      <DataTable.Row
+        key={firstName + lastName + uid}
+        onPress={() => { addCostToFriend({ firstName, lastName, uid }); }}
+      >
+        <DataTable.Cell>{`${firstName} ${lastName}`}</DataTable.Cell>
+        <DataTable.Cell numeric>
+          +
+        </DataTable.Cell>
+      </DataTable.Row>
+    );
+  }
+
+  return Row;
+}
 
 const usersRef = collection(db, 'Users');
 
 interface Props {
+  start: string,
+  end: string,
   cost: number,
   gasPrice: number,
   distance: number,
@@ -29,10 +51,8 @@ interface Props {
 }
 
 export default function AddToFriendTable({
-  cost, gasPrice, distance, riders, closeModal,
+  start, end, cost, gasPrice, distance, riders, closeModal,
 }: Props) {
-  const itemsPerPage = 5;
-  const [page, setPage] = useState(0);
   const [currentUser] = useAuthState(auth);
 
   const userDoc = currentUser?.uid ? doc(db, 'Users', currentUser.uid) : undefined;
@@ -42,9 +62,13 @@ export default function AddToFriendTable({
   const friendsUIDs = Object.keys(userFriends);
 
   const usersQuery = friendsUIDs.length ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
-  const [usersData = [], , errorUsersDB] = useCollectionData(usersQuery);
+  const [usersData = [], usersDataLoading, errorUsersDB] = useCollectionData(usersQuery);
 
-  const addCostToFriend = useCallback(async (friend) => {
+  // Add key for each Row
+  // eslint-disable-next-line no-param-reassign
+  usersData.forEach((el) => { el.key = el.firstName + el.lastName + el.uid; });
+
+  const addCostToFriend = useCallback(async (friend: DocumentData) => {
     if (!currentUser?.uid) {
       return;
     }
@@ -57,6 +81,11 @@ export default function AddToFriendTable({
         distance,
         gasPrice,
         riders,
+        startLocation: start,
+        endLocation: end,
+        date: new Date(),
+        creator: currentUser.uid,
+        users: [currentUser.uid, friend.uid],
       });
       closeModal();
     } catch (exception) {
@@ -64,54 +93,39 @@ export default function AddToFriendTable({
     }
   }, [currentUser, cost, distance, gasPrice]);
 
-  const pageStart = page * itemsPerPage + 1;
-  const pageEnd = (page + 1) * itemsPerPage;
-  const numberOfPages = Number(((usersData.length) / itemsPerPage).toFixed(0));
-
-  const pageUserData = usersData.length
-    ? usersData.slice((pageStart - 1), (pageEnd))
-    : [];
-
   if (errorUsersDB) {
     console.log(errorUsersDB);
   }
 
+  const headers = [
+    { text: 'Name', numeric: false },
+    { text: 'Add', numeric: true },
+  ];
+
   return (
-    <View>
-      <Text style={globalStyles.title}>Assign Cost</Text>
-      <DataTable style={globalStyles.table}>
-
-        <DataTable.Header>
-          <DataTable.Title>Friend</DataTable.Title>
-          <DataTable.Title numeric>Assign cost to Friend</DataTable.Title>
-        </DataTable.Header>
-
-        {
-          userDocument
-            ? pageUserData.map((user) => (
-              <DataTable.Row
-                key={user.firstName + user.lastName + user.uid}
-                onPress={() => { addCostToFriend(user); }}
-              >
-                <DataTable.Cell>{`${user.firstName} ${user.lastName}`}</DataTable.Cell>
-                <DataTable.Cell numeric>
-                  +
-                </DataTable.Cell>
-              </DataTable.Row>
-            ))
-            : undefined
-        }
-
-        <DataTable.Pagination
-          page={page}
-          numberOfPages={numberOfPages}
-          onPageChange={setPage}
-          label={`${pageStart}-${Math.min(pageEnd, usersData.length)} of ${usersData.length}`}
-          selectPageDropdownLabel="Rows per page"
-          numberOfItemsPerPage={itemsPerPage}
-        />
-
-      </DataTable>
-    </View>
+    <>
+      <Text style={globalStyles.title}>Save Trip</Text>
+      <View style={styles.saveTripHeaderContainer}>
+        <Text style={globalStyles.smallText}>
+          {`Start: ${start}`}
+        </Text>
+        <Text style={globalStyles.smallText}>
+          {`End: ${end}`}
+        </Text>
+      </View>
+      <View style={styles.saveTripHeaderContainer}>
+        <Text style={globalStyles.smallText}>
+          {`Cost: $${cost}`}
+        </Text>
+      </View>
+      <Table
+        title=""
+        itemsPerPage={10}
+        data={usersData}
+        headers={headers}
+        Row={RowBuilder(addCostToFriend)}
+        loading={usersDataLoading}
+      />
+    </>
   );
 }

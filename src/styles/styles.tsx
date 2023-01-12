@@ -107,4 +107,9 @@ export const globalStyles = StyleSheet.create({
     textAlign: 'center',
     padding: 10,
   },
+  smallText: {
+    fontSize: 10,
+    fontFamily: font,
+    color: colors.secondary,
+  },
 });
