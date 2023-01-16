@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   friendInfoButtonSection: {
+    paddingTop: 24,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
   },

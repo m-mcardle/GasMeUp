@@ -38,7 +38,7 @@ export default function Table({
 
   const pageStart = page * itemsPerPage + 1;
   const pageEnd = (page + 1) * itemsPerPage;
-  const numberOfPages = Number(((data.length) / itemsPerPage).toFixed(0));
+  const numberOfPages = Math.ceil(data.length / itemsPerPage);
 
   const pageData = data.length
     ? data.slice((pageStart - 1), (pageEnd))

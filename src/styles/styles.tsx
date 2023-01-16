@@ -9,7 +9,7 @@ export const colors = {
   white: '#FFFBFE',
   tertiary: '#8FCB9B',
   lightTertiary: '#C7E5CD',
-  darkestGray: '#BBBBBB',
+  darkestGray: '#AAAAAA',
   darkGray: '#CCCCCC',
   gray: '#DDDDDD',
   lightGray: '#EEEEEE',

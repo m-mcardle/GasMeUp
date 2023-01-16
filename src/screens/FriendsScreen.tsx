@@ -18,7 +18,6 @@ import { auth, db } from '../../firebase';
 import LoginScreen from './LoginScreen';
 
 // Components
-// import Text from '../components/Text';
 import Table from '../components/Table';
 
 import AddFriendsTable from '../components/Friends/AddFriendsTable';
@@ -142,6 +141,7 @@ export default function FriendsScreen() {
                 uid={selectedFriendUID}
                 name={selectedFriendName}
                 amount={selectedFriendAmount}
+                close={() => setFriendInfoVisible(false)}
               />
             </View>
           </Modal>
