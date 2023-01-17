@@ -105,6 +105,12 @@ const styles = StyleSheet.create({
     width: '45%',
     paddingHorizontal: 50,
   },
+  saveTripHeaderContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-evenly',
+    paddingVertical: 2,
+  },
 });
 
 export default styles;

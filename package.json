@@ -13,6 +13,7 @@
     "build": "eas build",
     "publish": "eas submit --platform ios",
     "publish-functions": "firebase deploy",
+    "check-types": "npx tsc",
     "lint": "npx eslint './src/' 'App.tsx'",
     "lint-client": "npx eslint './src/' 'App.tsx'",
     "lint-server": "npx eslint './server/src/'",

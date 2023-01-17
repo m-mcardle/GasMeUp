@@ -9,7 +9,7 @@ export const colors = {
   white: '#FFFBFE',
   tertiary: '#8FCB9B',
   lightTertiary: '#C7E5CD',
-  darkestGray: '#BBBBBB',
+  darkestGray: '#AAAAAA',
   darkGray: '#CCCCCC',
   gray: '#DDDDDD',
   lightGray: '#EEEEEE',
@@ -106,5 +106,10 @@ export const globalStyles = StyleSheet.create({
     fontFamily: boldFont,
     textAlign: 'center',
     padding: 10,
+  },
+  smallText: {
+    fontSize: 10,
+    fontFamily: font,
+    color: colors.secondary,
   },
 });
