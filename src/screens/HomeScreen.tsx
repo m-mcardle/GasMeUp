@@ -51,9 +51,7 @@ import { colors, globalStyles } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
 
 // Mock Data
-import {
-  mockTripCost, mockSuggestions, mockGasPrice, mockDistance,
-} from '../data/data';
+import { fetchData } from '../data/data';
 
 const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
 
@@ -66,25 +64,6 @@ enum ActiveInput {
 }
 
 let sessionToken = uuid.v4();
-
-async function fetchData(url: string, mock = false) {
-  if (mock) {
-    const resp = new Response();
-    resp.json = () => new Promise((resolve) => {
-      if (url.includes('suggestion')) {
-        resolve(mockSuggestions);
-      } else if (url.includes('gas')) {
-        resolve(mockGasPrice);
-      } else if (url.includes('distance')) {
-        resolve(mockDistance);
-      } else {
-        resolve(mockTripCost);
-      }
-    });
-    return resp;
-  }
-  return fetch(url);
-}
 
 export default function HomeScreen() {
   const [user] = useAuthState(auth);
