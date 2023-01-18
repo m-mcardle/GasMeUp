@@ -36,11 +36,15 @@ export default function FriendInfoSection({
   const userDoc = currentUser?.uid ? doc(db, 'Users', currentUser?.uid) : undefined;
   const [userDocument] = useDocumentData(userDoc);
 
-  // Query for transactions involving he current user and the `uid` user
+  // Query for transactions involving he current user
   const transactionsQuery = userDocument?.transactions.length > 0
-    ? query(transactionsRef, where('__name__', 'in', userDocument?.transactions), where('users', 'array-contains', uid))
+    ? query(transactionsRef, where('users', 'array-contains', currentUser?.uid))
     : undefined;
   const [transactionsData] = useCollectionData(transactionsQuery);
+
+  // Filter transactions to only include transactions involving the selected friend
+  const filteredTransactions = transactionsData
+    ?.filter((transaction: DocumentData) => transaction.users.includes(uid));
 
   const settleUp = useCallback(async () => {
     if (!currentUser?.uid) {
@@ -62,13 +66,13 @@ export default function FriendInfoSection({
   }, [uid, name, amount, currentUser?.uid]);
 
   // Sort transactions by date, and then only show the transactions since the last `settle`
-  const sortedTranscations = transactionsData
+  const sortedTransactions = filteredTransactions
     ?.sort((a, b) => b.date.toDate() - a.date.toDate())
     ?? [];
-  const lastSettleIndex = sortedTranscations.findIndex((transaction: DocumentData) => transaction.type === 'settle');
+  const lastSettleIndex = sortedTransactions.findIndex((transaction: DocumentData) => transaction.type === 'settle');
   const transactionsSinceLastSettle = lastSettleIndex !== -1
-    ? sortedTranscations.slice(0, lastSettleIndex)
-    : sortedTranscations;
+    ? sortedTransactions.slice(0, lastSettleIndex)
+    : sortedTransactions;
 
   return (
     <View>
