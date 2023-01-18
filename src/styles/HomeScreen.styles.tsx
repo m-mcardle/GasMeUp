@@ -35,8 +35,9 @@ const styles = StyleSheet.create({
       width: 3,
       height: 3,
     },
+    shadowColor: colors.secondary,
     shadowOpacity: 0.5,
-    shadowRadius: 2,
+    shadowRadius: 10,
   },
   costText: {
     fontSize: 52,
@@ -119,6 +120,26 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     margin: 2,
+  },
+  saveButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 30,
+  },
+  buttonSection: {
+    flexDirection: 'row',
+    width: '90%',
+    justifyContent: 'center',
+  },
+  calculateButton: {
+    width: '45%',
+    paddingHorizontal: 50,
+  },
+  saveTripHeaderContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-evenly',
+    paddingVertical: 2,
   },
 });
 

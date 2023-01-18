@@ -30,7 +30,8 @@
     "start": "nodemon ./src/index.js",
     "tunnel": "lt --port 3001 --subdomain gas-me-up",
     "start-full": "NODE_OPTIONS='--experimental-specifier-resolution=node' nodemon ./src/index.js",
-    "test": "jest"
+    "test": "jest",
+    "deploy": "gcloud app deploy"
   },
   "keywords": [],
   "author": "Matthew McArdle",

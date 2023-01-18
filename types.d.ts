@@ -18,8 +18,7 @@ interface TripDistance {
 interface CostRequest {
   loading: boolean,
   distance: number,
-  gasPrice: number,
-  cost: number
+  gasPrice: number
 }
 
 interface Prediction {

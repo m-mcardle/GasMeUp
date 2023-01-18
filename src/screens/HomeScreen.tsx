@@ -5,7 +5,6 @@
 * Add modal for adjusting gas price manually
 * Fuel Efficiency Configuration
 * Highway vs City driving
-* Add clear button to Input component
 *
 */
 
@@ -16,9 +15,12 @@ import {
   Alert,
   KeyboardAvoidingView,
   Keyboard,
+  ViewStyle,
 } from 'react-native';
 
 // External Components
+import AntDesign from '@expo/vector-icons/AntDesign';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import NumericInput from 'react-native-numeric-input';
 
 import {
@@ -48,7 +50,14 @@ import DataModal from '../components/Home/DataModal';
 import { colors, globalStyles } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
 
+// Mock Data
+import {
+  mockTripCost, mockSuggestions, mockGasPrice, mockDistance,
+} from '../data/data';
+
 const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
+
+const FUEL_EFFICIENCY = 10;
 
 enum ActiveInput {
   None,
@@ -58,11 +67,29 @@ enum ActiveInput {
 
 let sessionToken = uuid.v4();
 
+async function fetchData(url: string, mock = false) {
+  if (mock) {
+    const resp = new Response();
+    resp.json = () => new Promise((resolve) => {
+      if (url.includes('suggestion')) {
+        resolve(mockSuggestions);
+      } else if (url.includes('gas')) {
+        resolve(mockGasPrice);
+      } else if (url.includes('distance')) {
+        resolve(mockDistance);
+      } else {
+        resolve(mockTripCost);
+      }
+    });
+    return resp;
+  }
+  return fetch(url);
+}
+
 export default function HomeScreen() {
   const [user] = useAuthState(auth);
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
   const [{
-    cost,
     distance,
     gasPrice,
     loading,
@@ -70,31 +97,47 @@ export default function HomeScreen() {
   setCostRequest] = useState<CostRequest>(
     {
       loading: false,
-      cost: 0,
       distance: 0,
       gasPrice: 0,
     },
   );
+  const [customGasPrice, setCustomGasPrice] = useState<number>(1.5);
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
   const [riders, setRiders] = useState<number>(1);
   const [visible, setVisible] = useState<boolean>(false);
-  const [customGasPrice, setCustomGasPrice] = useState<boolean>(false);
+  const [useCustomGasPrice, setUseCustomGasPrice] = useState<boolean>(false);
   const [globalState] = useGlobalState();
   const [modalVisible, setModalVisible] = useState(false);
+
+  const cost = ((distance * FUEL_EFFICIENCY) / 100) * gasPrice;
 
   const setGasPrice = (newPrice: number) => {
     setCostRequest((state) => ({ ...state, gasPrice: newPrice }));
   };
 
+  const updateCustomGasPrice = (newPrice: number) => {
+    setCustomGasPrice(newPrice);
+    if (useCustomGasPrice) {
+      setGasPrice(newPrice);
+    }
+  };
+
+  const configureCustomGasPrice = (value: boolean) => {
+    setUseCustomGasPrice(value);
+    if (value) {
+      setGasPrice(customGasPrice);
+    }
+  };
+
   const submit = useCallback(async () => {
     Keyboard.dismiss();
     setCostRequest({
-      loading: true, cost: 0, distance: 0, gasPrice: 0,
+      loading: true, distance: 0, gasPrice: 0,
     });
 
     try {
-      const distanceResponse = await fetch(`${serverUrl}/distance/?start=${startLocation}&end=${endLocation}`);
+      const distanceResponse = await fetchData(`${serverUrl}/distance/?start=${startLocation}&end=${endLocation}`, !globalState['Enable Requests']);
 
       if (!distanceResponse?.ok || !distanceResponse) {
         console.log(`Request for distance failed (${distanceResponse.status})`);
@@ -104,8 +147,8 @@ export default function HomeScreen() {
       const { distance: newDistance } = await distanceResponse.json();
       let newGasPrice = gasPrice;
 
-      if (!customGasPrice) {
-        const gasPriceResponse = await fetch(`${serverUrl}/gas`);
+      if (!useCustomGasPrice) {
+        const gasPriceResponse = await fetchData(`${serverUrl}/gas`, !globalState['Enable Requests']);
 
         if (!gasPriceResponse?.ok || !gasPriceResponse) {
           console.log(`Request for gas price failed (${gasPriceResponse.status})`);
@@ -116,11 +159,6 @@ export default function HomeScreen() {
         newGasPrice = price;
       }
 
-      // console.log(`[Cost Request]
-      //   Custom Price = ${customGasPrice},
-      //   Price = ${newGasPrice},
-      //   Distance = ${newDistance}`);
-
       setCostRequest((state) => ({
         ...state,
         loading: false,
@@ -130,11 +168,11 @@ export default function HomeScreen() {
     } catch (err: any) {
       Alert.alert(err);
       setCostRequest({
-        loading: false, cost: 0, distance: 0, gasPrice: 0,
+        loading: false, distance: 0, gasPrice: 0,
       });
     }
     return null;
-  }, [startLocation, endLocation, customGasPrice, gasPrice]);
+  }, [startLocation, endLocation, customGasPrice, gasPrice, globalState['Enable Requests']]);
 
   const updateSuggestions = useCallback((input: string) => {
     // If empty then just clear the suggestions
@@ -143,7 +181,7 @@ export default function HomeScreen() {
       return;
     }
 
-    fetch(`${serverUrl}/suggestions/?input=${input}&session=${sessionToken}`)
+    fetchData(`${serverUrl}/suggestions/?input=${input}&session=${sessionToken}`, !globalState['Enable Requests'])
       .then((res) => {
         if (!res?.ok || !res) {
           console.log(`Request for suggestions failed (${res.status})`);
@@ -155,7 +193,7 @@ export default function HomeScreen() {
       .catch((err) => {
         Alert.alert(err);
       });
-  }, []);
+  }, [globalState['Enable Requests']]);
 
   const updateStartLocation = (input: string) => {
     setLocations((state) => ({ ...state, startLocation: input }));
@@ -168,6 +206,7 @@ export default function HomeScreen() {
   };
 
   const setInputToPickedLocation = (item: string) => {
+    Keyboard.dismiss();
     // Create new session token after selecting an autocomplete result
     sessionToken = uuid.v4();
 
@@ -185,6 +224,12 @@ export default function HomeScreen() {
     setActiveInput(input);
   };
 
+  // Represents if the user has entered all the required data to save a trip's cost
+  const canSaveTrip = !!gasPrice && !!distance && !!user;
+
+  // Represents if the user has selected a start and end location
+  const canSubmit = !!startLocation && !!endLocation;
+
   return (
     <Provider>
       <KeyboardAvoidingView
@@ -195,10 +240,10 @@ export default function HomeScreen() {
         <DataModal
           visible={visible}
           setVisible={setVisible}
-          data={gasPrice}
-          setData={setGasPrice}
-          useCustomValue={customGasPrice}
-          setUseCustomValue={setCustomGasPrice}
+          data={customGasPrice}
+          setData={updateCustomGasPrice}
+          useCustomValue={useCustomGasPrice}
+          setUseCustomValue={configureCustomGasPrice}
         />
         <View style={styles.container}>
           <Text style={globalStyles.title}>⛽️ Gas Me Up 💸</Text>
@@ -209,6 +254,8 @@ export default function HomeScreen() {
             riders={riders}
             distance={distance}
             gasPrice={gasPrice}
+            useCustomGasPrice={useCustomGasPrice}
+            cost={cost}
             openModal={() => setVisible(true)}
           />
           <View style={styles.ridersSection}>
@@ -218,7 +265,7 @@ export default function HomeScreen() {
               totalHeight={18}
               totalWidth={120}
               containerStyle={{ backgroundColor: 'white' }}
-              inputStyle={styles.numericInput}
+              inputStyle={styles.numericInput as ViewStyle}
               minValue={1}
               leftButtonBackgroundColor={colors.lightGray}
               rightButtonBackgroundColor={colors.tertiary}
@@ -232,43 +279,64 @@ export default function HomeScreen() {
             onChangeText={updateStartLocation}
             onPressIn={() => changeActiveInput(ActiveInput.Start)}
             value={startLocation}
+            icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
+            clearButton
           />
           <Input
             placeholder="End location"
             onChangeText={updateEndLocation}
             onPressIn={() => changeActiveInput(ActiveInput.End)}
             value={endLocation}
+            icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
+            clearButton
           />
           <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-          <Button onPress={submit} disabled={!globalState['Enable Requests']}>
-            <Text style={{ color: colors.primary }}>Calculate</Text>
-          </Button>
-          {
-            distance && user
+          {/*
+            TODO - This next section is a little messy with the `canSaveTrip` logic
+            it essentially just hides the save button if the user isn't logged in
+            or the trip cost hasn't been calculated yet
+          */}
+          <View style={canSaveTrip ? styles.buttonSection : undefined}>
+            <Button
+              disabled={!canSubmit}
+              style={canSaveTrip ? styles.calculateButton : undefined}
+              onPress={submit}
+            >
+              <Text style={{ color: colors.primary }}>Calculate</Text>
+            </Button>
+            {canSaveTrip
               ? (
-                <View>
-                  <Portal>
-                    <Modal
-                      visible={modalVisible}
-                      onDismiss={() => setModalVisible(false)}
-                      contentContainerStyle={globalStyles.modal}
-                    >
-                      <AddToFriendsTable
-                        cost={cost}
-                        distance={distance}
-                        gasPrice={gasPrice}
-                        riders={riders}
-                        closeModal={() => setModalVisible(false)}
-                      />
-                    </Modal>
-                  </Portal>
-                  <Button onPress={() => setModalVisible(true)}>
-                    <Text style={{ color: colors.primary }}>Assign to Friend</Text>
-                  </Button>
-                </View>
-              )
-              : undefined
-          }
+                <Button
+                  style={[styles.saveButton, (canSaveTrip ? { width: '30%' } : undefined)]}
+                  onPress={() => setModalVisible(true)}
+                >
+                  <Text style={{ color: colors.primary, marginHorizontal: 2 }}>Save</Text>
+                  <AntDesign name="contacts" size={20} color={colors.primary} />
+                </Button>
+              ) : undefined}
+          </View>
+          {canSaveTrip
+            ? (
+              <View>
+                <Portal>
+                  <Modal
+                    visible={modalVisible}
+                    onDismiss={() => setModalVisible(false)}
+                    contentContainerStyle={globalStyles.modal}
+                  >
+                    <AddToFriendsTable
+                      cost={cost}
+                      distance={distance}
+                      gasPrice={gasPrice}
+                      riders={riders}
+                      start={startLocation}
+                      end={endLocation}
+                      closeModal={() => setModalVisible(false)}
+                    />
+                  </Modal>
+                </Portal>
+              </View>
+            ) : undefined}
         </View>
       </KeyboardAvoidingView>
     </Provider>

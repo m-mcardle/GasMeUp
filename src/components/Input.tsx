@@ -1,6 +1,10 @@
-import React from 'react';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-import { TextInput } from 'react-native';
+import React, { ReactComponentElement } from 'react';
+
+import {
+  TextInput, TouchableOpacity, View,
+} from 'react-native';
 
 import { colors, globalStyles } from '../styles/styles';
 
@@ -9,6 +13,9 @@ interface Props {
   placeholder?: string,
   style?: object,
   password?: boolean,
+  autoComplete?: TextInput['props']['autoComplete'],
+  clearButton?: boolean,
+  icon?: ReactComponentElement<typeof MaterialIcons>,
   onChangeText: (arg: string) => void,
   onPressIn?: () => void
 }
@@ -21,17 +28,37 @@ export default function Input(props: Props) {
     style,
     value,
     password,
+    clearButton,
+    icon,
+    autoComplete = 'off',
   } = props;
+
+  // Logic to resize the input based on the presence of an icon and clear button
+  let numWidth = clearButton ? 90 : 100;
+  if (icon) {
+    numWidth -= 10;
+  }
+  const width = `${numWidth}%`;
+
   return (
-    <TextInput
-      value={value}
-      style={[globalStyles.input, style]}
-      placeholder={placeholder}
-      placeholderTextColor={colors.secondary}
-      onChangeText={onChangeText}
-      onPressIn={onPressIn}
-      secureTextEntry={password}
-    />
+    <View style={globalStyles.inputView}>
+      {icon}
+      <TextInput
+        value={value}
+        style={[globalStyles.input, { width }, style]}
+        placeholder={placeholder}
+        placeholderTextColor={colors.black}
+        onChangeText={onChangeText}
+        onPressIn={onPressIn}
+        secureTextEntry={password}
+        autoComplete={autoComplete}
+      />
+      {clearButton && (
+        <TouchableOpacity style={globalStyles.clearInputButton} onPress={() => onChangeText('')}>
+          <MaterialIcons name="clear" size={15} color={colors.primary} />
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }
 
@@ -41,4 +68,7 @@ Input.defaultProps = {
   style: undefined,
   onPressIn: undefined,
   password: false,
+  autoComplete: 'off',
+  clearButton: false,
+  icon: undefined,
 };

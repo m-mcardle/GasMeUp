@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { TouchableOpacity, ViewPropTypes } from 'react-native';
+import { TouchableOpacity, Keyboard } from 'react-native';
 
 import PropTypes from 'prop-types';
 
@@ -23,7 +23,10 @@ export default function Button(props: Props) {
     <TouchableOpacity
       disabled={disabled}
       style={[globalStyles.button, (disabled ? globalStyles.disabledButton : null), style]}
-      onPress={onPress}
+      onPress={() => {
+        Keyboard.dismiss();
+        onPress();
+      }}
     >
       {children}
     </TouchableOpacity>
@@ -33,7 +36,10 @@ export default function Button(props: Props) {
 Button.propTypes = {
   onPress: PropTypes.func.isRequired,
   children: PropTypes.node,
-  style: ViewPropTypes.style,
+  style: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.array,
+  ]),
 };
 
 Button.defaultProps = {

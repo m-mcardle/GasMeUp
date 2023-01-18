@@ -43,7 +43,7 @@ exports.aggregateBalances = functions.firestore
 
         // Update payee info
         transaction.update(payeeRef, {
-          transactions: [...payerTransactions],
+          transactions: [...payeeTransactions],
           friends: {
             ...oldPayeeFriends,
             [payerDoc.id]: newPayeeBalance,

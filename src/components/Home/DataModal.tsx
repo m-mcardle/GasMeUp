@@ -2,6 +2,7 @@ import {
   View,
   Modal,
   TouchableOpacity,
+  ViewStyle,
 } from 'react-native';
 import CheckBox from 'expo-checkbox';
 
@@ -47,15 +48,13 @@ export default function DataModal(props: Props) {
             totalHeight={18}
             totalWidth={120}
             containerStyle={{ backgroundColor: 'white' }}
-            inputStyle={styles.numericInput}
+            inputStyle={styles.numericInput as ViewStyle}
             valueType="real"
             minValue={0.01}
             leftButtonBackgroundColor={colors.lightGray}
             rightButtonBackgroundColor={colors.tertiary}
             value={value}
             onChange={setData}
-            isCurrency
-            editable={false}
           />
         </View>
         <View style={styles.checkBoxSection}>

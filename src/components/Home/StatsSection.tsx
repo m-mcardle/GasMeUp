@@ -3,6 +3,8 @@ import { ActivityIndicator, Image, View } from 'react-native';
 
 // @ts-ignore
 import AdjustIcon from '../../../assets/AdjustButton.png';
+// @ts-ignore
+import AdjustIconDisabled from '../../../assets/AdjustButtonDisabled.png';
 
 import Text from '../Text';
 
@@ -13,10 +15,10 @@ interface Props {
   riders: number,
   distance: number,
   gasPrice: number,
+  useCustomGasPrice: boolean,
+  cost: number,
   openModal: () => void,
 }
-
-const FUEL_EFFICIENCY = 10;
 
 export default function StatsSection(props: Props) {
   const {
@@ -24,10 +26,11 @@ export default function StatsSection(props: Props) {
     riders = 0,
     distance = 0,
     gasPrice = 0,
+    useCustomGasPrice,
+    cost,
     openModal,
   } = props;
 
-  const cost = ((distance * FUEL_EFFICIENCY) / 100) * gasPrice;
   const safeRiders = riders < 1 ? 1 : riders;
   return (
     <View style={styles.statsSection}>
@@ -50,7 +53,10 @@ export default function StatsSection(props: Props) {
             {`Gas: $${gasPrice.toFixed(2)}/L`}
           </Text>
           <View>
-            <Image source={AdjustIcon} style={styles.adjustButton} />
+            <Image
+              source={useCustomGasPrice ? AdjustIcon : AdjustIconDisabled}
+              style={styles.adjustButton}
+            />
           </View>
         </View>
       </View>

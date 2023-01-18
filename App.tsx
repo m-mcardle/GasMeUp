@@ -1,6 +1,6 @@
 // Expo imports
 import Ionicons from '@expo/vector-icons/Ionicons';
-import AppLoading from 'expo-app-loading';
+import * as SplashScreen from 'expo-splash-screen';
 import {
   useFonts,
   Rubik_300Light,
@@ -20,7 +20,7 @@ import {
 } from '@expo-google-fonts/rubik';
 
 // React imports
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -38,6 +38,8 @@ import FriendsScreen from './src/screens/FriendsScreen';
 // Styles
 import { colors } from './src/styles/styles';
 
+SplashScreen.preventAutoHideAsync();
+
 const Tab = createBottomTabNavigator();
 
 interface TabIconProps {
@@ -53,7 +55,7 @@ function TabIcon({
   color,
   size,
 } : TabIconProps) {
-  let iconName: 'ios-home' | 'ios-home-outline' | 'ios-settings' | 'ios-settings-outline' | 'ios-square' | 'ios-people' | 'ios-people-outline' = 'ios-square';
+  let iconName: React.ComponentProps<typeof Ionicons>['name'] = 'ios-square';
 
   switch (name) {
     case 'Home':
@@ -87,6 +89,19 @@ const { auth } = firebase;
 export default function App() {
   const [globalState, setGlobalState] = useState(initialState);
 
+  const updateGlobalState = (key: string, newValue: any) => {
+    setGlobalState((oldState: any) => {
+      if (oldState[key] !== newValue) {
+        const newState = { ...oldState };
+        newState[key] = newValue;
+        return newState;
+      }
+      return oldState;
+    });
+  };
+
+  const state = useMemo(() => [globalState, updateGlobalState], [globalState]);
+
   const [fontsLoaded] = useFonts({
     Rubik_300Light,
     Rubik_400Regular,
@@ -104,21 +119,18 @@ export default function App() {
     Rubik_900Black_Italic,
   });
 
-  const updateGlobalState = (key: string, newValue: any) => {
-    setGlobalState((oldState: any) => {
-      if (oldState[key] !== newValue) {
-        const newState = { ...oldState };
-        newState[key] = newValue;
-        return newState;
-      }
-      return oldState;
-    });
-  };
+  useEffect(() => {
+    async function hideSplashScreen() {
+      await SplashScreen.hideAsync();
+    }
 
-  const state = useMemo(() => [globalState, updateGlobalState], [globalState]);
+    if (fontsLoaded) {
+      hideSplashScreen();
+    }
+  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
-    return <AppLoading />;
+    return null;
   }
 
   return (
@@ -126,9 +138,10 @@ export default function App() {
       <NavigationContainer>
         <Tab.Navigator
           initialRouteName="Home"
-          screenOptions={({ route }) => ({
+          screenOptions={({ route }: { route: any }) => ({
             headerShown: false,
-            tabBarIcon: ({ focused, color, size }) => TabIcon(
+            tabBarIcon: ({ focused, color, size }:
+            { focused: boolean, color: string, size: number }) => TabIcon(
               {
                 name: route.name,
                 focused,

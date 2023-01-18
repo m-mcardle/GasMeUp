@@ -3,23 +3,24 @@
     "name": "GasMeUp",
     "slug": "gas-me-up",
     "owner": "mmcardle",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/car.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/ca421c93-c21f-4e6b-a62c-52b626a5bbac"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mmcardle.gas-me-up"
+      "bundleIdentifier": "com.Virintus.GasMeUp"
     },
     "android": {
       "adaptiveIcon": {
@@ -29,6 +30,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ca421c93-c21f-4e6b-a62c-52b626a5bbac"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
     }
   }
 }
