@@ -95,14 +95,17 @@ Express API Endpoints
 app.get('/trip-cost', async (req, res) => {
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ?? 'Toronto';
+  const manualGasPrice = req.query?.price ?? '';
   const province = 'Ontario'; // TODO - This should end up being determined by the user's location
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const [distance, gasPrice] = await Promise.all([
-      GetDistance(startLocation, endLocation),
-      GetGasPrice(province),
-    ]);
+    const [distance, gasPrice] = manualGasPrice
+      ? [await GetDistance(startLocation, endLocation), Number(manualGasPrice)]
+      : await Promise.all([
+        GetDistance(startLocation, endLocation),
+        GetGasPrice(province),
+      ]);
     Log(`[trip-cost] Distance: ${distance}km and Gas Price: $${gasPrice}`);
 
     const cost = GasCostForDistance(distance, gasPrice);
@@ -127,7 +130,7 @@ app.get('/suggestions', async (req, res) => {
   }
 });
 
-// Handle autocomplete for distances
+// Handle request for distances
 app.get('/distance', async (req, res) => {
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ?? 'Toronto';
@@ -135,6 +138,7 @@ app.get('/distance', async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   try {
     const distance = await GetDistance(startLocation, endLocation);
+    Log(`[distance] Distance: ${distance}km`);
     res.json({ distance });
   } catch (exception) {
     res.status(500).send({ error: exception });
@@ -159,6 +163,7 @@ app.get('/gas', async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   try {
     const gasPrice = await GetGasPrice(province);
+    Log(`[gas] Gas Price: $${gasPrice}`);
     res.json({ price: gasPrice });
   } catch (exception) {
     LogError(exception);

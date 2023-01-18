@@ -12,4 +12,17 @@ export const mockSuggestions = {
   ],
 };
 
-export default { mockTripCost, mockSuggestions };
+export const mockGasPrice = {
+  price: 1.69,
+};
+
+export const mockDistance = {
+  distance: 120,
+};
+
+export default {
+  mockTripCost,
+  mockSuggestions,
+  mockGasPrice,
+  mockDistance,
+};

@@ -44,15 +44,20 @@ import Input from '../components/Input';
 import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
 import AddToFriendsTable from '../components/Home/AddToFriendTable';
+import GasPriceModal from '../components/Home/GasPriceModal';
 
 // Styles
 import { colors, globalStyles } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
 
 // Mock Data
-import { mockTripCost, mockSuggestions } from '../data/data';
+import {
+  mockTripCost, mockSuggestions, mockGasPrice, mockDistance,
+} from '../data/data';
 
 const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
+
+const FUEL_EFFICIENCY = 10;
 
 enum ActiveInput {
   None,
@@ -68,6 +73,10 @@ async function fetchData(url: string, mock = false) {
     resp.json = () => new Promise((resolve) => {
       if (url.includes('suggestion')) {
         resolve(mockSuggestions);
+      } else if (url.includes('gas')) {
+        resolve(mockGasPrice);
+      } else if (url.includes('distance')) {
+        resolve(mockDistance);
       } else {
         resolve(mockTripCost);
       }
@@ -81,7 +90,6 @@ export default function HomeScreen() {
   const [user] = useAuthState(auth);
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
   const [{
-    cost,
     distance,
     gasPrice,
     loading,
@@ -89,40 +97,82 @@ export default function HomeScreen() {
   setCostRequest] = useState<CostRequest>(
     {
       loading: false,
-      cost: 0,
       distance: 0,
       gasPrice: 0,
     },
   );
+  const [customGasPrice, setCustomGasPrice] = useState<number>(1.5);
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
   const [riders, setRiders] = useState<number>(1);
+  const [visible, setVisible] = useState<boolean>(false);
+  const [useCustomGasPrice, setUseCustomGasPrice] = useState<boolean>(false);
   const [globalState] = useGlobalState();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const submit = useCallback(() => {
+  const cost = ((distance * FUEL_EFFICIENCY) / 100) * gasPrice;
+
+  const setGasPrice = (newPrice: number) => {
+    setCostRequest((state) => ({ ...state, gasPrice: newPrice }));
+  };
+
+  const updateCustomGasPrice = (newPrice: number) => {
+    setCustomGasPrice(newPrice);
+    if (useCustomGasPrice) {
+      setGasPrice(newPrice);
+    }
+  };
+
+  const configureCustomGasPrice = (value: boolean) => {
+    setUseCustomGasPrice(value);
+    if (value) {
+      setGasPrice(customGasPrice);
+    }
+  };
+
+  const submit = useCallback(async () => {
     Keyboard.dismiss();
     setCostRequest({
-      loading: true, cost: 0, distance: 0, gasPrice: 0,
+      loading: true, distance: 0, gasPrice: 0,
     });
-    fetchData(`${serverUrl}/trip-cost/?start=${startLocation}&end=${endLocation}`, !globalState['Enable Requests'])
-      .then((res) => {
-        if (!res?.ok || !res) {
-          Alert.alert('Error', `Request for trip cost failed (${res.status})`);
-          return Error(`Request failed (${res.status})`);
+
+    try {
+      const distanceResponse = await fetchData(`${serverUrl}/distance/?start=${startLocation}&end=${endLocation}`, !globalState['Enable Requests']);
+
+      if (!distanceResponse?.ok || !distanceResponse) {
+        console.log(`Request for distance failed (${distanceResponse.status})`);
+        return Error(`Request failed (${distanceResponse.status})`);
+      }
+
+      const { distance: newDistance } = await distanceResponse.json();
+      let newGasPrice = gasPrice;
+
+      if (!useCustomGasPrice) {
+        const gasPriceResponse = await fetchData(`${serverUrl}/gas`, !globalState['Enable Requests']);
+
+        if (!gasPriceResponse?.ok || !gasPriceResponse) {
+          console.log(`Request for gas price failed (${gasPriceResponse.status})`);
+          return Error(`Request failed (${gasPriceResponse.status})`);
         }
-        return res.json();
-      })
-      .then((data) => setCostRequest({
-        loading: false, cost: data.cost, distance: data.distance, gasPrice: data.gasPrice,
-      }))
-      .catch((err) => {
-        Alert.alert('Error', err.message);
-        setCostRequest({
-          loading: false, cost: 0, distance: 0, gasPrice: 0,
-        });
+
+        const { price } = await gasPriceResponse.json();
+        newGasPrice = price;
+      }
+
+      setCostRequest((state) => ({
+        ...state,
+        loading: false,
+        distance: newDistance,
+        gasPrice: newGasPrice,
+      }));
+    } catch (err: any) {
+      Alert.alert(err);
+      setCostRequest({
+        loading: false, distance: 0, gasPrice: 0,
       });
-  }, [startLocation, endLocation, globalState['Enable Requests']]);
+    }
+    return null;
+  }, [startLocation, endLocation, customGasPrice, gasPrice, globalState['Enable Requests']]);
 
   const updateSuggestions = useCallback((input: string) => {
     // If empty then just clear the suggestions
@@ -156,6 +206,7 @@ export default function HomeScreen() {
   };
 
   const setInputToPickedLocation = (item: string) => {
+    Keyboard.dismiss();
     // Create new session token after selecting an autocomplete result
     sessionToken = uuid.v4();
 
@@ -174,7 +225,7 @@ export default function HomeScreen() {
   };
 
   // Represents if the user has entered all the required data to save a trip's cost
-  const canSaveTrip = !!cost && !!user;
+  const canSaveTrip = !!gasPrice && !!distance && !!user;
 
   // Represents if the user has selected a start and end location
   const canSubmit = !!startLocation && !!endLocation;
@@ -186,16 +237,43 @@ export default function HomeScreen() {
         keyboardVerticalOffset={160}
         style={styles.main}
       >
+        <GasPriceModal
+          visible={visible}
+          setVisible={setVisible}
+          data={customGasPrice}
+          setData={updateCustomGasPrice}
+          useCustomValue={useCustomGasPrice}
+          setUseCustomValue={configureCustomGasPrice}
+        />
+        <Portal>
+          <Modal
+            visible={modalVisible}
+            onDismiss={() => setModalVisible(false)}
+            contentContainerStyle={globalStyles.modal}
+          >
+            <AddToFriendsTable
+              cost={cost}
+              distance={distance}
+              gasPrice={gasPrice}
+              riders={riders}
+              start={startLocation}
+              end={endLocation}
+              closeModal={() => setModalVisible(false)}
+            />
+          </Modal>
+        </Portal>
         <View style={styles.container}>
           <Text style={globalStyles.title}>⛽️ Gas Me Up 💸</Text>
         </View>
         <View style={styles.dataContainer}>
           <StatsSection
             loading={loading}
-            cost={cost}
             riders={riders}
             distance={distance}
             gasPrice={gasPrice}
+            useCustomGasPrice={useCustomGasPrice}
+            cost={cost}
+            openModal={() => setVisible(true)}
           />
           <View style={styles.ridersSection}>
             <Text style={styles.ridersText}>Riders:</Text>
@@ -209,6 +287,7 @@ export default function HomeScreen() {
               leftButtonBackgroundColor={colors.lightGray}
               rightButtonBackgroundColor={colors.tertiary}
               value={riders}
+              editable={false}
               onChange={setRiders}
             />
           </View>
@@ -251,30 +330,9 @@ export default function HomeScreen() {
                   <Text style={{ color: colors.primary, marginHorizontal: 2 }}>Save</Text>
                   <AntDesign name="contacts" size={20} color={colors.primary} />
                 </Button>
-              ) : undefined}
+              )
+              : undefined}
           </View>
-          {canSaveTrip
-            ? (
-              <View>
-                <Portal>
-                  <Modal
-                    visible={modalVisible}
-                    onDismiss={() => setModalVisible(false)}
-                    contentContainerStyle={globalStyles.modal}
-                  >
-                    <AddToFriendsTable
-                      cost={cost}
-                      distance={distance}
-                      gasPrice={gasPrice}
-                      riders={riders}
-                      start={startLocation}
-                      end={endLocation}
-                      closeModal={() => setModalVisible(false)}
-                    />
-                  </Modal>
-                </Portal>
-              </View>
-            ) : undefined}
         </View>
       </KeyboardAvoidingView>
     </Provider>

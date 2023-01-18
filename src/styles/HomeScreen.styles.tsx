@@ -6,6 +6,15 @@ import {
 
 // Styles
 const styles = StyleSheet.create({
+  title: {
+    fontSize: 50,
+    fontFamily: boldFont,
+  },
+  heading: {
+    fontSize: 18,
+    fontFamily: boldFont,
+    textAlign: 'center',
+  },
   container: {
     flex: 1,
     alignItems: 'center',
@@ -90,6 +99,27 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     height: 16,
     width: 16,
+  },
+  checkBoxSection: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    paddingTop: 48,
+    alignItems: 'flex-end',
+  },
+  modalContainer: {
+    backgroundColor: colors.primary,
+    borderRadius: 20,
+    paddingTop: 32,
+    paddingBottom: 4,
+    marginVertical: '75%',
+    width: '60%',
+    alignSelf: 'center',
+    borderWidth: 2,
+  },
+  modalCheckBox: {
+    width: 12,
+    height: 12,
+    margin: 2,
   },
   saveButton: {
     flexDirection: 'row',

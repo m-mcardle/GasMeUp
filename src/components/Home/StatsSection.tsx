@@ -3,6 +3,8 @@ import { ActivityIndicator, Image, View } from 'react-native';
 
 // @ts-ignore
 import AdjustIcon from '../../../assets/AdjustButton.png';
+// @ts-ignore
+import AdjustIconDisabled from '../../../assets/AdjustButtonDisabled.png';
 
 import Text from '../Text';
 
@@ -10,17 +12,26 @@ import styles from '../../styles/HomeScreen.styles';
 
 interface Props {
   loading: boolean,
-  cost: number,
   riders: number,
   distance: number,
   gasPrice: number,
+  useCustomGasPrice: boolean,
+  cost: number,
+  openModal: () => void,
 }
 
 export default function StatsSection(props: Props) {
   const {
-    loading, cost = 0, riders = 0, distance = 0, gasPrice = 0,
+    loading,
+    riders = 0,
+    distance = 0,
+    gasPrice = 0,
+    useCustomGasPrice,
+    cost,
+    openModal,
   } = props;
 
+  const safeRiders = riders < 1 ? 1 : riders;
   return (
     <View style={styles.statsSection}>
       <View style={styles.costSection}>
@@ -29,7 +40,7 @@ export default function StatsSection(props: Props) {
           : (
             <Text style={styles.costText}>
               $
-              {(cost / riders).toFixed(2)}
+              {(cost / safeRiders).toFixed(2)}
             </Text>
           )}
       </View>
@@ -37,11 +48,16 @@ export default function StatsSection(props: Props) {
         <Text style={{ ...styles.statBox, ...styles.statBoxText }}>
           {`Distance: ${distance.toFixed(2)} km`}
         </Text>
-        <View style={styles.statBox}>
+        <View style={styles.statBox} onTouchEnd={() => openModal()}>
           <Text style={styles.statBoxText}>
             {`Gas: $${gasPrice.toFixed(2)}/L`}
           </Text>
-          <Image source={AdjustIcon} style={styles.adjustButton} />
+          <View>
+            <Image
+              source={useCustomGasPrice ? AdjustIcon : AdjustIconDisabled}
+              style={styles.adjustButton}
+            />
+          </View>
         </View>
       </View>
     </View>
