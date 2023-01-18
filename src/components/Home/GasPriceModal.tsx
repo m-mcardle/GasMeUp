@@ -1,7 +1,6 @@
 import {
   View,
   Modal,
-  TouchableOpacity,
   ViewStyle,
 } from 'react-native';
 import CheckBox from 'expo-checkbox';
@@ -9,9 +8,10 @@ import CheckBox from 'expo-checkbox';
 import NumericInput from 'react-native-numeric-input';
 
 import Text from '../Text';
+import Button from '../Button';
 
 import styles from '../../styles/HomeScreen.styles';
-import { colors, globalStyles } from '../../styles/styles';
+import { colors } from '../../styles/styles';
 
 interface Props {
   visible: boolean,
@@ -66,9 +66,9 @@ export default function GasPriceModal(props: Props) {
             style={styles.modalCheckBox}
           />
         </View>
-        <TouchableOpacity style={{ ...globalStyles.button, alignSelf: 'center' }} onPress={() => setVisible(false)}>
+        <Button style={{ alignSelf: 'center' }} onPress={() => setVisible(false)}>
           <Text style={{ color: colors.primary }}>Done</Text>
-        </TouchableOpacity>
+        </Button>
       </View>
     </Modal>
   );
