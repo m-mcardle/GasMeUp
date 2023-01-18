@@ -22,7 +22,7 @@ interface Props {
   setUseCustomValue: (_: any) => void,
 }
 
-export default function DataModal(props: Props) {
+export default function GasPriceModal(props: Props) {
   const {
     visible,
     setVisible,

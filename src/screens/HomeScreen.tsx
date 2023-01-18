@@ -44,7 +44,7 @@ import Input from '../components/Input';
 import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
 import AddToFriendsTable from '../components/Home/AddToFriendTable';
-import DataModal from '../components/Home/DataModal';
+import GasPriceModal from '../components/Home/GasPriceModal';
 
 // Styles
 import { colors, globalStyles } from '../styles/styles';
@@ -237,7 +237,7 @@ export default function HomeScreen() {
         keyboardVerticalOffset={160}
         style={styles.main}
       >
-        <DataModal
+        <GasPriceModal
           visible={visible}
           setVisible={setVisible}
           data={customGasPrice}
@@ -245,6 +245,23 @@ export default function HomeScreen() {
           useCustomValue={useCustomGasPrice}
           setUseCustomValue={configureCustomGasPrice}
         />
+        <Portal>
+          <Modal
+            visible={modalVisible}
+            onDismiss={() => setModalVisible(false)}
+            contentContainerStyle={globalStyles.modal}
+          >
+            <AddToFriendsTable
+              cost={cost}
+              distance={distance}
+              gasPrice={gasPrice}
+              riders={riders}
+              start={startLocation}
+              end={endLocation}
+              closeModal={() => setModalVisible(false)}
+            />
+          </Modal>
+        </Portal>
         <View style={styles.container}>
           <Text style={globalStyles.title}>⛽️ Gas Me Up 💸</Text>
         </View>
@@ -313,30 +330,9 @@ export default function HomeScreen() {
                   <Text style={{ color: colors.primary, marginHorizontal: 2 }}>Save</Text>
                   <AntDesign name="contacts" size={20} color={colors.primary} />
                 </Button>
-              ) : undefined}
+              )
+              : undefined}
           </View>
-          {canSaveTrip
-            ? (
-              <View>
-                <Portal>
-                  <Modal
-                    visible={modalVisible}
-                    onDismiss={() => setModalVisible(false)}
-                    contentContainerStyle={globalStyles.modal}
-                  >
-                    <AddToFriendsTable
-                      cost={cost}
-                      distance={distance}
-                      gasPrice={gasPrice}
-                      riders={riders}
-                      start={startLocation}
-                      end={endLocation}
-                      closeModal={() => setModalVisible(false)}
-                    />
-                  </Modal>
-                </Portal>
-              </View>
-            ) : undefined}
         </View>
       </KeyboardAvoidingView>
     </Provider>
