@@ -17,6 +17,8 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import Text from '../components/Text';
 
+import AppleLogin from '../components/Login/AppleLogin';
+
 // Styles
 import { colors, globalStyles } from '../styles/styles';
 
@@ -61,6 +63,7 @@ function LoginPage({ navigation }: Props) {
       <Button onPress={() => login(email, password)}>
         <Text style={{ color: colors.primary, textAlign: 'center' }}>Login</Text>
       </Button>
+      <AppleLogin />
       <TouchableOpacity style={{ flexDirection: 'row' }} onPress={() => navigation.navigate('Sign Up')}>
         <Text>Need an account?</Text>
         <Text style={{ textDecorationLine: 'underline' }}> Sign up here!</Text>

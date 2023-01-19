@@ -112,4 +112,8 @@ export const globalStyles = StyleSheet.create({
     fontFamily: font,
     color: colors.secondary,
   },
+  errorInput: {
+    borderWidth: 2,
+    borderColor: colors.red,
+  },
 });
