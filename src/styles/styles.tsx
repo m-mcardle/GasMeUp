@@ -112,4 +112,8 @@ export const globalStyles = StyleSheet.create({
     fontFamily: font,
     color: colors.secondary,
   },
+  numericInput: {
+    fontSize: 12,
+    fontFamily: font,
+  },
 });

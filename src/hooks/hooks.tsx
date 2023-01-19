@@ -8,18 +8,21 @@ export const GlobalContext = createContext<any>(null);
 
 export const useGlobalState = () => useContext(GlobalContext);
 
-export const SETTINGS = [
+export const TOGGLE_SETTINGS = [
   'Enable Requests',
-  'Setting 1',
-  'Setting 2',
-  'Setting 3',
-  'Setting 4',
-  'Setting 5',
+];
+
+export const NUMERIC_SETTINGS = [
+  'Gas Mileage',
 ];
 
 const intialSettings: any = {};
-SETTINGS.forEach((setting) => {
+TOGGLE_SETTINGS.forEach((setting) => {
   intialSettings[setting] = !!Settings.get(setting);
+});
+
+NUMERIC_SETTINGS.forEach((setting) => {
+  intialSettings[setting] = Settings.get(setting) || 0;
 });
 
 export const initialState = intialSettings;

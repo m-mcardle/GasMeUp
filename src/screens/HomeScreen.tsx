@@ -55,8 +55,6 @@ import { fetchData } from '../data/data';
 
 const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
 
-const FUEL_EFFICIENCY = 10;
-
 enum ActiveInput {
   None,
   Start,
@@ -89,7 +87,9 @@ export default function HomeScreen() {
   const [globalState] = useGlobalState();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const cost = ((distance * FUEL_EFFICIENCY) / 100) * gasPrice;
+  const GAS_MILEAGE = globalState['Gas Mileage'];
+
+  const cost = ((distance * GAS_MILEAGE) / 100) * gasPrice;
 
   const setGasPrice = (newPrice: number) => {
     setCostRequest((state) => ({ ...state, gasPrice: newPrice }));
@@ -237,6 +237,7 @@ export default function HomeScreen() {
               riders={riders}
               start={startLocation}
               end={endLocation}
+              gasMileage={GAS_MILEAGE}
               closeModal={() => setModalVisible(false)}
             />
           </Modal>
@@ -261,7 +262,7 @@ export default function HomeScreen() {
               totalHeight={18}
               totalWidth={120}
               containerStyle={{ backgroundColor: 'white' }}
-              inputStyle={styles.numericInput as ViewStyle}
+              inputStyle={globalStyles.numericInput as ViewStyle}
               minValue={1}
               leftButtonBackgroundColor={colors.lightGray}
               rightButtonBackgroundColor={colors.tertiary}

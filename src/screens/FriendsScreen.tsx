@@ -41,7 +41,7 @@ function RowBuilder(onPress: (friend: any) => void) {
         <DataTable.Cell>{name}</DataTable.Cell>
         <DataTable.Cell textStyle={amount < 0 ? { color: 'red' } : undefined} numeric>
           $
-          {amount}
+          {amount.toFixed(2)}
         </DataTable.Cell>
       </DataTable.Row>
     );
