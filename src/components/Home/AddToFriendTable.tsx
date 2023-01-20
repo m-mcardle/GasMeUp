@@ -57,11 +57,12 @@ interface Props {
   gasPrice: number,
   distance: number,
   riders: number,
+  gasMileage: number,
   closeModal: Function,
 }
 
 export default function AddToFriendTable({
-  start, end, cost, gasPrice, distance, riders, closeModal,
+  start, end, cost, gasPrice, distance, riders, closeModal, gasMileage,
 }: Props) {
   const [selectedFriend, setSelectedFriend] = useState<DocumentData>({});
 
@@ -85,18 +86,18 @@ export default function AddToFriendTable({
       return;
     }
 
-    const adjustor = owed ? -1 : 1;
     try {
       await addDoc(collection(db, 'Transactions'), {
-        cost: Number(cost.toFixed(2)) * adjustor,
-        amount: (Number(cost.toFixed(2)) * adjustor) / riders,
-        payeeUID: currentUser.uid,
-        payerUID: friend.uid,
+        cost: Number(cost.toFixed(2)),
+        amount: (Number(cost.toFixed(2))) / riders,
+        payeeUID: owed ? currentUser.uid : friend.uid,
+        payerUID: owed ? friend.uid : currentUser.uid,
         distance,
         gasPrice,
         riders,
         startLocation: start,
         endLocation: end,
+        gasMileage,
         date: new Date(),
         creator: currentUser.uid,
         users: [currentUser.uid, friend.uid],

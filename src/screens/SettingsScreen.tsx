@@ -6,7 +6,11 @@ import {
   View,
   Switch,
   Alert,
+  ViewStyle,
 } from 'react-native';
+
+// External Components
+import NumericInput from 'react-native-numeric-input';
 
 // Firebase
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -18,7 +22,7 @@ import Button from '../components/Button';
 import Text from '../components/Text';
 
 // Global state stuff
-import { useGlobalState, SETTINGS } from '../hooks/hooks';
+import { useGlobalState, TOGGLE_SETTINGS } from '../hooks/hooks';
 
 // Styles
 import styles from '../styles/SettingsScreen.styles';
@@ -38,13 +42,13 @@ export default function SettingsScreen() {
   const [user] = useAuthState(auth);
 
   const initialSettingsObject: any = {};
-  SETTINGS.forEach((setting) => {
+  TOGGLE_SETTINGS.forEach((setting) => {
     initialSettingsObject[setting] = !!Settings.get(setting);
   });
 
   const [globalState, updateGlobalState] = useGlobalState();
 
-  const changeSetting = (setting: string, value: Boolean) => {
+  const changeSetting = (setting: string, value: any) => {
     const newSetting: any = {};
     newSetting[setting] = value;
 
@@ -53,13 +57,14 @@ export default function SettingsScreen() {
   };
 
   const SettingsSwitch = ({ name = '', value = false }) => useMemo(() => (
-    <Switch
-      style={styles.settingsSwitch}
-      value={value}
-      onValueChange={(val) => changeSetting(name, val)}
-      trackColor={{ false: colors.primary, true: colors.tertiary }}
-      ios_backgroundColor={colors.primary}
-    />
+    <View style={styles.settingItem}>
+      <Switch
+        value={value}
+        onValueChange={(val) => changeSetting(name, val)}
+        trackColor={{ false: colors.primary, true: colors.tertiary }}
+        ios_backgroundColor={colors.primary}
+      />
+    </View>
   ), [value, name, globalState]);
 
   return (
@@ -68,12 +73,29 @@ export default function SettingsScreen() {
         <Text style={globalStyles.title}> Settings</Text>
       </View>
       <View style={styles.mainContainer}>
-        {SETTINGS.map((setting) => (
+        {TOGGLE_SETTINGS.map((setting) => (
           <View key={setting} style={styles.settingContainer}>
             <Text style={styles.settingsText}>{setting}</Text>
             <SettingsSwitch name={setting} value={globalState[setting]} />
           </View>
         ))}
+        <View style={styles.settingContainer}>
+          <Text style={styles.settingsText}>Gas Mileage (L / 100KM)</Text>
+          <View style={styles.settingItem}>
+            <NumericInput
+              rounded
+              totalHeight={18}
+              totalWidth={120}
+              containerStyle={{ backgroundColor: 'white' }}
+              inputStyle={globalStyles.numericInput as ViewStyle}
+              valueType="real"
+              minValue={0.01}
+              step={0.01}
+              onChange={(value) => changeSetting('Gas Mileage', value)}
+              value={globalState['Gas Mileage']}
+            />
+          </View>
+        </View>
         {
           user
             ? (
