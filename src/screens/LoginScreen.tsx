@@ -50,7 +50,7 @@ function LoginPage({ navigation }: Props) {
   return (
     <View style={styles.main}>
       <View style={styles.headingSection}>
-        <Text style={styles.h1}>Join GasMeUp</Text>
+        <Text style={styles.h1}>Sign In to GasMeUp</Text>
         <Text style={styles.h2}>To save your trips and split them with your friends!</Text>
       </View>
       <Input
