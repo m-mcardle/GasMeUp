@@ -1,6 +1,6 @@
 // React
 import React, { useState } from 'react';
-import { View, Alert } from 'react-native';
+import { View, Alert, KeyboardAvoidingView } from 'react-native';
 import PropTypes from 'prop-types';
 
 // Firebase
@@ -14,7 +14,7 @@ import Input from '../components/Input';
 import Text from '../components/Text';
 
 // Styles
-import { colors, globalStyles } from '../styles/styles';
+import styles from '../styles/SignUpScreen.styles';
 
 interface Props {
   navigation: {
@@ -23,7 +23,17 @@ interface Props {
 }
 
 export default function SignUpScreen({ navigation }: Props) {
-  const signUp = (email: string, password: string, firstName: string, lastName: string) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+
+  const signUp = () => {
+    setEmailError(false);
+    setPasswordError(false);
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log('signed up!');
@@ -45,17 +55,25 @@ export default function SignUpScreen({ navigation }: Props) {
       })
       .catch((exception) => {
         Alert.alert('Error', exception.message);
+        if (exception.code === 'auth/invalid-email') {
+          setEmailError(true);
+        } else if (exception.code === 'auth/weak-password') {
+          setPasswordError(true);
+        }
       });
   };
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-
   return (
-    <View>
-      <View style={{ ...globalStyles.centered, backgroundColor: colors.primary }}>
+    <KeyboardAvoidingView
+      behavior="padding"
+      keyboardVerticalOffset={160}
+      style={styles.screen}
+    >
+      <View style={styles.main}>
+        <View style={styles.headingSection}>
+          <Text style={styles.h1}>Join GasMeUp</Text>
+          <Text style={styles.h2}>To save your trips and split them with your friends!</Text>
+        </View>
         <Input
           placeholder="First Name"
           onChangeText={setFirstName}
@@ -66,25 +84,29 @@ export default function SignUpScreen({ navigation }: Props) {
           onChangeText={setLastName}
           value={lastName}
         />
+        {emailError && <Text style={styles.errorText}>Invalid email</Text>}
         <Input
           placeholder="Email"
+          error={emailError}
           onChangeText={setEmail}
           value={email}
         />
+        {passwordError && <Text style={styles.errorText}>Password is too weak</Text>}
         <Input
           placeholder="Password"
+          error={passwordError}
           onChangeText={setPassword}
           value={password}
           password
         />
         <Button
           disabled={!firstName || !lastName || !email || !password}
-          onPress={() => signUp(email, password, firstName, lastName)}
+          onPress={() => signUp()}
         >
-          <Text style={{ color: colors.primary, textAlign: 'center' }}>Sign Up</Text>
+          <Text style={styles.signUpButtonText}>Sign Up</Text>
         </Button>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

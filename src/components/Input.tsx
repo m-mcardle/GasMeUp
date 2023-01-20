@@ -16,6 +16,7 @@ interface Props {
   autoComplete?: TextInput['props']['autoComplete'],
   clearButton?: boolean,
   icon?: ReactComponentElement<typeof MaterialIcons>,
+  error?: boolean,
   onChangeText: (arg: string) => void,
   onPressIn?: () => void
 }
@@ -30,6 +31,7 @@ export default function Input(props: Props) {
     password,
     clearButton,
     icon,
+    error,
     autoComplete = 'off',
   } = props;
 
@@ -45,7 +47,12 @@ export default function Input(props: Props) {
       {icon}
       <TextInput
         value={value}
-        style={[globalStyles.input, { width }, style]}
+        style={[
+          globalStyles.input,
+          { width },
+          error ? { ...globalStyles.errorInput } : undefined,
+          style,
+        ]}
         placeholder={placeholder}
         placeholderTextColor={colors.black}
         onChangeText={onChangeText}
@@ -71,4 +78,5 @@ Input.defaultProps = {
   autoComplete: 'off',
   clearButton: false,
   icon: undefined,
+  error: false,
 };
