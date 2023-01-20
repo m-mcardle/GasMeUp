@@ -19,18 +19,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   settingContainer: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     margin: 8,
   },
   settingsText: {
     textAlign: 'right',
     fontSize: 16,
     padding: 4,
-    width: '60%',
+    width: '50%',
   },
-  settingsSwitch: {
+  settingItem: {
     width: '40%',
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 'auto',
   },
 });
 

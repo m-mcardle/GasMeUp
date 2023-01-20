@@ -11,7 +11,7 @@ import Text from '../Text';
 import Button from '../Button';
 
 import styles from '../../styles/HomeScreen.styles';
-import { colors } from '../../styles/styles';
+import { colors, globalStyles } from '../../styles/styles';
 
 interface Props {
   visible: boolean,
@@ -48,7 +48,7 @@ export default function GasPriceModal(props: Props) {
             totalHeight={18}
             totalWidth={120}
             containerStyle={{ backgroundColor: 'white' }}
-            inputStyle={styles.numericInput as ViewStyle}
+            inputStyle={globalStyles.numericInput as ViewStyle}
             valueType="real"
             minValue={0.01}
             leftButtonBackgroundColor={colors.lightGray}

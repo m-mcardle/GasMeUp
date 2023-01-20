@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import {
-  colors, boldFont, semiBoldFont, font,
+  colors, boldFont, semiBoldFont,
 } from './styles';
 
 // Styles
@@ -85,10 +85,6 @@ const styles = StyleSheet.create({
     width: '75%',
     justifyContent: 'space-between',
     color: colors.primary,
-  },
-  numericInput: {
-    fontSize: 12,
-    fontFamily: font,
   },
   ridersText: {
     color: colors.primary,

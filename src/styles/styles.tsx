@@ -116,4 +116,8 @@ export const globalStyles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.red,
   },
+  numericInput: {
+    fontSize: 12,
+    fontFamily: font,
+  },
 });
