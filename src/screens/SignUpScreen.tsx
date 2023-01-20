@@ -14,7 +14,7 @@ import Input from '../components/Input';
 import Text from '../components/Text';
 
 // Styles
-import { colors, globalStyles } from '../styles/styles';
+import styles from '../styles/SignUpScreen.styles';
 
 interface Props {
   navigation: {
@@ -67,16 +67,12 @@ export default function SignUpScreen({ navigation }: Props) {
     <KeyboardAvoidingView
       behavior="padding"
       keyboardVerticalOffset={160}
-      style={{
-        flex: 1,
-        paddingVertical: 20,
-        backgroundColor: colors.primary,
-      }}
+      style={styles.screen}
     >
-      <View style={{ ...globalStyles.centered, backgroundColor: colors.primary }}>
-        <View style={{ paddingBottom: 24 }}>
-          <Text style={{ fontSize: 24, textAlign: 'center' }}>Join GasMeUp</Text>
-          <Text style={{ fontSize: 10, textAlign: 'center' }}>To save your trips and split them with your friends!</Text>
+      <View style={styles.main}>
+        <View style={styles.headingSection}>
+          <Text style={styles.h1}>Join GasMeUp</Text>
+          <Text style={styles.h2}>To save your trips and split them with your friends!</Text>
         </View>
         <Input
           placeholder="First Name"
@@ -88,14 +84,14 @@ export default function SignUpScreen({ navigation }: Props) {
           onChangeText={setLastName}
           value={lastName}
         />
-        {emailError && <Text style={{ fontSize: 6, color: colors.red }}>Invalid email</Text>}
+        {emailError && <Text style={styles.errorText}>Invalid email</Text>}
         <Input
           placeholder="Email"
           error={emailError}
           onChangeText={setEmail}
           value={email}
         />
-        {passwordError && <Text style={{ fontSize: 6, color: colors.red }}>Weak password</Text>}
+        {passwordError && <Text style={styles.errorText}>Password is too weak</Text>}
         <Input
           placeholder="Password"
           error={passwordError}
@@ -107,7 +103,7 @@ export default function SignUpScreen({ navigation }: Props) {
           disabled={!firstName || !lastName || !email || !password}
           onPress={() => signUp()}
         >
-          <Text style={{ color: colors.primary, textAlign: 'center' }}>Sign Up</Text>
+          <Text style={styles.signUpButtonText}>Sign Up</Text>
         </Button>
       </View>
     </KeyboardAvoidingView>

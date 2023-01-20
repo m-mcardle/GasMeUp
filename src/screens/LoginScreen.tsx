@@ -20,7 +20,7 @@ import Text from '../components/Text';
 import AppleLogin from '../components/Login/AppleLogin';
 
 // Styles
-import { colors, globalStyles } from '../styles/styles';
+import styles from '../styles/LoginScreen.styles';
 
 const login = (email: string, password: string) => {
   signInWithEmailAndPassword(auth, email, password)
@@ -48,7 +48,11 @@ function LoginPage({ navigation }: Props) {
   }
 
   return (
-    <View style={{ ...globalStyles.centered, backgroundColor: colors.primary }}>
+    <View style={styles.main}>
+      <View style={styles.headingSection}>
+        <Text style={styles.h1}>Join GasMeUp</Text>
+        <Text style={styles.h2}>To save your trips and split them with your friends!</Text>
+      </View>
       <Input
         placeholder="Email"
         onChangeText={setEmail}
@@ -61,10 +65,10 @@ function LoginPage({ navigation }: Props) {
         password
       />
       <Button onPress={() => login(email, password)}>
-        <Text style={{ color: colors.primary, textAlign: 'center' }}>Login</Text>
+        <Text style={styles.loginButtonText}>Login</Text>
       </Button>
       <AppleLogin />
-      <TouchableOpacity style={{ flexDirection: 'row' }} onPress={() => navigation.navigate('Sign Up')}>
+      <TouchableOpacity style={styles.navigateSection} onPress={() => navigation.navigate('Sign Up')}>
         <Text>Need an account?</Text>
         <Text style={{ textDecorationLine: 'underline' }}> Sign up here!</Text>
       </TouchableOpacity>
