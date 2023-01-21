@@ -23,16 +23,6 @@ import AppleLogin from '../components/Login/AppleLogin';
 // Styles
 import styles from '../styles/LoginScreen.styles';
 
-const login = (email: string, password: string) => {
-  signInWithEmailAndPassword(auth, email, password)
-    .then(() => {
-      console.log('signed in!');
-    })
-    .catch((exception) => {
-      Alert.alert('Error', exception.message);
-    });
-};
-
 interface Props {
   navigation: {
     navigate: (str: string) => {},
@@ -43,6 +33,26 @@ function LoginPage({ navigation }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [, , error] = useAuthState(auth);
+
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+
+  const login = () => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        console.log('signed in!');
+        setEmailError(false);
+        setPasswordError(false);
+      })
+      .catch((exception) => {
+        Alert.alert('Error', exception.message);
+        if (exception.code === 'auth/wrong-password') {
+          setPasswordError(true);
+        } else {
+          setEmailError(true);
+        }
+      });
+  };
 
   if (error) {
     console.log(error);
@@ -59,14 +69,16 @@ function LoginPage({ navigation }: Props) {
           placeholder="Email"
           onChangeText={setEmail}
           value={email}
+          error={emailError}
         />
         <Input
           placeholder="Password"
           onChangeText={setPassword}
           value={password}
           password
+          error={passwordError}
         />
-        <Button onPress={() => login(email, password)}>
+        <Button onPress={login}>
           <Text style={styles.loginButtonText}>Login</Text>
         </Button>
         <AppleLogin />
