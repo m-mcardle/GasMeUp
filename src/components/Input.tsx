@@ -54,7 +54,7 @@ export default function Input(props: Props) {
           style,
         ]}
         placeholder={placeholder}
-        placeholderTextColor={colors.black}
+        placeholderTextColor={colors.secondary}
         onChangeText={onChangeText}
         onPressIn={onPressIn}
         secureTextEntry={password}

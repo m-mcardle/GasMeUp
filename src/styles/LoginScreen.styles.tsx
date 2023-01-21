@@ -8,7 +8,6 @@ import {
 const styles = StyleSheet.create({
   main: {
     ...globalStyles.centered,
-    backgroundColor: colors.primary,
   },
   loginButtonText: {
     color: colors.primary,

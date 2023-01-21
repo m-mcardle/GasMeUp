@@ -22,7 +22,11 @@ export default function Button(props: Props) {
   return (
     <TouchableOpacity
       disabled={disabled}
-      style={[globalStyles.button, (disabled ? globalStyles.disabledButton : null), style]}
+      style={[
+        globalStyles.button,
+        style,
+        (disabled ? globalStyles.disabledButton : null),
+      ]}
       onPress={() => {
         Keyboard.dismiss();
         onPress();

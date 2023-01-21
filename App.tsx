@@ -3,21 +3,14 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as SplashScreen from 'expo-splash-screen';
 import {
   useFonts,
-  Rubik_300Light,
-  Rubik_400Regular,
-  Rubik_500Medium,
-  Rubik_600SemiBold,
-  Rubik_700Bold,
-  Rubik_800ExtraBold,
-  Rubik_900Black,
-  Rubik_300Light_Italic,
-  Rubik_400Regular_Italic,
-  Rubik_500Medium_Italic,
-  Rubik_600SemiBold_Italic,
-  Rubik_700Bold_Italic,
-  Rubik_800ExtraBold_Italic,
-  Rubik_900Black_Italic,
-} from '@expo-google-fonts/rubik';
+  Inter_300Light,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+  Inter_900Black,
+} from '@expo-google-fonts/inter';
 
 // React imports
 import React, { useState, useMemo, useEffect } from 'react';
@@ -103,20 +96,13 @@ export default function App() {
   const state = useMemo(() => [globalState, updateGlobalState], [globalState]);
 
   const [fontsLoaded] = useFonts({
-    Rubik_300Light,
-    Rubik_400Regular,
-    Rubik_500Medium,
-    Rubik_600SemiBold,
-    Rubik_700Bold,
-    Rubik_800ExtraBold,
-    Rubik_900Black,
-    Rubik_300Light_Italic,
-    Rubik_400Regular_Italic,
-    Rubik_500Medium_Italic,
-    Rubik_600SemiBold_Italic,
-    Rubik_700Bold_Italic,
-    Rubik_800ExtraBold_Italic,
-    Rubik_900Black_Italic,
+    Inter_300Light,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    Inter_800ExtraBold,
+    Inter_900Black,
   });
 
   useEffect(() => {
@@ -149,7 +135,7 @@ export default function App() {
                 size,
               },
             ),
-            tabBarActiveTintColor: colors.tertiary,
+            tabBarActiveTintColor: colors.action,
             tabBarInactiveTintColor: colors.secondary,
             tabBarStyle: { backgroundColor: colors.primary },
           })}

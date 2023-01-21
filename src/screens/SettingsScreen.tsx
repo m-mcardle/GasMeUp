@@ -1,7 +1,6 @@
 // React
 import React, { useMemo } from 'react';
 import {
-  KeyboardAvoidingView,
   Settings,
   View,
   Switch,
@@ -18,6 +17,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
 
 // Components
+import Page from '../components/Page';
 import Button from '../components/Button';
 import Text from '../components/Text';
 
@@ -61,14 +61,14 @@ export default function SettingsScreen() {
       <Switch
         value={value}
         onValueChange={(val) => changeSetting(name, val)}
-        trackColor={{ false: colors.primary, true: colors.tertiary }}
+        trackColor={{ false: colors.primary, true: colors.action }}
         ios_backgroundColor={colors.primary}
       />
     </View>
   ), [value, name, globalState]);
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.main}>
+    <Page>
       <View style={styles.headerContainer}>
         <Text style={globalStyles.title}> Settings</Text>
       </View>
@@ -106,6 +106,6 @@ export default function SettingsScreen() {
             : undefined
         }
       </View>
-    </KeyboardAvoidingView>
+    </Page>
   );
 }

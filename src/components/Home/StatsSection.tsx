@@ -1,6 +1,8 @@
 import React from 'react';
 import { ActivityIndicator, Image, View } from 'react-native';
 
+import { LinearGradient } from 'expo-linear-gradient';
+
 // @ts-ignore
 import AdjustIcon from '../../../assets/AdjustButton.png';
 // @ts-ignore
@@ -9,6 +11,7 @@ import AdjustIconDisabled from '../../../assets/AdjustButtonDisabled.png';
 import Text from '../Text';
 
 import styles from '../../styles/HomeScreen.styles';
+import { colors } from '../../styles/styles';
 
 interface Props {
   loading: boolean,
@@ -34,7 +37,11 @@ export default function StatsSection(props: Props) {
   const safeRiders = riders < 1 ? 1 : riders;
   return (
     <View style={styles.statsSection}>
-      <View style={styles.costSection}>
+      <LinearGradient
+        colors={[colors.green, colors.darkGreen]}
+        start={{ x: 0, y: 0.2 }}
+        style={styles.costSection}
+      >
         {loading
           ? <ActivityIndicator size="large" />
           : (
@@ -43,7 +50,7 @@ export default function StatsSection(props: Props) {
               {(cost / safeRiders).toFixed(2)}
             </Text>
           )}
-      </View>
+      </LinearGradient>
       <View style={styles.subStatsSection}>
         <Text style={{ ...styles.statBox, ...styles.statBoxText }}>
           {`Distance: ${distance.toFixed(2)} km`}

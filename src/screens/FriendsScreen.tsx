@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 
 import {
-  DataTable, Provider, Portal, Modal,
+  DataTable, Portal, Modal,
 } from 'react-native-paper';
 
 // Firebase
@@ -18,14 +18,15 @@ import { auth, db } from '../../firebase';
 import LoginScreen from './LoginScreen';
 
 // Components
+import Page from '../components/Page';
 import Table from '../components/Table';
 
 import AddFriendsTable from '../components/Friends/AddFriendsTable';
+import FriendInfoSection from '../components/Friends/FriendInfoSection';
 
 // Styles
 import styles from '../styles/FriendsScreen.styles';
-import { globalStyles } from '../styles/styles';
-import FriendInfoSection from '../components/Friends/FriendInfoSection';
+import { colors, globalStyles } from '../styles/styles';
 
 function RowBuilder(onPress: (friend: any) => void) {
   function Row({ name, amount, uid }: DocumentData) {
@@ -38,8 +39,8 @@ function RowBuilder(onPress: (friend: any) => void) {
           selectedFriendAmount: amount,
         })}
       >
-        <DataTable.Cell>{name}</DataTable.Cell>
-        <DataTable.Cell textStyle={amount < 0 ? { color: 'red' } : undefined} numeric>
+        <DataTable.Cell textStyle={{ color: colors.secondary }}>{name}</DataTable.Cell>
+        <DataTable.Cell textStyle={amount < 0 ? { color: 'red' } : { color: colors.secondary }} numeric>
           $
           {amount.toFixed(2)}
         </DataTable.Cell>
@@ -53,8 +54,8 @@ function RowBuilder(onPress: (friend: any) => void) {
 function FooterRow(onPress: () => void) {
   return (
     <DataTable.Row onPress={onPress}>
-      <DataTable.Cell>Add Friend</DataTable.Cell>
-      <DataTable.Cell numeric>
+      <DataTable.Cell textStyle={{ color: colors.secondary }}>Add Friend</DataTable.Cell>
+      <DataTable.Cell textStyle={{ color: colors.secondary }} numeric>
         +
       </DataTable.Cell>
     </DataTable.Row>
@@ -120,7 +121,7 @@ export default function FriendsScreen() {
   const Footer = () => FooterRow(() => setVisible(true));
 
   return (
-    <Provider>
+    <Page>
       <View style={styles.main}>
         <Portal>
           <Modal
@@ -155,8 +156,9 @@ export default function FriendsScreen() {
           Row={Row}
           FooterRow={Footer}
           loading={friendsDataLoading}
+          style={styles.table}
         />
       </View>
-    </Provider>
+    </Page>
   );
 }

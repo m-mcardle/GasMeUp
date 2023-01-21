@@ -5,12 +5,11 @@ import { colors } from './styles';
 // Styles
 const styles = StyleSheet.create({
   main: {
-    backgroundColor: colors.primary,
     height: '100%',
     paddingVertical: 64,
   },
   table: {
-    height: '70%',
+    flex: 1,
     paddingVertical: 48,
   },
   friendInfoTitle: {

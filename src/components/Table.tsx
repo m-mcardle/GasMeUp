@@ -8,7 +8,7 @@ import { DataTable } from 'react-native-paper';
 import Text from './Text';
 
 // Styles
-import { globalStyles } from '../styles/styles';
+import { globalStyles, colors } from '../styles/styles';
 
 interface Props {
   title: string,
@@ -18,6 +18,7 @@ interface Props {
   Row: ComponentType,
   FooterRow?: ComponentType,
   headers: Array<Header>,
+  style?: object,
 }
 
 interface Header {
@@ -33,6 +34,7 @@ export default function Table({
   title,
   headers,
   loading = false,
+  style,
 }: Props) {
   const [page, setPage] = useState(0);
 
@@ -47,7 +49,7 @@ export default function Table({
   const min = (a: number, b: number) => Math.min(a, b);
 
   return (
-    <View>
+    <View style={style}>
       <Text style={globalStyles.title}>{title}</Text>
       <DataTable style={globalStyles.table}>
 
@@ -57,6 +59,7 @@ export default function Table({
               <DataTable.Title
                 key={header.text}
                 numeric={header.numeric}
+                textStyle={{ color: colors.secondary }}
               >
                 {header.text}
               </DataTable.Title>
@@ -97,4 +100,5 @@ Table.defaultProps = {
   itemsPerPage: 10,
   FooterRow: undefined,
   loading: false,
+  style: undefined,
 };

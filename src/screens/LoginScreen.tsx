@@ -13,6 +13,7 @@ import { auth } from '../../firebase';
 import SignUpScreen from './SignUpScreen';
 
 // Components
+import Page from '../components/Page';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Text from '../components/Text';
@@ -48,31 +49,33 @@ function LoginPage({ navigation }: Props) {
   }
 
   return (
-    <View style={styles.main}>
-      <View style={styles.headingSection}>
-        <Text style={styles.h1}>Sign In to GasMeUp</Text>
-        <Text style={styles.h2}>To save your trips and split them with your friends!</Text>
+    <Page>
+      <View style={styles.main}>
+        <View style={styles.headingSection}>
+          <Text style={styles.h1}>Sign In to GasMeUp</Text>
+          <Text style={styles.h2}>To save your trips and split them with your friends!</Text>
+        </View>
+        <Input
+          placeholder="Email"
+          onChangeText={setEmail}
+          value={email}
+        />
+        <Input
+          placeholder="Password"
+          onChangeText={setPassword}
+          value={password}
+          password
+        />
+        <Button onPress={() => login(email, password)}>
+          <Text style={styles.loginButtonText}>Login</Text>
+        </Button>
+        <AppleLogin />
+        <TouchableOpacity style={styles.navigateSection} onPress={() => navigation.navigate('Sign Up')}>
+          <Text>Need an account?</Text>
+          <Text style={{ textDecorationLine: 'underline' }}> Sign up here!</Text>
+        </TouchableOpacity>
       </View>
-      <Input
-        placeholder="Email"
-        onChangeText={setEmail}
-        value={email}
-      />
-      <Input
-        placeholder="Password"
-        onChangeText={setPassword}
-        value={password}
-        password
-      />
-      <Button onPress={() => login(email, password)}>
-        <Text style={styles.loginButtonText}>Login</Text>
-      </Button>
-      <AppleLogin />
-      <TouchableOpacity style={styles.navigateSection} onPress={() => navigation.navigate('Sign Up')}>
-        <Text>Need an account?</Text>
-        <Text style={{ textDecorationLine: 'underline' }}> Sign up here!</Text>
-      </TouchableOpacity>
-    </View>
+    </Page>
   );
 }
 

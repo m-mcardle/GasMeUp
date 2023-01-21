@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import Text from '../Text';
 
-import { colors, boldItalicFont } from '../../styles/styles';
+import { colors, boldFont } from '../../styles/styles';
 
 interface Props {
   items: Array<string>,
@@ -25,13 +25,13 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     fontWeight: '200',
     fontSize: 10,
-    fontFamily: boldItalicFont,
-    color: colors.black,
+    fontFamily: boldFont,
+    color: colors.secondary,
   },
   text: {
     fontSize: 10,
     padding: 5,
-    color: colors.black,
+    color: colors.secondary,
   },
 });
 

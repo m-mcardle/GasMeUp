@@ -2,9 +2,8 @@
 *
 * Get session tokens working (might b impossible)
 * Implement db to store cached queries
-* Add modal for adjusting gas price manually
-* Fuel Efficiency Configuration
 * Highway vs City driving
+* Get user location and use that as input
 *
 */
 
@@ -13,7 +12,6 @@ import React, { useCallback, useState } from 'react';
 import {
   View,
   Alert,
-  KeyboardAvoidingView,
   Keyboard,
   ViewStyle,
 } from 'react-native';
@@ -24,7 +22,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import NumericInput from 'react-native-numeric-input';
 
 import {
-  Provider, Portal, Modal,
+  Portal, Modal,
 } from 'react-native-paper';
 
 import uuid from 'react-native-uuid';
@@ -37,6 +35,7 @@ import { auth } from '../../firebase';
 import { useGlobalState } from '../hooks/hooks';
 
 // Components
+import Page from '../components/Page';
 import Text from '../components/Text';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -87,6 +86,9 @@ export default function HomeScreen() {
   const [globalState] = useGlobalState();
   const [modalVisible, setModalVisible] = useState(false);
 
+  const [startLocationError, setStartLocationError] = useState<boolean>(false);
+  const [endLocationError, setEndLocationError] = useState<boolean>(false);
+
   const GAS_MILEAGE = globalState['Gas Mileage'];
 
   const cost = ((distance * GAS_MILEAGE) / 100) * gasPrice;
@@ -110,6 +112,16 @@ export default function HomeScreen() {
   };
 
   const submit = useCallback(async () => {
+    if (!startLocation) {
+      setStartLocationError(true);
+    }
+    if (!endLocation) {
+      setEndLocationError(true);
+    }
+    if (!startLocation || !endLocation) {
+      return null;
+    }
+
     Keyboard.dismiss();
     setCostRequest({
       loading: true, distance: 0, gasPrice: 0,
@@ -137,6 +149,9 @@ export default function HomeScreen() {
         const { price } = await gasPriceResponse.json();
         newGasPrice = price;
       }
+
+      setStartLocationError(false);
+      setEndLocationError(false);
 
       setCostRequest((state) => ({
         ...state,
@@ -206,115 +221,99 @@ export default function HomeScreen() {
   // Represents if the user has entered all the required data to save a trip's cost
   const canSaveTrip = !!gasPrice && !!distance && !!user;
 
-  // Represents if the user has selected a start and end location
-  const canSubmit = !!startLocation && !!endLocation;
-
   return (
-    <Provider>
-      <KeyboardAvoidingView
-        behavior="padding"
-        keyboardVerticalOffset={160}
-        style={styles.main}
-      >
-        <GasPriceModal
-          visible={visible}
-          setVisible={setVisible}
-          data={customGasPrice}
-          setData={updateCustomGasPrice}
-          useCustomValue={useCustomGasPrice}
-          setUseCustomValue={configureCustomGasPrice}
-        />
-        <Portal>
-          <Modal
-            visible={modalVisible}
-            onDismiss={() => setModalVisible(false)}
-            contentContainerStyle={globalStyles.modal}
-          >
-            <AddToFriendsTable
-              cost={cost}
-              distance={distance}
-              gasPrice={gasPrice}
-              riders={riders}
-              start={startLocation}
-              end={endLocation}
-              gasMileage={GAS_MILEAGE}
-              closeModal={() => setModalVisible(false)}
-            />
-          </Modal>
-        </Portal>
-        <View style={styles.container}>
-          <Text style={globalStyles.title}>⛽️ Gas Me Up 💸</Text>
-        </View>
-        <View style={styles.dataContainer}>
-          <StatsSection
-            loading={loading}
-            riders={riders}
+    <Page>
+      <GasPriceModal
+        visible={visible}
+        setVisible={setVisible}
+        data={customGasPrice}
+        setData={updateCustomGasPrice}
+        useCustomValue={useCustomGasPrice}
+        setUseCustomValue={configureCustomGasPrice}
+      />
+      <Portal>
+        <Modal
+          visible={modalVisible}
+          onDismiss={() => setModalVisible(false)}
+          contentContainerStyle={globalStyles.modal}
+        >
+          <AddToFriendsTable
+            cost={cost}
             distance={distance}
             gasPrice={gasPrice}
-            useCustomGasPrice={useCustomGasPrice}
-            cost={cost}
-            openModal={() => setVisible(true)}
+            riders={riders}
+            start={startLocation}
+            end={endLocation}
+            gasMileage={GAS_MILEAGE}
+            closeModal={() => setModalVisible(false)}
           />
-          <View style={styles.ridersSection}>
-            <Text style={styles.ridersText}>Riders:</Text>
-            <NumericInput
-              rounded
-              totalHeight={18}
-              totalWidth={120}
-              containerStyle={{ backgroundColor: 'white' }}
-              inputStyle={globalStyles.numericInput as ViewStyle}
-              minValue={1}
-              leftButtonBackgroundColor={colors.lightGray}
-              rightButtonBackgroundColor={colors.tertiary}
-              value={riders}
-              editable={false}
-              onChange={setRiders}
-            />
-          </View>
-          <Input
-            placeholder="Start location"
-            onChangeText={updateStartLocation}
-            onPressIn={() => changeActiveInput(ActiveInput.Start)}
-            value={startLocation}
-            icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
-            clearButton
+        </Modal>
+      </Portal>
+      <View style={styles.container}>
+        <Text style={globalStyles.title}>⛽️ Gas Me Up 💸</Text>
+      </View>
+      <View style={styles.dataContainer}>
+        <StatsSection
+          loading={loading}
+          riders={riders}
+          distance={distance}
+          gasPrice={gasPrice}
+          useCustomGasPrice={useCustomGasPrice}
+          cost={cost}
+          openModal={() => setVisible(true)}
+        />
+        <View style={styles.ridersSection}>
+          <Text style={styles.ridersText}>Riders:</Text>
+          <NumericInput
+            rounded
+            totalHeight={18}
+            totalWidth={120}
+            containerStyle={{ backgroundColor: 'white' }}
+            inputStyle={globalStyles.numericInput as ViewStyle}
+            minValue={1}
+            leftButtonBackgroundColor={colors.lightGray}
+            rightButtonBackgroundColor={colors.action}
+            value={riders}
+            editable={false}
+            onChange={setRiders}
           />
-          <Input
-            placeholder="End location"
-            onChangeText={updateEndLocation}
-            onPressIn={() => changeActiveInput(ActiveInput.End)}
-            value={endLocation}
-            icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
-            clearButton
-          />
-          <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-          {/*
-            TODO - This next section is a little messy with the `canSaveTrip` logic
-            it essentially just hides the save button if the user isn't logged in
-            or the trip cost hasn't been calculated yet
-          */}
-          <View style={canSaveTrip ? styles.buttonSection : undefined}>
-            <Button
-              disabled={!canSubmit}
-              style={canSaveTrip ? styles.calculateButton : undefined}
-              onPress={submit}
-            >
-              <Text style={{ color: colors.primary }}>Calculate</Text>
-            </Button>
-            {canSaveTrip
-              ? (
-                <Button
-                  style={[styles.saveButton, (canSaveTrip ? { width: '30%' } : undefined)]}
-                  onPress={() => setModalVisible(true)}
-                >
-                  <Text style={{ color: colors.primary, marginHorizontal: 2 }}>Save</Text>
-                  <AntDesign name="contacts" size={20} color={colors.primary} />
-                </Button>
-              )
-              : undefined}
-          </View>
         </View>
-      </KeyboardAvoidingView>
-    </Provider>
+        <Input
+          placeholder="Start location"
+          onChangeText={updateStartLocation}
+          onPressIn={() => changeActiveInput(ActiveInput.Start)}
+          value={startLocation}
+          icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
+          clearButton
+          error={startLocationError}
+        />
+        <Input
+          placeholder="End location"
+          onChangeText={updateEndLocation}
+          onPressIn={() => changeActiveInput(ActiveInput.End)}
+          value={endLocation}
+          icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
+          clearButton
+          error={endLocationError}
+        />
+        <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
+        <View style={styles.buttonSection}>
+          <Button
+            style={styles.calculateButton}
+            onPress={submit}
+          >
+            <Text style={{ color: colors.primary }}>Calculate</Text>
+          </Button>
+          <Button
+            style={styles.saveButton}
+            onPress={() => setModalVisible(true)}
+            disabled={!canSaveTrip}
+          >
+            <Text style={{ color: colors.primary, marginHorizontal: 2 }}>Save</Text>
+            <AntDesign name="contacts" size={20} color={colors.primary} />
+          </Button>
+        </View>
+      </View>
+    </Page>
   );
 }

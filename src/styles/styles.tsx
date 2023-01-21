@@ -1,47 +1,48 @@
 import { StyleSheet, Appearance } from 'react-native';
 
-export const isDarkMode = Appearance.getColorScheme() === 'dark';
+// TODO - Renenable light mode
+export const isDarkMode = Appearance.getColorScheme() === 'dark' || true;
 
 export const colors = {
   primary: isDarkMode ? '#12130F' : '#FFFBFE',
   secondary: isDarkMode ? '#FFFBFE' : '#12130F',
   black: '#12130F',
   white: '#FFFBFE',
-  tertiary: '#8FCB9B',
-  lightTertiary: '#C7E5CD',
-  darkestGray: '#AAAAAA',
+  tertiary: '#1b1c2c',
+  lightTertiary: '#5F606B',
+  darkestGray: '#444444',
   darkGray: '#CCCCCC',
   gray: '#DDDDDD',
   lightGray: '#EEEEEE',
   teal: '#29A8AB',
   green: '#118C4F',
+  darkGreen: '#1f584e',
   red: '#DC143C',
+  test: '#1BC3B9',
+  secondaryAction: '#B44E8F',
+  purple: '#22133c',
+  action: '#6f61fe',
 };
 
 export const fonts = {
-  300: 'Rubik_300Light',
-  400: 'Rubik_400Regular',
-  500: 'Rubik_500Medium',
-  600: 'Rubik_600SemiBold',
-  700: 'Rubik_700Bold',
-  800: 'Rubik_800ExtraBold',
-  900: 'Rubik_900Black',
-  i300: 'Rubik_300Light_Italic',
-  i400: 'Rubik_400Regular_Italic',
-  i500: 'Rubik_500Medium_Italic',
-  i600: 'Rubik_600SemiBold_Italic',
-  i700: 'Rubik_700Bold_Italic',
-  i800: 'Rubik_800ExtraBold_Italic',
-  i900: 'Rubik_900Black_Italic',
+  300: 'Inter_300Light',
+  400: 'Inter_400Regular',
+  500: 'Inter_500Medium',
+  600: 'Inter_600SemiBold',
+  700: 'Inter_700Bold',
+  800: 'Inter_800ExtraBold',
+  900: 'Inter_900Black',
 };
 
 export const font = fonts[400];
-export const italicFont = fonts.i400;
-export const boldItalicFont = fonts.i700;
 export const boldFont = fonts[700];
 export const semiBoldFont = fonts[600];
 
 export const globalStyles = StyleSheet.create({
+  page: {
+    flex: 1,
+    paddingVertical: 20,
+  },
   text: {
     fontFamily: font,
     color: colors.secondary,
@@ -53,7 +54,7 @@ export const globalStyles = StyleSheet.create({
     marginVertical: 5,
     padding: 10,
     backgroundColor: colors.tertiary,
-    color: colors.black,
+    color: colors.white,
     fontSize: 10,
   },
   inputView: {
@@ -65,17 +66,17 @@ export const globalStyles = StyleSheet.create({
   clearInputButton: {
     width: 20,
     height: 20,
-    backgroundColor: colors.secondary,
-    color: colors.primary,
+    backgroundColor: colors.action,
+    color: colors.secondary,
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 'auto',
   },
   button: {
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.action,
     borderColor: colors.primary,
-    color: colors.primary,
+    color: colors.secondary,
     borderWidth: 1,
     borderRadius: 25,
     margin: 10,
@@ -85,6 +86,7 @@ export const globalStyles = StyleSheet.create({
   },
   disabledButton: {
     backgroundColor: colors.darkestGray,
+    color: colors.secondary,
   },
   centered: {
     alignItems: 'center',
@@ -93,7 +95,7 @@ export const globalStyles = StyleSheet.create({
     height: '100%',
   },
   table: {
-    height: '70%',
+    height: '100%',
   },
   modal: {
     backgroundColor: colors.primary,

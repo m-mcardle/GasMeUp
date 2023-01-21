@@ -52,7 +52,8 @@ export default function GasPriceModal(props: Props) {
             valueType="real"
             minValue={0.01}
             leftButtonBackgroundColor={colors.lightGray}
-            rightButtonBackgroundColor={colors.tertiary}
+            rightButtonBackgroundColor={colors.action}
+            textColor={colors.primary}
             value={value}
             onChange={setData}
           />
@@ -60,7 +61,7 @@ export default function GasPriceModal(props: Props) {
         <View style={styles.checkBoxSection}>
           <Text style={{ color: colors.secondary, fontSize: 12 }}>Use custom gas price:</Text>
           <CheckBox
-            color={colors.tertiary}
+            color={colors.action}
             value={useCustomValue}
             onValueChange={setUseCustomValue}
             style={styles.modalCheckBox}

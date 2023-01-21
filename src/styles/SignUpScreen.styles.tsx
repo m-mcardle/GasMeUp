@@ -13,7 +13,6 @@ const styles = StyleSheet.create({
   },
   main: {
     ...globalStyles.centered,
-    backgroundColor: colors.primary,
   },
   signUpButtonText: {
     color: colors.primary,

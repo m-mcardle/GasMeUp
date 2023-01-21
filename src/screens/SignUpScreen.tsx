@@ -1,6 +1,6 @@
 // React
 import React, { useState } from 'react';
-import { View, Alert, KeyboardAvoidingView } from 'react-native';
+import { View, Alert } from 'react-native';
 import PropTypes from 'prop-types';
 
 // Firebase
@@ -9,6 +9,7 @@ import { setDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 
 // Components
+import Page from '../components/Page';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Text from '../components/Text';
@@ -64,11 +65,7 @@ export default function SignUpScreen({ navigation }: Props) {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      keyboardVerticalOffset={160}
-      style={styles.screen}
-    >
+    <Page>
       <View style={styles.main}>
         <View style={styles.headingSection}>
           <Text style={styles.h1}>Join GasMeUp</Text>
@@ -106,7 +103,7 @@ export default function SignUpScreen({ navigation }: Props) {
           <Text style={styles.signUpButtonText}>Sign Up</Text>
         </Button>
       </View>
-    </KeyboardAvoidingView>
+    </Page>
   );
 }
 
