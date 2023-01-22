@@ -22,6 +22,7 @@ import AppleLogin from '../components/Login/AppleLogin';
 
 // Styles
 import styles from '../styles/LoginScreen.styles';
+import { colors } from '../styles/styles';
 
 interface Props {
   navigation: {
@@ -102,7 +103,15 @@ const RootStack = createStackNavigator();
 
 export default function LoginScreen() {
   return (
-    <RootStack.Navigator>
+    <RootStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.purple,
+          height: 80,
+        },
+        headerTitleStyle: { color: colors.white },
+      }}
+    >
       <RootStack.Group screenOptions={{ headerShown: false }}>
         <RootStack.Screen name="Login" component={LoginPage} />
       </RootStack.Group>
