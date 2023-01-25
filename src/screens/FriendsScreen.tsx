@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 
+import { Ionicons } from '@expo/vector-icons';
+
 import {
   DataTable, Portal, Modal,
 } from 'react-native-paper';
@@ -26,7 +28,7 @@ import FriendInfoSection from '../components/Friends/FriendInfoSection';
 
 // Styles
 import styles from '../styles/FriendsScreen.styles';
-import { colors, globalStyles } from '../styles/styles';
+import { boldFont, colors, globalStyles } from '../styles/styles';
 
 function RowBuilder(onPress: (friend: any) => void) {
   function Row({ name, amount, uid }: DocumentData) {
@@ -39,7 +41,9 @@ function RowBuilder(onPress: (friend: any) => void) {
           selectedFriendAmount: amount,
         })}
       >
-        <DataTable.Cell textStyle={{ color: colors.secondary }}>{name}</DataTable.Cell>
+        <DataTable.Cell textStyle={{ color: colors.secondary }}>
+          {name}
+        </DataTable.Cell>
         <DataTable.Cell textStyle={amount < 0 ? { color: 'red' } : { color: colors.secondary }} numeric>
           $
           {amount.toFixed(2)}
@@ -54,9 +58,11 @@ function RowBuilder(onPress: (friend: any) => void) {
 function FooterRow(onPress: () => void) {
   return (
     <DataTable.Row onPress={onPress}>
-      <DataTable.Cell textStyle={{ color: colors.secondary }}>Add Friend</DataTable.Cell>
+      <DataTable.Cell textStyle={{ color: colors.secondary, fontFamily: boldFont }}>
+        Add Friend
+      </DataTable.Cell>
       <DataTable.Cell textStyle={{ color: colors.secondary }} numeric>
-        +
+        <Ionicons name="person-add" size={24} color={colors.secondary} />
       </DataTable.Cell>
     </DataTable.Row>
   );
@@ -137,14 +143,12 @@ export default function FriendsScreen() {
             onDismiss={() => setFriendInfoVisible((state) => !state)}
             contentContainerStyle={globalStyles.modal}
           >
-            <View>
-              <FriendInfoSection
-                uid={selectedFriendUID}
-                name={selectedFriendName}
-                amount={selectedFriendAmount}
-                close={() => setFriendInfoVisible(false)}
-              />
-            </View>
+            <FriendInfoSection
+              uid={selectedFriendUID}
+              name={selectedFriendName}
+              amount={selectedFriendAmount}
+              close={() => setFriendInfoVisible(false)}
+            />
           </Modal>
         </Portal>
 

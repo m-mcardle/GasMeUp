@@ -41,11 +41,6 @@ const logout = () => {
 export default function SettingsScreen() {
   const [user] = useAuthState(auth);
 
-  const initialSettingsObject: any = {};
-  TOGGLE_SETTINGS.forEach((setting) => {
-    initialSettingsObject[setting] = !!Settings.get(setting);
-  });
-
   const [globalState, updateGlobalState] = useGlobalState();
 
   const changeSetting = (setting: string, value: any) => {
@@ -73,7 +68,7 @@ export default function SettingsScreen() {
         <Text style={globalStyles.title}> Settings</Text>
       </View>
       <View style={styles.mainContainer}>
-        {TOGGLE_SETTINGS.map((setting) => (
+        {Object.keys(TOGGLE_SETTINGS).map((setting) => (
           <View key={setting} style={styles.settingContainer}>
             <Text style={styles.settingsText}>{setting}</Text>
             <SettingsSwitch name={setting} value={globalState[setting]} />

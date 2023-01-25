@@ -8,21 +8,27 @@ export const GlobalContext = createContext<any>(null);
 
 export const useGlobalState = () => useContext(GlobalContext);
 
-export const TOGGLE_SETTINGS = [
-  'Enable Requests',
-];
+export const TOGGLE_SETTINGS: Record<string, boolean> = {
+  'Enable Requests': true,
+};
 
-export const NUMERIC_SETTINGS = [
-  'Gas Mileage',
-];
+export const NUMERIC_SETTINGS: Record<string, number> = {
+  'Gas Mileage': 10,
+};
 
-const intialSettings: any = {};
-TOGGLE_SETTINGS.forEach((setting) => {
-  intialSettings[setting] = !!Settings.get(setting);
+const initialSettings: any = {};
+
+// The settings are stored as numbers and so to convert them to booleans we must use `!!`
+Object.keys(TOGGLE_SETTINGS).forEach((setting) => {
+  initialSettings[setting] = Settings.get(setting) !== undefined
+    ? !!Settings.get(setting)
+    : TOGGLE_SETTINGS[setting];
 });
 
-NUMERIC_SETTINGS.forEach((setting) => {
-  intialSettings[setting] = Settings.get(setting) || 0;
+Object.keys(NUMERIC_SETTINGS).forEach((setting) => {
+  initialSettings[setting] = Settings.get(setting) !== undefined
+    ? Settings.get(setting)
+    : NUMERIC_SETTINGS[setting];
 });
 
-export const initialState = intialSettings;
+export const initialState = initialSettings;

@@ -95,13 +95,13 @@ export const globalStyles = StyleSheet.create({
     height: '100%',
   },
   table: {
-    height: '100%',
+    maxHeight: '100%',
   },
   modal: {
     backgroundColor: colors.primary,
     borderWidth: 4,
     borderColor: colors.secondary,
-    padding: 20,
+    height: '80%',
   },
   title: {
     fontSize: 48,

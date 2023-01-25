@@ -1,6 +1,11 @@
 // React
 import React, { useState } from 'react';
-import { TouchableOpacity, View, Alert } from 'react-native';
+import {
+  TouchableOpacity,
+  View,
+  Alert,
+  Platform,
+} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import PropTypes from 'prop-types';
 
@@ -59,6 +64,8 @@ function LoginPage({ navigation }: Props) {
     console.log(error);
   }
 
+  const platform = Platform.OS;
+
   return (
     <Page>
       <View style={styles.main}>
@@ -82,7 +89,7 @@ function LoginPage({ navigation }: Props) {
         <Button onPress={login}>
           <Text style={styles.loginButtonText}>Login</Text>
         </Button>
-        <AppleLogin />
+        {platform === 'ios' ? <AppleLogin /> : undefined}
         <TouchableOpacity style={styles.navigateSection} onPress={() => navigation.navigate('Sign Up')}>
           <Text>Need an account?</Text>
           <Text style={{ textDecorationLine: 'underline' }}> Sign up here!</Text>

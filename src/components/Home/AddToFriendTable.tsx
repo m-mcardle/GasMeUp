@@ -1,6 +1,6 @@
 // React
 import React, { useCallback, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 
 import { DataTable } from 'react-native-paper';
 
@@ -90,8 +90,8 @@ export default function AddToFriendTable({
       await addDoc(collection(db, 'Transactions'), {
         cost: Number(cost.toFixed(2)),
         amount: (Number(cost.toFixed(2))) / riders,
-        payeeUID: owed ? currentUser.uid : friend.uid,
-        payerUID: owed ? friend.uid : currentUser.uid,
+        payeeUID: owed ? friend.uid : currentUser.uid,
+        payerUID: owed ? currentUser.uid : friend.uid,
         distance,
         gasPrice,
         riders,
@@ -119,11 +119,6 @@ export default function AddToFriendTable({
 
   return (
     <>
-      <TouchableOpacity onPress={() => closeModal()}>
-        <Text>
-          X
-        </Text>
-      </TouchableOpacity>
       <Text style={globalStyles.title}>Save Trip</Text>
       <View style={styles.saveTripHeaderContainer}>
         <Text style={globalStyles.smallText}>
@@ -148,7 +143,7 @@ export default function AddToFriendTable({
         Row={RowBuilder(selectedFriend, setSelectedFriend)}
         loading={usersDataLoading}
       />
-      <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 'auto' }}>
         <Button
           disabled={!selectedFriend.uid}
           style={{ borderColor: colors.red, borderWidth: 4 }}

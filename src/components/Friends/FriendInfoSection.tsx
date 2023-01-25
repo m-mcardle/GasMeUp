@@ -111,7 +111,7 @@ export default function FriendInfoSection({
           disabled={amount === 0}
           onPress={settleUp}
         >
-          <Text style={{ color: 'black' }}>Settle Up</Text>
+          <Text style={{ color: 'white' }}>Settle Up</Text>
         </Button>
       </View>
     </View>

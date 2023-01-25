@@ -20,9 +20,10 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+    marginTop: 'auto',
   },
   friendInfoButton: {
-    backgroundColor: colors.tertiary,
+    backgroundColor: colors.action,
     padding: 10,
     borderRadius: 5,
   },
