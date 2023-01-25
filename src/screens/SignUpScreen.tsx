@@ -48,6 +48,8 @@ export default function SignUpScreen({ navigation }: Props) {
           lastName,
           transactions: [],
           friends: {},
+          incomingFriendRequests: [],
+          outgoingFriendRequests: [],
         })
           .then(() => {
             console.log('All done!');

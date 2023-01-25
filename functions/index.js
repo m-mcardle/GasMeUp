@@ -1,3 +1,6 @@
+/* eslint-disable max-len */
+const friends = require("./src/friends");
+
 const functions = require("firebase-functions");
 
 const admin = require("firebase-admin");
@@ -64,49 +67,19 @@ exports.aggregateBalances = functions.firestore
 exports.updateFriendsList = functions.firestore
     .document("Users/{uid}")
     .onUpdate(async (change, context) => {
-      // Only needs to run when a friends list changes
-      if (change.before.data().friends === change.after.data().friends) {
-        return;
+      const before = change.before.data();
+      const after = change.after.data();
+
+      /*
+      The logic for friend requests are as follows:
+      1. Bill requests to be friends with Fred and an outgoingFriendRequest is added to Bill (frontend)
+      2. handleOutGoingFriendRequest is called and adds an incomingFriendRequest to Fred (functions)
+      3. Fred accepts Bill's friend request and Bill is added as a friend to Fred (frontend)
+      4. handleAcceptedFriendRequest is called and Bill is added as a friend to Fred, and both the incomingFriendRequest and outgoingFriendRequest are removed from Fred and Bill respectively (functions)
+      */
+      if (before.outgoingFriendRequests !== after.outgoingFriendRequests) {
+        friends.handleOutgoingFriendRequest(db, change);
+      } else if (before.friends !== after.friends) {
+        friends.handleAcceptedFriendRequest(db, change);
       }
-      const uid = change.after.id;
-
-      // Get value of the newly added transaction
-      const oldFriendsList = Object.keys(change.before.data().friends);
-      const friendsList = Object.keys(change.after.data().friends);
-      const friendUID = friendsList.find((friend) =>
-        !oldFriendsList.includes(friend),
-      );
-
-      console.log("Old friends list:", oldFriendsList);
-      console.log("New friends list:", friendsList);
-      console.log("New friend UID:", friendUID);
-
-      if (!friendUID) {
-        console.log("Friend document not found");
-        return;
-      }
-
-      // Get a reference to the new friend
-      const friendRef = db.collection("Users").doc(friendUID);
-
-      // Update aggregations in a transaction
-      await db.runTransaction(async (transaction) => {
-        const friendDoc = await transaction.get(friendRef);
-
-        // Only need to run if this friend doesn't have this user as a friend
-        if (friendDoc.data().friends[uid]) {
-          console.log(`Friend (${friendUID}) already has ${uid} as friend`);
-          return;
-        }
-
-        const friendsFriendsList = friendDoc.data().friends;
-
-        // Update friend's friends list
-        transaction.update(friendRef, {
-          friends: {
-            ...friendsFriendsList,
-            [uid]: 0,
-          },
-        });
-      });
     });
