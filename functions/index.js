@@ -69,6 +69,7 @@ exports.updateFriendsList = functions.firestore
     .onUpdate(async (change, context) => {
       const before = change.before.data();
       const after = change.after.data();
+      console.log("updateFriendsList Triggered", before, after);
 
       /*
       The logic for friend requests are as follows:

@@ -11,8 +11,8 @@ async function handleOutgoingFriendRequest(db, change) {
   const uid = change.after.id;
 
   // Get value of the newly added friend request
-  const oldFriendsList = beforeData.outgoingFriendRequests;
-  const friendsList = afterData.outgoingFriendRequests;
+  const oldFriendsList = beforeData.outgoingFriendRequests ?? [];
+  const friendsList = afterData.outgoingFriendRequests ?? [];
   const friendUID = friendsList.find((friend) =>
     !oldFriendsList.includes(friend),
   );
@@ -22,7 +22,7 @@ async function handleOutgoingFriendRequest(db, change) {
   console.log("New friend UID:", friendUID);
 
   if (!friendUID) {
-    console.log("Friend document not found");
+    console.warn("Friend document not found");
     return;
   }
 
@@ -38,7 +38,7 @@ async function handleOutgoingFriendRequest(db, change) {
       friendDoc.data().friends[uid] ||
       friendDoc.data().incomingFriendRequests?.includes(uid)
     ) {
-      console.log(`Friend (${friendUID}) already has ${uid} as friend`);
+      console.warn(`Friend (${friendUID}) already has ${uid} as friend`);
       return;
     }
 
@@ -79,7 +79,7 @@ async function handleAcceptedFriendRequest(db, change) {
   console.log("New friend UID:", friendUID);
 
   if (!friendUID) {
-    console.log("Friend document not found");
+    console.warm("Friend document not found");
     return;
   }
 
@@ -92,7 +92,7 @@ async function handleAcceptedFriendRequest(db, change) {
 
     // Only need to run if this friend doesn't have this user as a friend
     if (friendDoc.data().friends[uid]) {
-      console.log(`Friend (${friendUID}) already has ${uid} as friend`);
+      console.warn(`Friend (${friendUID}) already has ${uid} as friend`);
       return;
     }
 

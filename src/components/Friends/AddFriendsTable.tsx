@@ -27,32 +27,36 @@ const usersRef = collection(db, 'Users');
 
 export default function AddFriendsTable() {
   const [friendEmail, setFriendEmail] = useState<string>('');
+  const [inputError, setInputError] = useState<boolean>(false);
+
   const [currentUser] = useAuthState(auth);
 
   const userDoc = currentUser?.uid ? doc(db, 'Users', currentUser.uid) : undefined;
   const [userDocument] = useDocumentData(userDoc);
 
   const userFriends = userDocument?.friends ?? {};
-  const userFriendRequests = userDocument?.outgoingFriendRequests ?? {};
+  const userFriendRequests = userDocument?.outgoingFriendRequests ?? [];
 
   const sendFriendRequest = useCallback(async () => {
     if (!currentUser?.uid) {
       return;
     }
 
-    console.log(friendEmail);
-
     const friendQuery = query(usersRef, where('email', '==', friendEmail));
     const querySnapshot = await getDocs(friendQuery);
 
     if (querySnapshot.empty) {
       console.log('Friend not found');
+      setInputError(true);
       return;
     }
-
     const newFriend = querySnapshot.docs[0].data();
 
-    console.log(friendEmail, newFriend, userFriendRequests);
+    if (userFriendRequests.includes(newFriend.uid) || userFriends[newFriend.uid] !== undefined) {
+      console.log('Friend already added');
+      setInputError(true);
+      return;
+    }
 
     try {
       await updateDoc(doc(db, 'Users', currentUser.uid), {
@@ -61,10 +65,11 @@ export default function AddFriendsTable() {
           newFriend.uid,
         ],
       });
+      setInputError(false);
     } catch (exception) {
       console.log(exception);
     }
-  }, [userDocument, currentUser, userFriends, friendEmail]);
+  }, [userDocument, currentUser, userFriendRequests, userFriends, friendEmail]);
 
   return (
     <View style={globalStyles.centered}>
@@ -73,10 +78,14 @@ export default function AddFriendsTable() {
       </Text>
       <Input
         placeholder="Friend's Email"
+        autoComplete="email"
+        keyboardType="email-address"
+        returnKeyType="done"
         value={friendEmail}
         onChangeText={setFriendEmail}
         onSubmitEditing={sendFriendRequest}
         icon={(<Ionicons name="person-add" size={24} color={colors.secondary} />)}
+        error={inputError}
       />
     </View>
   );
