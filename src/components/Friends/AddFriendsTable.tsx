@@ -64,7 +64,7 @@ export default function AddFriendsTable() {
     } catch (exception) {
       console.log(exception);
     }
-  }, [userDocument, currentUser, userFriends]);
+  }, [userDocument, currentUser, userFriends, friendEmail]);
 
   return (
     <View style={globalStyles.centered}>

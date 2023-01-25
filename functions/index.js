@@ -77,9 +77,15 @@ exports.updateFriendsList = functions.firestore
       3. Fred accepts Bill's friend request and Bill is added as a friend to Fred (frontend)
       4. handleAcceptedFriendRequest is called and Bill is added as a friend to Fred, and both the incomingFriendRequest and outgoingFriendRequest are removed from Fred and Bill respectively (functions)
       */
-      if (before.outgoingFriendRequests !== after.outgoingFriendRequests) {
+      if (
+        before.outgoingFriendRequests !== after.outgoingFriendRequests &&
+        after.outgoingFriendRequests?.length > before.outgoingFriendRequests?.length
+      ) {
         friends.handleOutgoingFriendRequest(db, change);
-      } else if (before.friends !== after.friends) {
+      } else if (
+        before.friends !== after.friends &&
+        Object.keys(after.friends ?? {}).length > Object.keys(before.friends ?? {}).length
+      ) {
         friends.handleAcceptedFriendRequest(db, change);
       }
     });

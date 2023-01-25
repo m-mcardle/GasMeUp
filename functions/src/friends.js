@@ -4,6 +4,7 @@
  * @param {Object} change - The change object
  */
 async function handleOutgoingFriendRequest(db, change) {
+  console.log("Handling outgoing friend request");
   const beforeData = change.before.data();
   const afterData = change.after.data();
 
@@ -41,8 +42,7 @@ async function handleOutgoingFriendRequest(db, change) {
       return;
     }
 
-    const friendsFriendRequests =
-    friendDoc.data().incomingFriendRequests;
+    const friendsFriendRequests = friendDoc.data().incomingFriendRequests ?? [];
 
     // Update friend's friend request list
     transaction.update(friendRef, {
@@ -60,6 +60,7 @@ async function handleOutgoingFriendRequest(db, change) {
  * @param {Object} change - The change object
  */
 async function handleAcceptedFriendRequest(db, change) {
+  console.log("Handling accepted friend request");
   const documentRef = change.after.ref;
   const beforeData = change.before.data();
   const afterData = change.after.data();
