@@ -14,17 +14,23 @@ interface Props {
   style?: object,
   password?: boolean,
   autoComplete?: TextInput['props']['autoComplete'],
+  keyboardType?: TextInput['props']['keyboardType'],
+  returnKeyType?: TextInput['props']['returnKeyType'],
   clearButton?: boolean,
   icon?: ReactComponentElement<typeof MaterialIcons>,
   error?: boolean,
+  blurOnSubmit?: boolean,
+  myRef?: React.RefObject<TextInput>,
   onChangeText: (arg: string) => void,
-  onPressIn?: () => void
+  onPressIn?: () => void,
+  onSubmitEditing?: () => void,
 }
 
 export default function Input(props: Props) {
   const {
     onChangeText,
     onPressIn,
+    onSubmitEditing,
     placeholder,
     style,
     value,
@@ -32,6 +38,10 @@ export default function Input(props: Props) {
     clearButton,
     icon,
     error,
+    returnKeyType,
+    myRef = undefined,
+    blurOnSubmit = true,
+    keyboardType = 'default',
     autoComplete = 'off',
   } = props;
 
@@ -46,17 +56,22 @@ export default function Input(props: Props) {
     <View style={globalStyles.inputView}>
       {icon}
       <TextInput
+        ref={myRef}
         value={value}
+        blurOnSubmit={blurOnSubmit}
         style={[
           globalStyles.input,
           { width },
           error ? { ...globalStyles.errorInput } : undefined,
           style,
         ]}
+        keyboardType={keyboardType}
+        returnKeyType={returnKeyType}
         placeholder={placeholder}
         placeholderTextColor={colors.secondary}
         onChangeText={onChangeText}
         onPressIn={onPressIn}
+        onSubmitEditing={onSubmitEditing}
         secureTextEntry={password}
         autoComplete={autoComplete}
       />
@@ -79,4 +94,9 @@ Input.defaultProps = {
   clearButton: false,
   icon: undefined,
   error: false,
+  returnKeyType: undefined,
+  blurOnSubmit: true,
+  keyboardType: 'default',
+  myRef: undefined,
+  onSubmitEditing: undefined,
 };

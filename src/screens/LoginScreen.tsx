@@ -1,10 +1,11 @@
 // React
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   TouchableOpacity,
   View,
   Alert,
   Platform,
+  TextInput,
 } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import PropTypes from 'prop-types';
@@ -66,8 +67,10 @@ function LoginPage({ navigation }: Props) {
 
   const platform = Platform.OS;
 
+  const passwordRef = useRef<TextInput>(null);
+
   return (
-    <Page>
+    <Page keyboardAvoiding={false}>
       <View style={styles.main}>
         <View style={styles.headingSection}>
           <Text style={styles.h1}>Sign In to GasMeUp</Text>
@@ -77,14 +80,23 @@ function LoginPage({ navigation }: Props) {
           placeholder="Email"
           onChangeText={setEmail}
           value={email}
+          autoComplete="email"
+          keyboardType="email-address"
+          returnKeyType="next"
           error={emailError}
+          blurOnSubmit={false}
+          onSubmitEditing={() => passwordRef?.current?.focus()}
         />
         <Input
+          myRef={passwordRef}
           placeholder="Password"
           onChangeText={setPassword}
           value={password}
+          autoComplete="password"
+          returnKeyType="done"
           password
           error={passwordError}
+          onSubmitEditing={login}
         />
         <Button onPress={login}>
           <Text style={styles.loginButtonText}>Login</Text>

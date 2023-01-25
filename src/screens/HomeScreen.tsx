@@ -8,12 +8,13 @@
 */
 
 // React imports
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import {
   View,
   Alert,
   Keyboard,
   ViewStyle,
+  TextInput,
 } from 'react-native';
 
 // External Components
@@ -132,7 +133,7 @@ export default function HomeScreen() {
 
       if (!distanceResponse?.ok || !distanceResponse) {
         console.log(`Request for distance failed (${distanceResponse.status})`);
-        return Error(`Request failed (${distanceResponse.status})`);
+        throw new Error(`Request for distance failed (${distanceResponse.status})`);
       }
 
       const { distance: newDistance } = await distanceResponse.json();
@@ -143,7 +144,7 @@ export default function HomeScreen() {
 
         if (!gasPriceResponse?.ok || !gasPriceResponse) {
           console.log(`Request for gas price failed (${gasPriceResponse.status})`);
-          return Error(`Request failed (${gasPriceResponse.status})`);
+          throw new Error(`Request for gas price failed (${gasPriceResponse.status})`);
         }
 
         const { price } = await gasPriceResponse.json();
@@ -160,7 +161,7 @@ export default function HomeScreen() {
         gasPrice: newGasPrice,
       }));
     } catch (err: any) {
-      Alert.alert(err);
+      Alert.alert(err.message);
       setCostRequest({
         loading: false, distance: 0, gasPrice: 0,
       });
@@ -220,6 +221,8 @@ export default function HomeScreen() {
 
   // Represents if the user has entered all the required data to save a trip's cost
   const canSaveTrip = !!gasPrice && !!distance && !!user;
+
+  const endLocationRef = useRef<TextInput>(null);
 
   return (
     <Page>
@@ -286,8 +289,13 @@ export default function HomeScreen() {
           icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
           clearButton
           error={startLocationError}
+          autoComplete="street-address"
+          blurOnSubmit={false}
+          onSubmitEditing={() => endLocationRef.current?.focus()}
+          returnKeyType="next"
         />
         <Input
+          myRef={endLocationRef}
           placeholder="End location"
           onChangeText={updateEndLocation}
           onPressIn={() => changeActiveInput(ActiveInput.End)}
@@ -295,6 +303,9 @@ export default function HomeScreen() {
           icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
           clearButton
           error={endLocationError}
+          autoComplete="street-address"
+          onSubmitEditing={submit}
+          returnKeyType="done"
         />
         <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
         <View style={styles.buttonSection}>

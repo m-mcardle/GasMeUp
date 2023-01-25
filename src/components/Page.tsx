@@ -16,6 +16,7 @@ import { colors, globalStyles } from '../styles/styles';
 
 interface Props {
   children: ReactNode,
+  keyboardAvoiding?: boolean,
 }
 
 const theme = {
@@ -26,7 +27,10 @@ const theme = {
   },
 };
 
-export default function Page({ children }: Props) {
+export default function Page({
+  children,
+  keyboardAvoiding = true,
+}: Props) {
   return (
     <Provider theme={theme}>
       <LinearGradient
@@ -34,14 +38,22 @@ export default function Page({ children }: Props) {
         start={{ x: 0.2, y: 0.9 }}
         style={globalStyles.page}
       >
-        <KeyboardAvoidingView
-          behavior="padding"
-          keyboardVerticalOffset={160}
-          style={globalStyles.page}
-        >
-          {children}
-        </KeyboardAvoidingView>
+        {keyboardAvoiding
+          ? (
+            <KeyboardAvoidingView
+              behavior="padding"
+              keyboardVerticalOffset={160}
+              style={globalStyles.page}
+            >
+              {children}
+            </KeyboardAvoidingView>
+          )
+          : children}
       </LinearGradient>
     </Provider>
   );
 }
+
+Page.defaultProps = {
+  keyboardAvoiding: true,
+};

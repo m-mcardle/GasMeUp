@@ -1,6 +1,6 @@
 // React
-import React, { useState } from 'react';
-import { View, Alert } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Alert, TextInput } from 'react-native';
 import PropTypes from 'prop-types';
 
 // Firebase
@@ -64,8 +64,11 @@ export default function SignUpScreen({ navigation }: Props) {
       });
   };
 
+  const lastNameRef = useRef<TextInput>(null);
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
   return (
-    <Page>
+    <Page keyboardAvoiding={false}>
       <View style={styles.main}>
         <View style={styles.headingSection}>
           <Text style={styles.h1}>Join GasMeUp</Text>
@@ -75,26 +78,42 @@ export default function SignUpScreen({ navigation }: Props) {
           placeholder="First Name"
           onChangeText={setFirstName}
           value={firstName}
+          returnKeyType="next"
+          autoComplete="name-given"
+          onSubmitEditing={() => lastNameRef?.current?.focus()}
         />
         <Input
+          myRef={lastNameRef}
           placeholder="Last Name"
           onChangeText={setLastName}
           value={lastName}
+          returnKeyType="next"
+          autoComplete="name-family"
+          onSubmitEditing={() => emailRef?.current?.focus()}
         />
         {emailError && <Text style={styles.errorText}>Invalid email</Text>}
         <Input
+          myRef={emailRef}
           placeholder="Email"
           error={emailError}
           onChangeText={setEmail}
           value={email}
+          autoComplete="email"
+          keyboardType="email-address"
+          returnKeyType="next"
+          onSubmitEditing={() => passwordRef?.current?.focus()}
         />
         {passwordError && <Text style={styles.errorText}>Password is too weak</Text>}
         <Input
+          myRef={passwordRef}
           placeholder="Password"
           error={passwordError}
           onChangeText={setPassword}
           value={password}
           password
+          autoComplete="password-new"
+          returnKeyType="done"
+          onSubmitEditing={signUp}
         />
         <Button
           disabled={!firstName || !lastName || !email || !password}
