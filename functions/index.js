@@ -83,10 +83,15 @@ exports.updateFriendsList = functions.firestore
         after.outgoingFriendRequests?.length > before.outgoingFriendRequests?.length
       ) {
         friends.handleOutgoingFriendRequest(db, change);
-      } else if (
-        before.friends !== after.friends &&
-        Object.keys(after.friends ?? {}).length > Object.keys(before.friends ?? {}).length
-      ) {
-        friends.handleAcceptedFriendRequest(db, change);
+      } else if (before.friends !== after.friends) {
+        const newFriendsLength = Object.keys(after.friends ?? {}).length;
+        const oldFriendsLength = Object.keys(before.friends ?? {}).length;
+        if (newFriendsLength > oldFriendsLength) {
+          // Right now this will fire twice, once for when the user adds it from the front-end and once from when the function adds it to the friend
+          friends.handleAcceptedFriendRequest(db, change);
+        } else if (newFriendsLength < oldFriendsLength) {
+          // Right now this will fire twice, once for when the user removes it from the front-end and once from when the function removes it from the friend
+          friends.handleRemovedFriend(db, change);
+        }
       }
     });

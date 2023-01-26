@@ -141,7 +141,70 @@ async function handleAcceptedFriendRequest(db, change) {
   console.log("Done `handleAcceptedFriendRequest`");
 }
 
+
+/**
+ * Handles someone removing a friend
+ * @param {Object} db - The Firestore database
+ * @param {Object} change - The change object
+ */
+async function handleRemovedFriend(db, change) {
+  console.log("Handling removed friend");
+  const beforeData = change.before.data();
+  const afterData = change.after.data();
+
+  const uid = change.after.id;
+
+  // Get value of the newly added transaction
+  const oldFriendsList = Object.keys(beforeData.friends);
+  const friendsList = Object.keys(afterData.friends);
+  const friendUID = oldFriendsList.find((friend) =>
+    !friendsList.includes(friend),
+  );
+
+  console.log("Old friends list:", oldFriendsList);
+  console.log("New friends list:", friendsList);
+  console.log("Removed friend UID:", friendUID);
+
+  if (!friendUID) {
+    console.log("Friend document not found");
+    return;
+  }
+
+  // Get a reference to the new friend
+  const friendRef = db.collection("Users").doc(friendUID);
+
+  try {
+    // Update aggregations in a transaction
+    await db.runTransaction(async (transaction) => {
+      const friendDoc = await transaction.get(friendRef);
+
+      // Only need to run if this friend has this user as a friend
+      if (friendDoc.data().friends[uid] === undefined ) {
+        console.log(`Friend (${friendUID}) doesn't have ${uid} as friend`);
+        return;
+      }
+
+      const friendsFriendsList = friendDoc.data().friends;
+      delete friendsFriendsList[uid];
+
+      console.log("Friend's new friends list:", friendsFriendsList);
+
+      // Update friend's friends list and remove outgoing friend request
+      transaction.update(friendRef, {
+        friends: {
+          ...friendsFriendsList,
+        },
+      });
+    });
+  } catch (e) {
+    console.error(e);
+  }
+
+  console.log("Done `handleRemovedFriend`");
+}
+
 module.exports = {
   handleOutgoingFriendRequest,
   handleAcceptedFriendRequest,
+  handleRemovedFriend,
 };
