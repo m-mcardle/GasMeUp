@@ -22,7 +22,7 @@ async function handleOutgoingFriendRequest(db, change) {
   console.log("New friend UID:", friendUID);
 
   if (!friendUID) {
-    console.warn("Friend document not found");
+    console.log("Friend document not found");
     return;
   }
 
@@ -38,7 +38,7 @@ async function handleOutgoingFriendRequest(db, change) {
       friendDoc.data().friends[uid] ||
       friendDoc.data().incomingFriendRequests?.includes(uid)
     ) {
-      console.warn(`Friend (${friendUID}) already has ${uid} as friend`);
+      console.log(`Friend (${friendUID}) already has ${uid} as friend`);
       return;
     }
 
@@ -79,47 +79,66 @@ async function handleAcceptedFriendRequest(db, change) {
   console.log("New friend UID:", friendUID);
 
   if (!friendUID) {
-    console.warm("Friend document not found");
+    console.log("Friend document not found");
     return;
   }
 
   // Get a reference to the new friend
   const friendRef = db.collection("Users").doc(friendUID);
 
-  // Update aggregations in a transaction
-  await db.runTransaction(async (transaction) => {
-    const friendDoc = await transaction.get(friendRef);
 
-    // Only need to run if this friend doesn't have this user as a friend
-    if (friendDoc.data().friends[uid]) {
-      console.warn(`Friend (${friendUID}) already has ${uid} as friend`);
-      return;
-    }
+  try {
+    // Update aggregations in a transaction
+    await db.runTransaction(async (transaction) => {
+      const friendDoc = await transaction.get(friendRef);
 
-    const friendsFriendsList = friendDoc.data().friends;
+      // Only need to run if this friend doesn't have this user as a friend
+      if (friendDoc.data().friends[uid]) {
+        console.log(`Friend (${friendUID}) already has ${uid} as friend`);
+        return;
+      }
 
-    // Update friend's friends list and remove outgoing friend request
-    transaction.update(friendRef, {
-      friends: {
-        ...friendsFriendsList,
-        [uid]: 0,
-      },
-      outgoingFriendRequests: [
-        friendDoc.data().outgoingFriendRequests.filter(
-            (friend) => friend !== uid,
-        ),
-      ],
+      const friendsFriendsList = friendDoc.data().friends;
+
+      console.log("Friend's friends list:", friendsFriendsList);
+
+      const newOutgoingFriendRequests = friendDoc.data().outgoingFriendRequests
+          .filter((friend) => friend !== uid);
+
+      console.log(
+          "Friend's new outgoing friend requests:",
+          newOutgoingFriendRequests,
+      );
+
+
+      const newIncomingFriendRequests = afterData.incomingFriendRequests
+          .filter((friend) => friend !== friendUID);
+
+      console.log("New incoming friend requests:", newIncomingFriendRequests);
+
+      // Update friend's friends list and remove outgoing friend request
+      transaction.update(friendRef, {
+        friends: {
+          ...friendsFriendsList,
+          [uid]: 0,
+        },
+        outgoingFriendRequests: [
+          ...newOutgoingFriendRequests,
+        ],
+      });
+
+      // Update user's incoming friend requests
+      transaction.update(documentRef, {
+        incomingFriendRequests: [
+          ...newIncomingFriendRequests,
+        ],
+      });
     });
-  });
+  } catch (e) {
+    console.error(e);
+  }
 
-  // Remove friend request from user
-  await documentRef.update({
-    incomingFriendRequests: [
-      afterData.incomingFriendRequests.filter(
-          (friend) => friend !== friendUID,
-      ),
-    ],
-  });
+  console.log("Done `handleAcceptedFriendRequest`");
 }
 
 module.exports = {
