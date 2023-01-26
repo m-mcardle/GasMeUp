@@ -25,7 +25,11 @@ import { colors, globalStyles } from '../../styles/styles';
 
 const usersRef = collection(db, 'Users');
 
-export default function AddFriendsTable() {
+interface Props {
+  close: () => void,
+}
+
+export default function AddFriendsTable({ close }: Props) {
   const [friendEmail, setFriendEmail] = useState<string>('');
   const [inputError, setInputError] = useState<boolean>(false);
 
@@ -66,6 +70,7 @@ export default function AddFriendsTable() {
         ],
       });
       setInputError(false);
+      close();
     } catch (exception) {
       console.log(exception);
     }

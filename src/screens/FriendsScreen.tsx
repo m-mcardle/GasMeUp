@@ -1,8 +1,8 @@
 // React
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
 import {
   DataTable, Portal, Modal,
@@ -22,9 +22,11 @@ import LoginScreen from './LoginScreen';
 // Components
 import Page from '../components/Page';
 import Table from '../components/Table';
+import Text from '../components/Text';
 
 import AddFriendsTable from '../components/Friends/AddFriendsTable';
 import FriendInfoSection from '../components/Friends/FriendInfoSection';
+import FriendRequestsSection from '../components/Friends/FriendRequestsSection';
 
 // Styles
 import styles from '../styles/FriendsScreen.styles';
@@ -102,6 +104,8 @@ export default function FriendsScreen() {
 
   const [visible, setVisible] = useState(false);
   const [friendInfoVisible, setFriendInfoVisible] = useState(false);
+  const [friendRequestsVisible, setFriendRequestsVisible] = useState(false);
+
   const [{ selectedFriendUID, selectedFriendName, selectedFriendAmount }, setSelectedFriend] = useState({ selectedFriendUID: '', selectedFriendName: '', selectedFriendAmount: 0 });
 
   if (errorUserDB || errorFriendsDB || error) {
@@ -126,6 +130,8 @@ export default function FriendsScreen() {
   });
   const Footer = () => FooterRow(() => setVisible(true));
 
+  const hasFriendRequests = userDocument?.incomingFriendRequests.length > 0;
+
   return (
     <Page>
       <View style={styles.main}>
@@ -135,7 +141,9 @@ export default function FriendsScreen() {
             onDismiss={() => setVisible((state) => !state)}
             contentContainerStyle={globalStyles.modal}
           >
-            <AddFriendsTable />
+            <AddFriendsTable
+              close={() => setVisible(false)}
+            />
           </Modal>
 
           <Modal
@@ -150,7 +158,26 @@ export default function FriendsScreen() {
               close={() => setFriendInfoVisible(false)}
             />
           </Modal>
+
+          <Modal
+            visible={friendRequestsVisible}
+            onDismiss={() => setFriendRequestsVisible((state) => !state)}
+            contentContainerStyle={globalStyles.modal}
+          >
+            <FriendRequestsSection
+              friendRequestUIDs={userDocument?.incomingFriendRequests}
+              closeModal={() => setFriendRequestsVisible(false)}
+            />
+          </Modal>
         </Portal>
+
+        <TouchableOpacity
+          style={{ paddingHorizontal: 12, justifyContent: 'flex-end', flexDirection: 'row' }}
+          onPress={() => hasFriendRequests && setFriendRequestsVisible(true)}
+        >
+          <Text style={{ color: colors.white }}>{userDocument?.incomingFriendRequests.length}</Text>
+          <FontAwesome5 name="user-friends" size={24} color="white" />
+        </TouchableOpacity>
 
         <Table
           title="Friends"

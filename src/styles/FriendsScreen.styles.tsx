@@ -6,7 +6,8 @@ import { colors } from './styles';
 const styles = StyleSheet.create({
   main: {
     height: '100%',
-    paddingVertical: 64,
+    paddingTop: 32,
+    paddingBottom: 64,
   },
   table: {
     flex: 1,
