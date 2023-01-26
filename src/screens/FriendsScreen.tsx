@@ -130,7 +130,11 @@ export default function FriendsScreen() {
   });
   const Footer = () => FooterRow(() => setVisible(true));
 
-  const hasFriendRequests = userDocument?.incomingFriendRequests.length > 0;
+  // Remove friend requests that are now friends, fixes race condition of Firebase Function
+  const sanitizedFriendRequests = userDocument?.incomingFriendRequests
+    .filter((uid: string) => userDocument?.friends[uid] === undefined) ?? [];
+
+  const hasFriendRequests = sanitizedFriendRequests.length > 0;
 
   return (
     <Page>
@@ -165,7 +169,7 @@ export default function FriendsScreen() {
             contentContainerStyle={globalStyles.modal}
           >
             <FriendRequestsSection
-              friendRequestUIDs={userDocument?.incomingFriendRequests}
+              friendRequestUIDs={sanitizedFriendRequests}
               closeModal={() => setFriendRequestsVisible(false)}
             />
           </Modal>
@@ -175,7 +179,7 @@ export default function FriendsScreen() {
           style={{ paddingHorizontal: 12, justifyContent: 'flex-end', flexDirection: 'row' }}
           onPress={() => hasFriendRequests && setFriendRequestsVisible(true)}
         >
-          <Text style={{ color: colors.white }}>{userDocument?.incomingFriendRequests.length}</Text>
+          <Text style={{ color: colors.white }}>{sanitizedFriendRequests.length}</Text>
           <FontAwesome5 name="user-friends" size={24} color="white" />
         </TouchableOpacity>
 

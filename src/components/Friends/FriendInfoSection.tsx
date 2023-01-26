@@ -1,6 +1,6 @@
 // React
 import React, { useCallback } from 'react';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -86,6 +86,22 @@ export default function FriendInfoSection({
     }
   }, [uid, userDocument, userDoc, currentUser?.uid]);
 
+  const showConfirmationAlert = () => Alert.alert(
+    'Remove Friend',
+    'Are you sure you want to remove this friend?',
+    [
+      {
+        text: 'OK',
+        onPress: () => removeFriend(),
+        style: 'default',
+      },
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+    ],
+  );
+
   // Sort transactions by date, and then only show the transactions since the last `settle`
   const sortedTransactions = filteredTransactions
     ?.sort((a, b) => b.date.toDate() - a.date.toDate())
@@ -101,7 +117,7 @@ export default function FriendInfoSection({
         style={{
           paddingHorizontal: 0, paddingVertical: 4, width: 52, alignItems: 'center',
         }}
-        onPress={removeFriend}
+        onPress={showConfirmationAlert}
       >
         <Ionicons name="close" size={24} color="white" />
       </Button>

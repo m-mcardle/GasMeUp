@@ -78,6 +78,8 @@ exports.updateFriendsList = functions.firestore
       3. Fred accepts Bill's friend request and Bill is added as a friend to Fred (frontend)
       4. handleAcceptedFriendRequest is called and Bill is added as a friend to Fred, and both the incomingFriendRequest and outgoingFriendRequest are removed from Fred and Bill respectively (functions)
       */
+
+      // TODO - Do I need to care about the transactions being orphaned / lost when a friend is removed?
       if (
         before.outgoingFriendRequests !== after.outgoingFriendRequests &&
         after.outgoingFriendRequests?.length > before.outgoingFriendRequests?.length
