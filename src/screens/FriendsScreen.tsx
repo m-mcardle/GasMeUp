@@ -1,8 +1,8 @@
 // React
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { Alert, TouchableOpacity, View } from 'react-native';
 
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
 import {
   DataTable, Portal, Modal,
@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
+import { signOut } from 'firebase/auth';
 import { auth, db } from '../../firebase';
 
 // Screens
@@ -22,9 +23,11 @@ import LoginScreen from './LoginScreen';
 // Components
 import Page from '../components/Page';
 import Table from '../components/Table';
+import Text from '../components/Text';
 
-import AddFriendsTable from '../components/Friends/AddFriendsTable';
+import AddFriendsSection from '../components/Friends/AddFriendsSection';
 import FriendInfoSection from '../components/Friends/FriendInfoSection';
+import FriendRequestsSection from '../components/Friends/FriendRequestsSection';
 
 // Styles
 import styles from '../styles/FriendsScreen.styles';
@@ -68,6 +71,16 @@ function FooterRow(onPress: () => void) {
   );
 }
 
+const logout = () => {
+  signOut(auth)
+    .then(() => {
+      console.log('signed out!');
+    })
+    .catch((exception) => {
+      Alert.alert('Error', exception.message);
+    });
+};
+
 const usersRef = collection(db, 'Users');
 
 export default function FriendsScreen() {
@@ -102,6 +115,8 @@ export default function FriendsScreen() {
 
   const [visible, setVisible] = useState(false);
   const [friendInfoVisible, setFriendInfoVisible] = useState(false);
+  const [friendRequestsVisible, setFriendRequestsVisible] = useState(false);
+
   const [{ selectedFriendUID, selectedFriendName, selectedFriendAmount }, setSelectedFriend] = useState({ selectedFriendUID: '', selectedFriendName: '', selectedFriendAmount: 0 });
 
   if (errorUserDB || errorFriendsDB || error) {
@@ -126,6 +141,12 @@ export default function FriendsScreen() {
   });
   const Footer = () => FooterRow(() => setVisible(true));
 
+  // Remove friend requests that are now friends, fixes race condition of Firebase Function
+  const sanitizedFriendRequests = userDocument?.incomingFriendRequests
+    .filter((uid: string) => userDocument?.friends[uid] === undefined) ?? [];
+
+  const hasFriendRequests = sanitizedFriendRequests.length > 0;
+
   return (
     <Page>
       <View style={styles.main}>
@@ -135,7 +156,9 @@ export default function FriendsScreen() {
             onDismiss={() => setVisible((state) => !state)}
             contentContainerStyle={globalStyles.modal}
           >
-            <AddFriendsTable />
+            <AddFriendsSection
+              close={() => setVisible(false)}
+            />
           </Modal>
 
           <Modal
@@ -150,8 +173,36 @@ export default function FriendsScreen() {
               close={() => setFriendInfoVisible(false)}
             />
           </Modal>
+
+          <Modal
+            visible={friendRequestsVisible}
+            onDismiss={() => setFriendRequestsVisible((state) => !state)}
+            contentContainerStyle={globalStyles.modal}
+          >
+            <FriendRequestsSection
+              friendRequestUIDs={sanitizedFriendRequests}
+              closeModal={() => setFriendRequestsVisible(false)}
+            />
+          </Modal>
         </Portal>
 
+        <View
+          style={styles.headerSection}
+        >
+          <TouchableOpacity
+            onPress={logout}
+          >
+            <Ionicons name="log-out" size={24} color="white" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{ flexDirection: 'row' }}
+            onPress={() => hasFriendRequests && setFriendRequestsVisible(true)}
+          >
+            <Text style={{ color: colors.white }}>{sanitizedFriendRequests.length}</Text>
+            <FontAwesome5 name="user-friends" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
         <Table
           title="Friends"
           itemsPerPage={10}

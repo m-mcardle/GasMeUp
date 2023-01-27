@@ -23,14 +23,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: colors.red,
   },
-  h1: {
-    fontSize: 24,
-    textAlign: 'center',
-  },
-  h2: {
-    fontSize: 10,
-    textAlign: 'center',
-  },
   headingSection: {
     paddingBottom: 24,
   },

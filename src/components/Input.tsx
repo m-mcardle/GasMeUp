@@ -11,6 +11,7 @@ import { colors, globalStyles } from '../styles/styles';
 interface Props {
   value?: string,
   placeholder?: string,
+  containerStyle?: object,
   style?: object,
   password?: boolean,
   autoComplete?: TextInput['props']['autoComplete'],
@@ -32,6 +33,7 @@ export default function Input(props: Props) {
     onPressIn,
     onSubmitEditing,
     placeholder,
+    containerStyle,
     style,
     value,
     password,
@@ -53,7 +55,7 @@ export default function Input(props: Props) {
   const width = `${numWidth}%`;
 
   return (
-    <View style={globalStyles.inputView}>
+    <View style={[globalStyles.inputView, containerStyle]}>
       {icon}
       <TextInput
         ref={myRef}
@@ -88,6 +90,7 @@ Input.defaultProps = {
   value: undefined,
   placeholder: undefined,
   style: undefined,
+  containerStyle: undefined,
   onPressIn: undefined,
   password: false,
   autoComplete: 'off',

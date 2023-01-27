@@ -1,3 +1,6 @@
+/* eslint-disable max-len */
+const friends = require("./src/friends");
+
 const functions = require("firebase-functions");
 
 const admin = require("firebase-admin");
@@ -64,49 +67,33 @@ exports.aggregateBalances = functions.firestore
 exports.updateFriendsList = functions.firestore
     .document("Users/{uid}")
     .onUpdate(async (change, context) => {
-      // Only needs to run when a friends list changes
-      if (change.before.data().friends === change.after.data().friends) {
-        return;
-      }
-      const uid = change.after.id;
+      const before = change.before.data();
+      const after = change.after.data();
+      console.log("updateFriendsList Triggered");
 
-      // Get value of the newly added transaction
-      const oldFriendsList = Object.keys(change.before.data().friends);
-      const friendsList = Object.keys(change.after.data().friends);
-      const friendUID = friendsList.find((friend) =>
-        !oldFriendsList.includes(friend),
-      );
+      /*
+      The logic for friend requests are as follows:
+      1. Bill requests to be friends with Fred and an outgoingFriendRequest is added to Bill (frontend)
+      2. handleOutGoingFriendRequest is called and adds an incomingFriendRequest to Fred (functions)
+      3. Fred accepts Bill's friend request and Bill is added as a friend to Fred (frontend)
+      4. handleAcceptedFriendRequest is called and Bill is added as a friend to Fred, and both the incomingFriendRequest and outgoingFriendRequest are removed from Fred and Bill respectively (functions)
+      */
 
-      console.log("Old friends list:", oldFriendsList);
-      console.log("New friends list:", friendsList);
-      console.log("New friend UID:", friendUID);
-
-      if (!friendUID) {
-        console.log("Friend document not found");
-        return;
-      }
-
-      // Get a reference to the new friend
-      const friendRef = db.collection("Users").doc(friendUID);
-
-      // Update aggregations in a transaction
-      await db.runTransaction(async (transaction) => {
-        const friendDoc = await transaction.get(friendRef);
-
-        // Only need to run if this friend doesn't have this user as a friend
-        if (friendDoc.data().friends[uid]) {
-          console.log(`Friend (${friendUID}) already has ${uid} as friend`);
-          return;
+      // TODO - Do I need to care about the transactions being orphaned / lost when a friend is removed?
+      if (
+        before.outgoingFriendRequests !== after.outgoingFriendRequests &&
+        after.outgoingFriendRequests?.length > before.outgoingFriendRequests?.length
+      ) {
+        friends.handleOutgoingFriendRequest(db, change);
+      } else if (before.friends !== after.friends) {
+        const newFriendsLength = Object.keys(after.friends ?? {}).length;
+        const oldFriendsLength = Object.keys(before.friends ?? {}).length;
+        if (newFriendsLength > oldFriendsLength) {
+          // Right now this will fire twice, once for when the user adds it from the front-end and once from when the function adds it to the friend
+          friends.handleAcceptedFriendRequest(db, change);
+        } else if (newFriendsLength < oldFriendsLength) {
+          // Right now this will fire twice, once for when the user removes it from the front-end and once from when the function removes it from the friend
+          friends.handleRemovedFriend(db, change);
         }
-
-        const friendsFriendsList = friendDoc.data().friends;
-
-        // Update friend's friends list
-        transaction.update(friendRef, {
-          friends: {
-            ...friendsFriendsList,
-            [uid]: 0,
-          },
-        });
-      });
+      }
     });

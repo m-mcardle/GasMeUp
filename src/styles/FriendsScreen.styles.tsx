@@ -6,7 +6,8 @@ import { colors } from './styles';
 const styles = StyleSheet.create({
   main: {
     height: '100%',
-    paddingVertical: 64,
+    paddingTop: 32,
+    paddingBottom: 64,
   },
   table: {
     flex: 1,
@@ -26,6 +27,26 @@ const styles = StyleSheet.create({
     backgroundColor: colors.action,
     padding: 10,
     borderRadius: 5,
+  },
+  headerSection: {
+    paddingHorizontal: 12,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+  },
+  deleteFriendButton: {
+    paddingHorizontal: 0,
+    paddingVertical: 4,
+    width: 52,
+    alignItems: 'center',
+  },
+  friendRequestsSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  acceptFriendRequestButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 4,
   },
 });
 
