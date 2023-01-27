@@ -7,6 +7,7 @@ export const colors = {
   primary: isDarkMode ? '#12130F' : '#FFFBFE',
   secondary: isDarkMode ? '#FFFBFE' : '#12130F',
   black: '#12130F',
+  softBlack: '#1C1D1A',
   white: '#FFFBFE',
   tertiary: '#1b1c2c',
   lightTertiary: '#5F606B',
@@ -98,7 +99,7 @@ export const globalStyles = StyleSheet.create({
     maxHeight: '100%',
   },
   modal: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.softBlack,
     borderWidth: 4,
     borderColor: colors.secondary,
     padding: 24,
@@ -109,6 +110,14 @@ export const globalStyles = StyleSheet.create({
     fontFamily: boldFont,
     textAlign: 'center',
     padding: 10,
+  },
+  h1: {
+    fontSize: 24,
+    textAlign: 'center',
+  },
+  h2: {
+    fontSize: 10,
+    textAlign: 'center',
   },
   smallText: {
     fontSize: 10,

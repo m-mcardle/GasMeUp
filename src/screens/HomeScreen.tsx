@@ -313,15 +313,15 @@ export default function HomeScreen() {
             style={styles.calculateButton}
             onPress={submit}
           >
-            <Text style={{ color: colors.primary }}>Calculate</Text>
+            <Text style={{ color: colors.secondary }}>Calculate</Text>
           </Button>
           <Button
             style={styles.saveButton}
             onPress={() => setModalVisible(true)}
             disabled={!canSaveTrip}
           >
-            <Text style={{ color: colors.primary, marginHorizontal: 2 }}>Save</Text>
-            <AntDesign name="contacts" size={20} color={colors.primary} />
+            <Text style={{ color: colors.secondary, marginHorizontal: 2 }}>Save</Text>
+            <AntDesign name="contacts" size={20} color={colors.secondary} />
           </Button>
         </View>
       </View>

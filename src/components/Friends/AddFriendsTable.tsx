@@ -4,7 +4,7 @@
 
 // React
 import React, { useCallback, useState } from 'react';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -19,6 +19,10 @@ import { db, auth } from '../../../firebase';
 // Components
 import Input from '../Input';
 import Text from '../Text';
+import Button from '../Button';
+
+// Helpers
+import { maybeValidEmail } from '../../helpers/emailHelper';
 
 // Styles
 import { colors, globalStyles } from '../../styles/styles';
@@ -41,8 +45,16 @@ export default function AddFriendsTable({ close }: Props) {
   const userFriends = userDocument?.friends ?? {};
   const userFriendRequests = userDocument?.outgoingFriendRequests ?? [];
 
+  const validEmail = maybeValidEmail(friendEmail);
+
+  const closeModal = () => {
+    setInputError(false);
+    close();
+    Alert.alert('Friend Request Sent', `If a user exists with the email: "${friendEmail}", they will receive a friend request.`);
+  };
+
   const sendFriendRequest = useCallback(async () => {
-    if (!currentUser?.uid) {
+    if (!currentUser?.uid || !validEmail) {
       return;
     }
 
@@ -50,14 +62,20 @@ export default function AddFriendsTable({ close }: Props) {
     const querySnapshot = await getDocs(friendQuery);
 
     if (querySnapshot.empty) {
-      console.log('Friend not found');
-      setInputError(true);
+      // Treat friend not found the same as if the friend exists
+      closeModal();
       return;
     }
     const newFriend = querySnapshot.docs[0].data();
 
-    if (userFriendRequests.includes(newFriend.uid) || userFriends[newFriend.uid] !== undefined) {
-      console.log('Friend already added');
+    if (userFriendRequests.includes(newFriend.uid)) {
+      Alert.alert('Error Sending Friend Request', 'Friend request already sent');
+      setInputError(true);
+      return;
+    }
+
+    if (userFriends[newFriend.uid] !== undefined) {
+      Alert.alert('Error Sending Friend Request', 'Friend already added');
       setInputError(true);
       return;
     }
@@ -69,8 +87,7 @@ export default function AddFriendsTable({ close }: Props) {
           newFriend.uid,
         ],
       });
-      setInputError(false);
-      close();
+      closeModal();
     } catch (exception) {
       console.log(exception);
     }
@@ -78,10 +95,15 @@ export default function AddFriendsTable({ close }: Props) {
 
   return (
     <View style={globalStyles.centered}>
-      <Text style={globalStyles.title}>
+      <Text style={globalStyles.h1}>
         Add Friend
       </Text>
+      <Text style={globalStyles.h2}>
+        Input your friends email to send them a friend request!
+      </Text>
       <Input
+        containerStyle={{ marginTop: 40 }}
+        style={{ borderColor: 'white' }}
         placeholder="Friend's Email"
         autoComplete="email"
         keyboardType="email-address"
@@ -91,7 +113,16 @@ export default function AddFriendsTable({ close }: Props) {
         onSubmitEditing={sendFriendRequest}
         icon={(<Ionicons name="person-add" size={24} color={colors.secondary} />)}
         error={inputError}
+        clearButton
       />
+      <Button
+        disabled={!validEmail}
+        onPress={sendFriendRequest}
+      >
+        <Text>
+          Send
+        </Text>
+      </Button>
     </View>
   );
 }

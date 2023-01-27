@@ -1,6 +1,6 @@
 // React
 import React, { useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { Alert, TouchableOpacity, View } from 'react-native';
 
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
+import { signOut } from 'firebase/auth';
 import { auth, db } from '../../firebase';
 
 // Screens
@@ -69,6 +70,16 @@ function FooterRow(onPress: () => void) {
     </DataTable.Row>
   );
 }
+
+const logout = () => {
+  signOut(auth)
+    .then(() => {
+      console.log('signed out!');
+    })
+    .catch((exception) => {
+      Alert.alert('Error', exception.message);
+    });
+};
 
 const usersRef = collection(db, 'Users');
 
@@ -175,14 +186,23 @@ export default function FriendsScreen() {
           </Modal>
         </Portal>
 
-        <TouchableOpacity
-          style={{ paddingHorizontal: 12, justifyContent: 'flex-end', flexDirection: 'row' }}
-          onPress={() => hasFriendRequests && setFriendRequestsVisible(true)}
+        <View
+          style={styles.headerSection}
         >
-          <Text style={{ color: colors.white }}>{sanitizedFriendRequests.length}</Text>
-          <FontAwesome5 name="user-friends" size={24} color="white" />
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={logout}
+          >
+            <Ionicons name="log-out" size={24} color="white" />
+          </TouchableOpacity>
 
+          <TouchableOpacity
+            style={{ flexDirection: 'row' }}
+            onPress={() => hasFriendRequests && setFriendRequestsVisible(true)}
+          >
+            <Text style={{ color: colors.white }}>{sanitizedFriendRequests.length}</Text>
+            <FontAwesome5 name="user-friends" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
         <Table
           title="Friends"
           itemsPerPage={10}

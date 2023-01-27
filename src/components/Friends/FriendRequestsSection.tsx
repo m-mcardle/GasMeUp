@@ -30,8 +30,6 @@ interface FriendObject {
   uid: string,
 }
 
-// const usersRef = collection(db, 'Users');
-
 export default function FriendRequestsSection({ friendRequestUIDs, closeModal } : Props) {
   const [currentUser] = useAuthState(auth);
   const [friendRequests, setFriendRequests] = useState<FriendObject[]>([]);

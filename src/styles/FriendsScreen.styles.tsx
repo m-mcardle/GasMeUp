@@ -28,6 +28,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
   },
+  headerSection: {
+    paddingHorizontal: 12,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+  },
 });
 
 export default styles;

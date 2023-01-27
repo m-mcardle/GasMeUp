@@ -14,8 +14,12 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import Text from '../components/Text';
 
+// Helpers
+import { maybeValidEmail } from '../helpers/emailHelper';
+
 // Styles
 import styles from '../styles/SignUpScreen.styles';
+import { globalStyles } from '../styles/styles';
 
 interface Props {
   navigation: {
@@ -66,6 +70,8 @@ export default function SignUpScreen({ navigation }: Props) {
       });
   };
 
+  const invalidInputs = !firstName || !lastName || !maybeValidEmail(email) || !password;
+
   const lastNameRef = useRef<TextInput>(null);
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
@@ -73,8 +79,8 @@ export default function SignUpScreen({ navigation }: Props) {
     <Page keyboardAvoiding={false}>
       <View style={styles.main}>
         <View style={styles.headingSection}>
-          <Text style={styles.h1}>Join GasMeUp</Text>
-          <Text style={styles.h2}>To save your trips and split them with your friends!</Text>
+          <Text style={globalStyles.h1}>Join GasMeUp</Text>
+          <Text style={globalStyles.h2}>To save your trips and split them with your friends!</Text>
         </View>
         <Input
           placeholder="First Name"
@@ -115,10 +121,10 @@ export default function SignUpScreen({ navigation }: Props) {
           password
           autoComplete="password-new"
           returnKeyType="done"
-          onSubmitEditing={signUp}
+          onSubmitEditing={() => !invalidInputs && signUp()}
         />
         <Button
-          disabled={!firstName || !lastName || !email || !password}
+          disabled={invalidInputs}
           onPress={() => signUp()}
         >
           <Text style={styles.signUpButtonText}>Sign Up</Text>

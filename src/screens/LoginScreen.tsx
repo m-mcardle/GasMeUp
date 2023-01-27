@@ -26,6 +26,9 @@ import Text from '../components/Text';
 
 import AppleLogin from '../components/Login/AppleLogin';
 
+// Helpers
+import { maybeValidEmail } from '../helpers/emailHelper';
+
 // Styles
 import styles from '../styles/LoginScreen.styles';
 import { colors } from '../styles/styles';
@@ -43,6 +46,8 @@ function LoginPage({ navigation }: Props) {
 
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+
+  const validInputs = maybeValidEmail(email) && password.length > 0;
 
   const login = () => {
     signInWithEmailAndPassword(auth, email, password)
@@ -96,9 +101,12 @@ function LoginPage({ navigation }: Props) {
           returnKeyType="done"
           password
           error={passwordError}
-          onSubmitEditing={login}
+          onSubmitEditing={() => validInputs && login()}
         />
-        <Button onPress={login}>
+        <Button
+          disabled={!validInputs}
+          onPress={login}
+        >
           <Text style={styles.loginButtonText}>Login</Text>
         </Button>
         {platform === 'ios' ? <AppleLogin /> : undefined}
