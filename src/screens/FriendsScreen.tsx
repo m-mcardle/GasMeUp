@@ -25,7 +25,7 @@ import Page from '../components/Page';
 import Table from '../components/Table';
 import Text from '../components/Text';
 
-import AddFriendsTable from '../components/Friends/AddFriendsTable';
+import AddFriendsSection from '../components/Friends/AddFriendsSection';
 import FriendInfoSection from '../components/Friends/FriendInfoSection';
 import FriendRequestsSection from '../components/Friends/FriendRequestsSection';
 
@@ -156,7 +156,7 @@ export default function FriendsScreen() {
             onDismiss={() => setVisible((state) => !state)}
             contentContainerStyle={globalStyles.modal}
           >
-            <AddFriendsTable
+            <AddFriendsSection
               close={() => setVisible(false)}
             />
           </Modal>

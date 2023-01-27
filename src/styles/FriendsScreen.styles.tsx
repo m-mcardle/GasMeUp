@@ -33,6 +33,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
   },
+  deleteFriendButton: {
+    paddingHorizontal: 0,
+    paddingVertical: 4,
+    width: 52,
+    alignItems: 'center',
+  },
+  friendRequestsSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  acceptFriendRequestButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+  },
 });
 
 export default styles;

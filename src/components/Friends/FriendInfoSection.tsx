@@ -114,9 +114,7 @@ export default function FriendInfoSection({
   return (
     <View style={{ height: '100%' }}>
       <Button
-        style={{
-          paddingHorizontal: 0, paddingVertical: 4, width: 52, alignItems: 'center',
-        }}
+        style={styles.deleteFriendButton}
         onPress={showConfirmationAlert}
       >
         <Ionicons name="close" size={24} color="white" />

@@ -55,7 +55,7 @@ async function handleOutgoingFriendRequest(db, change) {
 }
 
 /**
- * Handles someone sending a friend request
+ * Handles someone accepting a friend request
  * @param {Object} db - The Firestore database
  * @param {Object} change - The change object
  */
@@ -86,7 +86,6 @@ async function handleAcceptedFriendRequest(db, change) {
   // Get a reference to the new friend
   const friendRef = db.collection("Users").doc(friendUID);
 
-
   try {
     // Update aggregations in a transaction
     await db.runTransaction(async (transaction) => {
@@ -99,17 +98,14 @@ async function handleAcceptedFriendRequest(db, change) {
       }
 
       const friendsFriendsList = friendDoc.data().friends;
-
       console.log("Friend's friends list:", friendsFriendsList);
 
       const newOutgoingFriendRequests = friendDoc.data().outgoingFriendRequests
           .filter((friend) => friend !== uid);
-
       console.log(
           "Friend's new outgoing friend requests:",
           newOutgoingFriendRequests,
       );
-
 
       const newIncomingFriendRequests = afterData.incomingFriendRequests
           .filter((friend) => friend !== friendUID);

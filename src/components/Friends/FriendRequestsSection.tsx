@@ -85,11 +85,11 @@ export default function FriendRequestsSection({ friendRequestUIDs, closeModal } 
       {friendRequests.map((request: FriendObject) => (
         <View
           key={request.uid}
-          style={{ flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}
+          style={styles.friendRequestsSection}
         >
           <Text>{request.email}</Text>
           <Button
-            style={{ paddingHorizontal: 16, paddingVertical: 4 }}
+            style={styles.acceptFriendRequestButton}
             onPress={() => acceptFriendRequest(request.uid)}
           >
             <Ionicons name="checkmark" size={14} color={colors.white} />
