@@ -3,7 +3,7 @@
     "name": "GasMeUp",
     "slug": "gas-me-up",
     "owner": "mmcardle",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/car.png",
     "splash": {
