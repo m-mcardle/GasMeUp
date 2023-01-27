@@ -1,6 +1,6 @@
 // React
 import React, { useCallback } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -20,6 +20,7 @@ import Text from '../Text';
 // Styles
 import styles from '../../styles/FriendsScreen.styles';
 import Button from '../Button';
+import { boldFont } from '../../styles/styles';
 
 const transactionsRef = collection(db, 'Transactions');
 
@@ -123,26 +124,28 @@ export default function FriendInfoSection({
 
       <DataTable>
         <DataTable.Header>
-          <DataTable.Title>Amount</DataTable.Title>
-          <DataTable.Title numeric>Date</DataTable.Title>
+          <DataTable.Title>Date</DataTable.Title>
+          <DataTable.Title numeric>Amount</DataTable.Title>
         </DataTable.Header>
 
-        {transactionsSinceLastSettle?.map((transaction) => (
-          <DataTable.Row key={transaction.payeeUID + transaction.amount + transaction.date}>
-            <DataTable.Cell>
-              {`$${transaction.amount * (transaction.payeeUID === currentUser?.uid ? 1 : -1)}`}
-            </DataTable.Cell>
-            <DataTable.Cell numeric>
-              {transaction.date.toDate().toLocaleDateString()}
-            </DataTable.Cell>
-          </DataTable.Row>
-        ))}
+        <ScrollView style={{ maxHeight: 300 }}>
+          {transactionsSinceLastSettle?.map((transaction) => (
+            <DataTable.Row key={transaction.payeeUID + transaction.amount + transaction.date}>
+              <DataTable.Cell>
+                {transaction.date.toDate().toLocaleDateString()}
+              </DataTable.Cell>
+              <DataTable.Cell numeric>
+                {`$${transaction.amount * (transaction.payeeUID === currentUser?.uid ? 1 : -1)}`}
+              </DataTable.Cell>
+            </DataTable.Row>
+          ))}
+        </ScrollView>
 
         <DataTable.Row>
-          <DataTable.Cell>
+          <DataTable.Cell textStyle={{ fontFamily: boldFont }}>
             Total
           </DataTable.Cell>
-          <DataTable.Cell numeric>
+          <DataTable.Cell textStyle={{ fontFamily: boldFont }} numeric>
             {`$${amount.toFixed(2)}`}
           </DataTable.Cell>
         </DataTable.Row>

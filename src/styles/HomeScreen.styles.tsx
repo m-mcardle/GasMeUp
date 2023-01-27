@@ -125,7 +125,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   calculateButton: {
-    width: '45%',
     paddingHorizontal: 50,
   },
   saveTripHeaderContainer: {
@@ -133,6 +132,15 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'space-evenly',
     paddingVertical: 2,
+  },
+  addToFriendButton: {
+    paddingHorizontal: 20,
+    backgroundColor: colors.white,
+  },
+  saveTripButtonSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 'auto',
   },
 });
 

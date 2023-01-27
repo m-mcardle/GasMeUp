@@ -18,7 +18,7 @@ import Button from '../Button';
 
 // Styles
 import styles from '../../styles/FriendsScreen.styles';
-import { colors } from '../../styles/styles';
+import { boldFont, colors, globalStyles } from '../../styles/styles';
 
 interface Props {
   friendRequestUIDs: string[],
@@ -26,6 +26,7 @@ interface Props {
 }
 
 interface FriendObject {
+  fullName: string,
   email: string,
   uid: string,
 }
@@ -45,7 +46,7 @@ export default function FriendRequestsSection({ friendRequestUIDs, closeModal } 
       })))
         .map((document: DocumentData) => {
           const data = document.data();
-          return { email: data.email, uid: document.id };
+          return { fullName: `${data.firstName} ${data.lastName}`, email: data.email, uid: document.id };
         });
 
       setFriendRequests(requests);
@@ -63,9 +64,6 @@ export default function FriendRequestsSection({ friendRequestUIDs, closeModal } 
       return;
     }
 
-    console.log(userFriends);
-    console.log(friendUID);
-
     try {
       await updateDoc(doc(db, 'Users', currentUser.uid), {
         friends: {
@@ -80,22 +78,37 @@ export default function FriendRequestsSection({ friendRequestUIDs, closeModal } 
   };
 
   return (
-    <View>
+    <View style={{ height: '100%' }}>
       <Text style={styles.friendInfoTitle}>Friend Requests</Text>
-      {friendRequests.map((request: FriendObject) => (
+      <Text style={globalStyles.h2}>
+        Add these users as friends and begin sharing trips with them!
+      </Text>
+      <View style={{ height: '80%', marginTop: 20 }}>
         <View
-          key={request.uid}
           style={styles.friendRequestsSection}
         >
-          <Text>{request.email}</Text>
-          <Button
+          <Text style={{ fontFamily: boldFont, ...globalStyles.h2 }}>Name</Text>
+          <Text style={{ fontFamily: boldFont, ...globalStyles.h2 }}>Email</Text>
+          <View
             style={styles.acceptFriendRequestButton}
-            onPress={() => acceptFriendRequest(request.uid)}
-          >
-            <Ionicons name="checkmark" size={14} color={colors.white} />
-          </Button>
+          />
         </View>
-      ))}
+        {friendRequests.map((request: FriendObject) => (
+          <View
+            key={request.uid}
+            style={styles.friendRequestsSection}
+          >
+            <Text style={globalStyles.h2}>{request.fullName}</Text>
+            <Text style={globalStyles.h2}>{request.email}</Text>
+            <Button
+              style={styles.acceptFriendRequestButton}
+              onPress={() => acceptFriendRequest(request.uid)}
+            >
+              <Ionicons name="checkmark" size={14} color={colors.white} />
+            </Button>
+          </View>
+        ))}
+      </View>
     </View>
   );
 }
