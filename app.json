@@ -20,14 +20,16 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.Virintus.GasMeUp"
+      "bundleIdentifier": "com.Virintus.GasMeUp",
+      "buildNumber": "1.0.4"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.Virintus.GasMeUp"
+      "package": "com.Virintus.GasMeUp",
+      "versionCode": 470010004
     },
     "web": {
       "favicon": "./assets/favicon.png"
