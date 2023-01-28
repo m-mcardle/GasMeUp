@@ -143,10 +143,10 @@ export default function AddToFriendTable({
         Row={RowBuilder(selectedFriend, setSelectedFriend)}
         loading={usersDataLoading}
       />
-      <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 'auto' }}>
+      <View style={styles.saveTripButtonSection}>
         <Button
           disabled={!selectedFriend.uid}
-          style={{ borderColor: colors.red, borderWidth: 4 }}
+          style={{ borderColor: colors.red, ...styles.addToFriendButton }}
           onPress={() => addCostToFriend(selectedFriend, true)}
         >
           <Text style={{ ...globalStyles.smallText, color: colors.primary }}>
@@ -155,7 +155,7 @@ export default function AddToFriendTable({
         </Button>
         <Button
           disabled={!selectedFriend.uid}
-          style={{ borderColor: colors.green, borderWidth: 4 }}
+          style={{ borderColor: colors.green, ...styles.addToFriendButton }}
           onPress={() => addCostToFriend(selectedFriend, false)}
         >
           <Text style={{ ...globalStyles.smallText, color: colors.primary }}>
