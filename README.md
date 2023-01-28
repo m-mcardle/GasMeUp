@@ -45,7 +45,11 @@ npm run deploy
 
 ## Build
 
-To build the application for iOS, run `npm run build` to use the `eas` CLI to compiled app to Expo. Once built, we can then run `npm run publish` to update the app on `App Store Connect`. 
+Before building you likely need to bump the versions. The versioning of our app is managed through `standard-version-expo`. To bump versions before creating a new build run `npm run bump`.
 
-## Demo Video
+To build the application for iOS, run `npm run build` to use the `eas` CLI to compiled app to Expo.
+
+Once built, we can then run `npm run publish` to update the app on `App Store Connect`. 
+
+## Demo Video (Outdated)
 [![GasMeUp Thumbnail](https://i.ytimg.com/vi/z6_Ajiv4UBw/hqdefault.jpg)](https://youtube.com/shorts/z6_Ajiv4UBw?feature=share)
