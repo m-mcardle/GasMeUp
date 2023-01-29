@@ -123,7 +123,7 @@ export default function FriendsScreen() {
     console.log(errorUserDB, errorFriendsDB, error);
   }
 
-  if (!user || loading || error) {
+  if (!user || !user.emailVerified || loading || error) {
     return (
       <LoginScreen />
     );

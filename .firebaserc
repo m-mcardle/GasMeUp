@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "northern-bot-301518"
+    "default": "northern-bot-301518",
+    "development": "northern-bot-301518",
+    "production": "gasmeup-7ce5f"
   }
 }

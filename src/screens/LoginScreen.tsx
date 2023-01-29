@@ -11,7 +11,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import PropTypes from 'prop-types';
 
 // Firebase
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../firebase';
 
@@ -51,10 +51,16 @@ function LoginPage({ navigation }: Props) {
 
   const login = () => {
     signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
+      .then((userCredential) => {
+        const { user } = userCredential;
         console.log('signed in!');
         setEmailError(false);
         setPasswordError(false);
+
+        if (!user.emailVerified) {
+          Alert.alert('Email not verified', 'Please verify your email before logging in.');
+          signOut(auth);
+        }
       })
       .catch((exception) => {
         Alert.alert('Error', exception.message);
