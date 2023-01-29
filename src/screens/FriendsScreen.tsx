@@ -123,10 +123,16 @@ export default function FriendsScreen() {
     console.log(errorUserDB, errorFriendsDB, error);
   }
 
-  if (!user || !user.emailVerified || loading || error) {
+  if (!user || loading || error) {
     return (
       <LoginScreen />
     );
+  }
+
+  if (!user.emailVerified) {
+    Alert.alert('Email not verified', 'Please verify your email before logging in.');
+    signOut(auth);
+    return (<LoginScreen />);
   }
 
   const headers = [
