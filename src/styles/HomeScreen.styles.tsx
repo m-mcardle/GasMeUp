@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   calculateButton: {
+    width: '60%',
     paddingHorizontal: 50,
   },
   saveTripHeaderContainer: {
@@ -141,6 +142,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 'auto',
+  },
+  mapContainer: {
+    marginTop: 'auto',
+    marginBottom: 0,
+    height: '80%',
+    width: '100%',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
   },
 });
 

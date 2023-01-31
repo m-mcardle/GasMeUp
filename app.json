@@ -21,7 +21,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.Virintus.GasMeUp",
-      "buildNumber": "1.0.5"
+      "buildNumber": "1.0.5",
+      "config": {
+        "googleMapsApiKey": "AIzaSyB1JNdanwF6CavSHC5S2nS6mwefil7BcKc"
+      }
     },
     "android": {
       "adaptiveIcon": {
