@@ -5,6 +5,7 @@ import {
   View,
   Switch,
   ViewStyle,
+  Platform,
 } from 'react-native';
 
 // External Components
@@ -28,7 +29,7 @@ export default function SettingsScreen() {
     const newSetting: any = {};
     newSetting[setting] = value;
 
-    Settings.set(newSetting);
+    if (Platform.OS === 'ios') { Settings.set(newSetting); }
     updateGlobalState(setting, value);
   };
 
