@@ -26,6 +26,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     padding: 5,
     width: '100%',
+    minHeight: 75,
+    justifyContent: 'center',
     shadowOffset: {
       width: 3,
       height: 3,
@@ -49,9 +51,11 @@ const styles = StyleSheet.create({
   statBox: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.tertiary,
     width: '49%',
+    minHeight: 25,
   },
   statBoxText: {
     color: colors.secondary,

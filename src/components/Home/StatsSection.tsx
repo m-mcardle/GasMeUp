@@ -52,19 +52,31 @@ export default function StatsSection(props: Props) {
           )}
       </LinearGradient>
       <View style={styles.subStatsSection}>
-        <Text style={{ ...styles.statBox, ...styles.statBoxText }}>
-          {`Distance: ${distance.toFixed(2)} km`}
-        </Text>
-        <View style={styles.statBox} onTouchEnd={() => openModal()}>
-          <Text style={styles.statBoxText}>
-            {`Gas: $${gasPrice.toFixed(2)}/L`}
-          </Text>
-          <View>
-            <Image
-              source={useCustomGasPrice ? AdjustIcon : AdjustIconDisabled}
-              style={styles.adjustButton}
-            />
-          </View>
+        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : {})]}>
+          {loading
+            ? <ActivityIndicator size="small" />
+            : (
+              <Text style={styles.statBoxText}>
+                {`Distance: ${distance.toFixed(2)} km`}
+              </Text>
+            )}
+        </View>
+        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : {})]} onTouchEnd={() => openModal()}>
+          {loading
+            ? <ActivityIndicator size="small" />
+            : (
+              <>
+                <Text style={styles.statBoxText}>
+                  {`Gas: $${gasPrice.toFixed(2)}/L`}
+                </Text>
+                <View>
+                  <Image
+                    source={useCustomGasPrice ? AdjustIcon : AdjustIconDisabled}
+                    style={styles.adjustButton}
+                  />
+                </View>
+              </>
+            )}
         </View>
       </View>
     </View>
