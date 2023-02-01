@@ -54,10 +54,6 @@ import styles from '../styles/HomeScreen.styles';
 // Mock Data
 import { fetchData } from '../data/data';
 
-// TODO - Push to production server and remove this
-// const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
-const serverUrl = 'https://gas-me-up.loca.lt';
-
 enum ActiveInput {
   None,
   Start,
@@ -143,7 +139,7 @@ export default function HomeScreen() {
     });
 
     try {
-      const distanceResponse = await fetchData(serverUrl, `/distance/?start=${startLocation}&end=${endLocation}`, !globalState['Enable Requests']);
+      const distanceResponse = await fetchData(`/distance/?start=${startLocation}&end=${endLocation}`, !globalState['Enable Requests']);
 
       if (!distanceResponse?.ok || !distanceResponse) {
         console.log(`Request for distance failed (${distanceResponse.status})`);
@@ -154,7 +150,7 @@ export default function HomeScreen() {
       let newGasPrice = gasPrice;
 
       if (!useCustomGasPrice) {
-        const gasPriceResponse = await fetchData(serverUrl, '/gas', !globalState['Enable Requests']);
+        const gasPriceResponse = await fetchData('/gas', !globalState['Enable Requests']);
 
         if (!gasPriceResponse?.ok || !gasPriceResponse) {
           console.log(`Request for gas price failed (${gasPriceResponse.status})`);
@@ -196,7 +192,7 @@ export default function HomeScreen() {
       return;
     }
 
-    fetchData(serverUrl, `/suggestions/?input=${input}&session=${sessionToken}`, !globalState['Enable Requests'])
+    fetchData(`/suggestions/?input=${input}&session=${sessionToken}`, !globalState['Enable Requests'])
       .then((res) => {
         if (!res?.ok || !res) {
           console.log(`Request for suggestions failed (${res.status})`);

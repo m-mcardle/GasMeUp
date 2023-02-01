@@ -1,3 +1,7 @@
+// TODO - Push to production server and remove this
+// const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
+export const serverUrl = 'https://gas-me-up.loca.lt';
+
 export const mockTripCost = {
   cost: 420.69,
   distance: 120,
@@ -28,7 +32,9 @@ export const mockDistance = {
   },
 };
 
-export async function fetchData(url: string, route: string, mock = false) {
+// Helper method to easily mock requests
+// Ex: route = '/suggestion?start=Toronto&end=Waterloo'
+export async function fetchData(route: string, mock = false) {
   if (mock) {
     const resp = new Response();
     resp.json = () => new Promise((resolve) => {
@@ -44,7 +50,7 @@ export async function fetchData(url: string, route: string, mock = false) {
     });
     return resp;
   }
-  return fetch(url);
+  return fetch(serverUrl + route);
 }
 
 export default {
@@ -53,4 +59,5 @@ export default {
   mockSuggestions,
   mockGasPrice,
   mockDistance,
+  serverUrl,
 };
