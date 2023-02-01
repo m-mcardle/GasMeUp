@@ -1,3 +1,6 @@
+// TODO - These tests don't actually fetch from Google API
+// * Need to set `ENABLE_GOOGLE_QUERIES` to `true` in `.env`
+
 const supertest = require('supertest');
 const app = require('../src/index');
 

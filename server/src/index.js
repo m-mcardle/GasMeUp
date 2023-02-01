@@ -79,7 +79,17 @@ async function GetDistanceV2(startLocation, endLocation) {
     };
   }
 
-  return 10;
+  return {
+    distance: 10,
+    end: {
+      lat: 43.6532,
+      lng: -79.3832,
+    },
+    start: {
+      lat: 43.6532,
+      lng: -79.3832,
+    },
+  };
 }
 
 async function GetSuggestions(input, sessionId) {
