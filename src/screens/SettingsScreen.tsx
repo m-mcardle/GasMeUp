@@ -15,7 +15,7 @@ import Page from '../components/Page';
 import Text from '../components/Text';
 
 // Global state stuff
-import { useGlobalState, TOGGLE_SETTINGS } from '../hooks/hooks';
+import { useGlobalState, DEV_TOGGLE_SETTINGS } from '../hooks/hooks';
 
 // Styles
 import styles from '../styles/SettingsScreen.styles';
@@ -49,7 +49,7 @@ export default function SettingsScreen() {
         <Text style={globalStyles.title}> Settings</Text>
       </View>
       <View style={styles.mainContainer}>
-        {Object.keys(TOGGLE_SETTINGS).map((setting) => (
+        {process.env.NODE_ENV === 'development' && Object.keys(DEV_TOGGLE_SETTINGS).map((setting) => (
           <View key={setting} style={styles.settingContainer}>
             <Text style={styles.settingsText}>{setting}</Text>
             <SettingsSwitch name={setting} value={globalState[setting]} />

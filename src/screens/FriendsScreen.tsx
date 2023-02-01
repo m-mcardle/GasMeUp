@@ -129,6 +129,12 @@ export default function FriendsScreen() {
     );
   }
 
+  if (!user.emailVerified) {
+    Alert.alert('Email not verified', 'Please verify your email before logging in.');
+    signOut(auth);
+    return (<LoginScreen />);
+  }
+
   const headers = [
     { text: 'Friend', numeric: false },
     { text: 'Amount Owed', numeric: true },

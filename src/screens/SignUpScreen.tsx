@@ -4,7 +4,7 @@ import { View, Alert, TextInput } from 'react-native';
 import PropTypes from 'prop-types';
 
 // Firebase
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 
@@ -40,12 +40,16 @@ export default function SignUpScreen({ navigation }: Props) {
     setEmailError(false);
     setPasswordError(false);
     createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(async (userCredential) => {
         console.log('signed up!');
 
         const { user } = userCredential;
 
-        setDoc(doc(db, 'Users', user.uid), {
+        await sendEmailVerification(user);
+
+        Alert.alert('Success', 'Please verify your email address before logging in.');
+
+        await setDoc(doc(db, 'Users', user.uid), {
           uid: user.uid,
           email,
           firstName,
@@ -54,11 +58,10 @@ export default function SignUpScreen({ navigation }: Props) {
           friends: {},
           incomingFriendRequests: [],
           outgoingFriendRequests: [],
-        })
-          .then(() => {
-            console.log('All done!');
-            navigation.goBack();
-          });
+        });
+
+        console.log('All done!');
+        navigation.goBack();
       })
       .catch((exception) => {
         Alert.alert('Error', exception.message);

@@ -9,7 +9,7 @@ admin.initializeApp();
 const db = admin.firestore();
 
 exports.aggregateBalances = functions.firestore
-    .document("Transactions/{transcationUI}")
+    .document("Transactions/{transactionUID}")
     .onWrite(async (change, context) => {
       const newData = change.after.data();
       // Get value of the newly added transaction
