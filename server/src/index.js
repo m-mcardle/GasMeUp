@@ -169,6 +169,7 @@ app.get('/distance', async (req, res) => {
     Log(`[distance] Start: ${start.lat}/${start.lng},\tEnd: ${end.lat}/${end.lng}`);
     res.json({ distance, start, end });
   } catch (exception) {
+    LogError(exception);
     res.status(500).send({ error: exception });
   }
 });
