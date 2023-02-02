@@ -118,9 +118,10 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 30,
-    width: '30%',
+    paddingHorizontal: 20,
+    width: '25%',
     backgroundColor: colors.secondaryAction,
   },
   buttonSection: {
@@ -146,6 +147,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 'auto',
+  },
+  secondaryButtonText: {
+    color: colors.secondary,
+    marginHorizontal: 2,
+    fontSize: 8,
   },
   mapContainer: {
     marginTop: 'auto',

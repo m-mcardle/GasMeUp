@@ -352,16 +352,24 @@ export default function HomeScreen() {
             onPress={() => setMapModalVisible(true)}
             disabled={!tripCalculated}
           >
-            <Text style={{ color: colors.secondary, marginHorizontal: 2 }}>Map</Text>
-            <Ionicons name="map" size={20} color={colors.secondary} />
+            <Text
+              style={styles.secondaryButtonText}
+            >
+              View Map
+            </Text>
+            <Ionicons name="map" size={12} color={colors.secondary} />
           </Button>
           <Button
             style={styles.saveButton}
             onPress={() => setModalVisible(true)}
             disabled={!canSaveTrip}
           >
-            <Text style={{ color: colors.secondary, marginHorizontal: 2 }}>Save</Text>
-            <AntDesign name="contacts" size={20} color={colors.secondary} />
+            <Text
+              style={styles.secondaryButtonText}
+            >
+              Save
+            </Text>
+            <AntDesign name="contacts" size={12} color={colors.secondary} />
           </Button>
         </View>
       </View>
