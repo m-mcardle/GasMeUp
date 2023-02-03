@@ -142,8 +142,11 @@ export default function HomeScreen() {
       loading: true, distance: 0, gasPrice: 0, start: { lat: 0, lng: 0 }, end: { lat: 0, lng: 0 },
     });
 
+    const parsedStartLocation = startLocation === 'Current Location' ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : startLocation;
+    const parsedEndLocation = endLocation === 'Current Location' ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : endLocation;
+
     try {
-      const distanceResponse = await fetchData(`/distance/?start=${startLocation}&end=${endLocation}`, !globalState['Enable Requests']);
+      const distanceResponse = await fetchData(`/distance/?start=${parsedStartLocation}&end=${parsedEndLocation}`, !globalState['Enable Requests']);
 
       if (!distanceResponse?.ok || !distanceResponse) {
         console.log(`Request for distance failed (${distanceResponse.status})`);
@@ -190,8 +193,8 @@ export default function HomeScreen() {
   }, [startLocation, endLocation, customGasPrice, gasPrice, globalState['Enable Requests']]);
 
   const updateSuggestions = useCallback((input: string) => {
-    // If empty then just clear the suggestions
-    if (!input) {
+    // If empty or using `Current Location` then just clear the suggestions
+    if (!input || input === 'Current Location') {
       setSuggestions([]);
       return;
     }
@@ -278,10 +281,12 @@ export default function HomeScreen() {
           onDismiss={() => setMapModalVisible(false)}
           contentContainerStyle={globalStyles.modal}
         >
-          <MapContainer data={{
-            start,
-            end,
-          }}
+          <MapContainer
+            data={{
+              start,
+              end,
+            }}
+            showUserLocation={!(startLocation === 'Current Location' || endLocation === 'Current Location') && globalState.userLocation.latitude}
           />
         </Modal>
       </Portal>
@@ -319,7 +324,14 @@ export default function HomeScreen() {
           onChangeText={updateStartLocation}
           onPressIn={() => changeActiveInput(ActiveInput.Start)}
           value={startLocation}
-          icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
+          icon={(
+            <Ionicons
+              name="ios-location"
+              size={30}
+              color={colors.secondary}
+              onPress={() => updateStartLocation('Current Location')}
+            />
+           )}
           clearButton
           error={startLocationError}
           autoComplete="street-address"
@@ -333,7 +345,14 @@ export default function HomeScreen() {
           onChangeText={updateEndLocation}
           onPressIn={() => changeActiveInput(ActiveInput.End)}
           value={endLocation}
-          icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
+          icon={(
+            <Ionicons
+              name="ios-location"
+              size={30}
+              color={colors.secondary}
+              onPress={() => updateEndLocation('Current Location')}
+            />
+           )}
           clearButton
           error={endLocationError}
           autoComplete="street-address"

@@ -128,6 +128,10 @@ export default function App() {
       }
 
       const location = await Location.getCurrentPositionAsync({});
+      updateGlobalState('userLocation', {
+        lat: location.coords.latitude,
+        lng: location.coords.longitude,
+      });
       const readableLocation = (await Location.reverseGeocodeAsync(location.coords))[0];
 
       if (readableLocation.country === 'Canada') {
