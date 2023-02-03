@@ -9,7 +9,7 @@ const {
   Directions,
   mockLocations,
 } = require('./queries/google');
-const { GasPriceRequest, GasPricesRequest } = require('./queries/gasprice');
+const { CanadianGasPriceRequest, AmericanGasPriceRequest, GasPricesRequest } = require('./queries/gasprice');
 
 const { GasCostForDistance } = require('./calculations/fuel');
 
@@ -109,9 +109,9 @@ async function GetSuggestions(input, sessionId) {
   return mockLocations.predictions.map((el) => el.description);
 }
 
-async function GetGasPrice(province) {
-  if (province) {
-    const { data } = await api(GasPriceRequest(province));
+async function GetGasPrice(country, region) {
+  if (region) {
+    const { data } = await api(country === 'US' ? AmericanGasPriceRequest(region) : CanadianGasPriceRequest(region));
     const { price } = data;
     return price;
   }
@@ -197,11 +197,12 @@ app.get('/gas-prices', async (req, res) => {
 });
 
 app.get('/gas', async (req, res) => {
-  const province = req.query?.province ?? 'Ontario';
+  const country = req.query?.country ?? 'CA';
+  const region = req.query?.region ?? 'Ontario';
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const gasPrice = await GetGasPrice(province);
+    const gasPrice = await GetGasPrice(country, region);
     Log(`[gas] Gas Price: $${gasPrice}`);
     res.json({ price: gasPrice });
   } catch (exception) {

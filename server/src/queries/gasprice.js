@@ -1,9 +1,20 @@
 const url = 'https://canadian-gas-prices.p.rapidapi.com';
 
-function GasPriceRequest(province) {
+function CanadianGasPriceRequest(province) {
   return {
     method: 'get',
     url: encodeURI(`${url}/province?province=${province}`),
+    headers: {
+      'X-RapidAPI-Host': 'canadian-gas-prices.p.rapidapi.com',
+      'X-RapidAPI-Key': `${process.env.RAPID_API_KEY}`,
+    },
+  };
+}
+
+function AmericanGasPriceRequest(state) {
+  return {
+    method: 'get',
+    url: encodeURI(`${url}/state?state=${state}`),
     headers: {
       'X-RapidAPI-Host': 'canadian-gas-prices.p.rapidapi.com',
       'X-RapidAPI-Key': `${process.env.RAPID_API_KEY}`,
@@ -22,4 +33,4 @@ function GasPricesRequest() {
   };
 }
 
-module.exports = { GasPriceRequest, GasPricesRequest };
+module.exports = { CanadianGasPriceRequest, AmericanGasPriceRequest, GasPricesRequest };

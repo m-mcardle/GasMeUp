@@ -102,7 +102,11 @@ export default function HomeScreen() {
 
   const GAS_MILEAGE = globalState['Gas Mileage'];
 
-  const cost = ((distance * GAS_MILEAGE) / 100) * gasPrice;
+  const cost = (
+    ((distance * GAS_MILEAGE) / 100) // This get's the L of gas used
+    * gasPrice // This gets the cost of the gas used
+    * (globalState.country === 'CA' ? 1 : 0.2641729) // This converts the cost based on if the gas price is MPG or L/100km
+  );
 
   const setGasPrice = (newPrice: number) => {
     setCostRequest((state) => ({ ...state, gasPrice: newPrice }));
@@ -150,7 +154,7 @@ export default function HomeScreen() {
       let newGasPrice = gasPrice;
 
       if (!useCustomGasPrice) {
-        const gasPriceResponse = await fetchData('/gas', !globalState['Enable Requests']);
+        const gasPriceResponse = await fetchData(`/gas?country=${globalState.country}&region=${globalState.region}`, !globalState['Enable Requests']);
 
         if (!gasPriceResponse?.ok || !gasPriceResponse) {
           console.log(`Request for gas price failed (${gasPriceResponse.status})`);
@@ -241,7 +245,6 @@ export default function HomeScreen() {
   const canSaveTrip = tripCalculated && !!user;
 
   const endLocationRef = useRef<TextInput>(null);
-
   return (
     <Page>
       <GasPriceModal
