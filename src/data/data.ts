@@ -1,6 +1,4 @@
-// TODO - Push to production server and remove this
-// const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
-export const serverUrl = 'https://gas-me-up.loca.lt';
+export const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
 
 export const mockTripCost = {
   cost: 420.69,
