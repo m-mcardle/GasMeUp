@@ -106,7 +106,7 @@ export const globalStyles = StyleSheet.create({
     height: '80%',
   },
   title: {
-    fontSize: 48,
+    fontSize: 42,
     fontFamily: boldFont,
     textAlign: 'center',
     padding: 10,

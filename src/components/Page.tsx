@@ -1,7 +1,7 @@
 // React imports
 import React, { ReactNode } from 'react';
 import {
-  KeyboardAvoidingView,
+  KeyboardAvoidingView, Platform,
 } from 'react-native';
 
 // External Components
@@ -41,7 +41,7 @@ export default function Page({
         {keyboardAvoiding
           ? (
             <KeyboardAvoidingView
-              behavior="padding"
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
               keyboardVerticalOffset={160}
               style={globalStyles.page}
             >

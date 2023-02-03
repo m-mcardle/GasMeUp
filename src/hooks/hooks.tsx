@@ -2,7 +2,7 @@ import {
   createContext,
   useContext,
 } from 'react';
-import { Settings } from 'react-native';
+import { Settings, Platform } from 'react-native';
 
 export const GlobalContext = createContext<any>(null);
 
@@ -16,20 +16,27 @@ export const NUMERIC_SETTINGS: Record<string, number> = {
   'Gas Mileage': 10,
 };
 
-const initialSettings: any = {};
+let initialSettings: any = {};
 
-// The settings are stored as numbers and so to convert them to booleans we must use `!!`
-Object.keys(DEV_TOGGLE_SETTINGS).forEach((setting) => {
-  initialSettings[setting] = Settings.get(setting) !== undefined
-    ? !!Settings.get(setting)
-    : DEV_TOGGLE_SETTINGS[setting];
-});
+if (Platform.OS === 'ios') {
+  // The settings are stored as numbers and so to convert them to booleans we must use `!!`
+  Object.keys(DEV_TOGGLE_SETTINGS).forEach((setting) => {
+    initialSettings[setting] = Settings.get(setting) !== undefined
+      ? !!Settings.get(setting)
+      : DEV_TOGGLE_SETTINGS[setting];
+  });
 
-Object.keys(NUMERIC_SETTINGS).forEach((setting) => {
-  initialSettings[setting] = Settings.get(setting) !== undefined
-    ? Settings.get(setting)
-    : NUMERIC_SETTINGS[setting];
-});
+  Object.keys(NUMERIC_SETTINGS).forEach((setting) => {
+    initialSettings[setting] = Settings.get(setting) !== undefined
+      ? Settings.get(setting)
+      : NUMERIC_SETTINGS[setting];
+  });
+} else {
+  initialSettings = {
+    ...DEV_TOGGLE_SETTINGS,
+    ...NUMERIC_SETTINGS,
+  };
+}
 
 // Force enable requests in production
 if (process.env.NODE_ENV !== 'development') {
