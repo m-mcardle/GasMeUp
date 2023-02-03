@@ -1,3 +1,5 @@
+export const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
+
 export const mockTripCost = {
   cost: 420.69,
   distance: 120,
@@ -18,17 +20,27 @@ export const mockGasPrice = {
 
 export const mockDistance = {
   distance: 120,
+  start: {
+    lat: 43.54276157183944,
+    lng: -80.50447815774582,
+  },
+  end: {
+    lat: 43.6929259583315,
+    lng: -79.35451499026206,
+  },
 };
 
-export async function fetchData(url: string, mock = false) {
+// Helper method to easily mock requests
+// Ex: route = '/suggestion?start=Toronto&end=Waterloo'
+export async function fetchData(route: string, mock = false) {
   if (mock) {
     const resp = new Response();
     resp.json = () => new Promise((resolve) => {
-      if (url.includes('suggestion')) {
+      if (route.includes('suggestion')) {
         resolve(mockSuggestions);
-      } else if (url.includes('gas')) {
+      } else if (route.includes('gas')) {
         resolve(mockGasPrice);
-      } else if (url.includes('distance')) {
+      } else if (route.includes('distance')) {
         resolve(mockDistance);
       } else {
         resolve(mockTripCost);
@@ -36,7 +48,7 @@ export async function fetchData(url: string, mock = false) {
     });
     return resp;
   }
-  return fetch(url);
+  return fetch(serverUrl + route);
 }
 
 export default {
@@ -45,4 +57,5 @@ export default {
   mockSuggestions,
   mockGasPrice,
   mockDistance,
+  serverUrl,
 };

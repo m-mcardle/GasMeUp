@@ -26,6 +26,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     padding: 5,
     width: '100%',
+    minHeight: 75,
+    justifyContent: 'center',
     shadowOffset: {
       width: 3,
       height: 3,
@@ -49,9 +51,11 @@ const styles = StyleSheet.create({
   statBox: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.tertiary,
     width: '49%',
+    minHeight: 25,
   },
   statBoxText: {
     color: colors.secondary,
@@ -114,9 +118,10 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 30,
-    width: '30%',
+    paddingHorizontal: 20,
+    width: '25%',
     backgroundColor: colors.secondaryAction,
   },
   buttonSection: {
@@ -125,6 +130,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   calculateButton: {
+    width: '60%',
     paddingHorizontal: 50,
   },
   saveTripHeaderContainer: {
@@ -141,6 +147,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 'auto',
+  },
+  secondaryButtonText: {
+    color: colors.secondary,
+    marginHorizontal: 2,
+    fontSize: 8,
+  },
+  mapContainer: {
+    marginTop: 'auto',
+    marginBottom: 0,
+    height: '80%',
+    width: '100%',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
   },
 });
 

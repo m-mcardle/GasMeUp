@@ -1,5 +1,7 @@
-import React from 'react';
-import { ActivityIndicator, Image, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import {
+  ActivityIndicator, Animated, Easing, Image, View,
+} from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -23,6 +25,8 @@ interface Props {
   openModal: () => void,
 }
 
+const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
+
 export default function StatsSection(props: Props) {
   const {
     loading,
@@ -33,14 +37,44 @@ export default function StatsSection(props: Props) {
     cost,
     openModal,
   } = props;
+  const fadeAnim = useRef(new Animated.Value(0.5)).current;
+  const fadeIn = Animated.timing(fadeAnim, {
+    toValue: 1,
+    duration: 1500,
+    useNativeDriver: true,
+    easing: Easing.quad,
+  });
+
+  const fadeOut = Animated.timing(fadeAnim, {
+    toValue: 0.5,
+    duration: 1500,
+    useNativeDriver: true,
+    easing: Easing.quad,
+  });
+
+  const sequence = Animated.sequence([fadeIn, fadeOut]);
+  const animation = Animated.loop(sequence);
+
+  // Start the animation if the data is loading, otherwise stop it
+  useEffect(() => {
+    if (loading) {
+      animation.start();
+    } else {
+      animation.stop();
+      fadeAnim.setValue(1);
+    }
+  }, [loading, fadeAnim]);
 
   const safeRiders = riders < 1 ? 1 : riders;
   return (
     <View style={styles.statsSection}>
-      <LinearGradient
+      <AnimatedLinearGradient
         colors={[colors.green, colors.darkGreen]}
-        start={{ x: 0, y: 0.2 }}
-        style={styles.costSection}
+        start={{ x: 0.2, y: 0.2 }}
+        style={{
+          ...styles.costSection,
+          opacity: fadeAnim, // Bind opacity to animated value
+        }}
       >
         {loading
           ? <ActivityIndicator size="large" />
@@ -50,21 +84,33 @@ export default function StatsSection(props: Props) {
               {(cost / safeRiders).toFixed(2)}
             </Text>
           )}
-      </LinearGradient>
+      </AnimatedLinearGradient>
       <View style={styles.subStatsSection}>
-        <Text style={{ ...styles.statBox, ...styles.statBoxText }}>
-          {`Distance: ${distance.toFixed(2)} km`}
-        </Text>
-        <View style={styles.statBox} onTouchEnd={() => openModal()}>
-          <Text style={styles.statBoxText}>
-            {`Gas: $${gasPrice.toFixed(2)}/L`}
-          </Text>
-          <View>
-            <Image
-              source={useCustomGasPrice ? AdjustIcon : AdjustIconDisabled}
-              style={styles.adjustButton}
-            />
-          </View>
+        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : {})]}>
+          {loading
+            ? <ActivityIndicator size="small" />
+            : (
+              <Text style={styles.statBoxText}>
+                {`Distance: ${distance.toFixed(2)} km`}
+              </Text>
+            )}
+        </View>
+        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : {})]} onTouchEnd={() => openModal()}>
+          {loading
+            ? <ActivityIndicator size="small" />
+            : (
+              <>
+                <Text style={styles.statBoxText}>
+                  {`Gas: $${gasPrice.toFixed(2)}/L`}
+                </Text>
+                <View>
+                  <Image
+                    source={useCustomGasPrice ? AdjustIcon : AdjustIconDisabled}
+                    style={styles.adjustButton}
+                  />
+                </View>
+              </>
+            )}
         </View>
       </View>
     </View>

@@ -40,6 +40,7 @@ import Page from '../components/Page';
 import Text from '../components/Text';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import MapContainer from '../components/MapContainer';
 
 import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
@@ -52,8 +53,6 @@ import styles from '../styles/HomeScreen.styles';
 
 // Mock Data
 import { fetchData } from '../data/data';
-
-const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
 
 enum ActiveInput {
   None,
@@ -70,12 +69,22 @@ export default function HomeScreen() {
     distance,
     gasPrice,
     loading,
+    start,
+    end,
   },
   setCostRequest] = useState<CostRequest>(
     {
       loading: false,
       distance: 0,
       gasPrice: 0,
+      start: {
+        lat: 0,
+        lng: 0,
+      },
+      end: {
+        lat: 0,
+        lng: 0,
+      },
     },
   );
   const [customGasPrice, setCustomGasPrice] = useState<number>(1.5);
@@ -86,6 +95,7 @@ export default function HomeScreen() {
   const [useCustomGasPrice, setUseCustomGasPrice] = useState<boolean>(false);
   const [globalState] = useGlobalState();
   const [modalVisible, setModalVisible] = useState(false);
+  const [mapModalVisible, setMapModalVisible] = useState(false);
 
   const [startLocationError, setStartLocationError] = useState<boolean>(false);
   const [endLocationError, setEndLocationError] = useState<boolean>(false);
@@ -125,22 +135,22 @@ export default function HomeScreen() {
 
     Keyboard.dismiss();
     setCostRequest({
-      loading: true, distance: 0, gasPrice: 0,
+      loading: true, distance: 0, gasPrice: 0, start: { lat: 0, lng: 0 }, end: { lat: 0, lng: 0 },
     });
 
     try {
-      const distanceResponse = await fetchData(`${serverUrl}/distance/?start=${startLocation}&end=${endLocation}`, !globalState['Enable Requests']);
+      const distanceResponse = await fetchData(`/distance/?start=${startLocation}&end=${endLocation}`, !globalState['Enable Requests']);
 
       if (!distanceResponse?.ok || !distanceResponse) {
         console.log(`Request for distance failed (${distanceResponse.status})`);
         throw new Error(`Request for distance failed (${distanceResponse.status})`);
       }
 
-      const { distance: newDistance } = await distanceResponse.json();
+      const { distance: newDistance, start: newStart, end: newEnd } = await distanceResponse.json();
       let newGasPrice = gasPrice;
 
       if (!useCustomGasPrice) {
-        const gasPriceResponse = await fetchData(`${serverUrl}/gas`, !globalState['Enable Requests']);
+        const gasPriceResponse = await fetchData('/gas', !globalState['Enable Requests']);
 
         if (!gasPriceResponse?.ok || !gasPriceResponse) {
           console.log(`Request for gas price failed (${gasPriceResponse.status})`);
@@ -159,11 +169,17 @@ export default function HomeScreen() {
         loading: false,
         distance: newDistance,
         gasPrice: newGasPrice,
+        start: newStart,
+        end: newEnd,
       }));
     } catch (err: any) {
       Alert.alert(err.message);
       setCostRequest({
-        loading: false, distance: 0, gasPrice: 0,
+        loading: false,
+        distance: 0,
+        gasPrice: 0,
+        start: { lat: 0, lng: 0 },
+        end: { lat: 0, lng: 0 },
       });
     }
     return null;
@@ -176,11 +192,11 @@ export default function HomeScreen() {
       return;
     }
 
-    fetchData(`${serverUrl}/suggestions/?input=${input}&session=${sessionToken}`, !globalState['Enable Requests'])
+    fetchData(`/suggestions/?input=${input}&session=${sessionToken}`, !globalState['Enable Requests'])
       .then((res) => {
         if (!res?.ok || !res) {
           console.log(`Request for suggestions failed (${res.status})`);
-          return Error(`Request failed (${res.status})`);
+          return new Error(`Request failed (${res.status})`);
         }
         return res.json();
       })
@@ -219,8 +235,10 @@ export default function HomeScreen() {
     setActiveInput(input);
   };
 
+  const tripCalculated = !!distance && !!gasPrice;
+
   // Represents if the user has entered all the required data to save a trip's cost
-  const canSaveTrip = !!gasPrice && !!distance && !!user;
+  const canSaveTrip = tripCalculated && !!user;
 
   const endLocationRef = useRef<TextInput>(null);
 
@@ -249,6 +267,18 @@ export default function HomeScreen() {
             end={endLocation}
             gasMileage={GAS_MILEAGE}
             closeModal={() => setModalVisible(false)}
+          />
+        </Modal>
+
+        <Modal
+          visible={mapModalVisible}
+          onDismiss={() => setMapModalVisible(false)}
+          contentContainerStyle={globalStyles.modal}
+        >
+          <MapContainer data={{
+            start,
+            end,
+          }}
           />
         </Modal>
       </Portal>
@@ -313,15 +343,33 @@ export default function HomeScreen() {
             style={styles.calculateButton}
             onPress={submit}
           >
-            <Text style={{ color: colors.secondary }}>Calculate</Text>
+            <Text style={{ color: colors.secondary, textAlign: 'center' }}>Calculate</Text>
+          </Button>
+        </View>
+        <View style={styles.buttonSection}>
+          <Button
+            style={styles.saveButton}
+            onPress={() => setMapModalVisible(true)}
+            disabled={!tripCalculated}
+          >
+            <Text
+              style={styles.secondaryButtonText}
+            >
+              View Map
+            </Text>
+            <Ionicons name="map" size={12} color={colors.secondary} />
           </Button>
           <Button
             style={styles.saveButton}
             onPress={() => setModalVisible(true)}
             disabled={!canSaveTrip}
           >
-            <Text style={{ color: colors.secondary, marginHorizontal: 2 }}>Save</Text>
-            <AntDesign name="contacts" size={20} color={colors.secondary} />
+            <Text
+              style={styles.secondaryButtonText}
+            >
+              Save
+            </Text>
+            <AntDesign name="contacts" size={12} color={colors.secondary} />
           </Button>
         </View>
       </View>

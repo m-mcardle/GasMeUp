@@ -58,6 +58,40 @@ async function GetDistance(startLocation, endLocation) {
   return 10;
 }
 
+async function GetDistanceV2(startLocation, endLocation) {
+  if (useGoogleAPI) {
+    const response = await api(Directions(startLocation, endLocation));
+
+    const { data } = response;
+    if (data.status !== 'OK') {
+      throw Error(`Invalid Request to Google (${data.status})`);
+    }
+
+    const route = data.routes[0].legs[0];
+    const distance = route.distance.value / 1000;
+    const end = route.end_location;
+    const start = route.start_location;
+
+    return {
+      distance,
+      end,
+      start,
+    };
+  }
+
+  return {
+    distance: 10,
+    end: {
+      lat: 43.6532,
+      lng: -79.3832,
+    },
+    start: {
+      lat: 43.6532,
+      lng: -79.3832,
+    },
+  };
+}
+
 async function GetSuggestions(input, sessionId) {
   if (useGoogleAPI) {
     const response = await api(LocationAutocomplete(input, sessionId));
@@ -123,6 +157,8 @@ app.get('/suggestions', async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   try {
     const suggestions = await GetSuggestions(input, sessionId);
+
+    Log(`[suggestions] ${suggestions.length} suggestions for ${input}`);
     res.json({ suggestions });
   } catch (err) {
     LogError(err);
@@ -137,10 +173,13 @@ app.get('/distance', async (req, res) => {
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const distance = await GetDistance(startLocation, endLocation);
+    const { distance, start, end } = await GetDistanceV2(startLocation, endLocation);
+
     Log(`[distance] Distance: ${distance}km`);
-    res.json({ distance });
+    Log(`[distance] Start: ${start.lat}/${start.lng},\tEnd: ${end.lat}/${end.lng}`);
+    res.json({ distance, start, end });
   } catch (exception) {
+    LogError(exception);
     res.status(500).send({ error: exception });
   }
 });

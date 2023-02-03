@@ -1,3 +1,6 @@
+// TODO - These tests don't actually fetch from Google API
+// * Need to set `ENABLE_GOOGLE_QUERIES` to `true` in `.env`
+
 const supertest = require('supertest');
 const app = require('../src/index');
 
@@ -43,6 +46,20 @@ describe('Distance requests', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).not.toBeNull();
     expect(response.body).toHaveProperty('distance');
+  });
+
+  it('should return latitude and longitude of start and end locations', async () => {
+    const response = await api
+      .get(endpoint);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).not.toBeNull();
+    expect(response.body).toHaveProperty('start');
+    expect(response.body.start).toHaveProperty('lat');
+    expect(response.body.start).toHaveProperty('lng');
+    expect(response.body).toHaveProperty('end');
+    expect(response.body.end).toHaveProperty('lat');
+    expect(response.body.end).toHaveProperty('lng');
   });
 });
 
