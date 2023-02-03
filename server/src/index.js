@@ -76,6 +76,7 @@ async function GetDistanceV2(startLocation, endLocation) {
       distance,
       end,
       start,
+      data,
     };
   }
 
@@ -173,11 +174,15 @@ app.get('/distance', async (req, res) => {
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const { distance, start, end } = await GetDistanceV2(startLocation, endLocation);
+    const {
+      distance, start, end, data,
+    } = await GetDistanceV2(startLocation, endLocation);
 
     Log(`[distance] Distance: ${distance}km`);
     Log(`[distance] Start: ${start.lat}/${start.lng},\tEnd: ${end.lat}/${end.lng}`);
-    res.json({ distance, start, end });
+    res.json({
+      distance, start, end, data,
+    });
   } catch (exception) {
     LogError(exception);
     res.status(500).send({ error: exception });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 
-import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 
 import { useGlobalState } from '../hooks/hooks';
 
@@ -26,9 +26,10 @@ interface MapData {
 interface Props {
   data: MapData;
   showUserLocation: boolean;
+  waypoints: any,
 }
 
-export default function MapContainer({ data, showUserLocation }: Props) {
+export default function MapContainer({ data, showUserLocation, waypoints }: Props) {
   const [globalState] = useGlobalState();
   const latDelta = Math.abs(data.start.lat - data.end.lat) * 1.5;
   const lngDelta = Math.abs(data.start.lng - data.end.lng) * 1.5;
@@ -79,6 +80,7 @@ export default function MapContainer({ data, showUserLocation }: Props) {
               pinColor="blue"
             />
           )}
+          <Polyline coordinates={waypoints} strokeWidth={2} strokeColor="red" />
         </MapView>
       </View>
     </View>

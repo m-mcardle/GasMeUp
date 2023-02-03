@@ -87,6 +87,7 @@ export default function HomeScreen() {
       },
     },
   );
+  const [waypoints, setWaypoints] = useState<any>([]);
   const [customGasPrice, setCustomGasPrice] = useState<number>(1.5);
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
@@ -153,7 +154,20 @@ export default function HomeScreen() {
         throw new Error(`Request for distance failed (${distanceResponse.status})`);
       }
 
-      const { distance: newDistance, start: newStart, end: newEnd } = await distanceResponse.json();
+      const {
+        distance: newDistance, start: newStart, end: newEnd, data: routeData,
+      } = await distanceResponse.json();
+
+      const { steps } = routeData.routes[0].legs[0];
+      const newWaypoints = steps.map((step: any) => {
+        const { lat: latitude, lng: longitude } = step.start_location;
+        return {
+          latitude,
+          longitude,
+        };
+      });
+      setWaypoints(newWaypoints);
+
       let newGasPrice = gasPrice;
 
       if (!useCustomGasPrice) {
@@ -286,6 +300,7 @@ export default function HomeScreen() {
               start,
               end,
             }}
+            waypoints={waypoints}
             showUserLocation={!(startLocation === 'Current Location' || endLocation === 'Current Location') && globalState.userLocation.latitude}
           />
         </Modal>
