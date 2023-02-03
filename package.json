@@ -13,6 +13,7 @@
     "build": "eas build",
     "bump": "standard-version",
     "publish": "eas submit --platform ios",
+    "publish:expo": "eas update",
     "publish:android": "eas submit --platform android",
     "publish-functions": "firebase deploy",
     "check-types": "npx tsc",
