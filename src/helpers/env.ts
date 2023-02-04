@@ -16,4 +16,8 @@ export const ENV = expoConstants
     USE_DEV_API: false,
   };
 
+if (process.env.NODE_ENV === 'development') {
+  console.log('ENV:', ENV);
+}
+
 export default ENV;

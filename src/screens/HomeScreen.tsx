@@ -3,7 +3,6 @@
 * Get session tokens working (might b impossible)
 * Implement db to store cached queries
 * Highway vs City driving
-* Get user location and use that as input
 *
 */
 
@@ -26,6 +25,7 @@ import {
   Portal, Modal,
 } from 'react-native-paper';
 
+import { throttle, debounce } from 'throttle-debounce';
 import uuid from 'react-native-uuid';
 
 // Firebase
@@ -241,14 +241,31 @@ export default function HomeScreen() {
       });
   }, [globalState['Enable Requests']]);
 
+  const throttledUpdateSuggestions = useCallback(
+    throttle(500, updateSuggestions),
+    [updateSuggestions],
+  );
+  const debouncedUpdateSuggestions = useCallback(
+    debounce(500, updateSuggestions),
+    [updateSuggestions],
+  );
+
+  const autocompleteSearch = (input: string) => {
+    if (input.length < 10) {
+      throttledUpdateSuggestions(input);
+    } else {
+      debouncedUpdateSuggestions(input);
+    }
+  };
+
   const updateStartLocation = (input: string) => {
     setLocations((state) => ({ ...state, startLocation: input }));
-    updateSuggestions(input);
+    autocompleteSearch(input);
   };
 
   const updateEndLocation = (input: string) => {
     setLocations((state) => ({ ...state, endLocation: input }));
-    updateSuggestions(input);
+    autocompleteSearch(input);
   };
 
   const setInputToPickedLocation = (item: string) => {
