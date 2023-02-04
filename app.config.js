@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 module.exports = {
   name: 'GasMeUp',
   slug: 'gas-me-up',
@@ -40,6 +42,10 @@ module.exports = {
     eas: {
       projectId: 'ca421c93-c21f-4e6b-a62c-52b626a5bbac',
     },
+    firebaseAPIKey: process.env.FIREBASE_API_KEY,
+    prodFirebaseAPIKey: process.env.PROD_FIREBASE_API_KEY,
+    apiKey: process.env.API_KEY,
+    useDevAPI: process.env.USE_DEV_API,
   },
   runtimeVersion: {
     policy: 'sdkVersion',
