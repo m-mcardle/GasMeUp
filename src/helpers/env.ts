@@ -13,7 +13,7 @@ export const ENV = expoConstants
     FIREBASE_API_KEY: '',
     PROD_FIREBASE_API_KEY: '',
     API_KEY: '',
-    USE_DEV_API: false,
+    USE_DEV_API: 'false',
   };
 
 if (process.env.NODE_ENV === 'development') {

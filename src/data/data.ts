@@ -1,6 +1,6 @@
 import { ENV } from '../helpers/env';
 
-export const serverUrl = ENV.USE_DEV_API ? 'https://gas-me-up.loca.lt' : 'https://northern-bot-301518.uc.r.appspot.com';
+export const serverUrl = ENV.USE_DEV_API === 'true' ? 'https://gas-me-up.loca.lt' : 'https://northern-bot-301518.uc.r.appspot.com';
 
 export const mockTripCost = {
   cost: 420.69,
