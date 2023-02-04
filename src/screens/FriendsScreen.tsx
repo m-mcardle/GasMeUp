@@ -111,7 +111,10 @@ export default function FriendsScreen() {
         key: uid,
         uid,
       };
-    }).filter((el) => el) as Array<object> : [] as Array<object>;
+    })
+      .filter((el) => el)
+      .sort((a, b) => a!.amount - b!.amount) as Array<object>
+    : [] as Array<object>;
 
   const [visible, setVisible] = useState(false);
   const [friendInfoVisible, setFriendInfoVisible] = useState(false);
@@ -211,7 +214,7 @@ export default function FriendsScreen() {
         </View>
         <Table
           title="Friends"
-          itemsPerPage={10}
+          itemsPerPage={8}
           data={formattedBalances}
           headers={headers}
           Row={Row}
