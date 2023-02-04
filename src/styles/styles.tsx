@@ -103,7 +103,7 @@ export const globalStyles = StyleSheet.create({
     borderWidth: 4,
     borderColor: colors.secondary,
     padding: 24,
-    height: '80%',
+    height: '90%',
   },
   title: {
     fontSize: 42,

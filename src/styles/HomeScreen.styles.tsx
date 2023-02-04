@@ -133,6 +133,12 @@ const styles = StyleSheet.create({
     width: '60%',
     paddingHorizontal: 50,
   },
+  saveTripLocationHeaderContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'center',
+    paddingVertical: 2,
+  },
   saveTripHeaderContainer: {
     flexDirection: 'row',
     width: '100%',

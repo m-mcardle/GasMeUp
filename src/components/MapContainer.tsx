@@ -31,6 +31,8 @@ interface Props {
 
 export default function MapContainer({ data, showUserLocation, waypoints }: Props) {
   const [globalState] = useGlobalState();
+  const hasUserLocation = globalState.userLocation.lat && globalState.userLocation.lng;
+
   const latDelta = Math.abs(data.start.lat - data.end.lat) * 1.5;
   const lngDelta = Math.abs(data.start.lng - data.end.lng) * 1.5;
 
@@ -69,7 +71,7 @@ export default function MapContainer({ data, showUserLocation, waypoints }: Prop
             title="End"
             description="End Location of Trip"
           />
-          {showUserLocation && (
+          {showUserLocation && hasUserLocation && (
             <Marker
               coordinate={{
                 latitude: globalState.userLocation.lat,

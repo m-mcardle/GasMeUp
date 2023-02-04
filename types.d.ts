@@ -21,11 +21,13 @@ interface CostRequest {
   gasPrice: number,
   start: {
     lat: number,
-    lng: number
+    lng: number,
+    address: string,
   },
   end: {
     lat: number,
-    lng: number
+    lng: number,
+    address: string,
   }
 }
 
@@ -42,4 +44,9 @@ interface InputState {
 interface Locations {
   startLocation: string,
   endLocation: string
+}
+
+interface LatLng {
+  lat: number,
+  lng: number
 }

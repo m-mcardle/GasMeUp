@@ -80,10 +80,12 @@ export default function HomeScreen() {
       start: {
         lat: 0,
         lng: 0,
+        address: '',
       },
       end: {
         lat: 0,
         lng: 0,
+        address: '',
       },
     },
   );
@@ -140,7 +142,11 @@ export default function HomeScreen() {
 
     Keyboard.dismiss();
     setCostRequest({
-      loading: true, distance: 0, gasPrice: 0, start: { lat: 0, lng: 0 }, end: { lat: 0, lng: 0 },
+      loading: true,
+      distance: 0,
+      gasPrice: 0,
+      start: { lat: 0, lng: 0, address: '' },
+      end: { lat: 0, lng: 0, address: '' },
     });
 
     const parsedStartLocation = startLocation === 'Current Location' ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : startLocation;
@@ -151,6 +157,8 @@ export default function HomeScreen() {
 
       if (!distanceResponse?.ok || !distanceResponse) {
         console.log(`Request for distance failed (${distanceResponse.status})`);
+        setEndLocationError(true);
+        setStartLocationError(true);
         throw new Error(`Request for distance failed (${distanceResponse.status})`);
       }
 
@@ -199,8 +207,8 @@ export default function HomeScreen() {
         loading: false,
         distance: 0,
         gasPrice: 0,
-        start: { lat: 0, lng: 0 },
-        end: { lat: 0, lng: 0 },
+        start: { lat: 0, lng: 0, address: '' },
+        end: { lat: 0, lng: 0, address: '' },
       });
     }
     return null;
@@ -261,6 +269,8 @@ export default function HomeScreen() {
   // Represents if the user has entered all the required data to save a trip's cost
   const canSaveTrip = tripCalculated && !!user;
 
+  const shouldShowUserLocation = startLocation !== 'Current Location' && endLocation !== 'Current Location';
+
   const endLocationRef = useRef<TextInput>(null);
   return (
     <Page>
@@ -283,8 +293,9 @@ export default function HomeScreen() {
             distance={distance}
             gasPrice={gasPrice}
             riders={riders}
-            start={startLocation}
-            end={endLocation}
+            start={start.address}
+            end={end.address}
+            waypoints={waypoints}
             gasMileage={GAS_MILEAGE}
             closeModal={() => setModalVisible(false)}
           />
@@ -301,7 +312,7 @@ export default function HomeScreen() {
               end,
             }}
             waypoints={waypoints}
-            showUserLocation={!(startLocation === 'Current Location' || endLocation === 'Current Location') && globalState.userLocation.latitude}
+            showUserLocation={shouldShowUserLocation}
           />
         </Modal>
       </Portal>

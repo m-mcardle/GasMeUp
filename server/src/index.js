@@ -69,8 +69,14 @@ async function GetDistanceV2(startLocation, endLocation) {
 
     const route = data.routes[0].legs[0];
     const distance = route.distance.value / 1000;
-    const end = route.end_location;
-    const start = route.start_location;
+    const end = {
+      ...route.end_location,
+      address: route.end_address,
+    };
+    const start = {
+      ...route.start_location,
+      address: route.start_address,
+    };
 
     return {
       distance,

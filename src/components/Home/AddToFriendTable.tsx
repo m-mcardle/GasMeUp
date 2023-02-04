@@ -19,7 +19,7 @@ import Button from '../Button';
 
 // Styles
 import styles from '../../styles/HomeScreen.styles';
-import { colors, globalStyles } from '../../styles/styles';
+import { boldFont, colors, globalStyles } from '../../styles/styles';
 
 function RowBuilder(selectedFriend: DocumentData, setSelectedFriend: Function) {
   function Row({ firstName, lastName, uid }: DocumentData) {
@@ -58,11 +58,12 @@ interface Props {
   distance: number,
   riders: number,
   gasMileage: number,
+  waypoints: Array<LatLng>,
   closeModal: Function,
 }
 
 export default function AddToFriendTable({
-  start, end, cost, gasPrice, distance, riders, closeModal, gasMileage,
+  start, end, cost, gasPrice, distance, riders, closeModal, gasMileage, waypoints,
 }: Props) {
   const [selectedFriend, setSelectedFriend] = useState<DocumentData>({});
 
@@ -101,6 +102,7 @@ export default function AddToFriendTable({
         date: new Date(),
         creator: currentUser.uid,
         users: [currentUser.uid, friend.uid],
+        waypoints,
       });
       closeModal();
     } catch (exception) {
@@ -117,22 +119,60 @@ export default function AddToFriendTable({
     { text: 'Add', numeric: true },
   ];
 
+  const truncatedStart = start.length > 20 ? `${start.substring(0, 50)}...` : start;
+  const truncatedEnd = end.length > 20 ? `${end.substring(0, 50)}...` : end;
+
   return (
     <>
       <Text style={globalStyles.title}>Save Trip</Text>
       <View style={styles.saveTripHeaderContainer}>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+            {'Cost: '}
+          </Text>
+          <Text style={globalStyles.smallText}>
+            {`$${cost.toFixed(2)}`}
+          </Text>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+            {'Distance: '}
+          </Text>
+          <Text style={globalStyles.smallText}>
+            {`${distance.toFixed(1)}km`}
+          </Text>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+            {'Gas Used: '}
+          </Text>
+          <Text style={globalStyles.smallText}>
+            {`${((distance * gasMileage) / 100).toFixed(1)}L`}
+          </Text>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+            {'Gas Price: '}
+          </Text>
+          <Text style={globalStyles.smallText}>
+            {`$${gasPrice.toFixed(2)}/L`}
+          </Text>
+        </View>
+      </View>
+      <View style={styles.saveTripLocationHeaderContainer}>
+        <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+          {'Start: '}
+        </Text>
         <Text style={globalStyles.smallText}>
-          {`Start: ${start}`}
+          {truncatedStart}
         </Text>
       </View>
-      <View style={styles.saveTripHeaderContainer}>
-        <Text style={globalStyles.smallText}>
-          {`End: ${end}`}
+      <View style={styles.saveTripLocationHeaderContainer}>
+        <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+          {'End: '}
         </Text>
-      </View>
-      <View style={styles.saveTripHeaderContainer}>
         <Text style={globalStyles.smallText}>
-          {`Cost: $${cost.toFixed(2)}`}
+          {truncatedEnd}
         </Text>
       </View>
       <Table
