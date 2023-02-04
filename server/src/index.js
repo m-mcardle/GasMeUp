@@ -14,6 +14,7 @@ const { CanadianGasPriceRequest, AmericanGasPriceRequest, GasPricesRequest } = r
 const { GasCostForDistance } = require('./calculations/fuel');
 
 const { Log, LogError } = require('./utils/console');
+const { validateAPIKey } = require('./utils/validation');
 
 dotenv.config();
 
@@ -134,6 +135,11 @@ Express API Endpoints
 
 // Handle GET requests for total gas cost for a trip
 app.get('/trip-cost', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ?? 'Toronto';
   const manualGasPrice = req.query?.price ?? '';
@@ -159,6 +165,11 @@ app.get('/trip-cost', async (req, res) => {
 
 // Handle autocomplete suggestions for locations
 app.get('/suggestions', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
   const input = req.query?.input ?? 'Toronto';
   const sessionId = req.query?.session;
   res.set('Access-Control-Allow-Origin', '*');
@@ -175,6 +186,11 @@ app.get('/suggestions', async (req, res) => {
 
 // Handle request for distances
 app.get('/distance', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ?? 'Toronto';
 
@@ -197,6 +213,11 @@ app.get('/distance', async (req, res) => {
 
 // Handle GET requests to /gas-price route, provide list of gas prices of all provinces in Canada
 app.get('/gas-prices', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
   res.set('Access-Control-Allow-Origin', '*');
   try {
     const gasPrices = await GetGasPrice();
@@ -208,6 +229,11 @@ app.get('/gas-prices', async (req, res) => {
 });
 
 app.get('/gas', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
   const country = req.query?.country ?? 'CA';
   const region = req.query?.region ?? 'Ontario';
 
