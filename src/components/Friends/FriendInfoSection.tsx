@@ -155,7 +155,7 @@ export default function FriendInfoSection({
       <DataTable>
         <DataTable.Header>
           <DataTable.Title style={{ maxWidth: '8%' }}> </DataTable.Title>
-          <DataTable.Title style={{ minWidth: '30%' }}>Start/End</DataTable.Title>
+          <DataTable.Title style={{ minWidth: '35%' }}>Start/End</DataTable.Title>
           <DataTable.Title numeric>Date</DataTable.Title>
           <DataTable.Title numeric>Amount</DataTable.Title>
         </DataTable.Header>
@@ -173,17 +173,17 @@ export default function FriendInfoSection({
               >
                 {transaction?.waypoints?.length > 0 && <Ionicons name="map" size={12} color={colors.action} />}
               </DataTable.Cell>
-              <DataTable.Cell style={{ minWidth: '30%' }}>
+              <DataTable.Cell style={{ minWidth: '35%' }}>
                 <View style={{ justifyContent: 'center' }}>
-                  <Text style={{ fontSize: 10 }}>
-                    {`Start: ${(transaction.startLocation.length > 20 ? `${transaction.startLocation.substring(0, 20)}...` : transaction.startLocation)}`}
+                  <Text style={{ fontSize: 8 }}>
+                    {`Start: ${(transaction.startLocation.length > 30 ? `${transaction.startLocation.substring(0, 30)}...` : transaction.startLocation)}`}
                   </Text>
-                  <Text style={{ fontSize: 10, paddingTop: 4 }}>
-                    {`End: ${(transaction.endLocation.length > 20 ? `${transaction.endLocation.substring(0, 20)}...` : transaction.endLocation)}`}
+                  <Text style={{ fontSize: 8, paddingTop: 4 }}>
+                    {`End: ${(transaction.endLocation.length > 30 ? `${transaction.endLocation.substring(0, 30)}...` : transaction.endLocation)}`}
                   </Text>
                 </View>
               </DataTable.Cell>
-              <DataTable.Cell textStyle={{ fontSize: 10 }} numeric>
+              <DataTable.Cell textStyle={{ fontSize: 8 }} numeric>
                 {transaction.date.toDate().toLocaleDateString()}
               </DataTable.Cell>
               <DataTable.Cell textStyle={{ fontSize: 10 }} numeric>

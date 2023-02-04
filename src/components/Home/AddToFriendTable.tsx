@@ -125,6 +125,22 @@ export default function AddToFriendTable({
   return (
     <>
       <Text style={globalStyles.title}>Save Trip</Text>
+      <View style={styles.saveTripLocationHeaderContainer}>
+        <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+          {'Start: '}
+        </Text>
+        <Text style={globalStyles.smallText}>
+          {truncatedStart}
+        </Text>
+      </View>
+      <View style={styles.saveTripLocationHeaderContainer}>
+        <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+          {'End: '}
+        </Text>
+        <Text style={globalStyles.smallText}>
+          {truncatedEnd}
+        </Text>
+      </View>
       <View style={styles.saveTripHeaderContainer}>
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
@@ -142,6 +158,8 @@ export default function AddToFriendTable({
             {`${distance.toFixed(1)}km`}
           </Text>
         </View>
+      </View>
+      <View style={styles.saveTripHeaderContainer}>
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
             {'Gas Used: '}
@@ -159,22 +177,6 @@ export default function AddToFriendTable({
           </Text>
         </View>
       </View>
-      <View style={styles.saveTripLocationHeaderContainer}>
-        <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
-          {'Start: '}
-        </Text>
-        <Text style={globalStyles.smallText}>
-          {truncatedStart}
-        </Text>
-      </View>
-      <View style={styles.saveTripLocationHeaderContainer}>
-        <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
-          {'End: '}
-        </Text>
-        <Text style={globalStyles.smallText}>
-          {truncatedEnd}
-        </Text>
-      </View>
       <Table
         title=""
         itemsPerPage={5}
@@ -186,19 +188,19 @@ export default function AddToFriendTable({
       <View style={styles.saveTripButtonSection}>
         <Button
           disabled={!selectedFriend.uid}
-          style={{ borderColor: colors.red, ...styles.addToFriendButton }}
+          style={{ ...styles.addToFriendButton, backgroundColor: colors.red }}
           onPress={() => addCostToFriend(selectedFriend, true)}
         >
-          <Text style={{ ...globalStyles.smallText, color: colors.primary }}>
+          <Text style={{ ...globalStyles.smallText, color: colors.white }}>
             Owed by you
           </Text>
         </Button>
         <Button
           disabled={!selectedFriend.uid}
-          style={{ borderColor: colors.green, ...styles.addToFriendButton }}
+          style={{ ...styles.addToFriendButton, backgroundColor: colors.green }}
           onPress={() => addCostToFriend(selectedFriend, false)}
         >
-          <Text style={{ ...globalStyles.smallText, color: colors.primary }}>
+          <Text style={{ ...globalStyles.smallText, color: colors.white }}>
             Paid by you
           </Text>
         </Button>
