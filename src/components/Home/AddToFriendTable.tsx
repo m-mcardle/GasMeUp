@@ -119,8 +119,8 @@ export default function AddToFriendTable({
     { text: 'Add', numeric: true },
   ];
 
-  const truncatedStart = start.length > 20 ? `${start.substring(0, 50)}...` : start;
-  const truncatedEnd = end.length > 20 ? `${end.substring(0, 50)}...` : end;
+  const truncatedStart = start.length > 50 ? `${start.substring(0, 50)}...` : start;
+  const truncatedEnd = end.length > 50 ? `${end.substring(0, 50)}...` : end;
 
   return (
     <>

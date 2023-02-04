@@ -105,6 +105,13 @@ export const globalStyles = StyleSheet.create({
     padding: 24,
     height: '90%',
   },
+  miniModal: {
+    backgroundColor: colors.softBlack,
+    borderWidth: 4,
+    borderColor: colors.secondary,
+    padding: 24,
+    height: '80%',
+  },
   title: {
     fontSize: 42,
     fontFamily: boldFont,

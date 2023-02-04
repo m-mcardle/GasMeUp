@@ -26,7 +26,7 @@ interface MapData {
 interface Props {
   data: MapData;
   showUserLocation: boolean;
-  waypoints: any,
+  waypoints: Array<Location>,
 }
 
 export default function MapContainer({ data, showUserLocation, waypoints }: Props) {
@@ -82,7 +82,7 @@ export default function MapContainer({ data, showUserLocation, waypoints }: Prop
               pinColor="blue"
             />
           )}
-          <Polyline coordinates={waypoints} strokeWidth={2} strokeColor="red" />
+          {waypoints.length > 0 && <Polyline coordinates={waypoints} strokeWidth={2} strokeColor="red" />}
         </MapView>
       </View>
     </View>

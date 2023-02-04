@@ -50,3 +50,8 @@ interface LatLng {
   lat: number,
   lng: number
 }
+
+interface Location {
+  latitude: number,
+  longitude: number,
+}

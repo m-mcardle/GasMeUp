@@ -1,3 +1,11 @@
+// Waypoints are required to be in latitude/longitude format
+// whereas the API returns them in lat/lng format
+// --- This can be used to convert back to lat/lng ---
+export const locationToLatLng = (location: Location) => ({
+  lat: location.latitude,
+  lng: location.longitude,
+});
+
 export const customMapStyle = [
   {
     elementType: 'geometry',
