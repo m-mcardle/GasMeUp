@@ -316,9 +316,6 @@ export default function HomeScreen() {
           />
         </Modal>
       </Portal>
-      <View style={styles.container}>
-        <Text style={globalStyles.title}>⛽️ Gas Me Up 💸</Text>
-      </View>
       <View style={styles.dataContainer}>
         <StatsSection
           loading={loading}

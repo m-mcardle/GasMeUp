@@ -62,6 +62,7 @@ export default function MapContainer({ data, showUserLocation, waypoints }: Prop
             }}
             title="Start"
             description="Start Location of Trip"
+            pinColor="#BF00FF"
           />
           <Marker
             coordinate={{
@@ -70,6 +71,7 @@ export default function MapContainer({ data, showUserLocation, waypoints }: Prop
             }}
             title="End"
             description="End Location of Trip"
+            pinColor="#BF00FF"
           />
           {showUserLocation && hasUserLocation && (
             <Marker
@@ -82,7 +84,7 @@ export default function MapContainer({ data, showUserLocation, waypoints }: Prop
               pinColor="blue"
             />
           )}
-          {waypoints.length > 0 && <Polyline coordinates={waypoints} strokeWidth={2} strokeColor="red" />}
+          {waypoints.length > 0 && <Polyline coordinates={waypoints} strokeWidth={2} strokeColor="#BF00FF" />}
         </MapView>
       </View>
     </View>

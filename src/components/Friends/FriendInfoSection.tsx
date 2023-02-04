@@ -187,7 +187,7 @@ export default function FriendInfoSection({
                 {transaction.date.toDate().toLocaleDateString()}
               </DataTable.Cell>
               <DataTable.Cell textStyle={{ fontSize: 10 }} numeric>
-                {`$${transaction.amount * (transaction.payeeUID === currentUser?.uid ? 1 : -1)}`}
+                {`$${(transaction.amount * (transaction.payeeUID === currentUser?.uid ? 1 : -1)).toFixed(2)}`}
               </DataTable.Cell>
             </DataTable.Row>
           ))}
