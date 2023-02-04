@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.7](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.6...v1.0.7) (2023-02-04)
+
+* Localized gas prices
+* Debounced/Throttled suggestions
+* Layout tweaks
+* Stored waypoints
+* ENV helper
+
 ### [1.0.6](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.5...v1.0.6) (2023-02-03)
 
 * Map View
