@@ -65,7 +65,13 @@ async function GetDistanceV2(startLocation, endLocation) {
 
     const { data } = response;
     if (data.status !== 'OK') {
-      throw Error(`Invalid Request to Google (${data.status})`);
+      if (data.status === 'ZERO_RESULTS') {
+        throw Error('Route not found', { cause: 404 });
+      } else if (data.status === 'NOT_FOUND') {
+        throw Error('Location not found', { cause: 404 });
+      } else {
+        throw Error(`An unknown error occurred (${data.status})`, { cause: 500 });
+      }
     }
 
     const route = data.routes[0].legs[0];
@@ -207,7 +213,7 @@ app.get('/distance', async (req, res) => {
     });
   } catch (exception) {
     LogError(exception);
-    res.status(500).send({ error: exception });
+    res.status(exception.cause ?? 500).send({ error: exception.message });
   }
 });
 

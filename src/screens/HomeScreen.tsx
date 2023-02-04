@@ -159,7 +159,8 @@ export default function HomeScreen() {
         console.log(`Request for distance failed (${distanceResponse.status})`);
         setEndLocationError(true);
         setStartLocationError(true);
-        throw new Error(`Request for distance failed (${distanceResponse.status})`);
+        const { error } = await distanceResponse.json();
+        throw new Error(`Error: ${error} (${distanceResponse.status})`);
       }
 
       const {
@@ -375,6 +376,7 @@ export default function HomeScreen() {
               name="ios-location"
               size={30}
               color={colors.secondary}
+              disabled={!globalState.userLocation.lat || !globalState.userLocation.lng}
               onPress={() => updateStartLocation('Current Location')}
             />
            )}
@@ -396,6 +398,7 @@ export default function HomeScreen() {
               name="ios-location"
               size={30}
               color={colors.secondary}
+              disabled={!globalState.userLocation.lat || !globalState.userLocation.lng}
               onPress={() => updateEndLocation('Current Location')}
             />
            )}

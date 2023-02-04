@@ -17,6 +17,9 @@ import Table from '../Table';
 import Text from '../Text';
 import Button from '../Button';
 
+// Global State
+import { useGlobalState } from '../../hooks/hooks';
+
 // Styles
 import styles from '../../styles/HomeScreen.styles';
 import { boldFont, colors, globalStyles } from '../../styles/styles';
@@ -65,6 +68,7 @@ interface Props {
 export default function AddToFriendTable({
   start, end, cost, gasPrice, distance, riders, closeModal, gasMileage, waypoints,
 }: Props) {
+  const [globalState] = useGlobalState();
   const [selectedFriend, setSelectedFriend] = useState<DocumentData>({});
 
   const [currentUser] = useAuthState(auth);
@@ -103,6 +107,7 @@ export default function AddToFriendTable({
         creator: currentUser.uid,
         users: [currentUser.uid, friend.uid],
         waypoints,
+        country: globalState.country,
       });
       closeModal();
     } catch (exception) {
@@ -121,6 +126,7 @@ export default function AddToFriendTable({
 
   const truncatedStart = start.length > 50 ? `${start.substring(0, 50)}...` : start;
   const truncatedEnd = end.length > 50 ? `${end.substring(0, 50)}...` : end;
+  const gasPriceString = globalState.country === 'CA' ? `$${gasPrice.toFixed(2)}/L` : `$${gasPrice.toFixed(2)}/gal`;
 
   return (
     <>
@@ -173,7 +179,7 @@ export default function AddToFriendTable({
             {'Gas Price: '}
           </Text>
           <Text style={globalStyles.smallText}>
-            {`$${gasPrice.toFixed(2)}/L`}
+            {gasPriceString}
           </Text>
         </View>
       </View>

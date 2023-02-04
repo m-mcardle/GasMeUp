@@ -156,7 +156,7 @@ export default function App() {
     <GlobalContext.Provider value={state}>
       <NavigationContainer>
         <Tab.Navigator
-          initialRouteName="Home"
+          initialRouteName="Add"
           screenOptions={({ route }: { route: any }) => ({
             headerShown: false,
             tabBarIcon: ({ focused, color, size }:
