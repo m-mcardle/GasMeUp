@@ -174,6 +174,12 @@ export default function HomeScreen() {
           longitude,
         };
       });
+
+      // Add the end location to the waypoints
+      newWaypoints.push({
+        latitude: newEnd.lat,
+        longitude: newEnd.lng,
+      });
       setWaypoints(newWaypoints);
 
       let newGasPrice = gasPrice;
