@@ -23,7 +23,8 @@ const styles = StyleSheet.create({
   costSection: {
     backgroundColor: colors.green,
     borderRadius: 5,
-    marginVertical: 10,
+    marginBottom: 10,
+    marginTop: 150,
     padding: 5,
     width: '100%',
     minHeight: 75,
@@ -64,9 +65,9 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   dataContainer: {
-    flex: 2,
+    flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
   },
   ridersSection: {
     flexDirection: 'row',
@@ -132,6 +133,12 @@ const styles = StyleSheet.create({
   calculateButton: {
     width: '60%',
     paddingHorizontal: 50,
+  },
+  saveTripLocationHeaderContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'center',
+    paddingVertical: 2,
   },
   saveTripHeaderContainer: {
     flexDirection: 'row',

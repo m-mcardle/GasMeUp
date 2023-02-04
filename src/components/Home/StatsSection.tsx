@@ -5,6 +5,9 @@ import {
 
 import { LinearGradient } from 'expo-linear-gradient';
 
+// Global State Stuff
+import { useGlobalState } from '../../hooks/hooks';
+
 // @ts-ignore
 import AdjustIcon from '../../../assets/AdjustButton.png';
 // @ts-ignore
@@ -37,6 +40,8 @@ export default function StatsSection(props: Props) {
     cost,
     openModal,
   } = props;
+  const [globalState] = useGlobalState();
+
   const fadeAnim = useRef(new Animated.Value(0.5)).current;
   const fadeIn = Animated.timing(fadeAnim, {
     toValue: 1,
@@ -65,6 +70,14 @@ export default function StatsSection(props: Props) {
     }
   }, [loading, fadeAnim]);
 
+  const gasPriceString = globalState.country === 'CA'
+    ? `$${gasPrice.toFixed(2)}/L`
+    : `$${gasPrice.toFixed(2)}/gal`;
+
+  const distanceString = globalState.country === 'CA'
+    ? `${distance.toFixed(2)} km`
+    : `${(distance * 0.621371).toFixed(2)} mi`;
+
   const safeRiders = riders < 1 ? 1 : riders;
   return (
     <View style={styles.statsSection}>
@@ -91,7 +104,7 @@ export default function StatsSection(props: Props) {
             ? <ActivityIndicator size="small" />
             : (
               <Text style={styles.statBoxText}>
-                {`Distance: ${distance.toFixed(2)} km`}
+                {`Distance: ${distanceString}`}
               </Text>
             )}
         </View>
@@ -101,7 +114,7 @@ export default function StatsSection(props: Props) {
             : (
               <>
                 <Text style={styles.statBoxText}>
-                  {`Gas: $${gasPrice.toFixed(2)}/L`}
+                  {`Gas: ${gasPriceString}`}
                 </Text>
                 <View>
                   <Image

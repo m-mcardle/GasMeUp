@@ -11,6 +11,7 @@ import {
   Inter_800ExtraBold,
   Inter_900Black,
 } from '@expo-google-fonts/inter';
+import * as Location from 'expo-location';
 
 // React imports
 import React, { useState, useMemo, useEffect } from 'react';
@@ -30,6 +31,9 @@ import FriendsScreen from './src/screens/FriendsScreen';
 
 // Styles
 import { colors } from './src/styles/styles';
+
+// Helpers
+import { lookupProvince } from './src/helpers/locationHelper';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -51,10 +55,10 @@ function TabIcon({
   let iconName: React.ComponentProps<typeof Ionicons>['name'] = 'ios-square';
 
   switch (name) {
-    case 'Home':
+    case 'Add':
       iconName = focused
-        ? 'ios-home'
-        : 'ios-home-outline';
+        ? 'ios-calculator'
+        : 'ios-calculator-outline';
       break;
     case 'Settings':
       iconName = focused
@@ -115,6 +119,35 @@ export default function App() {
     }
   }, [fontsLoaded]);
 
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission to access location was denied');
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      updateGlobalState('userLocation', {
+        lat: location.coords.latitude,
+        lng: location.coords.longitude,
+      });
+      const readableLocation = (await Location.reverseGeocodeAsync(location.coords))[0];
+
+      if (readableLocation.country === 'Canada') {
+        const provinceCode = lookupProvince(readableLocation.region ?? 'ON');
+        updateGlobalState('region', provinceCode);
+        updateGlobalState('country', 'CA');
+      } else if (readableLocation.country === 'United States') {
+        updateGlobalState('region', readableLocation.region);
+        updateGlobalState('country', 'US');
+      } else {
+        updateGlobalState('region', 'ON');
+        updateGlobalState('country', 'CA');
+      }
+    })();
+  }, []);
+
   if (!fontsLoaded) {
     return null;
   }
@@ -123,7 +156,7 @@ export default function App() {
     <GlobalContext.Provider value={state}>
       <NavigationContainer>
         <Tab.Navigator
-          initialRouteName="Home"
+          initialRouteName="Add"
           screenOptions={({ route }: { route: any }) => ({
             headerShown: false,
             tabBarIcon: ({ focused, color, size }:
@@ -141,7 +174,7 @@ export default function App() {
           })}
         >
           <Tab.Screen name="Friends" component={FriendsScreen} />
-          <Tab.Screen name="Home" component={HomeScreen} />
+          <Tab.Screen name="Add" component={HomeScreen} />
           <Tab.Screen name="Settings" component={SettingsScreen} />
         </Tab.Navigator>
       </NavigationContainer>

@@ -19,10 +19,9 @@ export const colors = {
   green: '#118C4F',
   darkGreen: '#1f584e',
   red: '#DC143C',
-  test: '#1BC3B9',
-  secondaryAction: '#B44E8F',
+  secondaryAction: '#7851a9',
   purple: '#22133c',
-  action: '#6f61fe',
+  action: '#603fef',
 };
 
 export const fonts = {
@@ -99,6 +98,13 @@ export const globalStyles = StyleSheet.create({
     maxHeight: '100%',
   },
   modal: {
+    backgroundColor: colors.softBlack,
+    borderWidth: 4,
+    borderColor: colors.secondary,
+    padding: 24,
+    height: '90%',
+  },
+  miniModal: {
     backgroundColor: colors.softBlack,
     borderWidth: 4,
     borderColor: colors.secondary,

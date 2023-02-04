@@ -43,4 +43,12 @@ if (process.env.NODE_ENV !== 'development') {
   initialSettings['Enable Requests'] = true;
 }
 
-export const initialState = initialSettings;
+export const initialState = {
+  ...initialSettings,
+  region: 'ON',
+  country: 'CA',
+  userLocation: {
+    lat: undefined,
+    lng: undefined,
+  },
+};

@@ -1,7 +1,9 @@
 import React from 'react';
 import { View } from 'react-native';
 
-import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
+
+import { useGlobalState } from '../hooks/hooks';
 
 import Text from './Text';
 
@@ -23,9 +25,14 @@ interface MapData {
 
 interface Props {
   data: MapData;
+  showUserLocation: boolean;
+  waypoints: Array<Location>,
 }
 
-export default function MapContainer({ data }: Props) {
+export default function MapContainer({ data, showUserLocation, waypoints }: Props) {
+  const [globalState] = useGlobalState();
+  const hasUserLocation = globalState.userLocation.lat && globalState.userLocation.lng;
+
   const latDelta = Math.abs(data.start.lat - data.end.lat) * 1.5;
   const lngDelta = Math.abs(data.start.lng - data.end.lng) * 1.5;
 
@@ -55,6 +62,7 @@ export default function MapContainer({ data }: Props) {
             }}
             title="Start"
             description="Start Location of Trip"
+            pinColor="#BF00FF"
           />
           <Marker
             coordinate={{
@@ -63,7 +71,20 @@ export default function MapContainer({ data }: Props) {
             }}
             title="End"
             description="End Location of Trip"
+            pinColor="#BF00FF"
           />
+          {showUserLocation && hasUserLocation && (
+            <Marker
+              coordinate={{
+                latitude: globalState.userLocation.lat,
+                longitude: globalState.userLocation.lng,
+              }}
+              title="You"
+              description="Your Current Location"
+              pinColor="blue"
+            />
+          )}
+          {waypoints.length > 0 && <Polyline coordinates={waypoints} strokeWidth={2} strokeColor="#BF00FF" />}
         </MapView>
       </View>
     </View>

@@ -1,10 +1,10 @@
 // React
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Alert, ScrollView, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
-import { DataTable } from 'react-native-paper';
+import { DataTable, Modal, Portal } from 'react-native-paper';
 
 // Firebase
 import {
@@ -16,11 +16,15 @@ import { db, auth } from '../../../firebase';
 
 // Components
 import Text from '../Text';
+import Button from '../Button';
+import MapContainer from '../MapContainer';
 
 // Styles
 import styles from '../../styles/FriendsScreen.styles';
-import Button from '../Button';
-import { boldFont } from '../../styles/styles';
+import { colors, boldFont, globalStyles } from '../../styles/styles';
+
+// Helpers
+import { locationToLatLng } from '../../helpers/mapHelper';
 
 const transactionsRef = collection(db, 'Transactions');
 
@@ -35,6 +39,8 @@ export default function FriendInfoSection({
   uid, name, amount, close,
 }: Props) {
   const [currentUser] = useAuthState(auth);
+  const [visible, setVisible] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<DocumentData>({});
 
   const userDoc = currentUser?.uid ? doc(db, 'Users', currentUser?.uid) : undefined;
   const [userDocument] = useDocumentData(userDoc);
@@ -112,8 +118,32 @@ export default function FriendInfoSection({
     ? sortedTransactions.slice(0, lastSettleIndex)
     : sortedTransactions;
 
+  const transactionWaypoints = selectedTransaction.waypoints ?? [];
   return (
     <View style={{ height: '100%' }}>
+      <Portal>
+        <Modal
+          visible={visible}
+          onDismiss={() => setVisible(false)}
+        >
+          <View style={globalStyles.miniModal}>
+            {transactionWaypoints.length > 0 && (
+              <MapContainer
+                data={{
+                  start: {
+                    ...locationToLatLng(transactionWaypoints[0]),
+                  },
+                  end: {
+                    ...locationToLatLng(transactionWaypoints[transactionWaypoints.length - 1]),
+                  },
+                }}
+                showUserLocation={false}
+                waypoints={transactionWaypoints}
+              />
+            )}
+          </View>
+        </Modal>
+      </Portal>
       <Button
         style={styles.deleteFriendButton}
         onPress={showConfirmationAlert}
@@ -124,18 +154,40 @@ export default function FriendInfoSection({
 
       <DataTable>
         <DataTable.Header>
-          <DataTable.Title>Date</DataTable.Title>
+          <DataTable.Title style={{ maxWidth: '8%' }}> </DataTable.Title>
+          <DataTable.Title style={{ minWidth: '35%' }}>Start/End</DataTable.Title>
+          <DataTable.Title numeric>Date</DataTable.Title>
           <DataTable.Title numeric>Amount</DataTable.Title>
         </DataTable.Header>
 
         <ScrollView style={{ maxHeight: 300 }}>
           {transactionsSinceLastSettle?.map((transaction) => (
             <DataTable.Row key={transaction.payeeUID + transaction.amount + transaction.date}>
-              <DataTable.Cell>
+              <DataTable.Cell
+                style={{ maxWidth: '8%' }}
+                onPress={() => {
+                  setSelectedTransaction(transaction);
+                  setVisible(true);
+                }}
+                disabled={!(transaction?.waypoints?.length > 0)}
+              >
+                {transaction?.waypoints?.length > 0 && <Ionicons name="map" size={12} color={colors.action} />}
+              </DataTable.Cell>
+              <DataTable.Cell style={{ minWidth: '35%' }}>
+                <View style={{ justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 8 }}>
+                    {`Start: ${(transaction.startLocation.length > 30 ? `${transaction.startLocation.substring(0, 30)}...` : transaction.startLocation)}`}
+                  </Text>
+                  <Text style={{ fontSize: 8, paddingTop: 4 }}>
+                    {`End: ${(transaction.endLocation.length > 30 ? `${transaction.endLocation.substring(0, 30)}...` : transaction.endLocation)}`}
+                  </Text>
+                </View>
+              </DataTable.Cell>
+              <DataTable.Cell textStyle={{ fontSize: 8 }} numeric>
                 {transaction.date.toDate().toLocaleDateString()}
               </DataTable.Cell>
-              <DataTable.Cell numeric>
-                {`$${transaction.amount * (transaction.payeeUID === currentUser?.uid ? 1 : -1)}`}
+              <DataTable.Cell textStyle={{ fontSize: 10 }} numeric>
+                {`$${(transaction.amount * (transaction.payeeUID === currentUser?.uid ? 1 : -1)).toFixed(2)}`}
               </DataTable.Cell>
             </DataTable.Row>
           ))}
@@ -143,7 +195,7 @@ export default function FriendInfoSection({
 
         <DataTable.Row>
           <DataTable.Cell textStyle={{ fontFamily: boldFont }}>
-            Total
+            Balance
           </DataTable.Cell>
           <DataTable.Cell textStyle={{ fontFamily: boldFont }} numeric>
             {`$${amount.toFixed(2)}`}
