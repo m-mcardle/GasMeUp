@@ -55,10 +55,10 @@ function TabIcon({
   let iconName: React.ComponentProps<typeof Ionicons>['name'] = 'ios-square';
 
   switch (name) {
-    case 'Home':
+    case 'Add':
       iconName = focused
-        ? 'ios-home'
-        : 'ios-home-outline';
+        ? 'ios-calculator'
+        : 'ios-calculator-outline';
       break;
     case 'Settings':
       iconName = focused
@@ -174,7 +174,7 @@ export default function App() {
           })}
         >
           <Tab.Screen name="Friends" component={FriendsScreen} />
-          <Tab.Screen name="Home" component={HomeScreen} />
+          <Tab.Screen name="Add" component={HomeScreen} />
           <Tab.Screen name="Settings" component={SettingsScreen} />
         </Tab.Navigator>
       </NavigationContainer>
