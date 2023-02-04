@@ -1,3 +1,5 @@
+import Constants from 'expo-constants';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { initializeApp } from 'firebase/app';
@@ -10,7 +12,7 @@ console.log('Firebase environment:', DEVELOPMENT ? 'development' : 'production')
 
 const firebaseConfig = DEVELOPMENT
   ? {
-    apiKey: 'AIzaSyDxBb15kMpTmnBMr1tSIa7bAPMO7UJY8AY',
+    apiKey: Constants.expoConfig.extra.firebaseAPIKey,
     authDomain: 'northern-bot-301518.firebaseapp.com',
     projectId: 'northern-bot-301518',
     storageBucket: 'northern-bot-301518.appspot.com',
@@ -19,7 +21,7 @@ const firebaseConfig = DEVELOPMENT
     measurementId: 'G-57EGQKLV9R',
   }
   : {
-    apiKey: 'AIzaSyDmj7G5YZg0TW_WAdma4ETOTUMjeocEJmg',
+    apiKey: Constants.expoConfig.extra.prodFirebaseAPIKey,
     authDomain: 'gasmeup-7ce5f.firebaseapp.com',
     projectId: 'gasmeup-7ce5f',
     storageBucket: 'gasmeup-7ce5f.appspot.com',

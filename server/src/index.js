@@ -9,11 +9,12 @@ const {
   Directions,
   mockLocations,
 } = require('./queries/google');
-const { GasPriceRequest, GasPricesRequest } = require('./queries/gasprice');
+const { CanadianGasPriceRequest, AmericanGasPriceRequest, GasPricesRequest } = require('./queries/gasprice');
 
 const { GasCostForDistance } = require('./calculations/fuel');
 
 const { Log, LogError } = require('./utils/console');
+const { validateAPIKey } = require('./utils/validation');
 
 dotenv.config();
 
@@ -64,18 +65,31 @@ async function GetDistanceV2(startLocation, endLocation) {
 
     const { data } = response;
     if (data.status !== 'OK') {
-      throw Error(`Invalid Request to Google (${data.status})`);
+      if (data.status === 'ZERO_RESULTS') {
+        throw Error('Route not found', { cause: 404 });
+      } else if (data.status === 'NOT_FOUND') {
+        throw Error('Location not found', { cause: 404 });
+      } else {
+        throw Error(`An unknown error occurred (${data.status})`, { cause: 500 });
+      }
     }
 
     const route = data.routes[0].legs[0];
     const distance = route.distance.value / 1000;
-    const end = route.end_location;
-    const start = route.start_location;
+    const end = {
+      ...route.end_location,
+      address: route.end_address,
+    };
+    const start = {
+      ...route.start_location,
+      address: route.start_address,
+    };
 
     return {
       distance,
       end,
       start,
+      data,
     };
   }
 
@@ -109,9 +123,9 @@ async function GetSuggestions(input, sessionId) {
   return mockLocations.predictions.map((el) => el.description);
 }
 
-async function GetGasPrice(province) {
-  if (province) {
-    const { data } = await api(GasPriceRequest(province));
+async function GetGasPrice(country, region) {
+  if (region) {
+    const { data } = await api(country === 'US' ? AmericanGasPriceRequest(region) : CanadianGasPriceRequest(region));
     const { price } = data;
     return price;
   }
@@ -127,6 +141,11 @@ Express API Endpoints
 
 // Handle GET requests for total gas cost for a trip
 app.get('/trip-cost', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ?? 'Toronto';
   const manualGasPrice = req.query?.price ?? '';
@@ -152,6 +171,11 @@ app.get('/trip-cost', async (req, res) => {
 
 // Handle autocomplete suggestions for locations
 app.get('/suggestions', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
   const input = req.query?.input ?? 'Toronto';
   const sessionId = req.query?.session;
   res.set('Access-Control-Allow-Origin', '*');
@@ -168,24 +192,38 @@ app.get('/suggestions', async (req, res) => {
 
 // Handle request for distances
 app.get('/distance', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ?? 'Toronto';
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const { distance, start, end } = await GetDistanceV2(startLocation, endLocation);
+    const {
+      distance, start, end, data,
+    } = await GetDistanceV2(startLocation, endLocation);
 
     Log(`[distance] Distance: ${distance}km`);
     Log(`[distance] Start: ${start.lat}/${start.lng},\tEnd: ${end.lat}/${end.lng}`);
-    res.json({ distance, start, end });
+    res.json({
+      distance, start, end, data,
+    });
   } catch (exception) {
     LogError(exception);
-    res.status(500).send({ error: exception });
+    res.status(exception.cause ?? 500).send({ error: exception.message });
   }
 });
 
 // Handle GET requests to /gas-price route, provide list of gas prices of all provinces in Canada
 app.get('/gas-prices', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
   res.set('Access-Control-Allow-Origin', '*');
   try {
     const gasPrices = await GetGasPrice();
@@ -197,11 +235,17 @@ app.get('/gas-prices', async (req, res) => {
 });
 
 app.get('/gas', async (req, res) => {
-  const province = req.query?.province ?? 'Ontario';
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
+  const country = req.query?.country ?? 'CA';
+  const region = req.query?.region ?? 'Ontario';
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const gasPrice = await GetGasPrice(province);
+    const gasPrice = await GetGasPrice(country, region);
     Log(`[gas] Gas Price: $${gasPrice}`);
     res.json({ price: gasPrice });
   } catch (exception) {

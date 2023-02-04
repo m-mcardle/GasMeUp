@@ -17,9 +17,12 @@ import Table from '../Table';
 import Text from '../Text';
 import Button from '../Button';
 
+// Global State
+import { useGlobalState } from '../../hooks/hooks';
+
 // Styles
 import styles from '../../styles/HomeScreen.styles';
-import { colors, globalStyles } from '../../styles/styles';
+import { boldFont, colors, globalStyles } from '../../styles/styles';
 
 function RowBuilder(selectedFriend: DocumentData, setSelectedFriend: Function) {
   function Row({ firstName, lastName, uid }: DocumentData) {
@@ -58,12 +61,14 @@ interface Props {
   distance: number,
   riders: number,
   gasMileage: number,
+  waypoints: Array<LatLng>,
   closeModal: Function,
 }
 
 export default function AddToFriendTable({
-  start, end, cost, gasPrice, distance, riders, closeModal, gasMileage,
+  start, end, cost, gasPrice, distance, riders, closeModal, gasMileage, waypoints,
 }: Props) {
+  const [globalState] = useGlobalState();
   const [selectedFriend, setSelectedFriend] = useState<DocumentData>({});
 
   const [currentUser] = useAuthState(auth);
@@ -101,6 +106,8 @@ export default function AddToFriendTable({
         date: new Date(),
         creator: currentUser.uid,
         users: [currentUser.uid, friend.uid],
+        waypoints,
+        country: globalState.country,
       });
       closeModal();
     } catch (exception) {
@@ -117,23 +124,64 @@ export default function AddToFriendTable({
     { text: 'Add', numeric: true },
   ];
 
+  const truncatedStart = start.length > 50 ? `${start.substring(0, 50)}...` : start;
+  const truncatedEnd = end.length > 50 ? `${end.substring(0, 50)}...` : end;
+  const gasPriceString = globalState.country === 'CA' ? `$${gasPrice.toFixed(2)}/L` : `$${gasPrice.toFixed(2)}/gal`;
+
   return (
     <>
       <Text style={globalStyles.title}>Save Trip</Text>
-      <View style={styles.saveTripHeaderContainer}>
+      <View style={styles.saveTripLocationHeaderContainer}>
+        <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+          {'Start: '}
+        </Text>
         <Text style={globalStyles.smallText}>
-          {`Start: ${start}`}
+          {truncatedStart}
+        </Text>
+      </View>
+      <View style={styles.saveTripLocationHeaderContainer}>
+        <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+          {'End: '}
+        </Text>
+        <Text style={globalStyles.smallText}>
+          {truncatedEnd}
         </Text>
       </View>
       <View style={styles.saveTripHeaderContainer}>
-        <Text style={globalStyles.smallText}>
-          {`End: ${end}`}
-        </Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+            {'Cost: '}
+          </Text>
+          <Text style={globalStyles.smallText}>
+            {`$${cost.toFixed(2)}`}
+          </Text>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+            {'Distance: '}
+          </Text>
+          <Text style={globalStyles.smallText}>
+            {`${distance.toFixed(1)}km`}
+          </Text>
+        </View>
       </View>
       <View style={styles.saveTripHeaderContainer}>
-        <Text style={globalStyles.smallText}>
-          {`Cost: $${cost.toFixed(2)}`}
-        </Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+            {'Gas Used: '}
+          </Text>
+          <Text style={globalStyles.smallText}>
+            {`${((distance * gasMileage) / 100).toFixed(1)}L`}
+          </Text>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+            {'Gas Price: '}
+          </Text>
+          <Text style={globalStyles.smallText}>
+            {gasPriceString}
+          </Text>
+        </View>
       </View>
       <Table
         title=""
@@ -146,19 +194,19 @@ export default function AddToFriendTable({
       <View style={styles.saveTripButtonSection}>
         <Button
           disabled={!selectedFriend.uid}
-          style={{ borderColor: colors.red, ...styles.addToFriendButton }}
+          style={{ ...styles.addToFriendButton, backgroundColor: colors.red }}
           onPress={() => addCostToFriend(selectedFriend, true)}
         >
-          <Text style={{ ...globalStyles.smallText, color: colors.primary }}>
+          <Text style={{ ...globalStyles.smallText, color: colors.white }}>
             Owed by you
           </Text>
         </Button>
         <Button
           disabled={!selectedFriend.uid}
-          style={{ borderColor: colors.green, ...styles.addToFriendButton }}
+          style={{ ...styles.addToFriendButton, backgroundColor: colors.green }}
           onPress={() => addCostToFriend(selectedFriend, false)}
         >
-          <Text style={{ ...globalStyles.smallText, color: colors.primary }}>
+          <Text style={{ ...globalStyles.smallText, color: colors.white }}>
             Paid by you
           </Text>
         </Button>

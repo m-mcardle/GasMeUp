@@ -3,7 +3,6 @@
 * Get session tokens working (might b impossible)
 * Implement db to store cached queries
 * Highway vs City driving
-* Get user location and use that as input
 *
 */
 
@@ -26,6 +25,7 @@ import {
   Portal, Modal,
 } from 'react-native-paper';
 
+import { throttle, debounce } from 'throttle-debounce';
 import uuid from 'react-native-uuid';
 
 // Firebase
@@ -80,13 +80,16 @@ export default function HomeScreen() {
       start: {
         lat: 0,
         lng: 0,
+        address: '',
       },
       end: {
         lat: 0,
         lng: 0,
+        address: '',
       },
     },
   );
+  const [waypoints, setWaypoints] = useState<any>([]);
   const [customGasPrice, setCustomGasPrice] = useState<number>(1.5);
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
@@ -102,7 +105,11 @@ export default function HomeScreen() {
 
   const GAS_MILEAGE = globalState['Gas Mileage'];
 
-  const cost = ((distance * GAS_MILEAGE) / 100) * gasPrice;
+  const cost = (
+    ((distance * GAS_MILEAGE) / 100) // This get's the L of gas used
+    * gasPrice // This gets the cost of the gas used
+    * (globalState.country === 'CA' ? 1 : 0.2641729) // This converts the cost based on if the gas price is MPG or L/100km
+  );
 
   const setGasPrice = (newPrice: number) => {
     setCostRequest((state) => ({ ...state, gasPrice: newPrice }));
@@ -135,22 +142,51 @@ export default function HomeScreen() {
 
     Keyboard.dismiss();
     setCostRequest({
-      loading: true, distance: 0, gasPrice: 0, start: { lat: 0, lng: 0 }, end: { lat: 0, lng: 0 },
+      loading: true,
+      distance: 0,
+      gasPrice: 0,
+      start: { lat: 0, lng: 0, address: '' },
+      end: { lat: 0, lng: 0, address: '' },
     });
 
+    const parsedStartLocation = startLocation === 'Current Location' ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : startLocation;
+    const parsedEndLocation = endLocation === 'Current Location' ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : endLocation;
+
     try {
-      const distanceResponse = await fetchData(`/distance/?start=${startLocation}&end=${endLocation}`, !globalState['Enable Requests']);
+      const distanceResponse = await fetchData(`/distance/?start=${parsedStartLocation}&end=${parsedEndLocation}`, !globalState['Enable Requests']);
 
       if (!distanceResponse?.ok || !distanceResponse) {
         console.log(`Request for distance failed (${distanceResponse.status})`);
-        throw new Error(`Request for distance failed (${distanceResponse.status})`);
+        setEndLocationError(true);
+        setStartLocationError(true);
+        const { error } = await distanceResponse.json();
+        throw new Error(`Error: ${error} (${distanceResponse.status})`);
       }
 
-      const { distance: newDistance, start: newStart, end: newEnd } = await distanceResponse.json();
+      const {
+        distance: newDistance, start: newStart, end: newEnd, data: routeData,
+      } = await distanceResponse.json();
+
+      const { steps } = routeData.routes[0].legs[0];
+      const newWaypoints = steps.map((step: any) => {
+        const { lat: latitude, lng: longitude } = step.start_location;
+        return {
+          latitude,
+          longitude,
+        };
+      });
+
+      // Add the end location to the waypoints
+      newWaypoints.push({
+        latitude: newEnd.lat,
+        longitude: newEnd.lng,
+      });
+      setWaypoints(newWaypoints);
+
       let newGasPrice = gasPrice;
 
       if (!useCustomGasPrice) {
-        const gasPriceResponse = await fetchData('/gas', !globalState['Enable Requests']);
+        const gasPriceResponse = await fetchData(`/gas?country=${globalState.country}&region=${globalState.region}`, !globalState['Enable Requests']);
 
         if (!gasPriceResponse?.ok || !gasPriceResponse) {
           console.log(`Request for gas price failed (${gasPriceResponse.status})`);
@@ -178,16 +214,16 @@ export default function HomeScreen() {
         loading: false,
         distance: 0,
         gasPrice: 0,
-        start: { lat: 0, lng: 0 },
-        end: { lat: 0, lng: 0 },
+        start: { lat: 0, lng: 0, address: '' },
+        end: { lat: 0, lng: 0, address: '' },
       });
     }
     return null;
   }, [startLocation, endLocation, customGasPrice, gasPrice, globalState['Enable Requests']]);
 
   const updateSuggestions = useCallback((input: string) => {
-    // If empty then just clear the suggestions
-    if (!input) {
+    // If empty or using `Current Location` then just clear the suggestions
+    if (!input || input === 'Current Location') {
       setSuggestions([]);
       return;
     }
@@ -206,14 +242,31 @@ export default function HomeScreen() {
       });
   }, [globalState['Enable Requests']]);
 
+  const throttledUpdateSuggestions = useCallback(
+    throttle(500, updateSuggestions),
+    [updateSuggestions],
+  );
+  const debouncedUpdateSuggestions = useCallback(
+    debounce(500, updateSuggestions),
+    [updateSuggestions],
+  );
+
+  const autocompleteSearch = (input: string) => {
+    if (input.length < 10) {
+      throttledUpdateSuggestions(input);
+    } else {
+      debouncedUpdateSuggestions(input);
+    }
+  };
+
   const updateStartLocation = (input: string) => {
     setLocations((state) => ({ ...state, startLocation: input }));
-    updateSuggestions(input);
+    autocompleteSearch(input);
   };
 
   const updateEndLocation = (input: string) => {
     setLocations((state) => ({ ...state, endLocation: input }));
-    updateSuggestions(input);
+    autocompleteSearch(input);
   };
 
   const setInputToPickedLocation = (item: string) => {
@@ -240,8 +293,9 @@ export default function HomeScreen() {
   // Represents if the user has entered all the required data to save a trip's cost
   const canSaveTrip = tripCalculated && !!user;
 
-  const endLocationRef = useRef<TextInput>(null);
+  const shouldShowUserLocation = startLocation !== 'Current Location' && endLocation !== 'Current Location';
 
+  const endLocationRef = useRef<TextInput>(null);
   return (
     <Page>
       <GasPriceModal
@@ -263,8 +317,9 @@ export default function HomeScreen() {
             distance={distance}
             gasPrice={gasPrice}
             riders={riders}
-            start={startLocation}
-            end={endLocation}
+            start={start.address}
+            end={end.address}
+            waypoints={waypoints}
             gasMileage={GAS_MILEAGE}
             closeModal={() => setModalVisible(false)}
           />
@@ -275,16 +330,16 @@ export default function HomeScreen() {
           onDismiss={() => setMapModalVisible(false)}
           contentContainerStyle={globalStyles.modal}
         >
-          <MapContainer data={{
-            start,
-            end,
-          }}
+          <MapContainer
+            data={{
+              start,
+              end,
+            }}
+            waypoints={waypoints}
+            showUserLocation={shouldShowUserLocation}
           />
         </Modal>
       </Portal>
-      <View style={styles.container}>
-        <Text style={globalStyles.title}>⛽️ Gas Me Up 💸</Text>
-      </View>
       <View style={styles.dataContainer}>
         <StatsSection
           loading={loading}
@@ -316,7 +371,15 @@ export default function HomeScreen() {
           onChangeText={updateStartLocation}
           onPressIn={() => changeActiveInput(ActiveInput.Start)}
           value={startLocation}
-          icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
+          icon={(
+            <Ionicons
+              name="ios-location"
+              size={30}
+              color={colors.secondary}
+              disabled={!globalState.userLocation.lat || !globalState.userLocation.lng}
+              onPress={() => updateStartLocation('Current Location')}
+            />
+           )}
           clearButton
           error={startLocationError}
           autoComplete="street-address"
@@ -330,7 +393,15 @@ export default function HomeScreen() {
           onChangeText={updateEndLocation}
           onPressIn={() => changeActiveInput(ActiveInput.End)}
           value={endLocation}
-          icon={<Ionicons name="ios-location" size={30} color={colors.secondary} />}
+          icon={(
+            <Ionicons
+              name="ios-location"
+              size={30}
+              color={colors.secondary}
+              disabled={!globalState.userLocation.lat || !globalState.userLocation.lng}
+              onPress={() => updateEndLocation('Current Location')}
+            />
+           )}
           clearButton
           error={endLocationError}
           autoComplete="street-address"

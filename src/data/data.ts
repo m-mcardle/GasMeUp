@@ -1,4 +1,6 @@
-export const serverUrl = 'https://northern-bot-301518.uc.r.appspot.com';
+import { ENV } from '../helpers/env';
+
+export const serverUrl = ENV.USE_DEV_API ? 'https://gas-me-up.loca.lt' : 'https://northern-bot-301518.uc.r.appspot.com';
 
 export const mockTripCost = {
   cost: 420.69,
@@ -48,7 +50,7 @@ export async function fetchData(route: string, mock = false) {
     });
     return resp;
   }
-  return fetch(serverUrl + route);
+  return fetch(`${serverUrl + route}&api_key=${ENV.API_KEY}`);
 }
 
 export default {
