@@ -1,12 +1,13 @@
 // React
 import React, { useCallback, useState } from 'react';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 
-import { DataTable } from 'react-native-paper';
+import Checkbox from 'expo-checkbox';
+import { DataTable, Modal, Portal } from 'react-native-paper';
 
 // Firebase
 import {
-  collection, doc, query, where, addDoc, DocumentData,
+  collection, doc, query, where, DocumentData,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
@@ -20,9 +21,13 @@ import Button from '../Button';
 // Global State
 import { useGlobalState } from '../../hooks/hooks';
 
+// Helpers
+import { createTransaction } from '../../helpers/firestoreHelper';
+
 // Styles
 import styles from '../../styles/HomeScreen.styles';
 import { boldFont, colors, globalStyles } from '../../styles/styles';
+import TripSettingsModal from './TripSettingsModal';
 
 function RowBuilder(
   selectedFriends: Array<DocumentData>,
@@ -43,18 +48,16 @@ function RowBuilder(
       <DataTable.Row
         key={firstName + lastName + uid}
         onPress={() => updateSelectedFriends({ firstName, lastName, uid })}
-        style={isSelected ? { backgroundColor: '#e0e0e0' } : undefined}
       >
-        <DataTable.Cell
-          textStyle={isSelected ? { color: 'black' } : undefined}
-        >
+        <DataTable.Cell>
           {`${firstName} ${lastName}`}
         </DataTable.Cell>
-        <DataTable.Cell
-          textStyle={isSelected ? { color: 'black' } : undefined}
-          numeric
-        >
-          +
+        <DataTable.Cell numeric>
+          <Checkbox
+            onValueChange={() => updateSelectedFriends({ firstName, lastName, uid })}
+            value={isSelected}
+            color={colors.action}
+          />
         </DataTable.Cell>
       </DataTable.Row>
     );
@@ -72,7 +75,7 @@ interface Props {
   gasPrice: number,
   distance: number,
   gasMileage: number,
-  waypoints: Array<LatLng>,
+  waypoints: Array<Location>,
   closeModal: Function,
 }
 
@@ -81,6 +84,7 @@ export default function AddToFriendTable({
 }: Props) {
   const [globalState] = useGlobalState();
   const [selectedFriends, setSelectedFriends] = useState<Array<DocumentData>>([]);
+  const [splitTypeVisible, setSplitTypeVisible] = useState(false);
 
   const [currentUser] = useAuthState(auth);
 
@@ -97,20 +101,29 @@ export default function AddToFriendTable({
   // eslint-disable-next-line no-param-reassign
   usersData.forEach((el) => { el.key = el.firstName + el.lastName + el.uid; });
 
-  const createTransaction = useCallback(async (friends: Array<DocumentData>, owed = false) => {
+  const saveTrip = useCallback(async (
+    friends: Array<DocumentData>,
+    driver: DocumentData,
+    splitType: 'split' | 'full',
+  ) => {
     if (!currentUser?.uid) {
       return;
     }
 
     const friendUIDs = friends.map((friend) => friend.uid);
 
+    const payers = driver.uid === currentUser.uid
+      ? friendUIDs
+      : [currentUser.uid, ...friendUIDs.filter((friend) => friend !== driver.uid)];
+
+    const amount = Number((cost / payers.length).toFixed(2));
     try {
-      await addDoc(collection(db, 'Transactions'), {
+      await createTransaction({
         cost: Number(cost.toFixed(2)),
-        amount: Number(cost.toFixed(2)),
-        payeeUID: owed ? friendUIDs[0] : currentUser.uid,
-        payers: owed ? [currentUser.uid] : friendUIDs,
-        splitType: 'full',
+        amount,
+        payeeUID: driver.uid,
+        payers,
+        splitType,
         distance,
         gasPrice,
         startLocation: start,
@@ -121,10 +134,14 @@ export default function AddToFriendTable({
         users: [currentUser.uid, ...friendUIDs],
         waypoints,
         country: globalState.country,
+        type: 'trip',
       });
+      Alert.alert('Success', 'Trip was saved!');
       closeModal();
     } catch (exception) {
       console.log(exception);
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
+      closeModal();
     }
   }, [currentUser, cost, distance, gasPrice]);
 
@@ -143,6 +160,21 @@ export default function AddToFriendTable({
 
   return (
     <>
+      <Portal>
+        <Modal
+          visible={splitTypeVisible}
+          onDismiss={() => setSplitTypeVisible(false)}
+        >
+          {userDocument && (
+            <TripSettingsModal
+              closeModal={() => setSplitTypeVisible(false)}
+              saveTrip={saveTrip}
+              selectedFriends={selectedFriends}
+              userDocument={userDocument}
+            />
+          )}
+        </Modal>
+      </Portal>
       <Text style={globalStyles.title}>Save Trip</Text>
       <View style={styles.saveTripLocationHeaderContainer}>
         <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
@@ -207,20 +239,10 @@ export default function AddToFriendTable({
       <View style={styles.saveTripButtonSection}>
         <Button
           disabled={selectedFriends.length < 1}
-          style={{ ...styles.addToFriendButton, backgroundColor: colors.red }}
-          onPress={() => createTransaction(selectedFriends, true)}
+          onPress={() => setSplitTypeVisible(true)}
         >
-          <Text style={{ ...globalStyles.smallText, color: colors.white }}>
-            Owed by you
-          </Text>
-        </Button>
-        <Button
-          disabled={selectedFriends.length < 1}
-          style={{ ...styles.addToFriendButton, backgroundColor: colors.green }}
-          onPress={() => createTransaction(selectedFriends, false)}
-        >
-          <Text style={{ ...globalStyles.smallText, color: colors.white }}>
-            Paid by you
+          <Text>
+            Save
           </Text>
         </Button>
       </View>

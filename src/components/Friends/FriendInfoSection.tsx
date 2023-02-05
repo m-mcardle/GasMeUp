@@ -8,7 +8,7 @@ import { DataTable, Modal, Portal } from 'react-native-paper';
 
 // Firebase
 import {
-  collection, doc, query, where, addDoc, DocumentData, updateDoc,
+  collection, doc, query, where, DocumentData, updateDoc,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
@@ -25,6 +25,7 @@ import { colors, boldFont, globalStyles } from '../../styles/styles';
 
 // Helpers
 import { locationToLatLng } from '../../helpers/mapHelper';
+import { createTransaction } from '../../helpers/firestoreHelper';
 
 const transactionsRef = collection(db, 'Transactions');
 
@@ -39,7 +40,7 @@ export default function FriendInfoSection({
   uid, name, amount, close,
 }: Props) {
   const [currentUser] = useAuthState(auth);
-  const [visible, setVisible] = useState(false);
+  const [mapVisible, setMapVisible] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<DocumentData>({});
 
   const userDoc = currentUser?.uid ? doc(db, 'Users', currentUser?.uid) : undefined;
@@ -60,13 +61,17 @@ export default function FriendInfoSection({
       return;
     }
     try {
-      await addDoc(collection(db, 'Transactions'), {
+      await createTransaction({
         amount: amount * -1,
         payeeUID: currentUser.uid,
-        payerUID: uid,
+        payers: [uid],
         date: new Date(),
         users: [currentUser.uid, uid],
         type: 'settle',
+        splitType: 'full',
+        distance: 0,
+        gasPrice: 0,
+        creator: currentUser.uid,
       });
       close();
     } catch (exception) {
@@ -119,12 +124,19 @@ export default function FriendInfoSection({
     : sortedTransactions;
 
   const transactionWaypoints = selectedTransaction.waypoints ?? [];
+
+  // Helper method to calculate the amount associated with this friend on this transaction
+  const getTransactionAmount = (transaction: DocumentData) => {
+    const userIsPayee = transaction.payeeUID === currentUser?.uid;
+    return `$${(transaction.amount * (userIsPayee ? 1 : -1)).toFixed(2)}`;
+  };
+
   return (
     <View style={{ height: '100%' }}>
       <Portal>
         <Modal
-          visible={visible}
-          onDismiss={() => setVisible(false)}
+          visible={mapVisible}
+          onDismiss={() => setMapVisible(false)}
         >
           <View style={globalStyles.miniModal}>
             {transactionWaypoints.length > 0 && (
@@ -167,7 +179,7 @@ export default function FriendInfoSection({
                 style={{ maxWidth: '8%' }}
                 onPress={() => {
                   setSelectedTransaction(transaction);
-                  setVisible(true);
+                  setMapVisible(true);
                 }}
                 disabled={!(transaction?.waypoints?.length > 0)}
               >
@@ -187,7 +199,7 @@ export default function FriendInfoSection({
                 {transaction.date.toDate().toLocaleDateString()}
               </DataTable.Cell>
               <DataTable.Cell textStyle={{ fontSize: 10 }} numeric>
-                {`$${(transaction.amount * (transaction.payeeUID === currentUser?.uid ? 1 : -1)).toFixed(2)}`}
+                {getTransactionAmount(transaction)}
               </DataTable.Cell>
             </DataTable.Row>
           ))}
@@ -206,7 +218,7 @@ export default function FriendInfoSection({
       <View style={styles.friendInfoButtonSection}>
         <Button
           style={styles.friendInfoButton}
-          disabled={amount === 0}
+          disabled={transactionsSinceLastSettle.length === 0}
           onPress={settleUp}
         >
           <Text style={{ color: 'white' }}>Settle Up</Text>

@@ -148,7 +148,6 @@ const styles = StyleSheet.create({
   },
   addToFriendButton: {
     paddingHorizontal: 20,
-    backgroundColor: colors.white,
   },
   saveTripButtonSection: {
     flexDirection: 'row',
