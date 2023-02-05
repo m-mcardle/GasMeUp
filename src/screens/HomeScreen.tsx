@@ -12,14 +12,12 @@ import {
   View,
   Alert,
   Keyboard,
-  ViewStyle,
   TextInput,
 } from 'react-native';
 
 // External Components
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import NumericInput from 'react-native-numeric-input';
 
 import {
   Portal, Modal,
@@ -93,7 +91,6 @@ export default function HomeScreen() {
   const [customGasPrice, setCustomGasPrice] = useState<number>(1.5);
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
-  const [riders, setRiders] = useState<number>(1);
   const [visible, setVisible] = useState<boolean>(false);
   const [useCustomGasPrice, setUseCustomGasPrice] = useState<boolean>(false);
   const [globalState] = useGlobalState();
@@ -316,7 +313,6 @@ export default function HomeScreen() {
             cost={cost}
             distance={distance}
             gasPrice={gasPrice}
-            riders={riders}
             start={start.address}
             end={end.address}
             waypoints={waypoints}
@@ -343,29 +339,12 @@ export default function HomeScreen() {
       <View style={styles.dataContainer}>
         <StatsSection
           loading={loading}
-          riders={riders}
           distance={distance}
           gasPrice={gasPrice}
           useCustomGasPrice={useCustomGasPrice}
           cost={cost}
           openModal={() => setVisible(true)}
         />
-        <View style={styles.ridersSection}>
-          <Text style={styles.ridersText}>Riders:</Text>
-          <NumericInput
-            rounded
-            totalHeight={18}
-            totalWidth={120}
-            containerStyle={{ backgroundColor: 'white' }}
-            inputStyle={globalStyles.numericInput as ViewStyle}
-            minValue={1}
-            leftButtonBackgroundColor={colors.lightGray}
-            rightButtonBackgroundColor={colors.action}
-            value={riders}
-            editable={false}
-            onChange={setRiders}
-          />
-        </View>
         <Input
           placeholder="Start location"
           onChangeText={updateStartLocation}
