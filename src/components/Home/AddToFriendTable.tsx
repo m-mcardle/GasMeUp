@@ -41,7 +41,8 @@ function RowBuilder(
       if (friendIndex === -1) {
         setSelectedFriend([...selectedFriends, friend]);
       } else {
-        setSelectedFriend(selectedFriends.filter((el) => el.uid !== friend.uid));
+        selectedFriends.splice(friendIndex, 1);
+        setSelectedFriend([...selectedFriends]);
       }
     };
 
