@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { Alert, View } from 'react-native';
 
 import Checkbox from 'expo-checkbox';
-import { DataTable, Modal, Portal } from 'react-native-paper';
+import { DataTable, Portal } from 'react-native-paper';
 
 // Firebase
 import {
@@ -17,6 +17,9 @@ import { db, auth } from '../../../firebase';
 import Table from '../Table';
 import Text from '../Text';
 import Button from '../Button';
+import Modal from '../Modal';
+
+import TripSettingsModal from './TripSettingsModal';
 
 // Global State
 import { useGlobalState } from '../../hooks/hooks';
@@ -27,7 +30,6 @@ import { createTransaction } from '../../helpers/firestoreHelper';
 // Styles
 import styles from '../../styles/HomeScreen.styles';
 import { boldFont, colors, globalStyles } from '../../styles/styles';
-import TripSettingsModal from './TripSettingsModal';
 
 function RowBuilder(
   selectedFriends: Array<DocumentData>,

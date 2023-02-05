@@ -5,7 +5,7 @@ import { Alert, TouchableOpacity, View } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
 import {
-  DataTable, Portal, Modal,
+  DataTable, Portal,
 } from 'react-native-paper';
 
 // Firebase
@@ -24,6 +24,7 @@ import LoginScreen from './LoginScreen';
 import Page from '../components/Page';
 import Table from '../components/Table';
 import Text from '../components/Text';
+import Modal from '../components/Modal';
 
 import AddFriendsSection from '../components/Friends/AddFriendsSection';
 import FriendInfoSection from '../components/Friends/FriendInfoSection';
@@ -31,7 +32,7 @@ import FriendRequestsSection from '../components/Friends/FriendRequestsSection';
 
 // Styles
 import styles from '../styles/FriendsScreen.styles';
-import { boldFont, colors, globalStyles } from '../styles/styles';
+import { boldFont, colors } from '../styles/styles';
 
 function RowBuilder(onPress: (friend: any) => void) {
   function Row({ name, amount, uid }: DocumentData) {
@@ -163,7 +164,6 @@ export default function FriendsScreen() {
           <Modal
             visible={visible}
             onDismiss={() => setVisible((state) => !state)}
-            contentContainerStyle={globalStyles.modal}
           >
             <AddFriendsSection
               close={() => setVisible(false)}
@@ -173,7 +173,6 @@ export default function FriendsScreen() {
           <Modal
             visible={friendInfoVisible}
             onDismiss={() => setFriendInfoVisible((state) => !state)}
-            contentContainerStyle={globalStyles.modal}
           >
             <FriendInfoSection
               uid={selectedFriendUID}
@@ -186,7 +185,6 @@ export default function FriendsScreen() {
           <Modal
             visible={friendRequestsVisible}
             onDismiss={() => setFriendRequestsVisible((state) => !state)}
-            contentContainerStyle={globalStyles.modal}
           >
             <FriendRequestsSection
               friendRequestUIDs={sanitizedFriendRequests}

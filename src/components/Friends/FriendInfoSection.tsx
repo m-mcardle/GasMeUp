@@ -4,7 +4,7 @@ import { Alert, ScrollView, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
-import { DataTable, Modal, Portal } from 'react-native-paper';
+import { DataTable, Portal } from 'react-native-paper';
 
 // Firebase
 import {
@@ -18,10 +18,11 @@ import { db, auth } from '../../../firebase';
 import Text from '../Text';
 import Button from '../Button';
 import MapContainer from '../MapContainer';
+import Modal from '../Modal';
 
 // Styles
 import styles from '../../styles/FriendsScreen.styles';
-import { colors, boldFont, globalStyles } from '../../styles/styles';
+import { colors, boldFont } from '../../styles/styles';
 
 // Helpers
 import { locationToLatLng } from '../../helpers/mapHelper';
@@ -138,22 +139,20 @@ export default function FriendInfoSection({
           visible={mapVisible}
           onDismiss={() => setMapVisible(false)}
         >
-          <View style={globalStyles.miniModal}>
-            {transactionWaypoints.length > 0 && (
-              <MapContainer
-                data={{
-                  start: {
-                    ...locationToLatLng(transactionWaypoints[0]),
-                  },
-                  end: {
-                    ...locationToLatLng(transactionWaypoints[transactionWaypoints.length - 1]),
-                  },
-                }}
-                showUserLocation={false}
-                waypoints={transactionWaypoints}
-              />
-            )}
-          </View>
+          {transactionWaypoints.length > 0 && (
+            <MapContainer
+              data={{
+                start: {
+                  ...locationToLatLng(transactionWaypoints[0]),
+                },
+                end: {
+                  ...locationToLatLng(transactionWaypoints[transactionWaypoints.length - 1]),
+                },
+              }}
+              showUserLocation={false}
+              waypoints={transactionWaypoints}
+            />
+          )}
         </Modal>
       </Portal>
       <Button
@@ -218,7 +217,7 @@ export default function FriendInfoSection({
       <View style={styles.friendInfoButtonSection}>
         <Button
           style={styles.friendInfoButton}
-          disabled={transactionsSinceLastSettle.length === 0}
+          disabled={transactionsSinceLastSettle.length === 0 && amount === 0}
           onPress={settleUp}
         >
           <Text style={{ color: 'white' }}>Settle Up</Text>

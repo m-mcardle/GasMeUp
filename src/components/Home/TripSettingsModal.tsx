@@ -35,7 +35,7 @@ export default function TripSettingsModal({
 
   const isDriver = (friend: DocumentData) => friend.uid === driver.uid;
   return (
-    <View style={globalStyles.miniModal}>
+    <>
       <Text style={globalStyles.title}>Select Driver</Text>
       <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }} onPress={() => setDriver(userDocument!)}>
         <Checkbox
@@ -87,6 +87,6 @@ export default function TripSettingsModal({
           </Text>
         </Button>
       </View>
-    </View>
+    </>
   );
 }

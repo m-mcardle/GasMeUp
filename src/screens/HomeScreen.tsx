@@ -20,7 +20,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import {
-  Portal, Modal,
+  Portal,
 } from 'react-native-paper';
 
 import { throttle, debounce } from 'throttle-debounce';
@@ -39,6 +39,7 @@ import Text from '../components/Text';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import MapContainer from '../components/MapContainer';
+import Modal from '../components/Modal';
 
 import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
@@ -46,7 +47,7 @@ import AddToFriendsTable from '../components/Home/AddToFriendTable';
 import GasPriceModal from '../components/Home/GasPriceModal';
 
 // Styles
-import { colors, globalStyles } from '../styles/styles';
+import { colors } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
 
 // Mock Data
@@ -307,7 +308,6 @@ export default function HomeScreen() {
         <Modal
           visible={modalVisible}
           onDismiss={() => setModalVisible(false)}
-          contentContainerStyle={globalStyles.modal}
         >
           <AddToFriendsTable
             cost={cost}
@@ -324,7 +324,6 @@ export default function HomeScreen() {
         <Modal
           visible={mapModalVisible}
           onDismiss={() => setMapModalVisible(false)}
-          contentContainerStyle={globalStyles.modal}
         >
           <MapContainer
             data={{
