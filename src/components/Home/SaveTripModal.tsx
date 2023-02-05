@@ -82,7 +82,7 @@ interface Props {
   closeModal: Function,
 }
 
-export default function AddToFriendTable({
+export default function SaveTripModal({
   start, end, cost, gasPrice, distance, closeModal, gasMileage, waypoints,
 }: Props) {
   const [globalState] = useGlobalState();

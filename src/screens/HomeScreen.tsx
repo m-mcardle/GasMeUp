@@ -48,7 +48,7 @@ import Modal from '../components/Modal';
 
 import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
-import AddToFriendsTable from '../components/Home/AddToFriendTable';
+import SaveTripModal from '../components/Home/SaveTripModal';
 import GasPriceModal from '../components/Home/GasPriceModal';
 
 // Styles
@@ -320,7 +320,7 @@ export default function HomeScreen() {
           visible={modalVisible}
           onDismiss={() => setModalVisible(false)}
         >
-          <AddToFriendsTable
+          <SaveTripModal
             cost={cost}
             distance={distance}
             gasPrice={gasPrice}
