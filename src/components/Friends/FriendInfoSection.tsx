@@ -59,11 +59,13 @@ export default function FriendInfoSection({
 
   const settleUp = useCallback(async () => {
     if (!currentUser?.uid) {
+      console.log('User not logged in');
       return;
     }
     try {
       await createTransaction({
         amount: amount * -1,
+        cost: amount * -1,
         payeeUID: currentUser.uid,
         payers: [uid],
         date: new Date(),

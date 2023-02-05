@@ -58,7 +58,7 @@ interface Location {
 
 interface Transaction {
   amount: number,
-  cost?: number,
+  cost: number,
   payeeUID: string,
   payers: Array<string>,
   splitType?: 'split' | 'full'

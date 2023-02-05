@@ -111,14 +111,16 @@ export default function AddToFriendTable({
     if (!currentUser?.uid) {
       return;
     }
-
+    const userIsDriver = driver.uid === currentUser.uid;
     const friendUIDs = friends.map((friend) => friend.uid);
 
-    const payers = driver.uid === currentUser.uid
+    const payers = userIsDriver
       ? friendUIDs
       : [currentUser.uid, ...friendUIDs.filter((friend) => friend !== driver.uid)];
 
-    const amount = Number((cost / payers.length).toFixed(2));
+    const amount = splitType === 'full'
+      ? Number((cost / payers.length).toFixed(2))
+      : Number((cost / (payers.length + 1)).toFixed(2));
     try {
       await createTransaction({
         cost: Number(cost.toFixed(2)),

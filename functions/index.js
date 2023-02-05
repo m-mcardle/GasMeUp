@@ -15,10 +15,14 @@ exports.aggregateBalances = functions.firestore
       const newData = snapshot.data();
       const payeeUID = newData.payeeUID;
       const payerUIDs = newData.payers;
+      const cost = newData.cost;
       const amount = newData.amount;
       const splitType = newData.splitType;
-      const costPerRider = Number((splitType === "full" ? amount / payerUIDs.length : amount / (payerUIDs.length + 1)).toFixed(2));
+      const costPerRider = Number((splitType === "full" ? cost / payerUIDs.length : cost / (payerUIDs.length + 1)).toFixed(2));
 
+      if (costPerRider !== amount) {
+        console.warn(`costPerRider !== amount (${costPerRider} vs ${amount})`);
+      }
       // Get a reference to the payee
       const payeeRef = db.collection("Users").doc(payeeUID);
 
