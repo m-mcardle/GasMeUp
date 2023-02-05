@@ -39,7 +39,7 @@ export default function TripSettingsModal({
   const isDriver = (friend: DocumentData) => friend.uid === driver.uid;
   return (
     <>
-      <Text style={globalStyles.title}>Select Driver</Text>
+      <Text style={globalStyles.h1}>Select Driver</Text>
       <Text style={globalStyles.h2}>This determines who is owed the money for this trip</Text>
       <View style={{ marginTop: 24 }}>
         <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }} onPress={() => setDriver(userDocument!)}>
@@ -95,11 +95,11 @@ export default function TripSettingsModal({
             }}
           >
             <Text style={globalStyles.smallText}>
-              Riders Pay All
+              Only Riders Pay
             </Text>
           </Button>
           <Text style={{ ...globalStyles.smallText, textAlign: 'center' }}>
-            {`$${ridersCost.toFixed(2)} each`}
+            {`$${ridersCost.toFixed(2)} per rider`}
           </Text>
         </View>
       </View>

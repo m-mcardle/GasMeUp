@@ -3,18 +3,24 @@ import {
   ActivityIndicator, Animated, Easing, Image, View,
 } from 'react-native';
 
+import { FontAwesome5 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 // Global State Stuff
 import { useGlobalState } from '../../hooks/hooks';
+
+// Helpers
+import { convertKMtoMiles, convertLtoGallons } from '../../helpers/unitsHelper';
 
 // @ts-ignore
 import AdjustIcon from '../../../assets/AdjustButton.png';
 // @ts-ignore
 import AdjustIconDisabled from '../../../assets/AdjustButtonDisabled.png';
 
+// Components
 import Text from '../Text';
 
+// Styles
 import styles from '../../styles/HomeScreen.styles';
 import { colors } from '../../styles/styles';
 
@@ -24,6 +30,7 @@ interface Props {
   gasPrice: number,
   useCustomGasPrice: boolean,
   cost: number,
+  gasMileage: number,
   openModal: () => void,
 }
 
@@ -34,6 +41,7 @@ export default function StatsSection(props: Props) {
     loading,
     distance = 0,
     gasPrice = 0,
+    gasMileage,
     useCustomGasPrice,
     cost,
     openModal,
@@ -68,13 +76,15 @@ export default function StatsSection(props: Props) {
     }
   }, [loading, fadeAnim]);
 
+  const gasUsed = (distance * gasMileage) / 100;
+
   const gasPriceString = globalState.country === 'CA'
-    ? `$${gasPrice.toFixed(2)}/L`
-    : `$${gasPrice.toFixed(2)}/gal`;
+    ? `${gasUsed.toFixed()}L at $${gasPrice.toFixed(2)}/L`
+    : `${(convertLtoGallons(gasUsed)).toFixed()}gal $${gasPrice.toFixed(2)}/gal`;
 
   const distanceString = globalState.country === 'CA'
     ? `${distance.toFixed(2)} km`
-    : `${(distance * 0.621371).toFixed(2)} mi`;
+    : `${(convertKMtoMiles(distance)).toFixed(2)} mi`;
 
   return (
     <View style={styles.statsSection}>
@@ -96,23 +106,36 @@ export default function StatsSection(props: Props) {
           )}
       </AnimatedLinearGradient>
       <View style={styles.subStatsSection}>
-        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : {})]}>
+        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : { width: '40%' })]}>
           {loading
             ? <ActivityIndicator size="small" />
             : (
-              <Text style={styles.statBoxText}>
-                {`Distance: ${distanceString}`}
-              </Text>
+              <View style={styles.statText}>
+                <FontAwesome5 name="route" size={16} color={colors.secondary} />
+                <Text style={styles.statBoxText}>
+                  {distanceString}
+                </Text>
+              </View>
             )}
         </View>
-        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : {}), (useCustomGasPrice ? { borderColor: colors.secondaryAction, borderWidth: 1 } : {})]} onTouchEnd={() => openModal()}>
+        <View
+          style={[
+            styles.statBox,
+            (loading ? { justifyContent: 'center' } : { width: '59%' }),
+            (useCustomGasPrice ? { borderColor: colors.secondaryAction, borderWidth: 1 } : {}),
+          ]}
+          onTouchEnd={() => openModal()}
+        >
           {loading
             ? <ActivityIndicator size="small" />
             : (
               <>
-                <Text style={styles.statBoxText}>
-                  {`Gas: ${gasPriceString}`}
-                </Text>
+                <View style={styles.statText}>
+                  <FontAwesome5 name="gas-pump" size={16} color={colors.secondary} />
+                  <Text style={styles.statBoxText}>
+                    {gasPriceString}
+                  </Text>
+                </View>
                 <View>
                   <Image
                     source={useCustomGasPrice ? AdjustIcon : AdjustIconDisabled}

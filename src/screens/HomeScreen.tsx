@@ -21,8 +21,7 @@ import {
 } from 'react-native';
 
 // External Components
-import AntDesign from '@expo/vector-icons/AntDesign';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import {
   Portal,
@@ -95,6 +94,7 @@ export default function HomeScreen() {
   );
   const [waypoints, setWaypoints] = useState<any>([]);
   const [customGasPrice, setCustomGasPrice] = useState<number>(1.5);
+  const [fetchedGasPrice, setFetchedGasPrice] = useState<number>(0);
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
   const [visible, setVisible] = useState<boolean>(false);
@@ -197,6 +197,7 @@ export default function HomeScreen() {
         }
 
         const { price } = await gasPriceResponse.json();
+        setFetchedGasPrice(price);
         newGasPrice = price;
       }
 
@@ -291,9 +292,10 @@ export default function HomeScreen() {
     setActiveInput(input);
   };
 
+  // Reset to last server gas price each time the use disables custom gas price
   useEffect(() => {
     if (!useCustomGasPrice) {
-      setGasPrice(0);
+      setGasPrice(fetchedGasPrice);
     }
   }, [useCustomGasPrice]);
 
@@ -353,6 +355,7 @@ export default function HomeScreen() {
           gasPrice={gasPrice}
           useCustomGasPrice={useCustomGasPrice}
           cost={cost}
+          gasMileage={GAS_MILEAGE}
           openModal={() => setVisible(true)}
         />
         <Input
@@ -361,11 +364,11 @@ export default function HomeScreen() {
           onPressIn={() => changeActiveInput(ActiveInput.Start)}
           value={startLocation}
           icon={(
-            <Ionicons
-              name="ios-location"
+            <MaterialIcons
+              name="my-location"
               size={30}
-              color={colors.secondary}
-              disabled={!globalState.userLocation.lat || !globalState.userLocation.lng}
+              color={(startLocation === 'Current Location' ? colors.action : colors.secondary)}
+              disabled={!globalState.userLocation.lat || !globalState.userLocation.lng || endLocation === 'Current Location'}
               onPress={() => updateStartLocation('Current Location')}
             />
            )}
@@ -383,11 +386,11 @@ export default function HomeScreen() {
           onPressIn={() => changeActiveInput(ActiveInput.End)}
           value={endLocation}
           icon={(
-            <Ionicons
-              name="ios-location"
+            <MaterialIcons
+              name="my-location"
               size={30}
-              color={colors.secondary}
-              disabled={!globalState.userLocation.lat || !globalState.userLocation.lng}
+              color={(endLocation === 'Current Location' ? colors.action : colors.secondary)}
+              disabled={!globalState.userLocation.lat || !globalState.userLocation.lng || startLocation === 'Current Location'}
               onPress={() => updateEndLocation('Current Location')}
             />
            )}

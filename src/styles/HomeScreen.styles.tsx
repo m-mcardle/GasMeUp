@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     marginTop: 150,
     padding: 5,
     width: '100%',
-    minHeight: 75,
+    minHeight: 100,
     justifyContent: 'center',
     shadowOffset: {
       width: 3,
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
   },
   costText: {
-    fontSize: 52,
+    fontSize: 64,
     textAlign: 'center',
     fontFamily: boldFont,
     color: colors.primary,
@@ -56,12 +56,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.tertiary,
     width: '49%',
-    minHeight: 25,
+    minHeight: 50,
   },
   statBoxText: {
     color: colors.secondary,
     fontFamily: semiBoldFont,
-    fontSize: 12,
+    fontSize: 14,
     padding: 5,
   },
   dataContainer: {
@@ -93,8 +93,8 @@ const styles = StyleSheet.create({
   },
   adjustButton: {
     marginHorizontal: 5,
-    height: 16,
-    width: 16,
+    height: 24,
+    width: 24,
   },
   checkBoxSection: {
     flexDirection: 'row',
@@ -169,6 +169,11 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  statText: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 4,
   },
 });
 

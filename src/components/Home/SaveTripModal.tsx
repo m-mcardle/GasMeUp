@@ -2,6 +2,8 @@
 import React, { useCallback, useState } from 'react';
 import { Alert, View } from 'react-native';
 
+import { FontAwesome5 } from '@expo/vector-icons';
+
 import Checkbox from 'expo-checkbox';
 import { DataTable, Portal } from 'react-native-paper';
 
@@ -30,6 +32,7 @@ import { createTransaction } from '../../helpers/firestoreHelper';
 // Styles
 import styles from '../../styles/HomeScreen.styles';
 import { boldFont, colors, globalStyles } from '../../styles/styles';
+import { convertKMtoMiles, convertLtoGallons } from '../../helpers/unitsHelper';
 
 function RowBuilder(
   selectedFriends: Array<DocumentData>,
@@ -167,13 +170,16 @@ export default function SaveTripModal({
 
   const headers = [
     { text: 'Name', numeric: false },
-    { text: 'Add', numeric: true },
+    { text: 'Split Trip', numeric: true },
   ];
+  const canadianUnits = globalState.country === 'CA';
+  const gasUsed = (distance * gasMileage) / 100;
 
   const truncatedStart = start.length > 50 ? `${start.substring(0, 50)}...` : start;
   const truncatedEnd = end.length > 50 ? `${end.substring(0, 50)}...` : end;
-  const gasPriceString = globalState.country === 'CA' ? `$${gasPrice.toFixed(2)}/L` : `$${gasPrice.toFixed(2)}/gal`;
-
+  const gasPriceString = canadianUnits ? `$${gasPrice.toFixed(2)}/L` : `$${gasPrice.toFixed(2)}/gal`;
+  const gasUsageString = canadianUnits ? `${(gasUsed).toFixed(1)}L` : `${convertLtoGallons(gasUsed).toFixed(1)}gal`;
+  const distanceString = canadianUnits ? `${distance.toFixed(1)}km` : `${convertKMtoMiles(distance).toFixed(1)}mi`;
   return (
     <>
       <Portal>
@@ -192,7 +198,7 @@ export default function SaveTripModal({
           )}
         </Modal>
       </Portal>
-      <Text style={globalStyles.title}>Save Trip</Text>
+      <Text style={globalStyles.h1}>Save Trip</Text>
       <View style={styles.saveTripLocationHeaderContainer}>
         <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
           {'Start: '}
@@ -209,9 +215,21 @@ export default function SaveTripModal({
           {truncatedEnd}
         </Text>
       </View>
+      <View style={[styles.saveTripHeaderContainer, { marginTop: 8 }]}>
+        <View style={{ flexDirection: 'row' }}>
+          <FontAwesome5 name="gas-pump" size={12} color={colors.secondary} />
+          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont, paddingLeft: 4 }}>
+            {'Gas: '}
+          </Text>
+          <Text style={globalStyles.smallText}>
+            {`${gasUsageString} used at ${gasPriceString}`}
+          </Text>
+        </View>
+      </View>
       <View style={styles.saveTripHeaderContainer}>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+          <FontAwesome5 name="money-bill-alt" size={12} color={colors.secondary} />
+          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont, paddingLeft: 4 }}>
             {'Cost: '}
           </Text>
           <Text style={globalStyles.smallText}>
@@ -219,29 +237,12 @@ export default function SaveTripModal({
           </Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
+          <FontAwesome5 name="route" size={12} color={colors.secondary} />
+          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont, paddingLeft: 4 }}>
             {'Distance: '}
           </Text>
           <Text style={globalStyles.smallText}>
-            {`${distance.toFixed(1)}km`}
-          </Text>
-        </View>
-      </View>
-      <View style={styles.saveTripHeaderContainer}>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
-            {'Gas Used: '}
-          </Text>
-          <Text style={globalStyles.smallText}>
-            {`${((distance * gasMileage) / 100).toFixed(1)}L`}
-          </Text>
-        </View>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
-            {'Gas Price: '}
-          </Text>
-          <Text style={globalStyles.smallText}>
-            {gasPriceString}
+            {distanceString}
           </Text>
         </View>
       </View>
