@@ -24,13 +24,25 @@ import { useGlobalState } from '../../hooks/hooks';
 import styles from '../../styles/HomeScreen.styles';
 import { boldFont, colors, globalStyles } from '../../styles/styles';
 
-function RowBuilder(selectedFriend: DocumentData, setSelectedFriend: Function) {
+function RowBuilder(
+  selectedFriends: Array<DocumentData>,
+  setSelectedFriend: (_ : Array<DocumentData>) => void,
+) {
   function Row({ firstName, lastName, uid }: DocumentData) {
-    const isSelected = selectedFriend.uid === uid;
+    const updateSelectedFriends = (friend: DocumentData) => {
+      const friendIndex = selectedFriends.findIndex((el) => el.uid === friend.uid);
+      if (friendIndex === -1) {
+        setSelectedFriend([...selectedFriends, friend]);
+      } else {
+        setSelectedFriend(selectedFriends.filter((el) => el.uid !== friend.uid));
+      }
+    };
+
+    const isSelected = !!selectedFriends.find((friend: DocumentData) => friend.uid === uid);
     return (
       <DataTable.Row
         key={firstName + lastName + uid}
-        onPress={() => { setSelectedFriend(isSelected ? {} : { firstName, lastName, uid }); }}
+        onPress={() => updateSelectedFriends({ firstName, lastName, uid })}
         style={isSelected ? { backgroundColor: '#e0e0e0' } : undefined}
       >
         <DataTable.Cell
@@ -68,7 +80,7 @@ export default function AddToFriendTable({
   start, end, cost, gasPrice, distance, closeModal, gasMileage, waypoints,
 }: Props) {
   const [globalState] = useGlobalState();
-  const [selectedFriend, setSelectedFriend] = useState<DocumentData>({});
+  const [selectedFriends, setSelectedFriends] = useState<Array<DocumentData>>([]);
 
   const [currentUser] = useAuthState(auth);
 
@@ -85,17 +97,19 @@ export default function AddToFriendTable({
   // eslint-disable-next-line no-param-reassign
   usersData.forEach((el) => { el.key = el.firstName + el.lastName + el.uid; });
 
-  const addCostToFriend = useCallback(async (friend: DocumentData, owed: boolean = false) => {
+  const createTransaction = useCallback(async (friends: Array<DocumentData>, owed = false) => {
     if (!currentUser?.uid) {
       return;
     }
+
+    const friendUIDs = friends.map((friend) => friend.uid);
 
     try {
       await addDoc(collection(db, 'Transactions'), {
         cost: Number(cost.toFixed(2)),
         amount: Number(cost.toFixed(2)),
-        payeeUID: owed ? friend.uid : currentUser.uid,
-        payers: [owed ? currentUser.uid : friend.uid],
+        payeeUID: owed ? friendUIDs[0] : currentUser.uid,
+        payers: owed ? [currentUser.uid] : friendUIDs,
         splitType: 'full',
         distance,
         gasPrice,
@@ -104,7 +118,7 @@ export default function AddToFriendTable({
         gasMileage,
         date: new Date(),
         creator: currentUser.uid,
-        users: [currentUser.uid, friend.uid],
+        users: [currentUser.uid, ...friendUIDs],
         waypoints,
         country: globalState.country,
       });
@@ -187,23 +201,23 @@ export default function AddToFriendTable({
         itemsPerPage={5}
         data={usersData}
         headers={headers}
-        Row={RowBuilder(selectedFriend, setSelectedFriend)}
+        Row={RowBuilder(selectedFriends, setSelectedFriends)}
         loading={usersDataLoading}
       />
       <View style={styles.saveTripButtonSection}>
         <Button
-          disabled={!selectedFriend.uid}
+          disabled={selectedFriends.length < 1}
           style={{ ...styles.addToFriendButton, backgroundColor: colors.red }}
-          onPress={() => addCostToFriend(selectedFriend, true)}
+          onPress={() => createTransaction(selectedFriends, true)}
         >
           <Text style={{ ...globalStyles.smallText, color: colors.white }}>
             Owed by you
           </Text>
         </Button>
         <Button
-          disabled={!selectedFriend.uid}
+          disabled={selectedFriends.length < 1}
           style={{ ...styles.addToFriendButton, backgroundColor: colors.green }}
-          onPress={() => addCostToFriend(selectedFriend, false)}
+          onPress={() => createTransaction(selectedFriends, false)}
         >
           <Text style={{ ...globalStyles.smallText, color: colors.white }}>
             Paid by you

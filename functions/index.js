@@ -17,7 +17,7 @@ exports.aggregateBalances = functions.firestore
       const payerUIDs = newData.payers;
       const amount = newData.amount;
       const splitType = newData.splitType;
-      const costPerRider = splitType === "full" ? amount / payerUIDs.length : amount / (payerUIDs.length + 1);
+      const costPerRider = Number((splitType === "full" ? amount / payerUIDs.length : amount / (payerUIDs.length + 1)).toFixed(2));
 
       // Get a reference to the payee
       const payeeRef = db.collection("Users").doc(payeeUID);
