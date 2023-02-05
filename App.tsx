@@ -28,6 +28,7 @@ import { GlobalContext, initialState } from './src/hooks/hooks';
 import HomeScreen from './src/screens/HomeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import FriendsScreen from './src/screens/FriendsScreen';
+import GasPriceScreen from './src/screens/GasPriceScreen';
 
 // Styles
 import { colors } from './src/styles/styles';
@@ -175,6 +176,7 @@ export default function App() {
         >
           <Tab.Screen name="Friends" component={FriendsScreen} />
           <Tab.Screen name="Add" component={HomeScreen} />
+          <Tab.Screen name="Gas" component={GasPriceScreen} />
           <Tab.Screen name="Settings" component={SettingsScreen} />
         </Tab.Navigator>
       </NavigationContainer>

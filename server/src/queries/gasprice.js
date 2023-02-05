@@ -22,7 +22,7 @@ function AmericanGasPriceRequest(state) {
   };
 }
 
-function GasPricesRequest() {
+function CanadianGasPricesRequest() {
   return {
     method: 'get',
     url: encodeURI(`${url}/canada`),
@@ -33,4 +33,8 @@ function GasPricesRequest() {
   };
 }
 
-module.exports = { CanadianGasPriceRequest, AmericanGasPriceRequest, GasPricesRequest };
+module.exports = {
+  CanadianGasPriceRequest,
+  AmericanGasPriceRequest,
+  CanadianGasPricesRequest,
+};

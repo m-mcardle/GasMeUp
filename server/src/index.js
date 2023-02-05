@@ -9,7 +9,9 @@ const {
   Directions,
   mockLocations,
 } = require('./queries/google');
-const { CanadianGasPriceRequest, AmericanGasPriceRequest, GasPricesRequest } = require('./queries/gasprice');
+const {
+  CanadianGasPriceRequest, AmericanGasPriceRequest, CanadianGasPricesRequest,
+} = require('./queries/gasprice');
 
 const { GasCostForDistance } = require('./calculations/fuel');
 
@@ -130,7 +132,10 @@ async function GetGasPrice(country, region) {
     return price;
   }
 
-  const { data } = await api(GasPricesRequest());
+  if (country === 'US') {
+    throw Error('US Gas Prices are not supported yet', { cause: 400 });
+  }
+  const { data } = await api(CanadianGasPricesRequest());
   const { prices } = data;
   return prices;
 }
@@ -223,14 +228,16 @@ app.get('/gas-prices', async (req, res) => {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
+  const country = req.query?.country ?? 'CA';
+  Log(`[gas-prices] Requested gas prices for ${country}`);
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const gasPrices = await GetGasPrice();
+    const gasPrices = await GetGasPrice(country);
     res.json({ prices: gasPrices });
   } catch (exception) {
     LogError(exception);
-    res.status(500).send({ error: exception });
+    res.status(exception.cause ?? 500).send({ error: exception.message });
   }
 });
 
