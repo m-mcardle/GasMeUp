@@ -1,6 +1,6 @@
 // React
 import React, { useCallback, useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -8,7 +8,7 @@ import { DataTable, Portal } from 'react-native-paper';
 
 // Firebase
 import {
-  collection, doc, query, where, DocumentData, updateDoc,
+  collection, doc, query, where, DocumentData,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
@@ -80,41 +80,6 @@ export default function FriendInfoSection({
     }
   }, [uid, name, amount, currentUser?.uid]);
 
-  const removeFriend = useCallback(async () => {
-    if (!currentUser?.uid || !userDoc) {
-      return;
-    }
-    try {
-      const newFriendsList = userDocument?.friends;
-      delete newFriendsList[uid];
-
-      await updateDoc(userDoc, {
-        friends: {
-          ...newFriendsList,
-        },
-      });
-      close();
-    } catch (exception) {
-      console.log(exception);
-    }
-  }, [uid, userDocument, userDoc, currentUser?.uid]);
-
-  const showConfirmationAlert = () => Alert.alert(
-    'Remove Friend',
-    'Are you sure you want to remove this friend?',
-    [
-      {
-        text: 'OK',
-        onPress: () => removeFriend(),
-        style: 'default',
-      },
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-    ],
-  );
-
   // Sort transactions by date, and then only show the transactions since the last `settle`
   const sortedTransactions = filteredTransactions
     ?.sort((a, b) => b.date.toDate() - a.date.toDate())
@@ -155,12 +120,6 @@ export default function FriendInfoSection({
           )}
         </Modal>
       </Portal>
-      <Button
-        style={styles.deleteFriendButton}
-        onPress={showConfirmationAlert}
-      >
-        <Ionicons name="close" size={24} color="white" />
-      </Button>
       <Text style={styles.friendInfoTitle}>{name}</Text>
 
       <DataTable>

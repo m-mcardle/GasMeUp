@@ -1,6 +1,8 @@
 // React
 import React, { useState } from 'react';
-import { Alert, TouchableOpacity, View } from 'react-native';
+import {
+  Alert, TouchableOpacity, View,
+} from 'react-native';
 
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
@@ -10,7 +12,7 @@ import {
 
 // Firebase
 import {
-  collection, doc, query, where, DocumentData,
+  collection, doc, query, where,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
@@ -29,35 +31,11 @@ import Modal from '../components/Modal';
 import AddFriendsSection from '../components/Friends/AddFriendsSection';
 import FriendInfoSection from '../components/Friends/FriendInfoSection';
 import FriendRequestsSection from '../components/Friends/FriendRequestsSection';
+import Row from '../components/Friends/FriendRow';
 
 // Styles
 import styles from '../styles/FriendsScreen.styles';
 import { boldFont, colors } from '../styles/styles';
-
-function RowBuilder(onPress: (friend: any) => void) {
-  function Row({ name, amount, uid }: DocumentData) {
-    return (
-      <DataTable.Row
-        key={name}
-        onPress={() => onPress({
-          selectedFriendUID: uid,
-          selectedFriendName: name,
-          selectedFriendAmount: amount,
-        })}
-      >
-        <DataTable.Cell textStyle={{ color: colors.secondary }}>
-          {name}
-        </DataTable.Cell>
-        <DataTable.Cell textStyle={amount < 0 ? { color: 'red' } : { color: colors.secondary }} numeric>
-          $
-          {amount.toFixed(2)}
-        </DataTable.Cell>
-      </DataTable.Row>
-    );
-  }
-
-  return Row;
-}
 
 function FooterRow(onPress: () => void) {
   return (
@@ -144,10 +122,18 @@ export default function FriendsScreen() {
     { text: 'Amount Owed', numeric: true },
   ];
 
-  // Create custom components for the table
-  const Row = RowBuilder((friend: any) => {
-    setSelectedFriend(friend);
-    setFriendInfoVisible(true);
+  const MyRow = ({
+    name,
+    amount,
+    uid,
+  }: any) => Row({
+    name,
+    amount,
+    uid,
+    onPress: (friend: any) => {
+      setSelectedFriend(friend);
+      setFriendInfoVisible(true);
+    },
   });
   const Footer = () => FooterRow(() => setVisible(true));
 
@@ -215,7 +201,7 @@ export default function FriendsScreen() {
           itemsPerPage={8}
           data={formattedBalances}
           headers={headers}
-          Row={Row}
+          Row={MyRow}
           FooterRow={Footer}
           loading={friendsDataLoading}
           style={styles.table}
