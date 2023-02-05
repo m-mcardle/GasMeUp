@@ -113,8 +113,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   modalCheckBox: {
-    width: 12,
-    height: 12,
+    width: 16,
+    height: 16,
     margin: 2,
   },
   saveButton: {

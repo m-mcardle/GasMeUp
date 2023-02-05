@@ -105,7 +105,7 @@ export default function StatsSection(props: Props) {
               </Text>
             )}
         </View>
-        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : {})]} onTouchEnd={() => openModal()}>
+        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : {}), (useCustomGasPrice ? { borderColor: colors.secondaryAction, borderWidth: 1 } : {})]} onTouchEnd={() => openModal()}>
           {loading
             ? <ActivityIndicator size="small" />
             : (

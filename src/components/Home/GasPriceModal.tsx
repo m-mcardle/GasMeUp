@@ -45,8 +45,8 @@ export default function GasPriceModal(props: Props) {
           <NumericInput
             rounded
             step={0.01}
-            totalHeight={18}
-            totalWidth={120}
+            totalHeight={25}
+            totalWidth={150}
             containerStyle={{ backgroundColor: 'white' }}
             inputStyle={globalStyles.numericInput as ViewStyle}
             valueType="real"
@@ -59,7 +59,7 @@ export default function GasPriceModal(props: Props) {
           />
         </View>
         <View style={styles.checkBoxSection}>
-          <Text style={{ color: colors.secondary, fontSize: 12 }}>Use custom gas price:</Text>
+          <Text style={{ color: colors.secondary, fontSize: 14 }}>Use custom gas price:</Text>
           <CheckBox
             color={colors.action}
             value={useCustomValue}

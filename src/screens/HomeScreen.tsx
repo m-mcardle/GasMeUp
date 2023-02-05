@@ -7,7 +7,12 @@
 */
 
 // React imports
-import React, { useCallback, useState, useRef } from 'react';
+import React, {
+  useCallback,
+  useState,
+  useRef,
+  useEffect,
+} from 'react';
 import {
   View,
   Alert,
@@ -217,7 +222,7 @@ export default function HomeScreen() {
       });
     }
     return null;
-  }, [startLocation, endLocation, customGasPrice, gasPrice, globalState['Enable Requests']]);
+  }, [startLocation, endLocation, useCustomGasPrice, customGasPrice, gasPrice, globalState['Enable Requests']]);
 
   const updateSuggestions = useCallback((input: string) => {
     // If empty or using `Current Location` then just clear the suggestions
@@ -285,6 +290,12 @@ export default function HomeScreen() {
     setSuggestions([]);
     setActiveInput(input);
   };
+
+  useEffect(() => {
+    if (!useCustomGasPrice) {
+      setGasPrice(0);
+    }
+  }, [useCustomGasPrice]);
 
   const tripCalculated = !!distance && !!gasPrice;
 

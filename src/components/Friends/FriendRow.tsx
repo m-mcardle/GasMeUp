@@ -43,18 +43,29 @@ export default function Row({
   const userDoc = user?.uid ? doc(db, 'Users', user.uid) : undefined;
   const [userDocument] = useDocumentData(userDoc);
 
-  const renderRightActions = () => (
-    <RectButton
-      style={styles.rightAction}
-    >
-      <AnimatedIcon
-        name="remove-circle-outline"
-        size={30}
-        color="red"
-        style={styles.actionIcon}
-      />
-    </RectButton>
-  );
+  const renderRightActions = (
+    _progress: Animated.AnimatedInterpolation<number>,
+    dragX: Animated.AnimatedInterpolation<number>,
+  ) => {
+    const scale = dragX.interpolate({
+      inputRange: [-500, 0],
+      outputRange: [1, 0.25],
+      extrapolate: 'clamp',
+    });
+
+    return (
+      <RectButton
+        style={styles.rightAction}
+      >
+        <AnimatedIcon
+          name="remove-circle-outline"
+          size={30}
+          color="red"
+          style={[styles.actionIcon, { transform: [{ scale }] }]}
+        />
+      </RectButton>
+    );
+  };
 
   const removeFriend = useCallback(async () => {
     if (!user?.uid || !userDoc) {
@@ -74,9 +85,9 @@ export default function Row({
     }
   }, [userDocument, userDoc, user?.uid, uid]);
 
-  const showConfirmationAlert = () => Alert.alert(
+  const showRemoveConfirmationAlert = () => Alert.alert(
     'Remove Friend',
-    'Are you sure you want to remove this friend?',
+    `Are you sure you want to remove ${name} from your list of friends?`,
     [
       {
         text: 'OK',
@@ -94,7 +105,7 @@ export default function Row({
   return (
     <Swipeable
       ref={ref}
-      onSwipeableOpen={() => showConfirmationAlert()}
+      onSwipeableOpen={() => showRemoveConfirmationAlert()}
       renderRightActions={renderRightActions}
       friction={2}
       overshootFriction={10}

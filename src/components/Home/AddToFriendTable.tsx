@@ -99,6 +99,17 @@ export default function AddToFriendTable({
   const usersQuery = friendsUIDs.length ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
   const [usersData = [], usersDataLoading, errorUsersDB] = useCollectionData(usersQuery);
 
+  usersData.sort((a, b) => {
+    const aName = `${a.firstName} ${a.lastName}`;
+    const bName = `${b.firstName} ${b.lastName}`;
+    if (aName < bName) {
+      return -1;
+    }
+    if (aName > bName) {
+      return 1;
+    }
+    return 0;
+  });
   // Add key for each Row
   // eslint-disable-next-line no-param-reassign
   usersData.forEach((el) => { el.key = el.firstName + el.lastName + el.uid; });
@@ -171,6 +182,7 @@ export default function AddToFriendTable({
         >
           {userDocument && (
             <TripSettingsModal
+              cost={cost}
               closeModal={() => setSplitTypeVisible(false)}
               saveTrip={saveTrip}
               selectedFriends={selectedFriends}
