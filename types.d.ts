@@ -55,3 +55,22 @@ interface Location {
   latitude: number,
   longitude: number,
 }
+
+interface Transaction {
+  amount: number,
+  cost: number,
+  payeeUID: string,
+  payers: Array<string>,
+  splitType?: 'split' | 'full'
+  date: Date,
+  distance: number,
+  gasPrice: number,
+  startLocation?: string,
+  endLocation?: string,
+  gasMileage?: number,
+  creator: string,
+  type: 'settle' | 'trip',
+  users: Array<string>,
+  waypoints?: Array<Location>,
+  country?: string,
+}

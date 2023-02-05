@@ -10,55 +10,70 @@ const db = admin.firestore();
 
 exports.aggregateBalances = functions.firestore
     .document("Transactions/{transactionUID}")
-    .onWrite(async (change, context) => {
-      const newData = change.after.data();
+    .onCreate(async (snapshot, context) => {
       // Get value of the newly added transaction
+      const newData = snapshot.data();
       const payeeUID = newData.payeeUID;
-      const payerUID = newData.payerUID;
+      const payerUIDs = newData.payers;
+      const cost = newData.cost;
       const amount = newData.amount;
+      const splitType = newData.splitType;
+      const costPerRider = Number((splitType === "full" ? cost / payerUIDs.length : cost / (payerUIDs.length + 1)).toFixed(2));
 
+      if (costPerRider !== amount) {
+        console.warn(`costPerRider !== amount (${costPerRider} vs ${amount})`);
+      }
       // Get a reference to the payee
       const payeeRef = db.collection("Users").doc(payeeUID);
 
       // Get a reference to the payer
-      const payerRef = db.collection("Users").doc(payerUID);
+      const payerRefs = payerUIDs.map((uid) => db.collection("Users").doc(uid));
+
+      const newPayeeBalances = {};
 
       // Update aggregations in a transaction
       await db.runTransaction(async (transaction) => {
         const payeeDoc = await transaction.get(payeeRef);
-        const payerDoc = await transaction.get(payerRef);
+        const payerDocs = await Promise.all(payerRefs.map(async (ref) => transaction.get(ref)));
 
         const payeeData = payeeDoc.data();
-        const payerData = payerDoc.data();
+        const payersData = payerDocs.map((doc) => doc.data());
 
         // Compute new balances
-        const newPayeeBalance = payeeData.friends[payerDoc.id] + amount;
-        const newPayerBalance = payerData.friends[payeeDoc.id] - amount;
+        payersData.forEach((payerData, i) => {
+          const oldPayeeBalance = payeeData.friends[payerData.uid] ?? 0;
+          const newPayeeBalance = oldPayeeBalance + costPerRider;
 
-        const payeeTransactions = payeeData.transactions;
-        const payerTransactions = payerData.transactions;
+          const oldPayerBalance = payerData.friends[payeeDoc.id] ?? 0;
+          const newPayerBalance = oldPayerBalance - costPerRider;
 
-        payeeTransactions.push(change.after.id);
-        payerTransactions.push(change.after.id);
+          const payerTransactions = payerData.transactions;
+          payerTransactions.push(snapshot.id);
+
+          const oldPayerFriends = payerData.friends;
+
+          // Update payee balances
+          newPayeeBalances[payerData.uid] = newPayeeBalance;
+
+          // Update payer info
+          transaction.update(payerRefs[i], {
+            transactions: [...payerTransactions],
+            friends: {
+              ...oldPayerFriends,
+              [payeeDoc.id]: newPayerBalance,
+            },
+          });
+        });
 
         const oldPayeeFriends = payeeData.friends;
-        const oldPayerFriends = payerData.friends;
-
+        const payeeTransactions = payeeData.transactions;
+        payeeTransactions.push(snapshot.id);
         // Update payee info
         transaction.update(payeeRef, {
           transactions: [...payeeTransactions],
           friends: {
             ...oldPayeeFriends,
-            [payerDoc.id]: newPayeeBalance,
-          },
-        });
-
-        // Update payer info
-        transaction.update(payerRef, {
-          transactions: [...payerTransactions],
-          friends: {
-            ...oldPayerFriends,
-            [payeeDoc.id]: newPayerBalance,
+            ...newPayeeBalances,
           },
         });
       });

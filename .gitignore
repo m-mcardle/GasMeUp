@@ -11,6 +11,7 @@ npm-debug.*
 web-build/
 .env
 firebase-debug.log
+.ignore/
 
 # macOS
 .DS_Store

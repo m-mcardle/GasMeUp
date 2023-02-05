@@ -61,8 +61,8 @@ export default function SettingsScreen() {
           <View style={styles.settingItem}>
             <NumericInput
               rounded
-              totalHeight={18}
-              totalWidth={120}
+              totalHeight={25}
+              totalWidth={150}
               containerStyle={{ backgroundColor: 'white' }}
               inputStyle={globalStyles.numericInput as ViewStyle}
               valueType="real"

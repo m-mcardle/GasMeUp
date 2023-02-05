@@ -20,7 +20,6 @@ import { colors } from '../../styles/styles';
 
 interface Props {
   loading: boolean,
-  riders: number,
   distance: number,
   gasPrice: number,
   useCustomGasPrice: boolean,
@@ -33,7 +32,6 @@ const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 export default function StatsSection(props: Props) {
   const {
     loading,
-    riders = 0,
     distance = 0,
     gasPrice = 0,
     useCustomGasPrice,
@@ -78,7 +76,6 @@ export default function StatsSection(props: Props) {
     ? `${distance.toFixed(2)} km`
     : `${(distance * 0.621371).toFixed(2)} mi`;
 
-  const safeRiders = riders < 1 ? 1 : riders;
   return (
     <View style={styles.statsSection}>
       <AnimatedLinearGradient
@@ -94,7 +91,7 @@ export default function StatsSection(props: Props) {
           : (
             <Text style={styles.costText}>
               $
-              {(cost / safeRiders).toFixed(2)}
+              {cost.toFixed(2)}
             </Text>
           )}
       </AnimatedLinearGradient>
@@ -108,7 +105,7 @@ export default function StatsSection(props: Props) {
               </Text>
             )}
         </View>
-        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : {})]} onTouchEnd={() => openModal()}>
+        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : {}), (useCustomGasPrice ? { borderColor: colors.secondaryAction, borderWidth: 1 } : {})]} onTouchEnd={() => openModal()}>
           {loading
             ? <ActivityIndicator size="small" />
             : (

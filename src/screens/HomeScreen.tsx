@@ -7,22 +7,25 @@
 */
 
 // React imports
-import React, { useCallback, useState, useRef } from 'react';
+import React, {
+  useCallback,
+  useState,
+  useRef,
+  useEffect,
+} from 'react';
 import {
   View,
   Alert,
   Keyboard,
-  ViewStyle,
   TextInput,
 } from 'react-native';
 
 // External Components
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import NumericInput from 'react-native-numeric-input';
 
 import {
-  Portal, Modal,
+  Portal,
 } from 'react-native-paper';
 
 import { throttle, debounce } from 'throttle-debounce';
@@ -41,6 +44,7 @@ import Text from '../components/Text';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import MapContainer from '../components/MapContainer';
+import Modal from '../components/Modal';
 
 import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
@@ -48,7 +52,7 @@ import AddToFriendsTable from '../components/Home/AddToFriendTable';
 import GasPriceModal from '../components/Home/GasPriceModal';
 
 // Styles
-import { colors, globalStyles } from '../styles/styles';
+import { colors } from '../styles/styles';
 import styles from '../styles/HomeScreen.styles';
 
 // Mock Data
@@ -93,7 +97,6 @@ export default function HomeScreen() {
   const [customGasPrice, setCustomGasPrice] = useState<number>(1.5);
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
-  const [riders, setRiders] = useState<number>(1);
   const [visible, setVisible] = useState<boolean>(false);
   const [useCustomGasPrice, setUseCustomGasPrice] = useState<boolean>(false);
   const [globalState] = useGlobalState();
@@ -219,7 +222,7 @@ export default function HomeScreen() {
       });
     }
     return null;
-  }, [startLocation, endLocation, customGasPrice, gasPrice, globalState['Enable Requests']]);
+  }, [startLocation, endLocation, useCustomGasPrice, customGasPrice, gasPrice, globalState['Enable Requests']]);
 
   const updateSuggestions = useCallback((input: string) => {
     // If empty or using `Current Location` then just clear the suggestions
@@ -288,6 +291,12 @@ export default function HomeScreen() {
     setActiveInput(input);
   };
 
+  useEffect(() => {
+    if (!useCustomGasPrice) {
+      setGasPrice(0);
+    }
+  }, [useCustomGasPrice]);
+
   const tripCalculated = !!distance && !!gasPrice;
 
   // Represents if the user has entered all the required data to save a trip's cost
@@ -310,13 +319,11 @@ export default function HomeScreen() {
         <Modal
           visible={modalVisible}
           onDismiss={() => setModalVisible(false)}
-          contentContainerStyle={globalStyles.modal}
         >
           <AddToFriendsTable
             cost={cost}
             distance={distance}
             gasPrice={gasPrice}
-            riders={riders}
             start={start.address}
             end={end.address}
             waypoints={waypoints}
@@ -328,7 +335,6 @@ export default function HomeScreen() {
         <Modal
           visible={mapModalVisible}
           onDismiss={() => setMapModalVisible(false)}
-          contentContainerStyle={globalStyles.modal}
         >
           <MapContainer
             data={{
@@ -343,29 +349,12 @@ export default function HomeScreen() {
       <View style={styles.dataContainer}>
         <StatsSection
           loading={loading}
-          riders={riders}
           distance={distance}
           gasPrice={gasPrice}
           useCustomGasPrice={useCustomGasPrice}
           cost={cost}
           openModal={() => setVisible(true)}
         />
-        <View style={styles.ridersSection}>
-          <Text style={styles.ridersText}>Riders:</Text>
-          <NumericInput
-            rounded
-            totalHeight={18}
-            totalWidth={120}
-            containerStyle={{ backgroundColor: 'white' }}
-            inputStyle={globalStyles.numericInput as ViewStyle}
-            minValue={1}
-            leftButtonBackgroundColor={colors.lightGray}
-            rightButtonBackgroundColor={colors.action}
-            value={riders}
-            editable={false}
-            onChange={setRiders}
-          />
-        </View>
         <Input
           placeholder="Start location"
           onChangeText={updateStartLocation}

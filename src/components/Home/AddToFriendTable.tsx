@@ -1,12 +1,13 @@
 // React
 import React, { useCallback, useState } from 'react';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 
-import { DataTable } from 'react-native-paper';
+import Checkbox from 'expo-checkbox';
+import { DataTable, Portal } from 'react-native-paper';
 
 // Firebase
 import {
-  collection, doc, query, where, addDoc, DocumentData,
+  collection, doc, query, where, DocumentData,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
@@ -16,33 +17,50 @@ import { db, auth } from '../../../firebase';
 import Table from '../Table';
 import Text from '../Text';
 import Button from '../Button';
+import Modal from '../Modal';
+
+import TripSettingsModal from './TripSettingsModal';
 
 // Global State
 import { useGlobalState } from '../../hooks/hooks';
+
+// Helpers
+import { createTransaction } from '../../helpers/firestoreHelper';
 
 // Styles
 import styles from '../../styles/HomeScreen.styles';
 import { boldFont, colors, globalStyles } from '../../styles/styles';
 
-function RowBuilder(selectedFriend: DocumentData, setSelectedFriend: Function) {
+function RowBuilder(
+  selectedFriends: Array<DocumentData>,
+  setSelectedFriend: (_ : Array<DocumentData>) => void,
+) {
   function Row({ firstName, lastName, uid }: DocumentData) {
-    const isSelected = selectedFriend.uid === uid;
+    const updateSelectedFriends = (friend: DocumentData) => {
+      const friendIndex = selectedFriends.findIndex((el) => el.uid === friend.uid);
+      if (friendIndex === -1) {
+        setSelectedFriend([...selectedFriends, friend]);
+      } else {
+        selectedFriends.splice(friendIndex, 1);
+        setSelectedFriend([...selectedFriends]);
+      }
+    };
+
+    const isSelected = !!selectedFriends.find((friend: DocumentData) => friend.uid === uid);
     return (
       <DataTable.Row
         key={firstName + lastName + uid}
-        onPress={() => { setSelectedFriend(isSelected ? {} : { firstName, lastName, uid }); }}
-        style={isSelected ? { backgroundColor: '#e0e0e0' } : undefined}
+        onPress={() => updateSelectedFriends({ firstName, lastName, uid })}
       >
-        <DataTable.Cell
-          textStyle={isSelected ? { color: 'black' } : undefined}
-        >
+        <DataTable.Cell>
           {`${firstName} ${lastName}`}
         </DataTable.Cell>
-        <DataTable.Cell
-          textStyle={isSelected ? { color: 'black' } : undefined}
-          numeric
-        >
-          +
+        <DataTable.Cell numeric>
+          <Checkbox
+            onValueChange={() => updateSelectedFriends({ firstName, lastName, uid })}
+            value={isSelected}
+            color={colors.action}
+          />
         </DataTable.Cell>
       </DataTable.Row>
     );
@@ -59,17 +77,17 @@ interface Props {
   cost: number,
   gasPrice: number,
   distance: number,
-  riders: number,
   gasMileage: number,
-  waypoints: Array<LatLng>,
+  waypoints: Array<Location>,
   closeModal: Function,
 }
 
 export default function AddToFriendTable({
-  start, end, cost, gasPrice, distance, riders, closeModal, gasMileage, waypoints,
+  start, end, cost, gasPrice, distance, closeModal, gasMileage, waypoints,
 }: Props) {
   const [globalState] = useGlobalState();
-  const [selectedFriend, setSelectedFriend] = useState<DocumentData>({});
+  const [selectedFriends, setSelectedFriends] = useState<Array<DocumentData>>([]);
+  const [splitTypeVisible, setSplitTypeVisible] = useState(false);
 
   const [currentUser] = useAuthState(auth);
 
@@ -82,36 +100,64 @@ export default function AddToFriendTable({
   const usersQuery = friendsUIDs.length ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
   const [usersData = [], usersDataLoading, errorUsersDB] = useCollectionData(usersQuery);
 
+  usersData.sort((a, b) => {
+    const aName = `${a.firstName} ${a.lastName}`;
+    const bName = `${b.firstName} ${b.lastName}`;
+    if (aName < bName) {
+      return -1;
+    }
+    if (aName > bName) {
+      return 1;
+    }
+    return 0;
+  });
   // Add key for each Row
   // eslint-disable-next-line no-param-reassign
   usersData.forEach((el) => { el.key = el.firstName + el.lastName + el.uid; });
 
-  const addCostToFriend = useCallback(async (friend: DocumentData, owed: boolean = false) => {
+  const saveTrip = useCallback(async (
+    friends: Array<DocumentData>,
+    driver: DocumentData,
+    splitType: 'split' | 'full',
+  ) => {
     if (!currentUser?.uid) {
       return;
     }
+    const userIsDriver = driver.uid === currentUser.uid;
+    const friendUIDs = friends.map((friend) => friend.uid);
 
+    const payers = userIsDriver
+      ? friendUIDs
+      : [currentUser.uid, ...friendUIDs.filter((friend) => friend !== driver.uid)];
+
+    const amount = splitType === 'full'
+      ? Number((cost / payers.length).toFixed(2))
+      : Number((cost / (payers.length + 1)).toFixed(2));
     try {
-      await addDoc(collection(db, 'Transactions'), {
+      await createTransaction({
         cost: Number(cost.toFixed(2)),
-        amount: (Number(cost.toFixed(2))) / riders,
-        payeeUID: owed ? friend.uid : currentUser.uid,
-        payerUID: owed ? currentUser.uid : friend.uid,
+        amount,
+        payeeUID: driver.uid,
+        payers,
+        splitType,
         distance,
         gasPrice,
-        riders,
         startLocation: start,
         endLocation: end,
         gasMileage,
         date: new Date(),
         creator: currentUser.uid,
-        users: [currentUser.uid, friend.uid],
+        users: [currentUser.uid, ...friendUIDs],
         waypoints,
         country: globalState.country,
+        type: 'trip',
       });
+      Alert.alert('Success', 'Trip was saved!');
       closeModal();
     } catch (exception) {
       console.log(exception);
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
+      closeModal();
     }
   }, [currentUser, cost, distance, gasPrice]);
 
@@ -130,6 +176,22 @@ export default function AddToFriendTable({
 
   return (
     <>
+      <Portal>
+        <Modal
+          visible={splitTypeVisible}
+          onDismiss={() => setSplitTypeVisible(false)}
+        >
+          {userDocument && (
+            <TripSettingsModal
+              cost={cost}
+              closeModal={() => setSplitTypeVisible(false)}
+              saveTrip={saveTrip}
+              selectedFriends={selectedFriends}
+              userDocument={userDocument}
+            />
+          )}
+        </Modal>
+      </Portal>
       <Text style={globalStyles.title}>Save Trip</Text>
       <View style={styles.saveTripLocationHeaderContainer}>
         <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
@@ -188,26 +250,16 @@ export default function AddToFriendTable({
         itemsPerPage={5}
         data={usersData}
         headers={headers}
-        Row={RowBuilder(selectedFriend, setSelectedFriend)}
+        Row={RowBuilder(selectedFriends, setSelectedFriends)}
         loading={usersDataLoading}
       />
       <View style={styles.saveTripButtonSection}>
         <Button
-          disabled={!selectedFriend.uid}
-          style={{ ...styles.addToFriendButton, backgroundColor: colors.red }}
-          onPress={() => addCostToFriend(selectedFriend, true)}
+          disabled={selectedFriends.length < 1}
+          onPress={() => setSplitTypeVisible(true)}
         >
-          <Text style={{ ...globalStyles.smallText, color: colors.white }}>
-            Owed by you
-          </Text>
-        </Button>
-        <Button
-          disabled={!selectedFriend.uid}
-          style={{ ...styles.addToFriendButton, backgroundColor: colors.green }}
-          onPress={() => addCostToFriend(selectedFriend, false)}
-        >
-          <Text style={{ ...globalStyles.smallText, color: colors.white }}>
-            Paid by you
+          <Text>
+            Save
           </Text>
         </Button>
       </View>
