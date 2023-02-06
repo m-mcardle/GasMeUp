@@ -6,6 +6,7 @@ import {
   View,
   Alert,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import { DataTable } from 'react-native-paper';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -32,11 +33,17 @@ interface RequestLookup {
   [key: string]: Array<number>
 }
 
-function Row({ text, price }: any) {
+function Row({ text, price, setSelectedValue }: any) {
+  const isProvince = provinces.includes(text);
   return (
-    <DataTable.Row key={text}>
+    <DataTable.Row
+      key={text}
+      onPress={() => (isProvince ? setSelectedValue(text) : setSelectedValue('Canada'))}
+    >
       <DataTable.Cell>
+        {!isProvince && <Ionicons name="chevron-back" size={12} color={colors.secondary} />}
         {text}
+        {isProvince && <Ionicons name="chevron-forward" size={12} color={colors.secondary} />}
       </DataTable.Cell>
       <DataTable.Cell numeric>
         $
@@ -47,16 +54,18 @@ function Row({ text, price }: any) {
 }
 export default function GasPriceScreen() {
   const [globalState] = useGlobalState();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [selectedValue, setSelectedValue] = useState('Canada');
   const [gasPrices, setGasPrices] = useState<Array<number>>([]);
   const [persistedGasPrices, setPersistedGasPrices] = useState<RequestLookup>({});
 
   const fetchGasPrices = useCallback(async () => {
+    setLoading(true);
     try {
       const region = selectedValue === 'Canada' ? undefined : selectedValue;
       if (`${globalState.country}-${region}` in persistedGasPrices) {
         setGasPrices(persistedGasPrices[`${globalState.country}-${region}`]);
+        setLoading(false);
         return;
       }
       const gasPricesResponse = await fetchData(`/gas-prices?country=${globalState.country}&region=${region ?? ''}`, !globalState['Enable Requests']);
@@ -84,7 +93,9 @@ export default function GasPriceScreen() {
       }
     } catch (err: any) {
       Alert.alert(err.message);
+      setGasPrices([]);
     }
+    setLoading(false);
   }, [selectedValue, globalState['Enable Requests']]);
 
   useEffect(() => {
@@ -96,24 +107,14 @@ export default function GasPriceScreen() {
     <Page>
       <View style={styles.main}>
         <Text style={styles.title}>Gas Prices</Text>
-        <DropDownPicker
-          textStyle={{ color: colors.secondary }}
-          labelStyle={{ color: colors.secondary }}
-          style={{ backgroundColor: colors.action }}
-          containerStyle={{ width: 250 }}
-          items={['Canada', ...provinces].map((location) => ({ label: location, value: location }))}
-          open={dropdownOpen}
-          setOpen={setDropdownOpen}
-          setValue={setSelectedValue}
-          value={selectedValue}
-        />
         <Table
+          loading={loading}
           data={gasPrices}
           headers={[
             { text: 'Location', numeric: false },
             { text: 'Price ($/L)', numeric: true },
           ]}
-          Row={Row}
+          Row={(values) => Row({ ...values, setSelectedValue })}
           style={{ width: '100%', marginTop: 16 }}
         />
       </View>
