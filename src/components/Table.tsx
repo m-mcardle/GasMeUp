@@ -11,7 +11,7 @@ import Text from './Text';
 import { globalStyles, colors } from '../styles/styles';
 
 interface Props {
-  title: string,
+  title?: string,
   itemsPerPage?: number,
   data: Array<any>,
   loading?: boolean,
@@ -50,7 +50,7 @@ export default function Table({
 
   return (
     <View style={style}>
-      <Text style={globalStyles.title}>{title}</Text>
+      {title && <Text style={globalStyles.title}>{title}</Text>}
       <DataTable style={globalStyles.table}>
 
         <DataTable.Header>
@@ -97,6 +97,7 @@ export default function Table({
 }
 
 Table.defaultProps = {
+  title: '',
   itemsPerPage: 10,
   FooterRow: undefined,
   loading: false,

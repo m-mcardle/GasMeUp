@@ -1,8 +1,8 @@
 import { ENV } from '../helpers/env';
 
-export const serverUrl = ENV.USE_DEV_API === 'true' ? 'http://localhost:3001' : 'https://northern-bot-301518.uc.r.appspot.com';
-// export const serverUrl = ENV.USE_DEV_API === 'true' ? 'https://gas-me-up.loca.lt' : 'https://northern-bot-301518.uc.r.appspot.com';
-console.log(serverUrl);
+export const serverUrl = ENV.USE_DEV_API === 'true' && ENV.DEV_API_URL
+  ? ENV.DEV_API_URL
+  : 'https://northern-bot-301518.uc.r.appspot.com';
 
 export const mockTripCost = {
   cost: 420.69,
@@ -52,7 +52,6 @@ export async function fetchData(route: string, mock = false) {
     });
     return resp;
   }
-  console.log(`${serverUrl + route}&api_key=${ENV.API_KEY}`);
   return fetch(`${serverUrl + route}&api_key=${ENV.API_KEY}`);
 }
 

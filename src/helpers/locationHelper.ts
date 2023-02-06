@@ -15,6 +15,8 @@ export const provinceCodes: Record<string, string> = {
   // NU: 'Nunavut',
 };
 
+export const provinces = Object.values(provinceCodes);
+
 export const lookupProvince = (code: string) => provinceCodes[code] ?? 'Ontario';
 
-export default { provinceCodes, lookupProvince };
+export default { provinceCodes, lookupProvince, provinces };

@@ -8,7 +8,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 
 import {
-  Provider, DarkTheme,
+  Provider, MD3DarkTheme,
 } from 'react-native-paper';
 
 // Styles
@@ -20,9 +20,9 @@ interface Props {
 }
 
 const theme = {
-  ...DarkTheme,
+  ...MD3DarkTheme,
   colors: {
-    ...DarkTheme.colors,
+    ...MD3DarkTheme.colors,
     ...colors,
   },
 };

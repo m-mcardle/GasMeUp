@@ -1,5 +1,5 @@
 // Expo imports
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import * as SplashScreen from 'expo-splash-screen';
 import {
   useFonts,
@@ -71,6 +71,8 @@ function TabIcon({
         ? 'ios-people'
         : 'ios-people-outline';
       break;
+    case 'Gas':
+      return <FontAwesome5 name="gas-pump" size={size} color={color} />;
     default:
       iconName = 'ios-square';
   }

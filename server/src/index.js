@@ -10,7 +10,10 @@ const {
   mockLocations,
 } = require('./queries/google');
 const {
-  CanadianGasPriceRequest, AmericanGasPriceRequest, CanadianGasPricesRequest,
+  CanadianGasPriceRequest,
+  AmericanGasPriceRequest,
+  CanadianGasPricesRequest,
+  ProvincialGasPricesRequest,
 } = require('./queries/gasprice');
 
 const { GasCostForDistance } = require('./calculations/fuel');
@@ -126,15 +129,21 @@ async function GetSuggestions(input, sessionId) {
 }
 
 async function GetGasPrice(country, region) {
-  if (region) {
-    const { data } = await api(country === 'US' ? AmericanGasPriceRequest(region) : CanadianGasPriceRequest(region));
-    const { price } = data;
-    return price;
-  }
-
+  const { data } = await api(country === 'US' ? AmericanGasPriceRequest(region) : CanadianGasPriceRequest(region));
+  const { price } = data;
+  return price;
+}
+async function GetGasPrices(country, region) {
   if (country === 'US') {
     throw Error('US Gas Prices are not supported yet', { cause: 400 });
   }
+
+  if (region) {
+    const { data } = await api(ProvincialGasPricesRequest(region));
+    const { prices } = data;
+    return prices;
+  }
+
   const { data } = await api(CanadianGasPricesRequest());
   const { prices } = data;
   return prices;
@@ -222,18 +231,20 @@ app.get('/distance', async (req, res) => {
   }
 });
 
-// Handle GET requests to /gas-price route, provide list of gas prices of all provinces in Canada
+// Handle GET requests to /gas-price route
+// provides list of gas prices of all provinces in Canada or all cities in a province
 app.get('/gas-prices', async (req, res) => {
   if (!validateAPIKey(req.query?.api_key)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
   const country = req.query?.country ?? 'CA';
-  Log(`[gas-prices] Requested gas prices for ${country}`);
+  const region = req.query?.region;
+  Log(`[gas-prices] Requested gas prices for ${country} / ${region}`);
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const gasPrices = await GetGasPrice(country);
+    const gasPrices = await GetGasPrices(country, region);
     res.json({ prices: gasPrices });
   } catch (exception) {
     LogError(exception);
@@ -259,6 +270,10 @@ app.get('/gas', async (req, res) => {
     LogError(exception);
     res.status(500).send({ error: exception });
   }
+});
+
+app.get('/', (req, res) => {
+  res.send('GasMeUp API');
 });
 
 if (process.env.NODE_ENV !== 'test') {
