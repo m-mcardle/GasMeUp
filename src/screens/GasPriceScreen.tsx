@@ -26,7 +26,7 @@ import { colors } from '../styles/styles';
 import { fetchData } from '../data/data';
 
 // Helpers
-import { provinces } from '../helpers/locationHelper';
+import { provinces, states } from '../helpers/locationHelper';
 
 interface RequestLookup {
   [key: string]: Array<number>
@@ -34,13 +34,14 @@ interface RequestLookup {
 
 function Row({ text, price, setSelectedRegion }: any) {
   const isProvince = provinces.includes(text);
+  const isState = !isProvince && states.includes(text);
   return (
     <DataTable.Row
       key={text}
       onPress={() => (isProvince ? setSelectedRegion(text) : setSelectedRegion(''))}
     >
       <DataTable.Cell>
-        {!isProvince && <Ionicons name="chevron-back" size={12} color={colors.secondary} />}
+        {!isProvince && !isState && <Ionicons name="chevron-back" size={12} color={colors.secondary} />}
         {text}
         {isProvince && <Ionicons name="chevron-forward" size={12} color={colors.secondary} />}
       </DataTable.Cell>
