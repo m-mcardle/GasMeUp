@@ -1,5 +1,5 @@
 // React
-import React, { ComponentType, useState } from 'react';
+import React, { ComponentType, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { DataTable } from 'react-native-paper';
@@ -47,6 +47,11 @@ export default function Table({
     : [];
 
   const min = (a: number, b: number) => Math.min(a, b);
+
+  // Reset page number when data changes
+  useEffect(() => {
+    setPage(0);
+  }, [data]);
 
   return (
     <View style={style}>
