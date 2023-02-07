@@ -1,5 +1,5 @@
 // React
-import React, { ComponentType, useState } from 'react';
+import React, { ComponentType, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { DataTable } from 'react-native-paper';
@@ -11,7 +11,7 @@ import Text from './Text';
 import { globalStyles, colors } from '../styles/styles';
 
 interface Props {
-  title: string,
+  title?: string,
   itemsPerPage?: number,
   data: Array<any>,
   loading?: boolean,
@@ -48,9 +48,14 @@ export default function Table({
 
   const min = (a: number, b: number) => Math.min(a, b);
 
+  // Reset page number when data changes
+  useEffect(() => {
+    setPage(0);
+  }, [data]);
+
   return (
     <View style={style}>
-      <Text style={globalStyles.title}>{title}</Text>
+      {title && <Text style={globalStyles.title}>{title}</Text>}
       <DataTable style={globalStyles.table}>
 
         <DataTable.Header>
@@ -97,6 +102,7 @@ export default function Table({
 }
 
 Table.defaultProps = {
+  title: '',
   itemsPerPage: 10,
   FooterRow: undefined,
   loading: false,

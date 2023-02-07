@@ -1,5 +1,5 @@
 // Expo imports
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import * as SplashScreen from 'expo-splash-screen';
 import {
   useFonts,
@@ -28,6 +28,7 @@ import { GlobalContext, initialState } from './src/hooks/hooks';
 import HomeScreen from './src/screens/HomeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import FriendsScreen from './src/screens/FriendsScreen';
+import GasPriceScreen from './src/screens/GasPriceScreen';
 
 // Styles
 import { colors } from './src/styles/styles';
@@ -70,6 +71,8 @@ function TabIcon({
         ? 'ios-people'
         : 'ios-people-outline';
       break;
+    case 'Gas':
+      return <FontAwesome5 name="gas-pump" size={size} color={color} />;
     default:
       iconName = 'ios-square';
   }
@@ -175,6 +178,7 @@ export default function App() {
         >
           <Tab.Screen name="Friends" component={FriendsScreen} />
           <Tab.Screen name="Add" component={HomeScreen} />
+          <Tab.Screen name="Gas" component={GasPriceScreen} />
           <Tab.Screen name="Settings" component={SettingsScreen} />
         </Tab.Navigator>
       </NavigationContainer>

@@ -247,12 +247,12 @@ export default function SaveTripModal({
         </View>
       </View>
       <Table
-        title=""
         itemsPerPage={5}
         data={usersData}
         headers={headers}
         Row={RowBuilder(selectedFriends, setSelectedFriends)}
         loading={usersDataLoading}
+        style={{ marginTop: 16 }}
       />
       <View style={styles.saveTripButtonSection}>
         <Button

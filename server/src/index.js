@@ -9,7 +9,13 @@ const {
   Directions,
   mockLocations,
 } = require('./queries/google');
-const { CanadianGasPriceRequest, AmericanGasPriceRequest, GasPricesRequest } = require('./queries/gasprice');
+const {
+  CanadianGasPriceRequest,
+  AmericanGasPriceRequest,
+  CanadianGasPricesRequest,
+  AmericanGasPricesRequest,
+  ProvincialGasPricesRequest,
+} = require('./queries/gasprice');
 
 const { GasCostForDistance } = require('./calculations/fuel');
 
@@ -124,13 +130,28 @@ async function GetSuggestions(input, sessionId) {
 }
 
 async function GetGasPrice(country, region) {
+  const { data } = await api(country === 'US' ? AmericanGasPriceRequest(region) : CanadianGasPriceRequest(region));
+  const { price } = data;
+  return price;
+}
+
+async function GetGasPrices(country, region) {
+  if (country === 'CA') {
+    if (region) {
+      const { data } = await api(ProvincialGasPricesRequest(region));
+      const { prices } = data;
+      return prices;
+    }
+
+    const { data } = await api(CanadianGasPricesRequest());
+    const { prices } = data;
+    return prices;
+  }
   if (region) {
-    const { data } = await api(country === 'US' ? AmericanGasPriceRequest(region) : CanadianGasPriceRequest(region));
-    const { price } = data;
-    return price;
+    throw Error('Region is not supported for this country', { cause: 400 });
   }
 
-  const { data } = await api(GasPricesRequest());
+  const { data } = await api(AmericanGasPricesRequest());
   const { prices } = data;
   return prices;
 }
@@ -149,7 +170,8 @@ app.get('/trip-cost', async (req, res) => {
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ?? 'Toronto';
   const manualGasPrice = req.query?.price ?? '';
-  const province = 'Ontario'; // TODO - This should end up being determined by the user's location
+  const country = req.query?.country ?? 'CA';
+  const region = req.query?.region ?? 'Ontario';
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
@@ -157,7 +179,7 @@ app.get('/trip-cost', async (req, res) => {
       ? [await GetDistance(startLocation, endLocation), Number(manualGasPrice)]
       : await Promise.all([
         GetDistance(startLocation, endLocation),
-        GetGasPrice(province),
+        GetGasPrice(country, region),
       ]);
     Log(`[trip-cost] Distance: ${distance}km and Gas Price: $${gasPrice}`);
 
@@ -217,20 +239,24 @@ app.get('/distance', async (req, res) => {
   }
 });
 
-// Handle GET requests to /gas-price route, provide list of gas prices of all provinces in Canada
+// Handle GET requests to /gas-price route
+// provides list of gas prices of all provinces in Canada or all cities in a province
 app.get('/gas-prices', async (req, res) => {
   if (!validateAPIKey(req.query?.api_key)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
+  const country = req.query?.country ?? 'CA';
+  const region = req.query?.region;
+  Log(`[gas-prices] Requested gas prices for ${country} / ${region}`);
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const gasPrices = await GetGasPrice();
+    const gasPrices = await GetGasPrices(country, region);
     res.json({ prices: gasPrices });
   } catch (exception) {
     LogError(exception);
-    res.status(500).send({ error: exception });
+    res.status(exception.cause ?? 500).send({ error: exception.message });
   }
 });
 
@@ -252,6 +278,10 @@ app.get('/gas', async (req, res) => {
     LogError(exception);
     res.status(500).send({ error: exception });
   }
+});
+
+app.get('/', (req, res) => {
+  res.send('GasMeUp API');
 });
 
 if (process.env.NODE_ENV !== 'test') {

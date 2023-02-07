@@ -46,6 +46,7 @@ module.exports = {
     prodFirebaseAPIKey: process.env.PROD_FIREBASE_API_KEY,
     apiKey: process.env.API_KEY,
     useDevAPI: process.env.USE_DEV_API,
+    devAPIURL: process.env.DEV_API_URL,
   },
   runtimeVersion: {
     policy: 'sdkVersion',
