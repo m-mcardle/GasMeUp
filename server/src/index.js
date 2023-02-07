@@ -13,6 +13,7 @@ const {
   CanadianGasPriceRequest,
   AmericanGasPriceRequest,
   CanadianGasPricesRequest,
+  AmericanGasPricesRequest,
   ProvincialGasPricesRequest,
 } = require('./queries/gasprice');
 
@@ -133,18 +134,24 @@ async function GetGasPrice(country, region) {
   const { price } = data;
   return price;
 }
-async function GetGasPrices(country, region) {
-  if (country === 'US') {
-    throw Error('US Gas Prices are not supported yet', { cause: 400 });
-  }
 
-  if (region) {
-    const { data } = await api(ProvincialGasPricesRequest(region));
+async function GetGasPrices(country, region) {
+  if (country === 'CA') {
+    if (region) {
+      const { data } = await api(ProvincialGasPricesRequest(region));
+      const { prices } = data;
+      return prices;
+    }
+
+    const { data } = await api(CanadianGasPricesRequest());
     const { prices } = data;
     return prices;
   }
+  if (region) {
+    throw Error('Region is not supported for this country', { cause: 400 });
+  }
 
-  const { data } = await api(CanadianGasPricesRequest());
+  const { data } = await api(AmericanGasPricesRequest());
   const { prices } = data;
   return prices;
 }

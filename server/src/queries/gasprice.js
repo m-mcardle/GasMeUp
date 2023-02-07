@@ -44,9 +44,21 @@ function CanadianGasPricesRequest() {
   };
 }
 
+function AmericanGasPricesRequest() {
+  return {
+    method: 'get',
+    url: encodeURI(`${url}/usa`),
+    headers: {
+      'X-RapidAPI-Host': 'canadian-gas-prices.p.rapidapi.com',
+      'X-RapidAPI-Key': `${process.env.RAPID_API_KEY}`,
+    },
+  };
+}
+
 module.exports = {
   CanadianGasPriceRequest,
   AmericanGasPriceRequest,
   CanadianGasPricesRequest,
   ProvincialGasPricesRequest,
+  AmericanGasPricesRequest,
 };
