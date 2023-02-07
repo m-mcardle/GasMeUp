@@ -170,7 +170,8 @@ app.get('/trip-cost', async (req, res) => {
   const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
   const endLocation = req.query?.end ?? 'Toronto';
   const manualGasPrice = req.query?.price ?? '';
-  const province = 'Ontario'; // TODO - This should end up being determined by the user's location
+  const country = req.query?.country ?? 'CA';
+  const region = req.query?.region ?? 'Ontario';
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
@@ -178,7 +179,7 @@ app.get('/trip-cost', async (req, res) => {
       ? [await GetDistance(startLocation, endLocation), Number(manualGasPrice)]
       : await Promise.all([
         GetDistance(startLocation, endLocation),
-        GetGasPrice(province),
+        GetGasPrice(country, region),
       ]);
     Log(`[trip-cost] Distance: ${distance}km and Gas Price: $${gasPrice}`);
 
