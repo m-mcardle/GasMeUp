@@ -16,6 +16,15 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     alignItems: 'center',
   },
+  selectionButtons: {
+    marginTop: 'auto',
+    marginBottom: 0,
+    width: '50%',
+  },
+  gasPriceTable: {
+    width: '100%',
+    marginTop: 16,
+  },
 });
 
 export default styles;

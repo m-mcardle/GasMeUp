@@ -52,21 +52,7 @@ function Row({ text, price, setSelectedRegion }: any) {
   );
 }
 
-function USARow({ text, price }: any) {
-  return (
-    <DataTable.Row key={text}>
-      <DataTable.Cell>
-        {text}
-      </DataTable.Cell>
-      <DataTable.Cell numeric>
-        $
-        {price.toFixed(2)}
-      </DataTable.Cell>
-    </DataTable.Row>
-  );
-}
-
-export default function GasPriceScreenV2() {
+export default function GasPriceScreen() {
   const [globalState] = useGlobalState();
   const [{ selectedCountry, selectedRegion }, setSelected] = useState({ selectedCountry: 'CA', selectedRegion: '' });
   const setSelectedRegion = (region: string) => setSelected((prev) => (
@@ -82,6 +68,7 @@ export default function GasPriceScreenV2() {
   const fetchGasPrices = useCallback(async () => {
     setLoading(true);
     try {
+      // Try and use the cache if possible to avoid unnecessary requests
       if (selectedCountry + selectedRegion in persistedGasPrices) {
         setGasPrices(persistedGasPrices[selectedCountry + selectedRegion]);
         setLoading(false);
@@ -140,11 +127,11 @@ export default function GasPriceScreenV2() {
             { text: 'Location', numeric: false },
             { text: (selectedCountry === 'CA' ? 'Price ($/L)' : 'Price ($/gal)'), numeric: true },
           ]}
-          Row={(values) => (selectedCountry === 'CA' ? Row({ ...values, setSelectedRegion }) : USARow({ ...values }))}
-          style={{ width: '100%', marginTop: 16 }}
+          Row={(values) => Row({ ...values, setSelectedRegion })}
+          style={styles.gasPriceTable}
         />
         <SegmentedButtons
-          style={{ marginTop: 'auto', marginBottom: 0 }}
+          style={styles.selectionButtons}
           buttons={[
             {
               value: 'CA',

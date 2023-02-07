@@ -46,8 +46,11 @@ export async function fetchData(route: string, mock = false) {
         resolve(mockGasPrice);
       } else if (route.includes('distance')) {
         resolve(mockDistance);
-      } else {
+      } else if (route.includes('trip-cost')) {
         resolve(mockTripCost);
+      } else {
+        console.warn('No mock data for this route - actually fetching data');
+        resolve(fetch(`${serverUrl + route}&api_key=${ENV.API_KEY}`));
       }
     });
     return resp;
