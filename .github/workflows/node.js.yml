@@ -24,7 +24,7 @@ jobs:
     - name: create env file
       run: |
         touch ./server/.env
-        echo ${{ secrets.ENV_FILE }} >> ./server/.env
+        echo "${{ secrets.ENV_FILE }}" >> ./server/.env
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
