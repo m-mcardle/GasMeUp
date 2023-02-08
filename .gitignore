@@ -13,5 +13,7 @@ web-build/
 firebase-debug.log
 .ignore/
 
+ios
+
 # macOS
 .DS_Store

@@ -4,7 +4,7 @@ module.exports = {
   name: 'GasMeUp',
   slug: 'gas-me-up',
   owner: 'mmcardle',
-  version: '1.0.8',
+  version: '1.0.9',
   orientation: 'portrait',
   icon: './assets/car.png',
   splash: {
@@ -20,11 +20,11 @@ module.exports = {
     '**/*',
   ],
   ios: {
-    supportsTablet: true,
+    supportsTablet: false,
     bundleIdentifier: 'com.Virintus.GasMeUp',
-    buildNumber: '1.0.8',
+    buildNumber: '1.0.9',
     config: {
-      googleMapsApiKey: process.env.GOOGLE_IOS_SDK_KEY,
+      googleMapsApiKey: 'AIzaSyB1JNdanwF6CavSHC5S2nS6mwefil7BcKc',
     },
   },
   android: {
@@ -33,7 +33,7 @@ module.exports = {
       backgroundColor: '#FFFFFF',
     },
     package: 'com.Virintus.GasMeUp',
-    versionCode: 470010008,
+    versionCode: 470010009,
   },
   web: {
     favicon: './assets/favicon.png',
