@@ -1,6 +1,6 @@
 {
   "name": "gas-me-up",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -17,6 +17,7 @@
     "publish:android": "eas submit --platform android",
     "publish-functions": "firebase deploy",
     "check-types": "npx tsc",
+    "push:secrets": "eas secret:push --scope project --env-file .env --force",
     "lint": "npx eslint './src/' 'App.tsx'",
     "lint:fix": "npx eslint --fix './src/' 'App.tsx'",
     "lint-client": "npx eslint './src/' 'App.tsx'",
