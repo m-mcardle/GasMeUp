@@ -38,7 +38,7 @@ export default function TripSettingsModal({
   const ridersCost = cost / selectedFriends.length;
   const isDriver = (friend: DocumentData) => friend.uid === driver.uid;
   return (
-    <>
+    <View style={{ height: '100%', width: '100%', padding: 12 }}>
       <Text style={globalStyles.h1}>Select Driver</Text>
       <Text style={globalStyles.h2}>This determines who is owed the money for this trip</Text>
       <View style={{ marginTop: 24 }}>
@@ -103,6 +103,6 @@ export default function TripSettingsModal({
           </Text>
         </View>
       </View>
-    </>
+    </View>
   );
 }

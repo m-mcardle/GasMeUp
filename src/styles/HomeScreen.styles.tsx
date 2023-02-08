@@ -46,7 +46,6 @@ const styles = StyleSheet.create({
   subStatsSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
     width: '100%',
   },
   statBox: {
@@ -55,14 +54,16 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.tertiary,
-    width: '49%',
+    width: '50%',
     minHeight: 50,
   },
   statBoxText: {
-    color: colors.secondary,
+    color: colors.gray,
     fontFamily: semiBoldFont,
     fontSize: 14,
     padding: 5,
+    textAlign: 'center',
+    width: '80%',
   },
   dataContainer: {
     flex: 1,
@@ -99,11 +100,13 @@ const styles = StyleSheet.create({
   checkBoxSection: {
     flexDirection: 'row',
     alignSelf: 'center',
-    paddingTop: 48,
-    alignItems: 'flex-end',
+    marginTop: 24,
+    marginBottom: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalContainer: {
-    backgroundColor: colors.tertiary,
+    backgroundColor: colors.softBlack,
     borderRadius: 20,
     paddingTop: 32,
     paddingBottom: 4,
@@ -113,8 +116,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   modalCheckBox: {
-    width: 16,
-    height: 16,
+    width: 24,
+    height: 24,
     margin: 2,
   },
   saveButton: {
@@ -174,6 +177,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 4,
+    width: '100%',
+    justifyContent: 'center',
   },
 });
 

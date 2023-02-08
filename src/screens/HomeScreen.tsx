@@ -111,7 +111,7 @@ export default function HomeScreen() {
   const cost = (
     ((distance * GAS_MILEAGE) / 100) // This get's the L of gas used
     * gasPrice // This gets the cost of the gas used
-    * (globalState.country === 'CA' ? 1 : 0.2641729) // This converts the cost based on if the gas price is MPG or L/100km
+    * (globalState.country === 'CA' ? 1 : 0.2641729) // This converts the cost based on if the gas price is $/gal or $/L
   );
 
   const setGasPrice = (newPrice: number) => {
@@ -289,7 +289,23 @@ export default function HomeScreen() {
 
   const changeActiveInput = (input: ActiveInput) => {
     setSuggestions([]);
+    if (input === ActiveInput.Start && startLocation === 'Current Location') {
+      setLocations((state) => ({ ...state, startLocation: '' }));
+    } else if (input === ActiveInput.End && endLocation === 'Current Location') {
+      setLocations((state) => ({ ...state, endLocation: '' }));
+    }
     setActiveInput(input);
+  };
+
+  const useCurrentLocation = (input: ActiveInput) => {
+    Keyboard.dismiss();
+
+    if (input === ActiveInput.Start) {
+      setLocations((state) => ({ ...state, startLocation: (state.startLocation === 'Current Location' ? '' : 'Current Location') }));
+    } else {
+      setLocations((state) => ({ ...state, endLocation: (state.endLocation === 'Current Location' ? '' : 'Current Location') }));
+    }
+    setSuggestions([]);
   };
 
   // Reset to last server gas price each time the use disables custom gas price
@@ -303,8 +319,6 @@ export default function HomeScreen() {
 
   // Represents if the user has entered all the required data to save a trip's cost
   const canSaveTrip = tripCalculated && !!user;
-
-  const shouldShowUserLocation = startLocation !== 'Current Location' && endLocation !== 'Current Location';
 
   const endLocationRef = useRef<TextInput>(null);
   return (
@@ -344,7 +358,7 @@ export default function HomeScreen() {
               end,
             }}
             waypoints={waypoints}
-            showUserLocation={shouldShowUserLocation}
+            showUserLocation={false}
           />
         </Modal>
       </Portal>
@@ -359,7 +373,7 @@ export default function HomeScreen() {
           openModal={() => setVisible(true)}
         />
         <Input
-          placeholder="Start location"
+          placeholder="Start Location"
           onChangeText={updateStartLocation}
           onPressIn={() => changeActiveInput(ActiveInput.Start)}
           value={startLocation}
@@ -369,7 +383,7 @@ export default function HomeScreen() {
               size={30}
               color={(startLocation === 'Current Location' ? colors.action : colors.secondary)}
               disabled={!globalState.userLocation.lat || !globalState.userLocation.lng || endLocation === 'Current Location'}
-              onPress={() => updateStartLocation('Current Location')}
+              onPress={() => useCurrentLocation(ActiveInput.Start)}
             />
            )}
           clearButton
@@ -381,7 +395,7 @@ export default function HomeScreen() {
         />
         <Input
           myRef={endLocationRef}
-          placeholder="End location"
+          placeholder="End Location"
           onChangeText={updateEndLocation}
           onPressIn={() => changeActiveInput(ActiveInput.End)}
           value={endLocation}
@@ -391,7 +405,7 @@ export default function HomeScreen() {
               size={30}
               color={(endLocation === 'Current Location' ? colors.action : colors.secondary)}
               disabled={!globalState.userLocation.lat || !globalState.userLocation.lng || startLocation === 'Current Location'}
-              onPress={() => updateEndLocation('Current Location')}
+              onPress={() => useCurrentLocation(ActiveInput.End)}
             />
            )}
           clearButton

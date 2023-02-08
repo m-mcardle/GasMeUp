@@ -118,6 +118,9 @@ export default function SaveTripModal({
   // eslint-disable-next-line no-param-reassign
   usersData.forEach((el) => { el.key = el.firstName + el.lastName + el.uid; });
 
+  // This converts from $/gal to $/L
+  const convertedGasPrice = Number((globalState.country === 'US' ? gasPrice / 4.54609 : gasPrice).toFixed(4));
+
   const saveTrip = useCallback(async (
     friends: Array<DocumentData>,
     driver: DocumentData,
@@ -144,7 +147,7 @@ export default function SaveTripModal({
         payers,
         splitType,
         distance,
-        gasPrice,
+        gasPrice: convertedGasPrice,
         startLocation: start,
         endLocation: end,
         gasMileage,
@@ -219,10 +222,19 @@ export default function SaveTripModal({
         <View style={{ flexDirection: 'row' }}>
           <FontAwesome5 name="gas-pump" size={12} color={colors.secondary} />
           <Text style={{ ...globalStyles.smallText, fontFamily: boldFont, paddingLeft: 4 }}>
-            {'Gas: '}
+            {'Gas Used: '}
           </Text>
           <Text style={globalStyles.smallText}>
-            {`${gasUsageString} used at ${gasPriceString}`}
+            {gasUsageString}
+          </Text>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          <FontAwesome5 name="gas-pump" size={12} color={colors.secondary} />
+          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont, paddingLeft: 4 }}>
+            {'Gas Price: '}
+          </Text>
+          <Text style={globalStyles.smallText}>
+            {gasPriceString}
           </Text>
         </View>
       </View>

@@ -126,7 +126,7 @@ export default function FriendInfoSection({
 
       <DataTable>
         <DataTable.Header>
-          <DataTable.Title style={{ maxWidth: '8%' }}> </DataTable.Title>
+          <DataTable.Title style={{ maxWidth: '10%' }}> </DataTable.Title>
           <DataTable.Title style={{ minWidth: '35%' }}>Start/End</DataTable.Title>
           <DataTable.Title numeric>Date</DataTable.Title>
           <DataTable.Title numeric>Amount</DataTable.Title>
@@ -136,14 +136,18 @@ export default function FriendInfoSection({
           {transactionsSinceLastSettle?.map((transaction) => (
             <DataTable.Row key={transaction.payeeUID + transaction.amount + transaction.date}>
               <DataTable.Cell
-                style={{ maxWidth: '8%' }}
+                style={{ maxWidth: '10%' }}
                 onPress={() => {
                   setSelectedTransaction(transaction);
                   setMapVisible(true);
                 }}
                 disabled={!(transaction?.waypoints?.length > 0)}
               >
-                {transaction?.waypoints?.length > 0 && <Ionicons name="map" size={12} color={colors.action} />}
+                {transaction?.waypoints?.length > 0 && (
+                <View style={{ justifyContent: 'center', minWidth: '100%', alignItems: 'center' }}>
+                  <Ionicons name="map" size={18} color={colors.action} />
+                </View>
+                )}
               </DataTable.Cell>
               <DataTable.Cell style={{ minWidth: '35%' }}>
                 <View style={{ justifyContent: 'center' }}>

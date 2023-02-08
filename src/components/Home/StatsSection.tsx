@@ -3,7 +3,7 @@ import {
   ActivityIndicator, Animated, Easing, Image, View,
 } from 'react-native';
 
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 // Global State Stuff
@@ -78,13 +78,20 @@ export default function StatsSection(props: Props) {
 
   const gasUsed = (distance * gasMileage) / 100;
 
+  const gasUsedString = globalState.country === 'CA'
+    ? `${gasUsed.toFixed(2)}L`
+    : `${(convertLtoGallons(gasUsed)).toFixed(2)}gal`;
+
   const gasPriceString = globalState.country === 'CA'
-    ? `${gasUsed.toFixed()}L at $${gasPrice.toFixed(2)}/L`
-    : `${(convertLtoGallons(gasUsed)).toFixed()}gal $${gasPrice.toFixed(2)}/gal`;
+    ? `$${gasPrice.toFixed(2)}/L`
+    : `$${gasPrice.toFixed(2)}/gal`;
 
   const distanceString = globalState.country === 'CA'
     ? `${distance.toFixed(2)} km`
     : `${(convertKMtoMiles(distance)).toFixed(2)} mi`;
+
+  // TODO - Add support for mpg
+  const fuelEfficiencyString = `${gasMileage.toFixed(1)}L/100km`;
 
   return (
     <View style={styles.statsSection}>
@@ -106,12 +113,12 @@ export default function StatsSection(props: Props) {
           )}
       </AnimatedLinearGradient>
       <View style={styles.subStatsSection}>
-        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : { width: '40%' })]}>
+        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}>
           {loading
             ? <ActivityIndicator size="small" />
             : (
               <View style={styles.statText}>
-                <FontAwesome5 name="route" size={16} color={colors.secondary} />
+                <FontAwesome5 name="route" size={16} color={colors.gray} />
                 <Text style={styles.statBoxText}>
                   {distanceString}
                 </Text>
@@ -121,7 +128,7 @@ export default function StatsSection(props: Props) {
         <View
           style={[
             styles.statBox,
-            (loading ? { justifyContent: 'center' } : { width: '59%' }),
+            (loading ? { justifyContent: 'center' } : undefined),
             (useCustomGasPrice ? { borderColor: colors.secondaryAction, borderWidth: 1 } : {}),
           ]}
           onTouchEnd={() => openModal()}
@@ -130,8 +137,8 @@ export default function StatsSection(props: Props) {
             ? <ActivityIndicator size="small" />
             : (
               <>
-                <View style={styles.statText}>
-                  <FontAwesome5 name="gas-pump" size={16} color={colors.secondary} />
+                <View style={[styles.statText, { width: '75%' }]}>
+                  <Ionicons name="ios-pricetag" size={16} color={colors.gray} />
                   <Text style={styles.statBoxText}>
                     {gasPriceString}
                   </Text>
@@ -143,6 +150,38 @@ export default function StatsSection(props: Props) {
                   />
                 </View>
               </>
+            )}
+        </View>
+      </View>
+      <View style={styles.subStatsSection}>
+        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : {})]}>
+          {loading
+            ? <ActivityIndicator size="small" />
+            : (
+              <View style={styles.statText}>
+                <FontAwesome5 name="car" size={16} color={colors.gray} />
+                <Text style={styles.statBoxText}>
+                  {fuelEfficiencyString}
+                </Text>
+              </View>
+            )}
+        </View>
+        <View
+          style={[
+            styles.statBox,
+            (loading ? { justifyContent: 'center' } : {}),
+          ]}
+          onTouchEnd={() => openModal()}
+        >
+          {loading
+            ? <ActivityIndicator size="small" />
+            : (
+              <View style={[styles.statText, { width: '75%' }]}>
+                <FontAwesome5 name="gas-pump" size={16} color={colors.gray} />
+                <Text style={styles.statBoxText}>
+                  {gasUsedString}
+                </Text>
+              </View>
             )}
         </View>
       </View>

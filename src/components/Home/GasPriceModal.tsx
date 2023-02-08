@@ -68,7 +68,7 @@ export default function GasPriceModal(props: Props) {
           />
         </View>
         <Button style={{ alignSelf: 'center' }} onPress={() => setVisible(false)}>
-          <Text style={{ color: colors.primary }}>Done</Text>
+          <Text style={{ color: colors.secondary }}>Done</Text>
         </Button>
       </View>
     </Modal>

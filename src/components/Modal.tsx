@@ -20,12 +20,18 @@ export default function MyModal({
   children, style, visible, onDismiss,
 }: Props) {
   return (
-    <Modal visible={visible} onDismiss={onDismiss}>
-      <View style={[globalStyles.modal, style]}>
+    <Modal
+      visible={visible}
+      onDismiss={onDismiss}
+      contentContainerStyle={globalStyles.modal}
+    >
+      <View style={[{ height: '100%', padding: 4 }, style]}>
         <View style={{ width: '100%', height: 24, alignItems: 'flex-end' }}>
           <Ionicons name="close" size={24} color={colors.secondary} onPress={onDismiss} />
         </View>
-        {children}
+        <View style={{ maxHeight: '95%' }}>
+          {children}
+        </View>
       </View>
     </Modal>
   );
