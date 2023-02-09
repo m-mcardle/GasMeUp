@@ -24,7 +24,7 @@ module.exports = {
     bundleIdentifier: 'com.Virintus.GasMeUp',
     buildNumber: '1.0.9',
     config: {
-      googleMapsApiKey: 'AIzaSyB1JNdanwF6CavSHC5S2nS6mwefil7BcKc',
+      googleMapsApiKey: process.env.GOOGLE_IOS_SDK_KEY,
     },
   },
   android: {
@@ -54,4 +54,5 @@ module.exports = {
   plugins: [
     'expo-apple-authentication',
   ],
+  privacy: 'public',
 };

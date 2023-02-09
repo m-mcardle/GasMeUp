@@ -3,8 +3,12 @@ import React, { useState, useRef } from 'react';
 import { View, Alert, TextInput } from 'react-native';
 import PropTypes from 'prop-types';
 
+import md5 from 'md5';
+
 // Firebase
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword, sendEmailVerification, updateProfile,
+} from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 
@@ -45,9 +49,14 @@ export default function SignUpScreen({ navigation }: Props) {
 
         const { user } = userCredential;
 
+        await updateProfile(user, {
+          displayName: `${firstName} ${lastName}`,
+          photoURL: `https://www.gravatar.com/avatar/${md5(email.toLowerCase())}?d=identicon`,
+        });
+
         await sendEmailVerification(user);
 
-        Alert.alert('Success', 'Please verify your email address before logging in.');
+        Alert.alert('Successfully Created Account', `A verification email has been sent to ${email}. You must verify your account before you can save any trips!`);
 
         await setDoc(doc(db, 'Users', user.uid), {
           uid: user.uid,

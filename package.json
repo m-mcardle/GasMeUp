@@ -48,6 +48,7 @@
     "expo-status-bar": "~1.4.2",
     "expo-updates": "~0.15.6",
     "firebase": "^9.9.3",
+    "md5": "^2.3.0",
     "npm-force-resolutions": "^0.0.10",
     "prop-types": "^15.8.1",
     "react": "18.1.0",
@@ -67,6 +68,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
+    "@types/md5": "^2.3.2",
     "@types/react": "~18.0.24",
     "@types/react-native": "~0.70.6",
     "@types/throttle-debounce": "^5.0.0",

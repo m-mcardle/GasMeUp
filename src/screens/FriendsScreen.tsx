@@ -19,6 +19,9 @@ import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firesto
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../../firebase';
 
+// Helpers
+import { validateCurrentUser } from '../helpers/authHelper';
+
 // Screens
 import LoginScreen from './LoginScreen';
 
@@ -111,12 +114,6 @@ export default function FriendsScreen() {
     );
   }
 
-  if (!user.emailVerified) {
-    Alert.alert('Email not verified', 'Please verify your email before logging in.');
-    signOut(auth);
-    return (<LoginScreen />);
-  }
-
   const headers = [
     { text: 'Friend', numeric: false },
     { text: 'Amount Owed', numeric: true },
@@ -135,7 +132,7 @@ export default function FriendsScreen() {
       setFriendInfoVisible(true);
     },
   });
-  const Footer = () => FooterRow(() => setVisible(true));
+  const Footer = () => FooterRow(() => validateCurrentUser(user) && setVisible(true));
 
   // Remove friend requests that are now friends, fixes race condition of Firebase Function
   const sanitizedFriendRequests = userDocument?.incomingFriendRequests
@@ -190,7 +187,9 @@ export default function FriendsScreen() {
 
           <TouchableOpacity
             style={{ flexDirection: 'row' }}
-            onPress={() => hasFriendRequests && setFriendRequestsVisible(true)}
+            onPress={
+              () => validateCurrentUser(user) && hasFriendRequests && setFriendRequestsVisible(true)
+            }
           >
             <Text style={{ color: colors.white }}>{sanitizedFriendRequests.length}</Text>
             <FontAwesome5 name="user-friends" size={24} color="white" />

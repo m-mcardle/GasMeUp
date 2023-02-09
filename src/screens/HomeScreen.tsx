@@ -34,6 +34,9 @@ import uuid from 'react-native-uuid';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../firebase';
 
+// Helpers
+import { validateCurrentUser } from '../helpers/authHelper';
+
 // Global State Stuff
 import { useGlobalState } from '../hooks/hooks';
 
@@ -438,7 +441,7 @@ export default function HomeScreen() {
           </Button>
           <Button
             style={styles.saveButton}
-            onPress={() => setModalVisible(true)}
+            onPress={() => validateCurrentUser(user) && setModalVisible(true)}
             disabled={!canSaveTrip}
           >
             <Text
