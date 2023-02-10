@@ -21,7 +21,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   costSection: {
-    backgroundColor: colors.green,
     borderRadius: 5,
     marginBottom: 10,
     marginTop: 150,
@@ -91,11 +90,6 @@ const styles = StyleSheet.create({
     color: colors.secondary,
     fontFamily: semiBoldFont,
     fontSize: 12,
-  },
-  adjustButton: {
-    marginHorizontal: 5,
-    height: 24,
-    width: 24,
   },
   checkBoxSection: {
     flexDirection: 'row',
