@@ -48,7 +48,6 @@ import Input from '../components/Input';
 import MapContainer from '../components/MapContainer';
 import Modal from '../components/Modal';
 
-import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
 import SaveTripModal from '../components/Home/SaveTripModal';
 import GasPriceModal from '../components/Home/GasPriceModal';
@@ -136,6 +135,7 @@ export default function HomeScreen() {
   };
 
   const submit = useCallback(async () => {
+    setSuggestions([]);
     if (!startLocation) {
       setStartLocationError(true);
     }
@@ -324,6 +324,13 @@ export default function HomeScreen() {
   const canSaveTrip = tripCalculated && !!user;
 
   const endLocationRef = useRef<TextInput>(null);
+
+  const selectNextInput = () => {
+    setSuggestions([]);
+    endLocationRef?.current?.focus();
+  };
+
+  console.log('Rendered', new Date().toISOString());
   return (
     <Page>
       <GasPriceModal
@@ -376,6 +383,9 @@ export default function HomeScreen() {
           openModal={() => setVisible(true)}
         />
         <Input
+          z={2}
+          suggestions={activeInput === ActiveInput.Start ? suggestions : []}
+          onSuggestionPress={setInputToPickedLocation}
           placeholder="Start Location"
           onChangeText={updateStartLocation}
           onPressIn={() => changeActiveInput(ActiveInput.Start)}
@@ -393,11 +403,14 @@ export default function HomeScreen() {
           error={startLocationError}
           autoComplete="street-address"
           blurOnSubmit={false}
-          onSubmitEditing={() => endLocationRef.current?.focus()}
+          onSubmitEditing={() => selectNextInput()}
           returnKeyType="next"
         />
         <Input
           myRef={endLocationRef}
+          z={1}
+          suggestions={activeInput === ActiveInput.End ? suggestions : []}
+          onSuggestionPress={setInputToPickedLocation}
           placeholder="End Location"
           onChangeText={updateEndLocation}
           onPressIn={() => changeActiveInput(ActiveInput.End)}
@@ -417,8 +430,7 @@ export default function HomeScreen() {
           onSubmitEditing={submit}
           returnKeyType="done"
         />
-        <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
-        <View style={styles.buttonSection}>
+        <View style={[styles.buttonSection, { zIndex: -1 }]}>
           <Button
             style={styles.calculateButton}
             onPress={submit}
