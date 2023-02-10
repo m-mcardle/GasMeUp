@@ -4,7 +4,7 @@ import { ScrollView, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
-import { DataTable, Portal } from 'react-native-paper';
+import { ActivityIndicator, DataTable, Portal } from 'react-native-paper';
 
 // Firebase
 import {
@@ -51,7 +51,7 @@ export default function FriendInfoSection({
   const transactionsQuery = userDocument?.transactions.length > 0
     ? query(transactionsRef, where('users', 'array-contains', currentUser?.uid))
     : undefined;
-  const [transactionsData] = useCollectionData(transactionsQuery);
+  const [transactionsData, transactionsLoading] = useCollectionData(transactionsQuery);
 
   // Filter transactions to only include transactions involving the selected friend
   const filteredTransactions = transactionsData
@@ -131,6 +131,14 @@ export default function FriendInfoSection({
           <DataTable.Title numeric>Date</DataTable.Title>
           <DataTable.Title numeric>Amount</DataTable.Title>
         </DataTable.Header>
+
+        {transactionsLoading && (
+          <DataTable.Row style={{ minHeight: 150, alignContent: 'center' }}>
+            <DataTable.Cell style={{ alignContent: 'center', justifyContent: 'center' }}>
+              <ActivityIndicator animating color={colors.action} size="large" />
+            </DataTable.Cell>
+          </DataTable.Row>
+        )}
 
         <ScrollView style={{ maxHeight: 300 }}>
           {transactionsSinceLastSettle?.map((transaction) => (
