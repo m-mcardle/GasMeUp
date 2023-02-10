@@ -16,12 +16,18 @@ const customColors = [
 ];
 
 const Gradient = React.forwardRef(({
-  color0, color1, style, children, onTouchEnd,
+  x = 0,
+  y = 0.2,
+  color0,
+  color1,
+  style,
+  children,
+  onTouchEnd,
 }: any, ref: any) => (
   <LinearGradient
     ref={ref}
     colors={[color0, color1]}
-    start={{ x: 0, y: 0.2 }}
+    start={{ x, y }}
     style={{
       ...style,
     }}
@@ -35,10 +41,12 @@ const AnimatedLinearGradient = Animated.createAnimatedComponent(Gradient);
 
 interface Props {
   animate: boolean,
+  speed: number,
   children: ReactNode,
   colors?: string[],
   style?: object,
-  gradientOnIdle?: boolean,
+  x?: number,
+  y?: number,
   onTouchEnd?: () => void,
 }
 
@@ -47,8 +55,10 @@ export default function AnimatedGradient(props: Props) {
     animate,
     children,
     style,
+    speed,
+    x,
+    y,
     colors = customColors,
-    gradientOnIdle = true,
     onTouchEnd = () => {},
   } = props;
   const color0 = useRef(new Animated.Value(0)).current;
@@ -57,7 +67,7 @@ export default function AnimatedGradient(props: Props) {
   const colorGradient = Animated.parallel(
     [color0, color1].map((animatedColor) => Animated.timing(animatedColor, {
       toValue: colors.length,
-      duration: colors.length * 1000,
+      duration: colors.length * speed,
       easing: Easing.linear,
       useNativeDriver: false,
     })),
@@ -92,11 +102,12 @@ export default function AnimatedGradient(props: Props) {
     }),
   );
 
-  const showGradient = animate || gradientOnIdle;
   return (
     <AnimatedLinearGradient
-      color0={showGradient ? interpolatedColors[0] : undefined}
-      color1={showGradient ? interpolatedColors[1] : undefined}
+      color0={interpolatedColors[0]}
+      color1={interpolatedColors[1]}
+      x={x}
+      y={y}
       style={style}
       onTouchEnd={onTouchEnd}
     >
@@ -108,6 +119,7 @@ export default function AnimatedGradient(props: Props) {
 AnimatedGradient.defaultProps = {
   colors: customColors,
   style: undefined,
-  gradientOnIdle: true,
+  x: 0,
+  y: 0.2,
   onTouchEnd: () => {},
 };

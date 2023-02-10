@@ -91,14 +91,18 @@ export default function StatsSection(props: Props) {
   const costSectionGradient = [
     '#118C4F',
     '#006241',
-    '#7851a9',
-    '#603fef',
+    '#1b1c2c',
+    '#118C4F',
+    '#006241',
   ];
 
   const statBoxLoadingGradient = [
     colors.tertiary,
     colors.darkestGray,
-    colors.lightTertiary,
+    colors.tertiary,
+    colors.tertiary,
+    colors.darkestGray,
+    colors.tertiary,
   ];
 
   const statBoxGradient = [
@@ -112,6 +116,7 @@ export default function StatsSection(props: Props) {
         animate={loading}
         style={styles.costSection}
         colors={costSectionGradient}
+        speed={1000}
       >
         {loading
           ? <ActivityIndicator size="large" />
@@ -122,63 +127,95 @@ export default function StatsSection(props: Props) {
             </Text>
           )}
       </AnimatedGradient>
-      <View style={styles.subStatsSection}>
-        <AnimatedGradient
-          animate={loading}
-          style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
-          colors={loading ? statBoxLoadingGradient : statBoxGradient}
-        >
-          <View style={styles.statText}>
-            <FontAwesome5 name="route" size={16} color={colors.gray} />
-            <Text style={styles.statBoxText}>
-              {loading ? '' : distanceString}
-            </Text>
+      <AnimatedGradient
+        animate={loading}
+        speed={4000}
+        colors={loading ? statBoxLoadingGradient : statBoxGradient}
+        x={0.1}
+        y={0.1}
+      >
+        <View style={styles.subStatsSection}>
+          <View
+            style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
+          >
+            <View style={styles.statText}>
+              <FontAwesome5 name="route" size={16} color={colors.gray} />
+              {loading
+                ? (
+                  <View style={styles.statBoxText}>
+                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
+                  </View>
+                )
+                : (
+                  <Text style={styles.statBoxText}>
+                    {distanceString}
+                  </Text>
+                )}
+            </View>
           </View>
-        </AnimatedGradient>
-        <AnimatedGradient
-          animate={loading}
-          style={[
-            styles.statBox,
-            (loading ? { justifyContent: 'center' } : undefined),
-            (useCustomGasPrice ? { borderColor: colors.secondaryAction, borderWidth: 1 } : {}),
-          ]}
-          colors={loading ? statBoxLoadingGradient : statBoxGradient}
-          onTouchEnd={() => openModal()}
-        >
-          <View style={styles.statText}>
-            <Ionicons name="ios-pricetag" size={16} color={colors.gray} />
-            <Text style={styles.statBoxText}>
-              {loading ? '' : gasPriceString}
-            </Text>
+          <View
+            style={[
+              styles.statBox,
+              (loading ? { justifyContent: 'center' } : undefined),
+              (useCustomGasPrice ? { borderColor: colors.secondaryAction, borderWidth: 1 } : {}),
+            ]}
+            onTouchEnd={() => openModal()}
+          >
+            <View style={styles.statText}>
+              <Ionicons name="ios-pricetag" size={16} color={colors.gray} />
+              {loading
+                ? (
+                  <View style={styles.statBoxText}>
+                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
+                  </View>
+                )
+                : (
+                  <Text style={styles.statBoxText}>
+                    {gasPriceString}
+                  </Text>
+                )}
+            </View>
           </View>
-        </AnimatedGradient>
-      </View>
-      <View style={styles.subStatsSection}>
-        <AnimatedGradient
-          animate={loading}
-          style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
-          colors={loading ? statBoxLoadingGradient : statBoxGradient}
-        >
-          <View style={styles.statText}>
-            <FontAwesome5 name="car" size={16} color={colors.gray} />
-            <Text style={styles.statBoxText}>
-              {loading ? '' : fuelEfficiencyString}
-            </Text>
+        </View>
+        <View style={styles.subStatsSection}>
+          <View
+            style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
+          >
+            <View style={styles.statText}>
+              <FontAwesome5 name="car" size={16} color={colors.gray} />
+              {loading
+                ? (
+                  <View style={styles.statBoxText}>
+                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
+                  </View>
+                )
+                : (
+                  <Text style={styles.statBoxText}>
+                    {fuelEfficiencyString}
+                  </Text>
+                )}
+            </View>
           </View>
-        </AnimatedGradient>
-        <AnimatedGradient
-          animate={loading}
-          style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
-          colors={loading ? statBoxLoadingGradient : statBoxGradient}
-        >
-          <View style={styles.statText}>
-            <FontAwesome5 name="gas-pump" size={16} color={colors.gray} />
-            <Text style={styles.statBoxText}>
-              {loading ? '' : gasUsedString}
-            </Text>
+          <View
+            style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
+          >
+            <View style={styles.statText}>
+              <FontAwesome5 name="gas-pump" size={16} color={colors.gray} />
+              {loading
+                ? (
+                  <View style={styles.statBoxText}>
+                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
+                  </View>
+                )
+                : (
+                  <Text style={styles.statBoxText}>
+                    {gasUsedString}
+                  </Text>
+                )}
+            </View>
           </View>
-        </AnimatedGradient>
-      </View>
+        </View>
+      </AnimatedGradient>
     </View>
   );
 }

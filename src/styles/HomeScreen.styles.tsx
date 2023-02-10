@@ -52,11 +52,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.tertiary,
     width: '50%',
     minHeight: 50,
   },
   statBoxText: {
+    alignItems: 'center',
     color: colors.gray,
     fontFamily: semiBoldFont,
     fontSize: 14,
@@ -173,6 +173,12 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     width: '100%',
     justifyContent: 'center',
+  },
+  skeleton: {
+    minHeight: 12,
+    backgroundColor: colors.gray,
+    width: '90%',
+    borderRadius: 12,
   },
 });
 
