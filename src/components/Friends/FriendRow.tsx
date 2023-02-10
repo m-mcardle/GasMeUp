@@ -18,6 +18,9 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 import { auth, db } from '../../../firebase';
 
+// Helpers
+import { validateCurrentUser } from '../../helpers/authHelper';
+
 // Components
 import Text from '../Text';
 
@@ -113,7 +116,7 @@ export default function Row({
     >
       <DataTable.Row
         key={name}
-        onPress={() => onPress({
+        onPress={() => validateCurrentUser(user) && onPress({
           selectedFriendUID: uid,
           selectedFriendName: name,
           selectedFriendAmount: amount,

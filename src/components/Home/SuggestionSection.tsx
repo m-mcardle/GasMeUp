@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightTertiary,
     margin: 5,
     padding: 5,
-    minHeight: 72,
+    minHeight: 128,
   },
   emptyList: {
     padding: 5,
@@ -42,7 +42,7 @@ export default function SuggestionsSection(props: Props) {
     <View style={styles.container}>
       {items?.length > 0
         ? items.map((el, i) => {
-          if (i < 3) {
+          if (i < 5) {
             return (
               <Text
                 style={styles.text}

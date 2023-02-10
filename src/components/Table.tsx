@@ -2,7 +2,7 @@
 import React, { ComponentType, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
-import { DataTable } from 'react-native-paper';
+import { ActivityIndicator, DataTable } from 'react-native-paper';
 
 // Components
 import Text from './Text';
@@ -17,6 +17,7 @@ interface Props {
   loading?: boolean,
   Row: ComponentType,
   FooterRow?: ComponentType,
+  EmptyState?: ComponentType,
   headers: Array<Header>,
   style?: object,
 }
@@ -31,6 +32,7 @@ export default function Table({
   data,
   Row,
   FooterRow = undefined,
+  EmptyState,
   title,
   headers,
   loading = false,
@@ -75,8 +77,10 @@ export default function Table({
         {
           loading
             ? (
-              <DataTable.Row>
-                <DataTable.Cell>Loading...</DataTable.Cell>
+              <DataTable.Row style={{ minHeight: 250, alignContent: 'center' }}>
+                <DataTable.Cell style={{ alignContent: 'center', justifyContent: 'center' }}>
+                  <ActivityIndicator animating color={colors.action} size="large" />
+                </DataTable.Cell>
               </DataTable.Row>
             )
             : pageData.map((rowData) => (
@@ -84,6 +88,16 @@ export default function Table({
               <Row key={rowData.key} {...rowData} />
             ))
         }
+
+        {!pageData.length && !loading && (
+          <DataTable.Row style={{ minHeight: 250, alignContent: 'center' }}>
+            <DataTable.Cell style={{ alignContent: 'center', justifyContent: 'center' }}>
+              {EmptyState
+                ? <EmptyState />
+                : <Text style={{ color: colors.secondary }}>No Data</Text>}
+            </DataTable.Cell>
+          </DataTable.Row>
+        )}
 
         {FooterRow && <FooterRow />}
 
@@ -105,6 +119,7 @@ Table.defaultProps = {
   title: '',
   itemsPerPage: 10,
   FooterRow: undefined,
+  EmptyState: undefined,
   loading: false,
   style: undefined,
 };

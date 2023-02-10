@@ -1,10 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, {
+  useEffect, useRef,
+} from 'react';
 import {
-  ActivityIndicator, Animated, Easing, Image, View,
+  Animated, Easing, View,
 } from 'react-native';
 
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { ActivityIndicator } from 'react-native-paper';
 
 // Global State Stuff
 import { useGlobalState } from '../../hooks/hooks';
@@ -12,13 +14,9 @@ import { useGlobalState } from '../../hooks/hooks';
 // Helpers
 import { convertKMtoMiles, convertLtoGallons } from '../../helpers/unitsHelper';
 
-// @ts-ignore
-import AdjustIcon from '../../../assets/AdjustButton.png';
-// @ts-ignore
-import AdjustIconDisabled from '../../../assets/AdjustButtonDisabled.png';
-
 // Components
 import Text from '../Text';
+import AnimatedGradient from '../AnimatedGradient';
 
 // Styles
 import styles from '../../styles/HomeScreen.styles';
@@ -33,8 +31,6 @@ interface Props {
   gasMileage: number,
   openModal: () => void,
 }
-
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 export default function StatsSection(props: Props) {
   const {
@@ -93,98 +89,134 @@ export default function StatsSection(props: Props) {
   // TODO - Add support for mpg
   const fuelEfficiencyString = `${gasMileage.toFixed(1)}L/100km`;
 
+  const costSectionGradient = [
+    '#118C4F',
+    '#006241',
+    '#1b1c2c',
+    '#118C4F',
+    '#006241',
+  ];
+
+  const statBoxLoadingGradient = [
+    colors.tertiary,
+    colors.darkestGray,
+    colors.tertiary,
+    colors.tertiary,
+    colors.darkestGray,
+    colors.tertiary,
+  ];
+
+  const statBoxGradient = [
+    colors.tertiary,
+    colors.tertiary,
+  ];
+
   return (
     <View style={styles.statsSection}>
-      <AnimatedLinearGradient
-        colors={[colors.green, colors.darkGreen]}
-        start={{ x: 0.2, y: 0.2 }}
-        style={{
-          ...styles.costSection,
-          opacity: fadeAnim, // Bind opacity to animated value
-        }}
+      <AnimatedGradient
+        animate={loading}
+        style={styles.costSection}
+        colors={costSectionGradient}
+        speed={1000}
       >
         {loading
-          ? <ActivityIndicator size="large" />
+          ? <ActivityIndicator animating size="large" />
           : (
             <Text style={styles.costText}>
               $
               {cost.toFixed(2)}
             </Text>
           )}
-      </AnimatedLinearGradient>
-      <View style={styles.subStatsSection}>
-        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}>
-          {loading
-            ? <ActivityIndicator size="small" />
-            : (
-              <View style={styles.statText}>
-                <FontAwesome5 name="route" size={16} color={colors.gray} />
-                <Text style={styles.statBoxText}>
-                  {distanceString}
-                </Text>
-              </View>
-            )}
-        </View>
-        <View
-          style={[
-            styles.statBox,
-            (loading ? { justifyContent: 'center' } : undefined),
-            (useCustomGasPrice ? { borderColor: colors.secondaryAction, borderWidth: 1 } : {}),
-          ]}
-          onTouchEnd={() => openModal()}
-        >
-          {loading
-            ? <ActivityIndicator size="small" />
-            : (
-              <>
-                <View style={[styles.statText, { width: '75%' }]}>
-                  <Ionicons name="ios-pricetag" size={16} color={colors.gray} />
+      </AnimatedGradient>
+      <AnimatedGradient
+        animate={loading}
+        speed={4000}
+        colors={loading ? statBoxLoadingGradient : statBoxGradient}
+        x={0.1}
+        y={0.1}
+      >
+        <View style={styles.subStatsSection}>
+          <View
+            style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
+          >
+            <View style={styles.statText}>
+              <FontAwesome5 name="route" size={16} color={colors.gray} />
+              {loading
+                ? (
+                  <View style={styles.statBoxText}>
+                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
+                  </View>
+                )
+                : (
+                  <Text style={styles.statBoxText}>
+                    {distanceString}
+                  </Text>
+                )}
+            </View>
+          </View>
+          <View
+            style={[
+              styles.statBox,
+              (loading ? { justifyContent: 'center' } : undefined),
+              (useCustomGasPrice ? { borderColor: colors.secondaryAction, borderWidth: 1 } : {}),
+            ]}
+            onTouchEnd={() => openModal()}
+          >
+            <View style={styles.statText}>
+              <Ionicons name="ios-pricetag" size={16} color={colors.gray} />
+              {loading
+                ? (
+                  <View style={styles.statBoxText}>
+                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
+                  </View>
+                )
+                : (
                   <Text style={styles.statBoxText}>
                     {gasPriceString}
                   </Text>
-                </View>
-                <View>
-                  <Image
-                    source={useCustomGasPrice ? AdjustIcon : AdjustIconDisabled}
-                    style={styles.adjustButton}
-                  />
-                </View>
-              </>
-            )}
+                )}
+            </View>
+          </View>
         </View>
-      </View>
-      <View style={styles.subStatsSection}>
-        <View style={[styles.statBox, (loading ? { justifyContent: 'center' } : {})]}>
-          {loading
-            ? <ActivityIndicator size="small" />
-            : (
-              <View style={styles.statText}>
-                <FontAwesome5 name="car" size={16} color={colors.gray} />
-                <Text style={styles.statBoxText}>
-                  {fuelEfficiencyString}
-                </Text>
-              </View>
-            )}
+        <View style={styles.subStatsSection}>
+          <View
+            style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
+          >
+            <View style={styles.statText}>
+              <FontAwesome5 name="car" size={16} color={colors.gray} />
+              {loading
+                ? (
+                  <View style={styles.statBoxText}>
+                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
+                  </View>
+                )
+                : (
+                  <Text style={styles.statBoxText}>
+                    {fuelEfficiencyString}
+                  </Text>
+                )}
+            </View>
+          </View>
+          <View
+            style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
+          >
+            <View style={styles.statText}>
+              <FontAwesome5 name="gas-pump" size={16} color={colors.gray} />
+              {loading
+                ? (
+                  <View style={styles.statBoxText}>
+                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
+                  </View>
+                )
+                : (
+                  <Text style={styles.statBoxText}>
+                    {gasUsedString}
+                  </Text>
+                )}
+            </View>
+          </View>
         </View>
-        <View
-          style={[
-            styles.statBox,
-            (loading ? { justifyContent: 'center' } : {}),
-          ]}
-          onTouchEnd={() => openModal()}
-        >
-          {loading
-            ? <ActivityIndicator size="small" />
-            : (
-              <View style={[styles.statText, { width: '75%' }]}>
-                <FontAwesome5 name="gas-pump" size={16} color={colors.gray} />
-                <Text style={styles.statBoxText}>
-                  {gasUsedString}
-                </Text>
-              </View>
-            )}
-        </View>
-      </View>
+      </AnimatedGradient>
     </View>
   );
 }

@@ -55,4 +55,5 @@ module.exports = {
     'expo-apple-authentication',
   ],
   privacy: 'public',
+  jsEngine: 'hermes',
 };

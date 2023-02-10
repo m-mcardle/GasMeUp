@@ -53,6 +53,17 @@ function FooterRow(onPress: () => void) {
   );
 }
 
+function TableEmptyState() {
+  return (
+    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <Text style={{ color: colors.secondary, fontSize: 24 }}>No Friends</Text>
+      <Text style={{ color: colors.secondary, fontSize: 10 }}>
+        Add some friends and then they will show up here!
+      </Text>
+    </View>
+  );
+}
+
 const logout = () => {
   signOut(auth)
     .then(() => {
@@ -202,8 +213,9 @@ export default function FriendsScreen() {
           headers={headers}
           Row={MyRow}
           FooterRow={Footer}
-          loading={friendsDataLoading}
+          loading={friendsDataLoading || !friendsUIDs}
           style={styles.table}
+          EmptyState={TableEmptyState}
         />
       </View>
     </Page>
