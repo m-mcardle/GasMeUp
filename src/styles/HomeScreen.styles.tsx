@@ -150,6 +150,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 'auto',
+    marginBottom: 0,
   },
   secondaryButtonText: {
     color: colors.secondary,

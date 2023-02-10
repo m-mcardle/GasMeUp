@@ -72,6 +72,17 @@ function RowBuilder(
   return Row;
 }
 
+function TableEmptyState() {
+  return (
+    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <Text style={{ color: colors.secondary, fontSize: 24 }}>No Friends</Text>
+      <Text style={{ color: colors.secondary, fontSize: 10 }}>
+        Add some friends to start saving your trips!
+      </Text>
+    </View>
+  );
+}
+
 const usersRef = collection(db, 'Users');
 
 interface Props {
@@ -184,7 +195,7 @@ export default function SaveTripModal({
   const gasUsageString = canadianUnits ? `${(gasUsed).toFixed(1)}L` : `${convertLtoGallons(gasUsed).toFixed(1)}gal`;
   const distanceString = canadianUnits ? `${distance.toFixed(1)}km` : `${convertKMtoMiles(distance).toFixed(1)}mi`;
   return (
-    <>
+    <View style={{ height: '100%' }}>
       <Portal>
         <Modal
           visible={splitTypeVisible}
@@ -265,6 +276,7 @@ export default function SaveTripModal({
         Row={RowBuilder(selectedFriends, setSelectedFriends)}
         loading={usersDataLoading}
         style={{ marginTop: 16 }}
+        EmptyState={TableEmptyState}
       />
       <View style={styles.saveTripButtonSection}>
         <Button
@@ -276,6 +288,6 @@ export default function SaveTripModal({
           </Text>
         </Button>
       </View>
-    </>
+    </View>
   );
 }

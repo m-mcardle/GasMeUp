@@ -2,10 +2,11 @@ import React, {
   useEffect, useRef,
 } from 'react';
 import {
-  ActivityIndicator, Animated, Easing, View,
+  Animated, Easing, View,
 } from 'react-native';
 
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { ActivityIndicator } from 'react-native-paper';
 
 // Global State Stuff
 import { useGlobalState } from '../../hooks/hooks';
@@ -119,7 +120,7 @@ export default function StatsSection(props: Props) {
         speed={1000}
       >
         {loading
-          ? <ActivityIndicator size="large" />
+          ? <ActivityIndicator animating size="large" />
           : (
             <Text style={styles.costText}>
               $
