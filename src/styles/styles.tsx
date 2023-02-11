@@ -65,20 +65,34 @@ export const globalStyles = StyleSheet.create({
     fontSize: 14,
   },
   autocompleteContainer: {
-    // flex: 1,
-    left: '15%',
+    // 12.5 + 12.5 makes it take up 75% of the screen
+    left: '12.5%',
+    right: '12.5%',
     position: 'absolute',
-    right: '10%',
-    top: 5,
-    // zIndex: 100,
+    top: 10,
   },
   inputView: {
     width: '75%',
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    // alignItems: 'center',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    // backgroundColor: 'white',
+  },
+  autocompleteInputView: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    height: 60,
+  },
+  autocompleteListContainer: {
+    backgroundColor: colors.tertiary,
+    maxHeight: 300,
+    width: '100%',
+  },
+  autocompleteNestedContainer: {
+    width: '100%',
+    justifyContent: 'center',
+    alignContent: 'center',
   },
   inputItem: {
     alignContent: 'center',
