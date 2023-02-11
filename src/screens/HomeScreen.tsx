@@ -44,7 +44,7 @@ import { useGlobalState } from '../hooks/hooks';
 import Page from '../components/Page';
 import Text from '../components/Text';
 import Button from '../components/Button';
-import MapContainer from '../components/MapContainer';
+import MapModal from '../components/MapModal';
 import Modal from '../components/Modal';
 import AutocompleteInput from '../components/AutocompleteInput';
 
@@ -363,7 +363,7 @@ export default function HomeScreen() {
           visible={mapModalVisible}
           onDismiss={() => setMapModalVisible(false)}
         >
-          <MapContainer
+          <MapModal
             data={{
               start,
               end,

@@ -174,4 +174,13 @@ export const globalStyles = StyleSheet.create({
     fontSize: 16,
     fontFamily: font,
   },
+  mapContainer: {
+    height: '80%',
+    width: '100%',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
 });

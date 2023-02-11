@@ -157,17 +157,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
     fontSize: 8,
   },
-  mapContainer: {
-    marginTop: 'auto',
-    marginBottom: 0,
-    height: '80%',
-    width: '100%',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
   statText: {
     flexDirection: 'row',
     alignItems: 'center',

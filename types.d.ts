@@ -74,3 +74,14 @@ interface Transaction {
   waypoints?: Array<Location>,
   country?: string,
 }
+
+interface MapData {
+  start: {
+    lat: number;
+    lng: number;
+  },
+  end: {
+    lat: number;
+    lng: number;
+  }
+}

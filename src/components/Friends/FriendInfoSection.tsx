@@ -17,7 +17,7 @@ import { db, auth } from '../../../firebase';
 // Components
 import Text from '../Text';
 import Button from '../Button';
-import MapContainer from '../MapContainer';
+import MapModal from '../MapModal';
 import Modal from '../Modal';
 
 // Styles
@@ -27,6 +27,7 @@ import { colors, boldFont } from '../../styles/styles';
 // Helpers
 import { locationToLatLng } from '../../helpers/mapHelper';
 import { createTransaction } from '../../helpers/firestoreHelper';
+import TripDetailsModal from './TripDetailsModal';
 
 const transactionsRef = collection(db, 'Transactions');
 
@@ -42,6 +43,7 @@ export default function FriendInfoSection({
 }: Props) {
   const [currentUser] = useAuthState(auth);
   const [mapVisible, setMapVisible] = useState(false);
+  const [viewMoreVisible, setViewMoreVisible] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<DocumentData>({});
 
   const userDoc = currentUser?.uid ? doc(db, 'Users', currentUser?.uid) : undefined;
@@ -103,11 +105,23 @@ export default function FriendInfoSection({
     <View style={{ height: '100%' }}>
       <Portal>
         <Modal
+          visible={viewMoreVisible}
+          onDismiss={() => setViewMoreVisible(false)}
+        >
+          <TripDetailsModal
+            transaction={selectedTransaction}
+            setMapVisible={() => setMapVisible(true)}
+            transactionAmount={getTransactionAmount(selectedTransaction)}
+            transactionWaypoints={transactionWaypoints}
+          />
+        </Modal>
+
+        <Modal
           visible={mapVisible}
           onDismiss={() => setMapVisible(false)}
         >
           {transactionWaypoints.length > 0 && (
-            <MapContainer
+            <MapModal
               data={{
                 start: {
                   ...locationToLatLng(transactionWaypoints[0]),
@@ -157,7 +171,13 @@ export default function FriendInfoSection({
                 </View>
                 )}
               </DataTable.Cell>
-              <DataTable.Cell style={{ minWidth: '35%' }}>
+              <DataTable.Cell
+                style={{ minWidth: '35%' }}
+                onPress={() => {
+                  setSelectedTransaction(transaction);
+                  setViewMoreVisible(true);
+                }}
+              >
                 <View style={{ justifyContent: 'center' }}>
                   <Text style={{ fontSize: 8 }}>
                     {`Start: ${(transaction.startLocation.length > 30 ? `${transaction.startLocation.substring(0, 30)}...` : transaction.startLocation)}`}
@@ -167,10 +187,24 @@ export default function FriendInfoSection({
                   </Text>
                 </View>
               </DataTable.Cell>
-              <DataTable.Cell textStyle={{ fontSize: 8 }} numeric>
+              <DataTable.Cell
+                textStyle={{ fontSize: 8 }}
+                numeric
+                onPress={() => {
+                  setSelectedTransaction(transaction);
+                  setViewMoreVisible(true);
+                }}
+              >
                 {transaction.date.toDate().toLocaleDateString()}
               </DataTable.Cell>
-              <DataTable.Cell textStyle={{ fontSize: 10 }} numeric>
+              <DataTable.Cell
+                textStyle={{ fontSize: 10 }}
+                numeric
+                onPress={() => {
+                  setSelectedTransaction(transaction);
+                  setViewMoreVisible(true);
+                }}
+              >
                 {getTransactionAmount(transaction)}
               </DataTable.Cell>
             </DataTable.Row>
