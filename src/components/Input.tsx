@@ -53,7 +53,6 @@ export default function Input(props: Props) {
     numWidth -= 10;
   }
   const width = `${numWidth}%`;
-
   return (
     <View style={[globalStyles.inputView, containerStyle]}>
       {icon}

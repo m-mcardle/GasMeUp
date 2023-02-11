@@ -47,6 +47,13 @@ export const globalStyles = StyleSheet.create({
     fontFamily: font,
     color: colors.secondary,
   },
+  suggestionInput: {
+    borderWidth: 1,
+    borderRadius: 5,
+    marginVertical: 5,
+    padding: 10,
+    backgroundColor: colors.tertiary,
+  },
   input: {
     fontFamily: font,
     borderWidth: 1,
@@ -57,11 +64,47 @@ export const globalStyles = StyleSheet.create({
     color: colors.white,
     fontSize: 14,
   },
+  autocompleteContainer: {
+    // 12.5 + 12.5 makes it take up 75% of the screen
+    left: '12.5%',
+    right: '12.5%',
+    position: 'absolute',
+    top: 10,
+  },
   inputView: {
     width: '75%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  autocompleteInputView: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    height: 60,
+  },
+  autocompleteListContainer: {
+    backgroundColor: colors.tertiary,
+    maxHeight: 300,
+    width: '100%',
+  },
+  autocompleteListItem: {
+    padding: 4,
+    paddingLeft: 52,
+  },
+  autocompleteNestedContainer: {
+    width: '100%',
+    justifyContent: 'center',
+    alignContent: 'center',
+  },
+  inputItem: {
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 5,
+    marginHorizontal: 5,
+    paddingVertical: 10,
   },
   clearInputButton: {
     width: 20,

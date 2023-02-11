@@ -44,11 +44,10 @@ import { useGlobalState } from '../hooks/hooks';
 import Page from '../components/Page';
 import Text from '../components/Text';
 import Button from '../components/Button';
-import Input from '../components/Input';
 import MapContainer from '../components/MapContainer';
 import Modal from '../components/Modal';
+import AutocompleteInput from '../components/AutocompleteInput';
 
-import SuggestionsSection from '../components/Home/SuggestionSection';
 import StatsSection from '../components/Home/StatsSection';
 import SaveTripModal from '../components/Home/SaveTripModal';
 import GasPriceModal from '../components/Home/GasPriceModal';
@@ -136,6 +135,7 @@ export default function HomeScreen() {
   };
 
   const submit = useCallback(async () => {
+    setSuggestions([]);
     if (!startLocation) {
       setStartLocationError(true);
     }
@@ -284,9 +284,11 @@ export default function HomeScreen() {
     if (activeInput === ActiveInput.Start) {
       setLocations((state) => ({ ...state, startLocation: item }));
       setSuggestions([]);
+      setActiveInput(ActiveInput.End);
     } else if (activeInput === ActiveInput.End) {
       setLocations((state) => ({ ...state, endLocation: item }));
       setSuggestions([]);
+      setActiveInput(ActiveInput.Start);
     }
   };
 
@@ -324,6 +326,12 @@ export default function HomeScreen() {
   const canSaveTrip = tripCalculated && !!user;
 
   const endLocationRef = useRef<TextInput>(null);
+
+  const selectNextInput = () => {
+    setSuggestions([]);
+    endLocationRef?.current?.focus();
+  };
+
   return (
     <Page>
       <GasPriceModal
@@ -375,7 +383,10 @@ export default function HomeScreen() {
           gasMileage={GAS_MILEAGE}
           openModal={() => setVisible(true)}
         />
-        <Input
+        <AutocompleteInput
+          z={2}
+          suggestions={activeInput === ActiveInput.Start ? suggestions : []}
+          onSuggestionPress={setInputToPickedLocation}
           placeholder="Start Location"
           onChangeText={updateStartLocation}
           onPressIn={() => changeActiveInput(ActiveInput.Start)}
@@ -393,11 +404,14 @@ export default function HomeScreen() {
           error={startLocationError}
           autoComplete="street-address"
           blurOnSubmit={false}
-          onSubmitEditing={() => endLocationRef.current?.focus()}
+          onSubmitEditing={() => selectNextInput()}
           returnKeyType="next"
         />
-        <Input
+        <AutocompleteInput
           myRef={endLocationRef}
+          z={1}
+          suggestions={activeInput === ActiveInput.End ? suggestions : []}
+          onSuggestionPress={setInputToPickedLocation}
           placeholder="End Location"
           onChangeText={updateEndLocation}
           onPressIn={() => changeActiveInput(ActiveInput.End)}
@@ -417,7 +431,6 @@ export default function HomeScreen() {
           onSubmitEditing={submit}
           returnKeyType="done"
         />
-        <SuggestionsSection items={suggestions} onSelect={setInputToPickedLocation} />
         <View style={styles.buttonSection}>
           <Button
             style={styles.calculateButton}
