@@ -89,6 +89,10 @@ export const globalStyles = StyleSheet.create({
     maxHeight: 300,
     width: '100%',
   },
+  autocompleteListItem: {
+    padding: 4,
+    paddingLeft: 52,
+  },
   autocompleteNestedContainer: {
     width: '100%',
     justifyContent: 'center',

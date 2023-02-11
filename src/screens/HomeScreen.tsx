@@ -431,7 +431,7 @@ export default function HomeScreen() {
           onSubmitEditing={submit}
           returnKeyType="done"
         />
-        <View style={[styles.buttonSection, { zIndex: -1 }]}>
+        <View style={styles.buttonSection}>
           <Button
             style={styles.calculateButton}
             onPress={submit}

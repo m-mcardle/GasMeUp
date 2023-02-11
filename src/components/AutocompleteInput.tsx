@@ -108,7 +108,7 @@ export default function AutocompleteInput(props: Props) {
                 onPress={() => {
                   if (onSuggestionPress) onSuggestionPress(title);
                 }}
-                style={{ padding: 4, zIndex: z, paddingLeft: 52 }}
+                style={globalStyles.autocompleteListItem}
               >
                 <Text style={{ fontSize: 12 }}>{title}</Text>
               </TouchableOpacity>
