@@ -14,20 +14,24 @@ import styles from '../../styles/HomeScreen.styles';
 import { colors, globalStyles } from '../../styles/styles';
 
 interface Props {
+  setting: string,
   visible: boolean,
   setVisible: (_: any) => void,
   data: number,
   setData: (_: any) => void,
-  useCustomValue: boolean,
-  setUseCustomValue: (_: any) => void,
+  inputStep?: number,
+  useCustomValue?: boolean,
+  setUseCustomValue?: (_: any) => void,
 }
 
-export default function GasPriceModal(props: Props) {
+export default function SettingModal(props: Props) {
   const {
+    setting = 'Gas Price',
     visible,
     setVisible,
     data,
     setData,
+    inputStep = 0.01,
     useCustomValue,
     setUseCustomValue,
   } = props;
@@ -40,11 +44,13 @@ export default function GasPriceModal(props: Props) {
       visible={visible}
     >
       <View style={styles.modalContainer}>
-        <Text style={styles.heading}>Configure Gas Price</Text>
+        <Text style={styles.heading}>
+          {`Configure ${setting}`}
+        </Text>
         <View style={{ alignSelf: 'center', margin: 8 }}>
           <NumericInput
             rounded
-            step={0.01}
+            step={inputStep}
             totalHeight={25}
             totalWidth={150}
             containerStyle={{ backgroundColor: 'white' }}
@@ -58,6 +64,7 @@ export default function GasPriceModal(props: Props) {
             onChange={setData}
           />
         </View>
+        {setUseCustomValue && (
         <View style={styles.checkBoxSection}>
           <Text style={{ color: colors.secondary, fontSize: 14 }}>Use custom gas price:</Text>
           <CheckBox
@@ -67,6 +74,7 @@ export default function GasPriceModal(props: Props) {
             style={styles.modalCheckBox}
           />
         </View>
+        )}
         <Button style={{ alignSelf: 'center' }} onPress={() => setVisible(false)}>
           <Text style={{ color: colors.secondary }}>Done</Text>
         </Button>
@@ -74,3 +82,9 @@ export default function GasPriceModal(props: Props) {
     </Modal>
   );
 }
+
+SettingModal.defaultProps = {
+  useCustomValue: false,
+  setUseCustomValue: undefined,
+  inputStep: 0.01,
+};

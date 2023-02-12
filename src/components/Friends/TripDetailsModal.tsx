@@ -7,9 +7,11 @@ import {
   DocumentData,
 } from 'firebase/firestore';
 
+// Global State
+import { useGlobalState } from '../../hooks/hooks';
+
 // Components
 import Text from '../Text';
-import Button from '../Button';
 import MapContainer from '../MapContainer';
 
 // Styles
@@ -17,6 +19,7 @@ import styles from '../../styles/FriendsScreen.styles';
 
 // Helpers
 import { locationToLatLng } from '../../helpers/mapHelper';
+import { convertAllToString } from '../../helpers/unitsHelper';
 
 interface Props {
   setMapVisible: () => void,
@@ -28,6 +31,14 @@ interface Props {
 export default function TripDetailsModal({
   transactionWaypoints, transaction, transactionAmount, setMapVisible,
 }: Props) {
+  const [globalState] = useGlobalState();
+  const convertedStats = convertAllToString(
+    transaction.distance,
+    transaction.gasMilage ?? 10,
+    transaction.gasPrice,
+    'CA', // DB records are always in CA
+    globalState.Locale,
+  );
   return (
     <View style={{ height: '100%', width: '100%' }}>
       <Text style={styles.friendInfoTitle}>Trip Details</Text>
@@ -48,11 +59,12 @@ export default function TripDetailsModal({
           }}
           showUserLocation={false}
           waypoints={transactionWaypoints}
-          style={{ height: '50%', backgroundColor: 'white' }}
+          style={{ height: '50%', width: '90%', backgroundColor: 'white' }}
+          onPress={() => setMapVisible()}
         />
         )}
         <View style={{
-          flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 12,
+          flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 64,
         }}
         >
           <Text>{`Total: $${transaction.cost.toFixed(2)}`}</Text>
@@ -62,8 +74,8 @@ export default function TripDetailsModal({
           flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 12,
         }}
         >
-          <Text>{`Distance: ${transaction.distance.toFixed(2)} km`}</Text>
-          <Text>{`Gas Price: $${transaction.gasPrice.toFixed(2)}/L`}</Text>
+          <Text>{`Distance: ${convertedStats.distance}`}</Text>
+          <Text>{`Gas Price: ${convertedStats.gasPrice}`}</Text>
         </View>
         <View style={{
           flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 12,
@@ -71,9 +83,6 @@ export default function TripDetailsModal({
         >
           <Text>{`Date: ${transaction.date?.toDate().toLocaleDateString()}`}</Text>
         </View>
-        <Button onPress={setMapVisible} style={{ width: '60%', marginTop: 'auto' }}>
-          <Text>View On Map</Text>
-        </Button>
       </View>
     </View>
   );

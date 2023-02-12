@@ -18,7 +18,9 @@ import {
   Alert,
   Keyboard,
   TextInput,
+  TouchableOpacity,
 } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 // External Components
 import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -36,21 +38,23 @@ import { auth } from '../../firebase';
 
 // Helpers
 import { validateCurrentUser } from '../helpers/authHelper';
+import { convertGasPrice } from '../helpers/unitsHelper';
 
 // Global State Stuff
-import { useGlobalState } from '../hooks/hooks';
+import { useGlobalState, changeSetting } from '../hooks/hooks';
 
 // Components
 import Page from '../components/Page';
 import Text from '../components/Text';
 import Button from '../components/Button';
-import MapModal from '../components/MapModal';
+import MapContainer from '../components/MapContainer';
 import Modal from '../components/Modal';
 import AutocompleteInput from '../components/AutocompleteInput';
+import MapModal from '../components/MapModal';
 
 import StatsSection from '../components/Home/StatsSection';
 import SaveTripModal from '../components/Home/SaveTripModal';
-import GasPriceModal from '../components/Home/GasPriceModal';
+import SettingsModal from '../components/Home/SettingsModal';
 
 // Styles
 import { colors } from '../styles/styles';
@@ -58,6 +62,7 @@ import styles from '../styles/HomeScreen.styles';
 
 // Mock Data
 import { fetchData } from '../data/data';
+import SettingsScreen from './SettingsScreen';
 
 enum ActiveInput {
   None,
@@ -67,7 +72,14 @@ enum ActiveInput {
 
 let sessionToken = uuid.v4();
 
-export default function HomeScreen() {
+interface Props {
+  navigation: {
+    navigate: (str: string) => {},
+    goBack: () => {}
+  },
+}
+
+function HomePage({ navigation }: Props) {
   const [user] = useAuthState(auth);
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
   const [{
@@ -100,8 +112,9 @@ export default function HomeScreen() {
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
   const [visible, setVisible] = useState<boolean>(false);
+  const [fuelModalVisible, setFuelModalVisible] = useState<boolean>(false);
   const [useCustomGasPrice, setUseCustomGasPrice] = useState<boolean>(false);
-  const [globalState] = useGlobalState();
+  const [globalState, updateGlobalState] = useGlobalState();
   const [modalVisible, setModalVisible] = useState(false);
   const [mapModalVisible, setMapModalVisible] = useState(false);
 
@@ -112,8 +125,7 @@ export default function HomeScreen() {
 
   const cost = (
     ((distance * GAS_MILEAGE) / 100) // This get's the L of gas used
-    * gasPrice // This gets the cost of the gas used
-    * (globalState.country === 'CA' ? 1 : 0.2641729) // This converts the cost based on if the gas price is $/gal or $/L
+    * convertGasPrice(gasPrice, globalState.country, 'CA') // This gets the cost of the gas used and converts it to $/L if it is $/gal
   );
 
   const setGasPrice = (newPrice: number) => {
@@ -334,13 +346,22 @@ export default function HomeScreen() {
 
   return (
     <Page>
-      <GasPriceModal
+      <SettingsModal
+        setting="Gas Price"
         visible={visible}
         setVisible={setVisible}
         data={customGasPrice}
         setData={updateCustomGasPrice}
         useCustomValue={useCustomGasPrice}
         setUseCustomValue={configureCustomGasPrice}
+      />
+      <SettingsModal
+        setting="Fuel Efficiency"
+        visible={fuelModalVisible}
+        setVisible={setFuelModalVisible}
+        data={globalState['Gas Mileage']}
+        setData={(value) => changeSetting('Gas Mileage', value, updateGlobalState)}
+        inputStep={0.5}
       />
       <Portal>
         <Modal
@@ -368,12 +389,27 @@ export default function HomeScreen() {
               start,
               end,
             }}
+            showUserLocation={!start.address || !end.address}
             waypoints={waypoints}
-            showUserLocation={false}
           />
         </Modal>
       </Portal>
+      <View style={styles.settingsButton}>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={{ margin: 24 }}>
+          <Ionicons name="settings" size={30} color={colors.gray} />
+        </TouchableOpacity>
+      </View>
       <View style={styles.dataContainer}>
+        <MapContainer
+          waypoints={waypoints}
+          showUserLocation={!start.address || !end.address}
+          data={{
+            start,
+            end,
+          }}
+          style={styles.mapView}
+          onPress={() => setMapModalVisible(true)}
+        />
         <StatsSection
           loading={loading}
           distance={distance}
@@ -381,7 +417,9 @@ export default function HomeScreen() {
           useCustomGasPrice={useCustomGasPrice}
           cost={cost}
           gasMileage={GAS_MILEAGE}
+          locale={globalState.Locale}
           openModal={() => setVisible(true)}
+          openFuelModal={() => setFuelModalVisible(true)}
         />
         <AutocompleteInput
           z={2}
@@ -438,20 +476,6 @@ export default function HomeScreen() {
           >
             <Text style={{ color: colors.secondary, textAlign: 'center' }}>Calculate</Text>
           </Button>
-        </View>
-        <View style={styles.buttonSection}>
-          <Button
-            style={styles.saveButton}
-            onPress={() => setMapModalVisible(true)}
-            disabled={!tripCalculated}
-          >
-            <Text
-              style={styles.secondaryButtonText}
-            >
-              View Map
-            </Text>
-            <Ionicons name="map" size={12} color={colors.secondary} />
-          </Button>
           <Button
             style={styles.saveButton}
             onPress={() => validateCurrentUser(user) && setModalVisible(true)}
@@ -462,10 +486,33 @@ export default function HomeScreen() {
             >
               Save
             </Text>
-            <AntDesign name="contacts" size={12} color={colors.secondary} />
+            <AntDesign name="save" size={12} color={colors.secondary} />
           </Button>
         </View>
       </View>
     </Page>
+  );
+}
+
+const RootStack = createStackNavigator();
+
+export default function HomeScreen() {
+  return (
+    <RootStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.purple,
+          height: 80,
+        },
+        headerTitleStyle: { color: colors.white },
+      }}
+    >
+      <RootStack.Group screenOptions={{ headerShown: false }}>
+        <RootStack.Screen name="Home" component={HomePage} />
+      </RootStack.Group>
+      <RootStack.Group>
+        <RootStack.Screen name="Settings" component={SettingsScreen} />
+      </RootStack.Group>
+    </RootStack.Navigator>
   );
 }

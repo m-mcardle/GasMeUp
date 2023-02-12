@@ -6,17 +6,18 @@ import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import { useGlobalState } from '../hooks/hooks';
 
 import { customMapStyle } from '../helpers/mapHelper';
-import { globalStyles } from '../styles/styles';
+import { colors, globalStyles } from '../styles/styles';
 
 interface Props {
   data: MapData;
   showUserLocation: boolean;
   waypoints: Array<Location>,
   style?: object,
+  onPress?: () => void,
 }
 
 export default function MapContainer({
-  data, showUserLocation, waypoints, style,
+  data, showUserLocation, waypoints, style, onPress,
 }: Props) {
   const [globalState] = useGlobalState();
   const hasUserLocation = globalState.userLocation.lat && globalState.userLocation.lng;
@@ -26,18 +27,33 @@ export default function MapContainer({
 
   const middleLat = (data.start.lat + data.end.lat) / 2;
   const middleLng = (data.start.lng + data.end.lng) / 2;
+
+  const mapRegion = {
+    latitude: middleLat,
+    longitude: middleLng,
+    latitudeDelta: latDelta,
+    longitudeDelta: lngDelta,
+  };
+
+  const userLocationRegion = {
+    latitude: globalState.userLocation.lat,
+    longitude: globalState.userLocation.lng,
+    latitudeDelta: 1,
+    longitudeDelta: 1,
+  };
+
+  const fallbackToUserRegion = (
+    hasUserLocation && showUserLocation && mapRegion.latitude === 0 && mapRegion.longitude === 0
+  );
+
   return (
     <View style={[globalStyles.mapContainer, style]}>
       <MapView
         provider={PROVIDER_GOOGLE}
         style={globalStyles.map}
-        region={{
-          latitude: middleLat,
-          longitude: middleLng,
-          latitudeDelta: latDelta,
-          longitudeDelta: lngDelta,
-        }}
+        region={fallbackToUserRegion ? userLocationRegion : mapRegion}
         customMapStyle={customMapStyle}
+        onPress={onPress}
       >
         <Marker
           coordinate={{
@@ -46,7 +62,7 @@ export default function MapContainer({
           }}
           title="Start"
           description="Start Location of Trip"
-          pinColor="#BF00FF"
+          pinColor={colors.action}
         />
         <Marker
           coordinate={{
@@ -55,7 +71,7 @@ export default function MapContainer({
           }}
           title="End"
           description="End Location of Trip"
-          pinColor="#BF00FF"
+          pinColor={colors.action}
         />
         {showUserLocation && hasUserLocation && (
           <Marker
@@ -68,7 +84,9 @@ export default function MapContainer({
             pinColor="blue"
           />
         )}
-        {waypoints.length > 0 && <Polyline coordinates={waypoints} strokeWidth={2} strokeColor="#BF00FF" />}
+        {waypoints.length > 0 && (
+          <Polyline coordinates={waypoints} strokeWidth={2} strokeColor={colors.action} />
+        )}
       </MapView>
     </View>
   );
@@ -76,4 +94,5 @@ export default function MapContainer({
 
 MapContainer.defaultProps = {
   style: undefined,
+  onPress: undefined,
 };

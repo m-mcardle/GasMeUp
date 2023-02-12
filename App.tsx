@@ -26,7 +26,6 @@ import { GlobalContext, initialState } from './src/hooks/hooks';
 
 // Screens
 import HomeScreen from './src/screens/HomeScreen';
-import SettingsScreen from './src/screens/SettingsScreen';
 import FriendsScreen from './src/screens/FriendsScreen';
 import GasPriceScreen from './src/screens/GasPriceScreen';
 
@@ -56,7 +55,7 @@ function TabIcon({
   let iconName: React.ComponentProps<typeof Ionicons>['name'] = 'ios-square';
 
   switch (name) {
-    case 'Add':
+    case 'Calculate':
       iconName = focused
         ? 'ios-calculator'
         : 'ios-calculator-outline';
@@ -71,7 +70,7 @@ function TabIcon({
         ? 'ios-people'
         : 'ios-people-outline';
       break;
-    case 'Gas':
+    case 'Gas Prices':
       return <FontAwesome5 name="gas-pump" size={size} color={color} />;
     default:
       iconName = 'ios-square';
@@ -177,9 +176,8 @@ export default function App() {
           })}
         >
           <Tab.Screen name="Friends" component={FriendsScreen} />
-          <Tab.Screen name="Add" component={HomeScreen} />
-          <Tab.Screen name="Gas" component={GasPriceScreen} />
-          <Tab.Screen name="Settings" component={SettingsScreen} />
+          <Tab.Screen name="Calculate" component={HomeScreen} />
+          <Tab.Screen name="Gas Prices" component={GasPriceScreen} />
         </Tab.Navigator>
       </NavigationContainer>
     </GlobalContext.Provider>

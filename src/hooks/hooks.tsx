@@ -12,6 +12,23 @@ export const DEV_TOGGLE_SETTINGS: Record<string, boolean> = {
   'Enable Requests': true,
 };
 
+export const Locale = {
+  CA: 'CA',
+  US: 'US',
+};
+
+interface Option {
+  default: any,
+  options: Array<any>,
+}
+
+export const OPTIONS_SETTINGS: Record<string, Option> = {
+  Locale: {
+    default: Locale.CA,
+    options: [Locale.CA, Locale.US],
+  },
+};
+
 export const NUMERIC_SETTINGS: Record<string, number> = {
   'Gas Mileage': 10,
 };
@@ -24,6 +41,12 @@ if (Platform.OS === 'ios') {
     initialSettings[setting] = Settings.get(setting) !== undefined
       ? !!Settings.get(setting)
       : DEV_TOGGLE_SETTINGS[setting];
+  });
+
+  Object.keys(OPTIONS_SETTINGS).forEach((setting) => {
+    initialSettings[setting] = Settings.get(setting) !== undefined
+      ? Settings.get(setting)
+      : OPTIONS_SETTINGS[setting].default;
   });
 
   Object.keys(NUMERIC_SETTINGS).forEach((setting) => {
@@ -43,6 +66,8 @@ if (process.env.NODE_ENV !== 'development') {
   initialSettings['Enable Requests'] = true;
 }
 
+console.log(Settings.get('Locale'));
+
 export const initialState = {
   ...initialSettings,
   region: 'ON',
@@ -52,3 +77,15 @@ export const initialState = {
     lng: undefined,
   },
 };
+
+export function changeSetting(
+  setting: string,
+  value: any,
+  updateGlobalState: (k: string, v: any) => void,
+) {
+  const newSetting: any = {};
+  newSetting[setting] = value;
+
+  if (Platform.OS === 'ios') { Settings.set(newSetting); }
+  updateGlobalState(setting, value);
+}
