@@ -24,6 +24,47 @@ export const convertGasPrice = (price: number, inputCountry: 'CA' | 'US', output
   return price;
 };
 
+export function convertAll(
+  distance: number,
+  fuelEfficiency: number,
+  gasPrice: number,
+  inputCountry: 'CA' | 'US',
+  outputCountry: 'CA' | 'US',
+) {
+  // Distance and fuel are always in KM and L/100KM (for now)
+  return {
+    distance: convertKMtoMiles(distance),
+    fuelEfficiency: convertFuelEfficiency(fuelEfficiency),
+    gasPrice: convertGasPrice(gasPrice, inputCountry, outputCountry),
+  };
+}
+
+export function convertAllToString(
+  distance: number,
+  fuelEfficiency: number,
+  gasPrice: number,
+  inputCountry: 'CA' | 'US',
+  outputCountry: 'CA' | 'US',
+) {
+  const {
+    distance: distanceConverted,
+    fuelEfficiency: fuelEfficiencyConverted,
+    gasPrice: gasPriceConverted,
+  } = convertAll(
+    distance,
+    fuelEfficiency,
+    gasPrice,
+    inputCountry,
+    outputCountry,
+  );
+
+  return {
+    distance: `${distanceConverted.toFixed(2)} ${outputCountry === 'CA' ? 'km' : 'mi'}`,
+    fuelEfficiency: `${fuelEfficiencyConverted.toFixed(1)} ${outputCountry === 'CA' ? 'L/100km' : 'mpg'}`,
+    gasPrice: `$${gasPriceConverted.toFixed(2)}${outputCountry === 'CA' ? '/L' : '/gal'}`,
+  };
+}
+
 export default {
   convertKMtoMiles,
   convertMilesToKM,

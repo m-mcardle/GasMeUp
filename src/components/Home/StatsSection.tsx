@@ -13,7 +13,7 @@ import { useGlobalState } from '../../hooks/hooks';
 
 // Helpers
 import {
-  convertKMtoMiles, convertLtoGallons, convertFuelEfficiency, convertGasPrice,
+  convertLtoGallons, convertAllToString,
 } from '../../helpers/unitsHelper';
 
 // Components
@@ -81,22 +81,16 @@ export default function StatsSection(props: Props) {
   // L
   const gasUsed = (distance * gasMileage) / 100;
 
+  const convertedStats = convertAllToString(
+    distance,
+    gasMileage,
+    gasPrice,
+    globalState.country,
+    locale,
+  );
   const gasUsedString = locale === 'CA'
     ? `${gasUsed.toFixed(2)}L`
     : `${(convertLtoGallons(gasUsed)).toFixed(2)}gal`;
-
-  const convertedGasPrice = convertGasPrice(gasPrice, globalState.country, locale);
-  const gasPriceString = locale === 'CA'
-    ? `$${convertedGasPrice.toFixed(2)}/L`
-    : `$${convertedGasPrice.toFixed(2)}/gal`;
-
-  const distanceString = locale === 'CA'
-    ? `${distance.toFixed(2)} km`
-    : `${(convertKMtoMiles(distance)).toFixed(2)} mi`;
-
-  const fuelEfficiencyString = locale === 'CA'
-    ? `${gasMileage.toFixed(1)}L/100km`
-    : `${convertFuelEfficiency(gasMileage).toFixed(1)}mpg`;
 
   const costSectionGradient = [
     '#118C4F',
@@ -158,7 +152,7 @@ export default function StatsSection(props: Props) {
                 )
                 : (
                   <Text style={styles.statBoxText}>
-                    {distanceString}
+                    {convertedStats.distance}
                   </Text>
                 )}
             </View>
@@ -176,6 +170,7 @@ export default function StatsSection(props: Props) {
                 )
                 : (
                   <Text style={styles.statBoxText}>
+                    {/* TODO */}
                     {gasUsedString}
                   </Text>
                 )}
@@ -197,7 +192,7 @@ export default function StatsSection(props: Props) {
                 )
                 : (
                   <Text style={styles.statBoxText}>
-                    {fuelEfficiencyString}
+                    {convertedStats.fuelEfficiency}
                     {'  '}
                     <Ionicons name="chevron-up-circle" size={16} color={colors.gray} />
                   </Text>
@@ -222,7 +217,7 @@ export default function StatsSection(props: Props) {
                 )
                 : (
                   <Text style={styles.statBoxText}>
-                    {gasPriceString}
+                    {convertedStats.gasPrice}
                     {'  '}
                     <Ionicons name="chevron-up-circle" size={16} color={useCustomGasPrice ? colors.action : colors.gray} />
                   </Text>

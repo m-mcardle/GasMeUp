@@ -7,6 +7,9 @@ import {
   DocumentData,
 } from 'firebase/firestore';
 
+// Global State
+import { useGlobalState } from '../../hooks/hooks';
+
 // Components
 import Text from '../Text';
 import MapContainer from '../MapContainer';
@@ -16,6 +19,7 @@ import styles from '../../styles/FriendsScreen.styles';
 
 // Helpers
 import { locationToLatLng } from '../../helpers/mapHelper';
+import { convertAllToString } from '../../helpers/unitsHelper';
 
 interface Props {
   setMapVisible: () => void,
@@ -27,6 +31,14 @@ interface Props {
 export default function TripDetailsModal({
   transactionWaypoints, transaction, transactionAmount, setMapVisible,
 }: Props) {
+  const [globalState] = useGlobalState();
+  const convertedStats = convertAllToString(
+    transaction.distance,
+    transaction.gasMilage ?? 10,
+    transaction.gasPrice,
+    'CA', // DB records are always in CA
+    globalState.Locale,
+  );
   return (
     <View style={{ height: '100%', width: '100%' }}>
       <Text style={styles.friendInfoTitle}>Trip Details</Text>
@@ -62,8 +74,8 @@ export default function TripDetailsModal({
           flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 12,
         }}
         >
-          <Text>{`Distance: ${transaction.distance.toFixed(2)} km`}</Text>
-          <Text>{`Gas Price: $${transaction.gasPrice.toFixed(2)}/L`}</Text>
+          <Text>{`Distance: ${convertedStats.distance}`}</Text>
+          <Text>{`Gas Price: ${convertedStats.gasPrice}`}</Text>
         </View>
         <View style={{
           flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 12,
