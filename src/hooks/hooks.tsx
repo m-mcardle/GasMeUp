@@ -13,12 +13,20 @@ export const DEV_TOGGLE_SETTINGS: Record<string, boolean> = {
 };
 
 export const Locale = {
-  CA: true,
-  US: false,
+  CA: 'CA',
+  US: 'US',
 };
 
-export const TOGGLE_SETTINGS: Record<string, boolean> = {
-  Locale: Locale.CA,
+interface Option {
+  default: any,
+  options: Array<any>,
+}
+
+export const OPTIONS_SETTINGS: Record<string, Option> = {
+  Locale: {
+    default: Locale.CA,
+    options: [Locale.CA, Locale.US],
+  },
 };
 
 export const NUMERIC_SETTINGS: Record<string, number> = {
@@ -34,10 +42,11 @@ if (Platform.OS === 'ios') {
       ? !!Settings.get(setting)
       : DEV_TOGGLE_SETTINGS[setting];
   });
-  Object.keys(TOGGLE_SETTINGS).forEach((setting) => {
+
+  Object.keys(OPTIONS_SETTINGS).forEach((setting) => {
     initialSettings[setting] = Settings.get(setting) !== undefined
-      ? !!Settings.get(setting)
-      : TOGGLE_SETTINGS[setting];
+      ? Settings.get(setting)
+      : OPTIONS_SETTINGS[setting].default;
   });
 
   Object.keys(NUMERIC_SETTINGS).forEach((setting) => {
@@ -56,6 +65,8 @@ if (Platform.OS === 'ios') {
 if (process.env.NODE_ENV !== 'development') {
   initialSettings['Enable Requests'] = true;
 }
+
+console.log(Settings.get('Locale'));
 
 export const initialState = {
   ...initialSettings,

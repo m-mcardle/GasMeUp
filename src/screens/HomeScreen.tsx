@@ -402,7 +402,7 @@ export default function HomeScreen() {
           useCustomGasPrice={useCustomGasPrice}
           cost={cost}
           gasMileage={GAS_MILEAGE}
-          locale={globalState.Locale ? 'CA' : 'US'}
+          locale={globalState.Locale}
           openModal={() => setVisible(true)}
           openFuelModal={() => setFuelModalVisible(true)}
         />

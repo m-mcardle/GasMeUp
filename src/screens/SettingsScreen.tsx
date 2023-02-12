@@ -8,6 +8,7 @@ import {
 
 // External Components
 import NumericInput from 'react-native-numeric-input';
+import { SegmentedButtons } from 'react-native-paper';
 
 // Components
 import Page from '../components/Page';
@@ -15,7 +16,7 @@ import Text from '../components/Text';
 
 // Global state stuff
 import {
-  useGlobalState, changeSetting, DEV_TOGGLE_SETTINGS, TOGGLE_SETTINGS,
+  useGlobalState, changeSetting, DEV_TOGGLE_SETTINGS, OPTIONS_SETTINGS,
 } from '../hooks/hooks';
 
 // Styles
@@ -48,10 +49,18 @@ export default function SettingsScreen() {
             <SettingsSwitch name={setting} value={globalState[setting]} />
           </View>
         ))}
-        {Object.keys(TOGGLE_SETTINGS).map((setting) => (
+        {Object.keys(OPTIONS_SETTINGS).map((setting) => (
           <View key={setting} style={styles.settingContainer}>
             <Text style={styles.settingsText}>{setting}</Text>
-            <SettingsSwitch name={setting} value={globalState[setting]} />
+            <SegmentedButtons
+              buttons={OPTIONS_SETTINGS[setting].options.map((option) => ({
+                label: option,
+                value: option,
+              }))}
+              value={globalState[setting]}
+              onValueChange={(val: any) => changeSetting(setting, val, updateGlobalState)}
+              style={styles.settingItem}
+            />
           </View>
         ))}
         <View style={styles.settingContainer}>
