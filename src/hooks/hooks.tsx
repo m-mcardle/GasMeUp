@@ -66,3 +66,15 @@ export const initialState = {
     lng: undefined,
   },
 };
+
+export function changeSetting(
+  setting: string,
+  value: any,
+  updateGlobalState: (k: string, v: any) => void,
+) {
+  const newSetting: any = {};
+  newSetting[setting] = value;
+
+  if (Platform.OS === 'ios') { Settings.set(newSetting); }
+  updateGlobalState(setting, value);
+}

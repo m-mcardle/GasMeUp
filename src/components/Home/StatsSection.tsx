@@ -33,6 +33,7 @@ interface Props {
   gasMileage: number,
   locale: 'CA' | 'US',
   openModal: () => void,
+  openFuelModal: () => void,
 }
 
 export default function StatsSection(props: Props) {
@@ -45,6 +46,7 @@ export default function StatsSection(props: Props) {
     cost,
     locale,
     openModal,
+    openFuelModal,
   } = props;
   const [globalState] = useGlobalState();
 
@@ -162,6 +164,47 @@ export default function StatsSection(props: Props) {
             </View>
           </View>
           <View
+            style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
+          >
+            <View style={styles.statText}>
+              <FontAwesome5 name="gas-pump" size={16} color={colors.gray} />
+              {loading
+                ? (
+                  <View style={styles.statBoxText}>
+                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
+                  </View>
+                )
+                : (
+                  <Text style={styles.statBoxText}>
+                    {gasUsedString}
+                  </Text>
+                )}
+            </View>
+          </View>
+        </View>
+        <View style={styles.subStatsSection}>
+          <View
+            style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
+            onTouchEnd={() => openFuelModal()}
+          >
+            <View style={styles.statText}>
+              <FontAwesome5 name="car" size={16} color={colors.gray} />
+              {loading
+                ? (
+                  <View style={styles.statBoxText}>
+                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
+                  </View>
+                )
+                : (
+                  <Text style={styles.statBoxText}>
+                    {fuelEfficiencyString}
+                    {'  '}
+                    <Ionicons name="chevron-up-circle" size={16} color={colors.gray} />
+                  </Text>
+                )}
+            </View>
+          </View>
+          <View
             style={[
               styles.statBox,
               (loading ? { justifyContent: 'center' } : undefined),
@@ -182,44 +225,6 @@ export default function StatsSection(props: Props) {
                     {gasPriceString}
                     {'  '}
                     <Ionicons name="chevron-up-circle" size={16} color={useCustomGasPrice ? colors.action : colors.gray} />
-                  </Text>
-                )}
-            </View>
-          </View>
-        </View>
-        <View style={styles.subStatsSection}>
-          <View
-            style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
-          >
-            <View style={styles.statText}>
-              <FontAwesome5 name="car" size={16} color={colors.gray} />
-              {loading
-                ? (
-                  <View style={styles.statBoxText}>
-                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
-                  </View>
-                )
-                : (
-                  <Text style={styles.statBoxText}>
-                    {fuelEfficiencyString}
-                  </Text>
-                )}
-            </View>
-          </View>
-          <View
-            style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
-          >
-            <View style={styles.statText}>
-              <FontAwesome5 name="gas-pump" size={16} color={colors.gray} />
-              {loading
-                ? (
-                  <View style={styles.statBoxText}>
-                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
-                  </View>
-                )
-                : (
-                  <Text style={styles.statBoxText}>
-                    {gasUsedString}
                   </Text>
                 )}
             </View>

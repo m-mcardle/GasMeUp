@@ -9,7 +9,6 @@ import {
 
 // Components
 import Text from '../Text';
-import Button from '../Button';
 import MapContainer from '../MapContainer';
 
 // Styles
@@ -48,11 +47,12 @@ export default function TripDetailsModal({
           }}
           showUserLocation={false}
           waypoints={transactionWaypoints}
-          style={{ height: '50%', backgroundColor: 'white' }}
+          style={{ height: '50%', width: '90%', backgroundColor: 'white' }}
+          onPress={() => setMapVisible()}
         />
         )}
         <View style={{
-          flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 12,
+          flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 64,
         }}
         >
           <Text>{`Total: $${transaction.cost.toFixed(2)}`}</Text>
@@ -71,9 +71,6 @@ export default function TripDetailsModal({
         >
           <Text>{`Date: ${transaction.date?.toDate().toLocaleDateString()}`}</Text>
         </View>
-        <Button onPress={setMapVisible} style={{ width: '60%', marginTop: 'auto' }}>
-          <Text>View On Map</Text>
-        </Button>
       </View>
     </View>
   );

@@ -13,10 +13,11 @@ interface Props {
   showUserLocation: boolean;
   waypoints: Array<Location>,
   style?: object,
+  onPress?: () => void,
 }
 
 export default function MapContainer({
-  data, showUserLocation, waypoints, style,
+  data, showUserLocation, waypoints, style, onPress,
 }: Props) {
   const [globalState] = useGlobalState();
   const hasUserLocation = globalState.userLocation.lat && globalState.userLocation.lng;
@@ -52,6 +53,7 @@ export default function MapContainer({
         style={globalStyles.map}
         region={fallbackToUserRegion ? userLocationRegion : mapRegion}
         customMapStyle={customMapStyle}
+        onPress={onPress}
       >
         <Marker
           coordinate={{
@@ -92,4 +94,5 @@ export default function MapContainer({
 
 MapContainer.defaultProps = {
   style: undefined,
+  onPress: undefined,
 };

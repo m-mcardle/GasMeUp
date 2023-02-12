@@ -1,11 +1,9 @@
 // React
 import React, { useMemo } from 'react';
 import {
-  Settings,
   View,
   Switch,
   ViewStyle,
-  Platform,
 } from 'react-native';
 
 // External Components
@@ -16,7 +14,9 @@ import Page from '../components/Page';
 import Text from '../components/Text';
 
 // Global state stuff
-import { useGlobalState, DEV_TOGGLE_SETTINGS, TOGGLE_SETTINGS } from '../hooks/hooks';
+import {
+  useGlobalState, changeSetting, DEV_TOGGLE_SETTINGS, TOGGLE_SETTINGS,
+} from '../hooks/hooks';
 
 // Styles
 import styles from '../styles/SettingsScreen.styles';
@@ -25,19 +25,11 @@ import { colors, globalStyles } from '../styles/styles';
 export default function SettingsScreen() {
   const [globalState, updateGlobalState] = useGlobalState();
 
-  const changeSetting = (setting: string, value: any) => {
-    const newSetting: any = {};
-    newSetting[setting] = value;
-
-    if (Platform.OS === 'ios') { Settings.set(newSetting); }
-    updateGlobalState(setting, value);
-  };
-
   const SettingsSwitch = ({ name = '', value = false }) => useMemo(() => (
     <View style={styles.settingItem}>
       <Switch
         value={value}
-        onValueChange={(val) => changeSetting(name, val)}
+        onValueChange={(val) => changeSetting(name, val, updateGlobalState)}
         trackColor={{ false: colors.primary, true: colors.action }}
         ios_backgroundColor={colors.primary}
       />
@@ -47,7 +39,7 @@ export default function SettingsScreen() {
   return (
     <Page>
       <View style={styles.headerContainer}>
-        <Text style={globalStyles.title}> Settings</Text>
+        <Text style={globalStyles.title}>Settings</Text>
       </View>
       <View style={styles.mainContainer}>
         {process.env.NODE_ENV === 'development' && Object.keys(DEV_TOGGLE_SETTINGS).map((setting) => (
@@ -74,7 +66,7 @@ export default function SettingsScreen() {
               valueType="real"
               minValue={0.01}
               step={0.01}
-              onChange={(value) => changeSetting('Gas Mileage', value)}
+              onChange={(value) => changeSetting('Gas Mileage', value, updateGlobalState)}
               value={globalState['Gas Mileage']}
             />
           </View>

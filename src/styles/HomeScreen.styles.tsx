@@ -119,17 +119,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    width: '25%',
+    width: '30%',
     backgroundColor: colors.secondaryAction,
   },
   buttonSection: {
     flexDirection: 'row',
-    width: '90%',
+    width: '70%',
     justifyContent: 'center',
   },
   calculateButton: {
-    width: '60%',
-    paddingHorizontal: 50,
+    width: '50%',
+    paddingHorizontal: 20,
   },
   saveTripLocationHeaderContainer: {
     flexDirection: 'row',
@@ -155,7 +155,6 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: colors.secondary,
     marginHorizontal: 2,
-    fontSize: 8,
   },
   statText: {
     flexDirection: 'row',
@@ -173,7 +172,7 @@ const styles = StyleSheet.create({
   mapView: {
     height: '30%',
     marginTop: 100,
-    width: '100%',
+    width: '70%',
     borderWidth: 1,
     borderColor: 'white',
   },

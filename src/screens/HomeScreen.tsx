@@ -39,7 +39,7 @@ import { validateCurrentUser } from '../helpers/authHelper';
 import { convertGasPrice } from '../helpers/unitsHelper';
 
 // Global State Stuff
-import { useGlobalState } from '../hooks/hooks';
+import { useGlobalState, changeSetting } from '../hooks/hooks';
 
 // Components
 import Page from '../components/Page';
@@ -48,10 +48,11 @@ import Button from '../components/Button';
 import MapContainer from '../components/MapContainer';
 import Modal from '../components/Modal';
 import AutocompleteInput from '../components/AutocompleteInput';
+import MapModal from '../components/MapModal';
 
 import StatsSection from '../components/Home/StatsSection';
 import SaveTripModal from '../components/Home/SaveTripModal';
-import GasPriceModal from '../components/Home/GasPriceModal';
+import SettingsModal from '../components/Home/SettingsModal';
 
 // Styles
 import { colors } from '../styles/styles';
@@ -101,9 +102,11 @@ export default function HomeScreen() {
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
   const [visible, setVisible] = useState<boolean>(false);
+  const [fuelModalVisible, setFuelModalVisible] = useState<boolean>(false);
   const [useCustomGasPrice, setUseCustomGasPrice] = useState<boolean>(false);
-  const [globalState] = useGlobalState();
+  const [globalState, updateGlobalState] = useGlobalState();
   const [modalVisible, setModalVisible] = useState(false);
+  const [mapModalVisible, setMapModalVisible] = useState(false);
 
   const [startLocationError, setStartLocationError] = useState<boolean>(false);
   const [endLocationError, setEndLocationError] = useState<boolean>(false);
@@ -333,13 +336,22 @@ export default function HomeScreen() {
 
   return (
     <Page>
-      <GasPriceModal
+      <SettingsModal
+        setting="Gas Price"
         visible={visible}
         setVisible={setVisible}
         data={customGasPrice}
         setData={updateCustomGasPrice}
         useCustomValue={useCustomGasPrice}
         setUseCustomValue={configureCustomGasPrice}
+      />
+      <SettingsModal
+        setting="Fuel Efficiency"
+        visible={fuelModalVisible}
+        setVisible={setFuelModalVisible}
+        data={globalState['Gas Mileage']}
+        setData={(value) => changeSetting('Gas Mileage', value, updateGlobalState)}
+        inputStep={0.5}
       />
       <Portal>
         <Modal
@@ -357,6 +369,20 @@ export default function HomeScreen() {
             closeModal={() => setModalVisible(false)}
           />
         </Modal>
+
+        <Modal
+          visible={mapModalVisible}
+          onDismiss={() => setMapModalVisible(false)}
+        >
+          <MapModal
+            data={{
+              start,
+              end,
+            }}
+            showUserLocation={!start.address || !end.address}
+            waypoints={waypoints}
+          />
+        </Modal>
       </Portal>
       <View style={styles.dataContainer}>
         <MapContainer
@@ -367,6 +393,7 @@ export default function HomeScreen() {
             end,
           }}
           style={styles.mapView}
+          onPress={() => setMapModalVisible(true)}
         />
         <StatsSection
           loading={loading}
@@ -377,6 +404,7 @@ export default function HomeScreen() {
           gasMileage={GAS_MILEAGE}
           locale={globalState.Locale ? 'CA' : 'US'}
           openModal={() => setVisible(true)}
+          openFuelModal={() => setFuelModalVisible(true)}
         />
         <AutocompleteInput
           z={2}
@@ -433,8 +461,6 @@ export default function HomeScreen() {
           >
             <Text style={{ color: colors.secondary, textAlign: 'center' }}>Calculate</Text>
           </Button>
-        </View>
-        <View style={styles.buttonSection}>
           <Button
             style={styles.saveButton}
             onPress={() => validateCurrentUser(user) && setModalVisible(true)}
@@ -445,7 +471,7 @@ export default function HomeScreen() {
             >
               Save
             </Text>
-            <AntDesign name="contacts" size={12} color={colors.secondary} />
+            <AntDesign name="save" size={12} color={colors.secondary} />
           </Button>
         </View>
       </View>
