@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.10](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.9...v1.0.10) (2023-02-12)
 
+* Tweak verified email behaviour
+* Autocomplete inputs
+* Loading / Empty states
+* Map on main page
+* Settings page no longer on tabs
+* Add locale setting
+
 ### [1.0.9](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.8...v1.0.9) (2023-02-08)
 
 ### [1.0.8](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.7...v1.0.8) (2023-02-08)
