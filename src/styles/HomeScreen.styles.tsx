@@ -175,6 +175,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'white',
   },
+  settingsButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 1,
+  },
 });
 
 export default styles;

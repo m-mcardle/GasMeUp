@@ -9,14 +9,10 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     backgroundColor: colors.primary,
   },
-  headerContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   mainContainer: {
     flex: 3,
     alignItems: 'center',
+    paddingHorizontal: 48,
   },
   settingContainer: {
     width: '100%',

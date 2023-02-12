@@ -18,10 +18,12 @@ import {
   Alert,
   Keyboard,
   TextInput,
+  TouchableOpacity,
 } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 // External Components
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import {
   Portal,
@@ -60,6 +62,7 @@ import styles from '../styles/HomeScreen.styles';
 
 // Mock Data
 import { fetchData } from '../data/data';
+import SettingsScreen from './SettingsScreen';
 
 enum ActiveInput {
   None,
@@ -69,7 +72,14 @@ enum ActiveInput {
 
 let sessionToken = uuid.v4();
 
-export default function HomeScreen() {
+interface Props {
+  navigation: {
+    navigate: (str: string) => {},
+    goBack: () => {}
+  },
+}
+
+function HomePage({ navigation }: Props) {
   const [user] = useAuthState(auth);
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
   const [{
@@ -384,6 +394,11 @@ export default function HomeScreen() {
           />
         </Modal>
       </Portal>
+      <View style={styles.settingsButton}>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={{ margin: 24 }}>
+          <Ionicons name="settings" size={30} color={colors.gray} />
+        </TouchableOpacity>
+      </View>
       <View style={styles.dataContainer}>
         <MapContainer
           waypoints={waypoints}
@@ -476,5 +491,28 @@ export default function HomeScreen() {
         </View>
       </View>
     </Page>
+  );
+}
+
+const RootStack = createStackNavigator();
+
+export default function HomeScreen() {
+  return (
+    <RootStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.purple,
+          height: 80,
+        },
+        headerTitleStyle: { color: colors.white },
+      }}
+    >
+      <RootStack.Group screenOptions={{ headerShown: false }}>
+        <RootStack.Screen name="Home" component={HomePage} />
+      </RootStack.Group>
+      <RootStack.Group>
+        <RootStack.Screen name="Settings" component={SettingsScreen} />
+      </RootStack.Group>
+    </RootStack.Navigator>
   );
 }

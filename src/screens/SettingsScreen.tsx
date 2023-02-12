@@ -3,11 +3,9 @@ import React, { useMemo } from 'react';
 import {
   View,
   Switch,
-  ViewStyle,
 } from 'react-native';
 
 // External Components
-import NumericInput from 'react-native-numeric-input';
 import { SegmentedButtons } from 'react-native-paper';
 
 // Components
@@ -21,7 +19,7 @@ import {
 
 // Styles
 import styles from '../styles/SettingsScreen.styles';
-import { colors, globalStyles } from '../styles/styles';
+import { colors } from '../styles/styles';
 
 export default function SettingsScreen() {
   const [globalState, updateGlobalState] = useGlobalState();
@@ -39,9 +37,6 @@ export default function SettingsScreen() {
 
   return (
     <Page>
-      <View style={styles.headerContainer}>
-        <Text style={globalStyles.title}>Settings</Text>
-      </View>
       <View style={styles.mainContainer}>
         {process.env.NODE_ENV === 'development' && Object.keys(DEV_TOGGLE_SETTINGS).map((setting) => (
           <View key={setting} style={styles.settingContainer}>
@@ -63,23 +58,6 @@ export default function SettingsScreen() {
             />
           </View>
         ))}
-        <View style={styles.settingContainer}>
-          <Text style={styles.settingsText}>Gas Mileage (L / 100KM)</Text>
-          <View style={styles.settingItem}>
-            <NumericInput
-              rounded
-              totalHeight={25}
-              totalWidth={150}
-              containerStyle={{ backgroundColor: 'white' }}
-              inputStyle={globalStyles.numericInput as ViewStyle}
-              valueType="real"
-              minValue={0.01}
-              step={0.01}
-              onChange={(value) => changeSetting('Gas Mileage', value, updateGlobalState)}
-              value={globalState['Gas Mileage']}
-            />
-          </View>
-        </View>
       </View>
     </Page>
   );
