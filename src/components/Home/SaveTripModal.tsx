@@ -190,7 +190,7 @@ export default function SaveTripModal({
   ];
   const useCanadianUnits = globalState.Locale === Locale.CA;
   const gasUsed = (distance * gasMileage) / 100;
-  const convertedGasPrice = convertGasPrice(gasPrice, globalState.country, globalState.Locale);
+  const convertedGasPrice = convertGasPrice(gasPrice, globalState.country, useCanadianUnits ? 'CA' : 'US');
 
   const truncatedStart = start.length > 50 ? `${start.substring(0, 50)}...` : start;
   const truncatedEnd = end.length > 50 ? `${end.substring(0, 50)}...` : end;

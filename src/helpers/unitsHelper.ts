@@ -3,8 +3,8 @@ export const convertKMtoMiles = (km: number) => km * KM_TO_MILES;
 export const convertMilesToKM = (miles: number) => miles / KM_TO_MILES;
 
 const L_TO_GALLONS = 0.264172;
-export const convertLtoGallons = (l: number) => l / L_TO_GALLONS;
-export const convertGallonsToL = (gallons: number) => gallons * L_TO_GALLONS;
+export const convertLtoGallons = (l: number) => l * L_TO_GALLONS;
+export const convertGallonsToL = (gallons: number) => gallons / L_TO_GALLONS;
 
 export const convertFuelEfficiency = (fuel: number) => 235.214583 / fuel;
 
@@ -16,10 +16,10 @@ export const convertGasPrice = (price: number, inputCountry: 'CA' | 'US', output
     return price;
   }
   if (inputCountry === 'CA' && outputCountry === 'US') {
-    return convertLtoGallons(price);
+    return convertGallonsToL(price);
   }
   if (inputCountry === 'US' && outputCountry === 'CA') {
-    return convertGallonsToL(price);
+    return convertLtoGallons(price);
   }
   return price;
 };
