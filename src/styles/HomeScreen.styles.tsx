@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   costSection: {
     borderRadius: 5,
     marginBottom: 10,
-    marginTop: 150,
+    marginTop: 50,
     padding: 5,
     width: '100%',
     minHeight: 100,
@@ -169,6 +169,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray,
     width: '90%',
     borderRadius: 12,
+  },
+  mapView: {
+    height: '30%',
+    marginTop: 100,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: 'white',
   },
 });
 

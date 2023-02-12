@@ -12,6 +12,15 @@ export const DEV_TOGGLE_SETTINGS: Record<string, boolean> = {
   'Enable Requests': true,
 };
 
+export const Locale = {
+  CA: true,
+  US: false,
+};
+
+export const TOGGLE_SETTINGS: Record<string, boolean> = {
+  Locale: Locale.CA,
+};
+
 export const NUMERIC_SETTINGS: Record<string, number> = {
   'Gas Mileage': 10,
 };
@@ -24,6 +33,11 @@ if (Platform.OS === 'ios') {
     initialSettings[setting] = Settings.get(setting) !== undefined
       ? !!Settings.get(setting)
       : DEV_TOGGLE_SETTINGS[setting];
+  });
+  Object.keys(TOGGLE_SETTINGS).forEach((setting) => {
+    initialSettings[setting] = Settings.get(setting) !== undefined
+      ? !!Settings.get(setting)
+      : TOGGLE_SETTINGS[setting];
   });
 
   Object.keys(NUMERIC_SETTINGS).forEach((setting) => {

@@ -21,7 +21,7 @@ import {
 } from 'react-native';
 
 // External Components
-import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 
 import {
   Portal,
@@ -36,6 +36,7 @@ import { auth } from '../../firebase';
 
 // Helpers
 import { validateCurrentUser } from '../helpers/authHelper';
+import { convertGasPrice } from '../helpers/unitsHelper';
 
 // Global State Stuff
 import { useGlobalState } from '../hooks/hooks';
@@ -44,7 +45,7 @@ import { useGlobalState } from '../hooks/hooks';
 import Page from '../components/Page';
 import Text from '../components/Text';
 import Button from '../components/Button';
-import MapModal from '../components/MapModal';
+import MapContainer from '../components/MapContainer';
 import Modal from '../components/Modal';
 import AutocompleteInput from '../components/AutocompleteInput';
 
@@ -103,7 +104,6 @@ export default function HomeScreen() {
   const [useCustomGasPrice, setUseCustomGasPrice] = useState<boolean>(false);
   const [globalState] = useGlobalState();
   const [modalVisible, setModalVisible] = useState(false);
-  const [mapModalVisible, setMapModalVisible] = useState(false);
 
   const [startLocationError, setStartLocationError] = useState<boolean>(false);
   const [endLocationError, setEndLocationError] = useState<boolean>(false);
@@ -112,8 +112,7 @@ export default function HomeScreen() {
 
   const cost = (
     ((distance * GAS_MILEAGE) / 100) // This get's the L of gas used
-    * gasPrice // This gets the cost of the gas used
-    * (globalState.country === 'CA' ? 1 : 0.2641729) // This converts the cost based on if the gas price is $/gal or $/L
+    * convertGasPrice(gasPrice, globalState.country, 'CA') // This gets the cost of the gas used and converts it to $/L if it is $/gal
   );
 
   const setGasPrice = (newPrice: number) => {
@@ -358,22 +357,17 @@ export default function HomeScreen() {
             closeModal={() => setModalVisible(false)}
           />
         </Modal>
-
-        <Modal
-          visible={mapModalVisible}
-          onDismiss={() => setMapModalVisible(false)}
-        >
-          <MapModal
-            data={{
-              start,
-              end,
-            }}
-            waypoints={waypoints}
-            showUserLocation={false}
-          />
-        </Modal>
       </Portal>
       <View style={styles.dataContainer}>
+        <MapContainer
+          waypoints={waypoints}
+          showUserLocation={!start.address || !end.address}
+          data={{
+            start,
+            end,
+          }}
+          style={styles.mapView}
+        />
         <StatsSection
           loading={loading}
           distance={distance}
@@ -381,6 +375,7 @@ export default function HomeScreen() {
           useCustomGasPrice={useCustomGasPrice}
           cost={cost}
           gasMileage={GAS_MILEAGE}
+          locale={globalState.Locale ? 'CA' : 'US'}
           openModal={() => setVisible(true)}
         />
         <AutocompleteInput
@@ -440,18 +435,6 @@ export default function HomeScreen() {
           </Button>
         </View>
         <View style={styles.buttonSection}>
-          <Button
-            style={styles.saveButton}
-            onPress={() => setMapModalVisible(true)}
-            disabled={!tripCalculated}
-          >
-            <Text
-              style={styles.secondaryButtonText}
-            >
-              View Map
-            </Text>
-            <Ionicons name="map" size={12} color={colors.secondary} />
-          </Button>
           <Button
             style={styles.saveButton}
             onPress={() => validateCurrentUser(user) && setModalVisible(true)}

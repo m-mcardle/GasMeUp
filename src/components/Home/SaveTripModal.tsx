@@ -24,7 +24,8 @@ import Modal from '../Modal';
 import TripSettingsModal from './TripSettingsModal';
 
 // Global State
-import { useGlobalState } from '../../hooks/hooks';
+import { useGlobalState, Locale } from '../../hooks/hooks';
+import { convertGasPrice, convertKMtoMiles, convertLtoGallons } from '../../helpers/unitsHelper';
 
 // Helpers
 import { createTransaction } from '../../helpers/firestoreHelper';
@@ -32,7 +33,6 @@ import { createTransaction } from '../../helpers/firestoreHelper';
 // Styles
 import styles from '../../styles/HomeScreen.styles';
 import { boldFont, colors, globalStyles } from '../../styles/styles';
-import { convertKMtoMiles, convertLtoGallons } from '../../helpers/unitsHelper';
 
 function RowBuilder(
   selectedFriends: Array<DocumentData>,
@@ -129,8 +129,10 @@ export default function SaveTripModal({
   // eslint-disable-next-line no-param-reassign
   usersData.forEach((el) => { el.key = el.firstName + el.lastName + el.uid; });
 
-  // This converts from $/gal to $/L
-  const convertedGasPrice = Number((globalState.country === 'US' ? gasPrice / 4.54609 : gasPrice).toFixed(4));
+  // This converts from $/gal to $/L if needed
+  const canadianGasPrice = Number(
+    convertGasPrice(gasPrice, globalState.country, 'CA').toFixed(4),
+  );
 
   const saveTrip = useCallback(async (
     friends: Array<DocumentData>,
@@ -158,7 +160,7 @@ export default function SaveTripModal({
         payers,
         splitType,
         distance,
-        gasPrice: convertedGasPrice,
+        gasPrice: canadianGasPrice,
         startLocation: start,
         endLocation: end,
         gasMileage,
@@ -186,14 +188,15 @@ export default function SaveTripModal({
     { text: 'Name', numeric: false },
     { text: 'Split Trip', numeric: true },
   ];
-  const canadianUnits = globalState.country === 'CA';
+  const useCanadianUnits = globalState.Locale === Locale.CA;
   const gasUsed = (distance * gasMileage) / 100;
+  const convertedGasPrice = convertGasPrice(gasPrice, globalState.country, globalState.Locale);
 
   const truncatedStart = start.length > 50 ? `${start.substring(0, 50)}...` : start;
   const truncatedEnd = end.length > 50 ? `${end.substring(0, 50)}...` : end;
-  const gasPriceString = canadianUnits ? `$${gasPrice.toFixed(2)}/L` : `$${gasPrice.toFixed(2)}/gal`;
-  const gasUsageString = canadianUnits ? `${(gasUsed).toFixed(1)}L` : `${convertLtoGallons(gasUsed).toFixed(1)}gal`;
-  const distanceString = canadianUnits ? `${distance.toFixed(1)}km` : `${convertKMtoMiles(distance).toFixed(1)}mi`;
+  const gasPriceString = useCanadianUnits ? `$${convertedGasPrice.toFixed(2)}/L` : `$${convertedGasPrice.toFixed(2)}/gal`;
+  const gasUsageString = useCanadianUnits ? `${(gasUsed).toFixed(1)}L` : `${convertLtoGallons(gasUsed).toFixed(1)}gal`;
+  const distanceString = useCanadianUnits ? `${distance.toFixed(1)}km` : `${convertKMtoMiles(distance).toFixed(1)}mi`;
   return (
     <View style={{ height: '100%' }}>
       <Portal>
