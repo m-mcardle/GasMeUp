@@ -31,10 +31,11 @@ export function convertAll(
   inputCountry: 'CA' | 'US',
   outputCountry: 'CA' | 'US',
 ) {
+  const convertToUS = outputCountry === 'US';
   // Distance and fuel are always in KM and L/100KM (for now)
   return {
-    distance: convertKMtoMiles(distance),
-    fuelEfficiency: convertFuelEfficiency(fuelEfficiency),
+    distance: convertToUS ? convertKMtoMiles(distance) : distance,
+    fuelEfficiency: convertToUS ? convertFuelEfficiency(fuelEfficiency) : fuelEfficiency,
     gasPrice: convertGasPrice(gasPrice, inputCountry, outputCountry),
   };
 }
