@@ -2,11 +2,61 @@
 const friends = require("./src/friends");
 
 const functions = require("firebase-functions");
+const {Expo} = require("expo-server-sdk");
 
 const admin = require("firebase-admin");
 admin.initializeApp();
 
 const db = admin.firestore();
+const expo = new Expo();
+
+exports.sendTransactionNotifications = functions.firestore
+    .document("Transactions/{transactionUID}")
+    .onCreate(async (snapshot, context) => {
+      // Get value of the newly added transaction
+      const newData = snapshot.data();
+      const payeeUID = newData.payeeUID;
+      const payerUIDs = newData.payers;
+      const creatorUID = newData.creator;
+
+      const cost = newData.cost;
+      const splitType = newData.splitType;
+      const onlyRidersPay = splitType === "full";
+      const costPerRider = Number((onlyRidersPay ? cost / payerUIDs.length : cost / (payerUIDs.length + 1)).toFixed(2));
+
+      const creatorDoc = await db.collection("Users").doc(creatorUID).get();
+      const creatorData = await creatorDoc.data();
+
+      const messages = [];
+      const usersToNotify = [...payerUIDs, payeeUID].filter((uid) => uid !== newData.creator);
+      console.log("Users to notify:", usersToNotify);
+
+      await Promise.all(usersToNotify.map(async (uid) => {
+        const ref = db.collection("Users").doc(uid);
+        const doc = await ref.get();
+        const data = await doc.data();
+
+        const expoPushToken = data.notificationToken;
+        if (Expo.isExpoPushToken(expoPushToken)) {
+          console.log("Sending notification to", expoPushToken, "for", uid);
+          const isDriver = uid === payeeUID;
+          const amountOwed = isDriver ? costPerRider * payerUIDs.length : costPerRider;
+          messages.push({
+            to: expoPushToken,
+            sound: "default",
+            title: "New Trip",
+            body: `${creatorData.firstName} ${creatorData.lastName} added a new trip! You ${isDriver ? "owe" : "are owed"} $${amountOwed}.`,
+            data: {
+              transactionUID: snapshot.id,
+            },
+          });
+        } else {
+          console.log("Not a valid token:", expoPushToken, "for", uid);
+        }
+      }));
+      console.log("messages", messages);
+      expo.sendPushNotificationsAsync(messages);
+    });
 
 exports.aggregateBalances = functions.firestore
     .document("Transactions/{transactionUID}")

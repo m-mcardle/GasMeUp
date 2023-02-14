@@ -66,7 +66,9 @@
     "react-native-screens": "~3.18.0",
     "react-native-uuid": "^2.0.1",
     "react-native-web": "~0.18.7",
-    "throttle-debounce": "^5.0.0"
+    "throttle-debounce": "^5.0.0",
+    "expo-notifications": "~0.17.0",
+    "expo-device": "~5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",

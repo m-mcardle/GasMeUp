@@ -24,7 +24,10 @@ An example invocation could be:
 ```
 aggregateBalances({ payeeUID: 'foo', payers: ['bar'], cost: 100, amount: 100, splitType: 'split' })
 ```
-
+or
+```
+sendTransactionNotifications({ payeeUID: 'VMDgsjEqLxc0qBO8hzLmKrz8MKs1', payers: ['UIrBmJyi31hxTEt52MkqCF7Vjgg1', 'UvousU6NpccuLdltaUeNbfK0oNF2'], cost: 100, amount: 100, splitType: 'split', creator: 'VMDgsjEqLxc0qBO8hzLmKrz8MKs1' })
+```
 
 ## Deployment
 
