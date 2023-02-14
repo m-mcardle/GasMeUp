@@ -45,7 +45,7 @@ exports.sendTransactionNotifications = functions.firestore
             to: expoPushToken,
             sound: "default",
             title: "New Trip",
-            body: `${creatorData.firstName} ${creatorData.lastName} added a new trip! You ${isDriver ? "owe" : "are owed"} $${amountOwed}.`,
+            body: `${creatorData.firstName} ${creatorData.lastName} added a new trip! You ${isDriver ? "are owed" : "owe"} $${amountOwed}.`,
             data: {
               transactionUID: snapshot.id,
             },
@@ -54,7 +54,7 @@ exports.sendTransactionNotifications = functions.firestore
           console.log("Not a valid token:", expoPushToken, "for", uid);
         }
       }));
-      console.log("messages", messages);
+      console.log(`Sending ${messages.length} notifications`);
       expo.sendPushNotificationsAsync(messages);
     });
 

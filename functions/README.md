@@ -31,4 +31,4 @@ sendTransactionNotifications({ payeeUID: 'VMDgsjEqLxc0qBO8hzLmKrz8MKs1', payers:
 
 ## Deployment
 
-To deploy to the development Firebase environment run `npm run build`, and to deploy to the production Firebase environment run `npm run build:production`
+To deploy to the development Firebase environment run `npm run deploy`, and to deploy to the production Firebase environment run `npm run deploy:production`

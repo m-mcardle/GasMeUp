@@ -181,8 +181,6 @@ export default function App() {
     return null;
   }
 
-  console.log('globalState', globalState);
-
   return (
     <GlobalContext.Provider value={state}>
       <NavigationContainer>
