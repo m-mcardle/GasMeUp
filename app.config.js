@@ -25,6 +25,7 @@ module.exports = {
     buildNumber: '1.0.10',
     config: {
       googleMapsApiKey: process.env.GOOGLE_IOS_SDK_KEY,
+      usesNonExemptEncryption: false,
     },
   },
   android: {

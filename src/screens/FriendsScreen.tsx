@@ -147,7 +147,7 @@ export default function FriendsScreen() {
 
   // Remove friend requests that are now friends, fixes race condition of Firebase Function
   const sanitizedFriendRequests = userDocument?.incomingFriendRequests
-    .filter((uid: string) => userDocument?.friends[uid] === undefined) ?? [];
+    ?.filter((uid: string) => userDocument?.friends[uid] === undefined) ?? [];
 
   const hasFriendRequests = sanitizedFriendRequests.length > 0;
 

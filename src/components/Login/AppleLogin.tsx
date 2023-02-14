@@ -1,7 +1,9 @@
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { View, Alert } from 'react-native';
 
-import { signInWithCredential, OAuthProvider } from 'firebase/auth';
+import md5 from 'md5';
+
+import { signInWithCredential, OAuthProvider, updateProfile } from 'firebase/auth';
 import { setDoc, getDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../../firebase';
 
@@ -32,10 +34,16 @@ export default function AppleLogin() {
           const { user } = firebaseCredential;
           const firstName = appleCredential.fullName?.givenName ?? 'Unknown';
           const lastName = appleCredential.fullName?.familyName ?? 'Unknown';
-          const { email, uid } = user;
+          const email = appleCredential.email ?? 'Unknown';
+          const { uid } = user;
 
           const userDocument = await getDoc(doc(db, 'Users', uid));
           if (!userDocument.exists()) {
+            await updateProfile(user, {
+              displayName: `${firstName} ${lastName}`,
+              photoURL: `https://www.gravatar.com/avatar/${md5(email.toLowerCase())}?d=identicon`,
+            });
+
             setDoc(doc(db, 'Users', user.uid), {
               uid: user.uid,
               email,
@@ -43,6 +51,8 @@ export default function AppleLogin() {
               lastName,
               transactions: [],
               friends: {},
+              incomingFriendRequests: [],
+              outgoingFriendRequests: [],
             })
               .then(() => {
                 console.log('All done! Created user!');
