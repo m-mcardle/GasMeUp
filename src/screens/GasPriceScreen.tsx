@@ -27,9 +27,10 @@ import { fetchData } from '../data/data';
 
 // Helpers
 import { provinces, states } from '../helpers/locationHelper';
+import { convertDollarsPerGalToDollarsPerL, convertDollarsPerLToDollarsPerGal } from '../helpers/unitsHelper';
 
 interface RequestLookup {
-  [key: string]: Array<number>
+  [key: string]: Array<any>
 }
 
 function Row({ text, price, setSelectedRegion }: any) {
@@ -61,7 +62,7 @@ export default function GasPriceScreen() {
   ));
 
   const [loading, setLoading] = useState(false);
-  const [gasPrices, setGasPrices] = useState<Array<number>>([]);
+  const [gasPrices, setGasPrices] = useState<Array<any>>([]);
   const [persistedGasPrices, setPersistedGasPrices] = useState<RequestLookup>({});
 
   const regionType = selectedCountry === 'CA' ? 'province' : 'state';
@@ -89,7 +90,10 @@ export default function GasPriceScreen() {
 
       if (selectedRegion) {
         const formattedGasPrices = prices.map((price: any) => ({
-          ...price, key: price.city, text: price.city, price: price.price / 100,
+          ...price,
+          key: price.city,
+          text: price.city,
+          price: price.price / 100,
         }));
         setGasPrices(formattedGasPrices);
         setPersistedGasPrices((prev) => ({
@@ -98,7 +102,9 @@ export default function GasPriceScreen() {
         }));
       } else {
         const formattedGasPrices = prices.map((price: any) => ({
-          ...price, key: price[regionType], text: price[regionType],
+          ...price,
+          key: price[regionType],
+          text: price[regionType],
         }));
         setGasPrices(formattedGasPrices);
         setPersistedGasPrices((prev) => ({
@@ -117,16 +123,23 @@ export default function GasPriceScreen() {
     fetchGasPrices();
   }, [selectedRegion, selectedCountry]);
 
+  let gasPriceConversion = (gasPrice: number) => gasPrice;
+  if (globalState.Locale === 'CA' && selectedCountry === 'USA') {
+    gasPriceConversion = convertDollarsPerLToDollarsPerGal;
+  } else if (globalState.Locale === 'US' && selectedCountry === 'CA') {
+    gasPriceConversion = convertDollarsPerGalToDollarsPerL;
+  }
+
   return (
     <Page>
       <View style={styles.main}>
         <Text style={styles.title}>Gas Prices</Text>
         <Table
           loading={loading}
-          data={gasPrices}
+          data={gasPrices.map((obj) => ({ ...obj, price: gasPriceConversion(obj.price) }))}
           headers={[
             { text: 'Location', numeric: false },
-            { text: (selectedCountry === 'CA' ? 'Price ($/L)' : 'Price ($/gal)'), numeric: true },
+            { text: (globalState.Locale === 'CA' ? 'Price ($/L)' : 'Price ($/gal)'), numeric: true },
           ]}
           Row={(values) => Row({ ...values, setSelectedRegion })}
           style={styles.gasPriceTable}
