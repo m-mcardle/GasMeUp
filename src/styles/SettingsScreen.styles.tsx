@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 3,
     alignItems: 'center',
-    paddingHorizontal: 48,
+    paddingHorizontal: 24,
   },
   settingContainer: {
     width: '100%',

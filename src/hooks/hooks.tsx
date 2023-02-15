@@ -18,12 +18,14 @@ export const Locale = {
 };
 
 interface Option {
+  label: string,
   default: any,
   options: Array<any>,
 }
 
 export const OPTIONS_SETTINGS: Record<string, Option> = {
   Locale: {
+    label: 'Units (Metric/Imperial)',
     default: Locale.CA,
     options: [Locale.CA, Locale.US],
   },
@@ -65,8 +67,6 @@ if (Platform.OS === 'ios') {
 if (process.env.NODE_ENV !== 'development') {
   initialSettings['Enable Requests'] = true;
 }
-
-console.log(Settings.get('Locale'));
 
 export const initialState = {
   ...initialSettings,

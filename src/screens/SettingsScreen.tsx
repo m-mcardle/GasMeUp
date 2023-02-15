@@ -46,7 +46,7 @@ export default function SettingsScreen() {
         ))}
         {Object.keys(OPTIONS_SETTINGS).map((setting) => (
           <View key={setting} style={styles.settingContainer}>
-            <Text style={styles.settingsText}>{setting}</Text>
+            <Text style={styles.settingsText}>{OPTIONS_SETTINGS[setting].label ?? setting}</Text>
             <SegmentedButtons
               buttons={OPTIONS_SETTINGS[setting].options.map((option) => ({
                 label: option,
