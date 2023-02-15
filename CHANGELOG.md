@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.11](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.10...v1.0.11) (2023-02-15)
 
+* Add notifications
+* Fix sign-in with Apple
+* Convert gas price table based on exchange rate
+
 ### [1.0.10](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.9...v1.0.10) (2023-02-12)
 
 * Tweak verified email behaviour
