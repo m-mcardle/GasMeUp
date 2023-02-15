@@ -1,6 +1,10 @@
 # Firebase Functions
 
-This directory contains the code associated with this project's Firebase Function infrastructure. These functions are used to run server-side updates in response to Firestore document changes due to the user. The two Functions at the moment are `aggregateBalances` and `updateFriendsList`.
+This directory contains the code associated with this project's Firebase Function infrastructure. These functions are used to run server-side updates in response to Firestore document changes due to the user. The three Functions at the moment are `sendTransactionNotifications`, `aggregateBalances` and `updateFriendsList`.
+
+## `sendTransactionNotifications`
+
+This function is responsible for sending out notifications to each user involved in a transaction other than its creator. It does this through the `expo-server-sdk` by reading the `notificationToken` property on each User's Firestore document and requesting the sdk to send out a notification informing them of the new transaction.
 
 
 ## `aggregateBalances`
