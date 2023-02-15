@@ -1,6 +1,10 @@
 # Firebase Functions
 
-This directory contains the code associated with this project's Firebase Function infrastructure. These functions are used to run server-side updates in response to Firestore document changes due to the user. The two Functions at the moment are `aggregateBalances` and `updateFriendsList`.
+This directory contains the code associated with this project's Firebase Function infrastructure. These functions are used to run server-side updates in response to Firestore document changes due to the user. The three Functions at the moment are `sendTransactionNotifications`, `aggregateBalances` and `updateFriendsList`.
+
+## `sendTransactionNotifications`
+
+This function is responsible for sending out notifications to each user involved in a transaction other than its creator. It does this through the `expo-server-sdk` by reading the `notificationToken` property on each User's Firestore document and requesting the sdk to send out a notification informing them of the new transaction.
 
 
 ## `aggregateBalances`
@@ -24,8 +28,11 @@ An example invocation could be:
 ```
 aggregateBalances({ payeeUID: 'foo', payers: ['bar'], cost: 100, amount: 100, splitType: 'split' })
 ```
-
+or
+```
+sendTransactionNotifications({ payeeUID: 'VMDgsjEqLxc0qBO8hzLmKrz8MKs1', payers: ['UIrBmJyi31hxTEt52MkqCF7Vjgg1', 'UvousU6NpccuLdltaUeNbfK0oNF2'], cost: 100, amount: 100, splitType: 'split', creator: 'VMDgsjEqLxc0qBO8hzLmKrz8MKs1' })
+```
 
 ## Deployment
 
-To deploy to the development Firebase environment run `npm run build`, and to deploy to the production Firebase environment run `npm run build:production`
+To deploy to the development Firebase environment run `npm run deploy`, and to deploy to the production Firebase environment run `npm run deploy:production`

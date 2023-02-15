@@ -12,6 +12,9 @@ import {
 import { setDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 
+// Global State
+import { useGlobalState } from '../hooks/hooks';
+
 // Components
 import Page from '../components/Page';
 import Button from '../components/Button';
@@ -32,6 +35,8 @@ interface Props {
 }
 
 export default function SignUpScreen({ navigation }: Props) {
+  const [globalState] = useGlobalState();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -67,6 +72,7 @@ export default function SignUpScreen({ navigation }: Props) {
           friends: {},
           incomingFriendRequests: [],
           outgoingFriendRequests: [],
+          notificationToken: globalState.expoToken,
         });
 
         console.log('All done!');

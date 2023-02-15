@@ -12,6 +12,7 @@
     "web": "expo start --web",
     "eject": "expo eject",
     "build": "eas build",
+    "build:dev": "eas build --profile development",
     "bump": "standard-version",
     "publish": "eas submit --platform ios",
     "publish:expo": "eas update",
@@ -66,7 +67,10 @@
     "react-native-screens": "~3.18.0",
     "react-native-uuid": "^2.0.1",
     "react-native-web": "~0.18.7",
-    "throttle-debounce": "^5.0.0"
+    "throttle-debounce": "^5.0.0",
+    "expo-notifications": "~0.17.0",
+    "expo-device": "~5.0.0",
+    "expo-dev-client": "~2.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",

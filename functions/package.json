@@ -15,6 +15,7 @@
   },
   "main": "index.js",
   "dependencies": {
+    "expo-server-sdk": "^3.7.0",
     "firebase-admin": "^11.5.0",
     "firebase-functions": "^4.1.1"
   },

@@ -12,9 +12,12 @@ import {
   Inter_900Black,
 } from '@expo-google-fonts/inter';
 import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
 
 // React imports
-import React, { useState, useMemo, useEffect } from 'react';
+import React, {
+  useState, useMemo, useEffect, useRef,
+} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -34,6 +37,7 @@ import { colors } from './src/styles/styles';
 
 // Helpers
 import { lookupProvince } from './src/helpers/locationHelper';
+import { registerForPushNotificationsAsync } from './src/helpers/notificationHelper';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -121,6 +125,7 @@ export default function App() {
     }
   }, [fontsLoaded]);
 
+  // Location initialization
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -148,6 +153,28 @@ export default function App() {
         updateGlobalState('country', 'CA');
       }
     })();
+  }, []);
+
+  const [, setNotification] = useState<Notifications.Notification | undefined>();
+  const notificationListener = useRef<any>();
+  const responseListener = useRef<any>();
+
+  // Notification initialization
+  useEffect(() => {
+    registerForPushNotificationsAsync().then((token) => token && updateGlobalState('expoToken', token));
+
+    notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
+      setNotification(notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+      console.log(response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
   }, []);
 
   if (!fontsLoaded) {

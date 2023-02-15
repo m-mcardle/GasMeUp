@@ -1,5 +1,5 @@
 // React
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert, TouchableOpacity, View,
 } from 'react-native';
@@ -12,12 +12,15 @@ import {
 
 // Firebase
 import {
-  collection, doc, query, where,
+  collection, doc, query, where, updateDoc,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../../firebase';
+
+// Global State
+import { useGlobalState } from '../hooks/hooks';
 
 // Helpers
 import { validateCurrentUser } from '../helpers/authHelper';
@@ -77,6 +80,7 @@ const logout = () => {
 const usersRef = collection(db, 'Users');
 
 export default function FriendsScreen() {
+  const [globalState] = useGlobalState();
   const [user, loading, error] = useAuthState(auth);
 
   const userDoc = user?.uid ? doc(db, 'Users', user.uid) : undefined;
@@ -114,6 +118,15 @@ export default function FriendsScreen() {
   const [friendRequestsVisible, setFriendRequestsVisible] = useState(false);
 
   const [{ selectedFriendUID, selectedFriendName, selectedFriendAmount }, setSelectedFriend] = useState({ selectedFriendUID: '', selectedFriendName: '', selectedFriendAmount: 0 });
+
+  // Set the user's notification token if possible
+  useEffect(() => {
+    if (globalState.expoToken && userDoc && userDocument && !userDocument.notificationToken) {
+      updateDoc(userDoc, {
+        notificationToken: globalState.expoToken,
+      });
+    }
+  }, [globalState.expoToken, userDocument]);
 
   if (errorUserDB || errorFriendsDB || error) {
     console.log(errorUserDB, errorFriendsDB, error);
