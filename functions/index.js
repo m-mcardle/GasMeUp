@@ -32,8 +32,7 @@ exports.sendTransactionNotifications = functions.firestore
       console.log("Users to notify:", usersToNotify);
 
       await Promise.all(usersToNotify.map(async (uid) => {
-        const ref = db.collection("Users").doc(uid);
-        const doc = await ref.get();
+        const doc = db.collection("Users").doc(uid).get();
         const data = await doc.data();
 
         const expoPushToken = data.notificationToken;
