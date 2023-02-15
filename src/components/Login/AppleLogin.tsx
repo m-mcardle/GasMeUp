@@ -53,6 +53,7 @@ export default function AppleLogin() {
               friends: {},
               incomingFriendRequests: [],
               outgoingFriendRequests: [],
+              appleUser: true,
             })
               .then(() => {
                 console.log('All done! Created user!');
