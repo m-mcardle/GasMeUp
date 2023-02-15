@@ -9,6 +9,7 @@ export const ENV = expoConstants
     API_KEY: expoConstants.apiKey,
     USE_DEV_API: expoConstants.useDevAPI,
     DEV_API_URL: expoConstants.devAPIURL,
+    EXCHANGE_RATE_API_KEY: expoConstants.exchangeRateAPIKey,
   }
   : {
     FIREBASE_API_KEY: '',
@@ -16,6 +17,7 @@ export const ENV = expoConstants
     API_KEY: '',
     USE_DEV_API: 'false',
     DEV_API_URL: '',
+    EXCHANGE_RATE_API_KEY: '',
   };
 
 async function checkDevAPI() {

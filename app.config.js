@@ -48,6 +48,7 @@ module.exports = {
     apiKey: process.env.API_KEY,
     useDevAPI: process.env.USE_DEV_API,
     devAPIURL: process.env.DEV_API_URL,
+    exchangeRateAPIKey: process.env.EXCHANGE_RATE_API_KEY,
   },
   runtimeVersion: {
     policy: 'sdkVersion',

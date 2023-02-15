@@ -125,9 +125,13 @@ export default function GasPriceScreen() {
 
   let gasPriceConversion = (gasPrice: number) => gasPrice;
   if (globalState.Locale === 'CA' && selectedCountry === 'USA') {
-    gasPriceConversion = convertDollarsPerLToDollarsPerGal;
+    gasPriceConversion = (gasPrice: number) => (
+      convertDollarsPerLToDollarsPerGal(gasPrice) / globalState.exchangeRate
+    );
   } else if (globalState.Locale === 'US' && selectedCountry === 'CA') {
-    gasPriceConversion = convertDollarsPerGalToDollarsPerL;
+    gasPriceConversion = (gasPrice: number) => (
+      convertDollarsPerGalToDollarsPerL(gasPrice) * globalState.exchangeRate
+    );
   }
 
   return (

@@ -38,6 +38,7 @@ import { colors } from './src/styles/styles';
 // Helpers
 import { lookupProvince } from './src/helpers/locationHelper';
 import { registerForPushNotificationsAsync } from './src/helpers/notificationHelper';
+import { getExchangeRate } from './src/helpers/unitsHelper';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -175,6 +176,16 @@ export default function App() {
       Notifications.removeNotificationSubscription(notificationListener.current);
       Notifications.removeNotificationSubscription(responseListener.current);
     };
+  }, []);
+
+  // Exchange Rate initialization
+  useEffect(() => {
+    async function fetchRate() {
+      const exchangeRate = await getExchangeRate();
+      updateGlobalState('exchangeRate', exchangeRate);
+    }
+
+    fetchRate();
   }, []);
 
   if (!fontsLoaded) {

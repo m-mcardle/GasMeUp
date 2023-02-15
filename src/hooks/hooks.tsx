@@ -76,6 +76,7 @@ export const initialState = {
     lat: undefined,
     lng: undefined,
   },
+  exchangeRate: 1,
 };
 
 export function changeSetting(

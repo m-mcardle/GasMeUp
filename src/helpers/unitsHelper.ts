@@ -1,3 +1,19 @@
+import { ENV } from './env';
+
+export async function getExchangeRate() {
+  try {
+    const response = await fetch(`https://v6.exchangerate-api.com/v6/${ENV.EXCHANGE_RATE_API_KEY}/pair/CAD/USD`);
+    const json = await response.json();
+    if (json.result !== 'success') {
+      throw new Error('Failed to get exchange rate');
+    }
+    return json.conversion_rate ?? 1;
+  } catch (ex) {
+    console.error(ex);
+    return 1;
+  }
+}
+
 const KM_TO_MILES = 0.621371;
 export const convertKMtoMiles = (km: number) => km * KM_TO_MILES;
 export const convertMilesToKM = (miles: number) => miles / KM_TO_MILES;
