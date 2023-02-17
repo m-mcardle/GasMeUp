@@ -68,7 +68,11 @@ export default function FriendRequestsSection({ friendRequestUIDs, closeModal } 
       await updateDoc(doc(db, 'Users', currentUser.uid), {
         friends: {
           ...userFriends,
-          [friendUID]: 0,
+          [friendUID]: {
+            status: 'accepted',
+            accepted: true,
+            balance: 0,
+          },
         },
       });
       closeModal();

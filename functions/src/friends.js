@@ -1,3 +1,4 @@
+// This should trigger when a user creates a new friend with status:"outgoing"
 /**
  * Handles someone sending a friend request
  * @param {Object} db - The Firestore database
@@ -11,8 +12,10 @@ async function handleOutgoingFriendRequest(db, change) {
   const uid = change.after.id;
 
   // Get value of the newly added friend request
-  const oldFriendsList = beforeData.outgoingFriendRequests ?? [];
-  const friendsList = afterData.outgoingFriendRequests ?? [];
+  const oldFriendsList = Object.keys(beforeData.friends)
+      .filter((uid) => beforeData.friends[uid].status === "outgoing");
+  const friendsList = Object.keys(afterData.friends)
+      .filter((uid) => afterData.friends[uid].status === "outgoing");
   const friendUID = friendsList.find((friend) =>
     !oldFriendsList.includes(friend),
   );
@@ -34,26 +37,28 @@ async function handleOutgoingFriendRequest(db, change) {
     const friendDoc = await transaction.get(friendRef);
 
     // Only need to run if this friend doesn't have this user as a friend
-    if (
-      friendDoc.data().friends[uid] ||
-      friendDoc.data().incomingFriendRequests?.includes(uid)
-    ) {
+    if (friendDoc.data().friends[uid]) {
       console.log(`Friend (${friendUID}) already has ${uid} as friend`);
       return;
     }
 
-    const friendsFriendRequests = friendDoc.data().incomingFriendRequests ?? [];
+    const friendsFriends = friendDoc.data().friends ?? {};
 
     // Update friend's friend request list
     transaction.update(friendRef, {
-      incomingFriendRequests: [
-        ...friendsFriendRequests,
-        uid,
-      ],
+      friends: {
+        ...friendsFriends,
+        [uid]: {
+          status: "incoming",
+          accepted: false,
+          balance: 0,
+        },
+      },
     });
   });
 }
 
+// This should trigger when a user updates a friend with status:"accepted"
 /**
  * Handles someone accepting a friend request
  * @param {Object} db - The Firestore database
@@ -61,15 +66,17 @@ async function handleOutgoingFriendRequest(db, change) {
  */
 async function handleAcceptedFriendRequest(db, change) {
   console.log("Handling accepted friend request");
-  const documentRef = change.after.ref;
+  // const documentRef = change.after.ref;
   const beforeData = change.before.data();
   const afterData = change.after.data();
 
   const uid = change.after.id;
 
-  // Get value of the newly added transaction
-  const oldFriendsList = Object.keys(beforeData.friends);
-  const friendsList = Object.keys(afterData.friends);
+  // Get value of the newly accepted friend request
+  const oldFriendsList = Object.keys(beforeData.friends)
+      .filter((uid) => beforeData.friends[uid].status === "accepted");
+  const friendsList = Object.keys(afterData.friends)
+      .filter((uid) => afterData.friends[uid].status === "accepted");
   const friendUID = friendsList.find((friend) =>
     !oldFriendsList.includes(friend),
   );
@@ -92,7 +99,7 @@ async function handleAcceptedFriendRequest(db, change) {
       const friendDoc = await transaction.get(friendRef);
 
       // Only need to run if this friend doesn't have this user as a friend
-      if (friendDoc.data().friends[uid]) {
+      if (friendDoc.data().friends[uid]?.status === "accepted") {
         console.log(`Friend (${friendUID}) already has ${uid} as friend`);
         return;
       }
@@ -100,34 +107,22 @@ async function handleAcceptedFriendRequest(db, change) {
       const friendsFriendsList = friendDoc.data().friends;
       console.log("Friend's friends list:", friendsFriendsList);
 
-      const newOutgoingFriendRequests = friendDoc.data().outgoingFriendRequests
-          .filter((friend) => friend !== uid);
-      console.log(
-          "Friend's new outgoing friend requests:",
-          newOutgoingFriendRequests,
-      );
+      const newFriendsList = {
+        ...friendsFriendsList,
+        [uid]: {
+          status: "accepted",
+          accepted: true,
+          balance: 0,
+        },
+      };
 
-      const newIncomingFriendRequests = afterData.incomingFriendRequests
-          .filter((friend) => friend !== friendUID);
-
-      console.log("New incoming friend requests:", newIncomingFriendRequests);
+      console.log("Friend's new friends list:", newFriendsList);
 
       // Update friend's friends list and remove outgoing friend request
       transaction.update(friendRef, {
         friends: {
-          ...friendsFriendsList,
-          [uid]: 0,
+          ...newFriendsList,
         },
-        outgoingFriendRequests: [
-          ...newOutgoingFriendRequests,
-        ],
-      });
-
-      // Update user's incoming friend requests
-      transaction.update(documentRef, {
-        incomingFriendRequests: [
-          ...newIncomingFriendRequests,
-        ],
       });
     });
   } catch (e) {

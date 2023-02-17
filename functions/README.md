@@ -32,6 +32,50 @@ or
 ```
 sendTransactionNotifications({ payeeUID: 'VMDgsjEqLxc0qBO8hzLmKrz8MKs1', payers: ['UIrBmJyi31hxTEt52MkqCF7Vjgg1', 'UvousU6NpccuLdltaUeNbfK0oNF2'], cost: 100, amount: 100, splitType: 'split', creator: 'VMDgsjEqLxc0qBO8hzLmKrz8MKs1' })
 ```
+or
+```
+updateFriendsList({
+  before: {
+    uid: '1hiiw6Hfw2URZQVu1H2pOLeOwOR2',
+    friends: {}
+  },
+  after: {
+    uid: '1hiiw6Hfw2URZQVu1H2pOLeOwOR2',
+    friends: { 
+      LH4gkGLhXnS20cHSIwvGkIzV7Tw2: {
+        status: 'outgoing',
+        balance: 0,
+        accepted: false  
+      }
+    }
+  }
+})
+```
+or
+```
+updateFriendsList({
+  before: {
+    uid: 'LH4gkGLhXnS20cHSIwvGkIzV7Tw2',
+    friends: { 
+      '1hiiw6Hfw2URZQVu1H2pOLeOwOR2': {
+        status: 'incoming',
+        balance: 0,
+        accepted: false  
+      }
+    }
+  },
+  after: {
+    uid: 'LH4gkGLhXnS20cHSIwvGkIzV7Tw2',
+    friends: { 
+      '1hiiw6Hfw2URZQVu1H2pOLeOwOR2': {
+        status: 'accepted',
+        balance: 0,
+        accepted: true  
+      }
+    }
+  }
+})
+```
 
 ## Deployment
 

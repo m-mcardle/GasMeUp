@@ -43,7 +43,7 @@ export default function AddFriendsTable({ close }: Props) {
   const [userDocument] = useDocumentData(userDoc);
 
   const userFriends = userDocument?.friends ?? {};
-  const userFriendRequests = userDocument?.outgoingFriendRequests ?? [];
+  const userFriendRequests = Object.keys(userFriends ?? {}).filter((uid) => userFriends[uid].status === 'outgoing');
 
   const validEmail = maybeValidEmail(friendEmail);
 
@@ -53,6 +53,13 @@ export default function AddFriendsTable({ close }: Props) {
     Alert.alert('Friend Request Sent', `If a user exists with the email: "${friendEmail}", they will receive a friend request.`);
   };
 
+  // THIS NEEDS TO BE FIXED SO THAT WE CAN KEEP THE SECURE FIRESTORE RULES
+  // IDEA: CHANGE FRIENDS TO BE A MAP OF MAPS
+  // Each friend will have a current value and a 'accepted' value
+  // Only show the 'accepted' friends in the UI
+  // and tweak the Firebase Function to trigger on changes to the the 'accepted' value
+  // LOL ^^ THIS WON'T EVEN WORK
+  // Need a way to add a friend without searching for them on the front-end
   const sendFriendRequest = useCallback(async () => {
     if (!currentUser?.uid || !validEmail) {
       return;
@@ -74,7 +81,7 @@ export default function AddFriendsTable({ close }: Props) {
       return;
     }
 
-    if (userFriends[newFriend.uid] !== undefined) {
+    if (userFriends[newFriend.uid].status === 'accepted') {
       Alert.alert('Error Sending Friend Request', 'Friend already added');
       setInputError(true);
       return;
@@ -82,10 +89,14 @@ export default function AddFriendsTable({ close }: Props) {
 
     try {
       await updateDoc(doc(db, 'Users', currentUser.uid), {
-        outgoingFriendRequests: [
-          ...userFriendRequests,
-          newFriend.uid,
-        ],
+        friends: {
+          ...userFriends,
+          [newFriend.uid]: {
+            status: 'outgoing',
+            accepted: false,
+            balance: 0,
+          },
+        },
       });
       closeModal();
     } catch (exception) {
