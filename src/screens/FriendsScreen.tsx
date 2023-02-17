@@ -86,8 +86,8 @@ export default function FriendsScreen() {
   const userDoc = user?.uid ? doc(db, 'Users', user.uid) : undefined;
   const [userDocument, , errorUserDB] = useDocumentData(userDoc);
 
-  const balances = userDocument ? userDocument.friends : undefined;
-  const friendsUIDs = balances ? Object.keys(balances) : undefined;
+  const userFriends = userDocument ? userDocument.friends : undefined;
+  const friendsUIDs = userFriends ? Object.keys(userFriends) : undefined;
 
   const friendsQuery = friendsUIDs?.length ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
   const [friendsData, friendsDataLoading, errorFriendsDB] = useCollectionData(friendsQuery);
@@ -102,9 +102,15 @@ export default function FriendsScreen() {
       if (!currentFriend?.firstName) {
         return null;
       }
+
+      // If the current friend hasn't been accepted yet, then don't show them
+      if (!userFriends[currentFriend.uid].accepted) {
+        return null;
+      }
+
       return {
         name: `${currentFriend?.firstName} ${currentFriend?.lastName}`,
-        amount: balances[uid],
+        amount: userFriends[uid].balance,
         key: uid,
         uid,
       };
