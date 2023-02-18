@@ -30,6 +30,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - run: cd app
     - run: npm install
     - run: npm run install-server
     - run: npm run lint
