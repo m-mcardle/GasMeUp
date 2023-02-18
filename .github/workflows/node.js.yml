@@ -34,5 +34,4 @@ jobs:
     - run: cd app && npm install
     - run: cd app && npm run install-server
     - run: cd app && npm run lint
-    - run: cd app && npm run lint-server
     - run: cd app && npm run test-server

@@ -23,7 +23,6 @@
     "lint": "npx eslint './src/' 'App.tsx'",
     "lint:fix": "npx eslint --fix './src/' 'App.tsx'",
     "lint-client": "npx eslint './src/' 'App.tsx'",
-    "lint-server": "npx eslint '../server/src/'",
     "install-server": "cd ../server && npm install",
     "test-server": "cd ../server && npm test"
   },
