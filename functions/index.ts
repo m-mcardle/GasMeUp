@@ -1,16 +1,19 @@
 /* eslint-disable max-len */
-const friends = require("./src/friends");
+import friends from "./src/friends";
 
-const functions = require("firebase-functions");
-const {Expo} = require("expo-server-sdk");
+import * as functions from "firebase-functions";
+import {Expo, ExpoPushMessage} from "expo-server-sdk";
 
-const admin = require("firebase-admin");
+import * as admin from "firebase-admin";
 admin.initializeApp();
 
 const db = admin.firestore();
 const expo = new Expo();
 
-exports.sendTransactionNotifications = functions.firestore
+type Transaction = admin.firestore.Transaction;
+type DocumentReference = admin.firestore.DocumentReference;
+
+export const sendTransactionNotifications = functions.firestore
     .document("Transactions/{transactionUID}")
     .onCreate(async (snapshot, context) => {
       // Get value of the newly added transaction
@@ -25,15 +28,15 @@ exports.sendTransactionNotifications = functions.firestore
       const costPerRider = Number((onlyRidersPay ? cost / payerUIDs.length : cost / (payerUIDs.length + 1)).toFixed(2));
 
       const creatorDoc = await db.collection("Users").doc(creatorUID).get();
-      const creatorData = await creatorDoc.data();
+      const creatorData = await creatorDoc.data() ?? {};
 
-      const messages = [];
+      const messages: Array<ExpoPushMessage> = [];
       const usersToNotify = [...payerUIDs, payeeUID].filter((uid) => uid !== newData.creator);
       console.log("Users to notify:", usersToNotify);
 
       await Promise.all(usersToNotify.map(async (uid) => {
         const doc = await db.collection("Users").doc(uid).get();
-        const data = await doc.data();
+        const data = await doc.data() ?? {};
 
         const expoPushToken = data.notificationToken;
         if (Expo.isExpoPushToken(expoPushToken)) {
@@ -57,7 +60,7 @@ exports.sendTransactionNotifications = functions.firestore
       expo.sendPushNotificationsAsync(messages);
     });
 
-exports.aggregateBalances = functions.firestore
+export const aggregateBalances = functions.firestore
     .document("Transactions/{transactionUID}")
     .onCreate(async (snapshot, context) => {
       // Get value of the newly added transaction
@@ -76,16 +79,16 @@ exports.aggregateBalances = functions.firestore
       const payeeRef = db.collection("Users").doc(payeeUID);
 
       // Get a reference to the payer
-      const payerRefs = payerUIDs.map((uid) => db.collection("Users").doc(uid));
+      const payerRefs = payerUIDs.map((uid: string) => db.collection("Users").doc(uid));
 
-      const newPayeeBalances = {};
+      const newPayeeBalances: Record<string, any> = {};
 
       // Update aggregations in a transaction
-      await db.runTransaction(async (transaction) => {
+      await db.runTransaction(async (transaction: Transaction) => {
         const payeeDoc = await transaction.get(payeeRef);
-        const payerDocs = await Promise.all(payerRefs.map(async (ref) => transaction.get(ref)));
+        const payerDocs = await Promise.all(payerRefs.map(async (ref: DocumentReference) => transaction.get(ref)));
 
-        const payeeData = payeeDoc.data();
+        const payeeData = payeeDoc.data() ?? {};
         const payersData = payerDocs.map((doc) => doc.data());
 
         // Compute new balances
@@ -128,9 +131,9 @@ exports.aggregateBalances = functions.firestore
       });
     });
 
-exports.updateFriendsList = functions.firestore
+export const updateFriendsList = functions.firestore
     .document("Users/{uid}")
-    .onUpdate(async (change, context) => {
+    .onUpdate(async (change: any, context: any) => {
       console.log("updateFriendsList Triggered");
       const before = change.before.data();
       const after = change.after.data();

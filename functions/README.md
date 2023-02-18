@@ -42,10 +42,11 @@ updateFriendsList({
   after: {
     uid: '1hiiw6Hfw2URZQVu1H2pOLeOwOR2',
     friends: { 
-      LH4gkGLhXnS20cHSIwvGkIzV7Tw2: {
+      garbo: {
         status: 'outgoing',
         balance: 0,
-        accepted: false  
+        accepted: false,
+        email: 'verify4@melen.com'  
       }
     }
   }
