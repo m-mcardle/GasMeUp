@@ -8,10 +8,10 @@ import { Alert, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
+import uuid from 'react-native-uuid';
+
 // Firebase
-import {
-  collection, doc, updateDoc, query, where, getDocs,
-} from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 import { db, auth } from '../../../firebase';
@@ -23,11 +23,10 @@ import Button from '../Button';
 
 // Helpers
 import { maybeValidEmail } from '../../helpers/emailHelper';
+import { updateFriend } from '../../helpers/firestoreHelper';
 
 // Styles
 import { colors, globalStyles } from '../../styles/styles';
-
-const usersRef = collection(db, 'Users');
 
 interface Props {
   close: () => void,
@@ -43,7 +42,7 @@ export default function AddFriendsTable({ close }: Props) {
   const [userDocument] = useDocumentData(userDoc);
 
   const userFriends = userDocument?.friends ?? {};
-  const userFriendRequests = Object.keys(userFriends ?? {}).filter((uid) => userFriends[uid].status === 'outgoing');
+  const userFriendRequests = Object.keys(userFriends ?? {}).filter((uid) => userFriends[uid].status === 'outgoing').map((uid) => userFriends[uid]);
 
   const validEmail = maybeValidEmail(friendEmail);
 
@@ -54,49 +53,39 @@ export default function AddFriendsTable({ close }: Props) {
   };
 
   // THIS NEEDS TO BE FIXED SO THAT WE CAN KEEP THE SECURE FIRESTORE RULES
-  // IDEA: CHANGE FRIENDS TO BE A MAP OF MAPS
-  // Each friend will have a current value and a 'accepted' value
-  // Only show the 'accepted' friends in the UI
-  // and tweak the Firebase Function to trigger on changes to the the 'accepted' value
-  // LOL ^^ THIS WON'T EVEN WORK
   // Need a way to add a friend without searching for them on the front-end
+  // Dumb idea - randomly generate temporary UID, then the function searches for friend
   const sendFriendRequest = useCallback(async () => {
     if (!currentUser?.uid || !validEmail) {
       return;
     }
+    const email = friendEmail.toLowerCase();
+    const existingFriend = userFriendRequests.find((friend) => friend.email === email);
 
-    const friendQuery = query(usersRef, where('email', '==', friendEmail));
-    const querySnapshot = await getDocs(friendQuery);
-
-    if (querySnapshot.empty) {
-      // Treat friend not found the same as if the friend exists
-      closeModal();
-      return;
-    }
-    const newFriend = querySnapshot.docs[0].data();
-
-    if (userFriendRequests.includes(newFriend.uid)) {
-      Alert.alert('Error Sending Friend Request', 'Friend request already sent');
-      setInputError(true);
-      return;
-    }
-
-    if (userFriends[newFriend.uid].status === 'accepted') {
+    if (existingFriend?.accepted) {
       Alert.alert('Error Sending Friend Request', 'Friend already added');
       setInputError(true);
       return;
     }
 
+    if (existingFriend) {
+      Alert.alert('Error Sending Friend Request', 'Friend request already sent');
+      setInputError(true);
+      return;
+    }
+
+    if (email === currentUser.email) {
+      Alert.alert('Error Sending Friend Request', 'Cannot send friend request to yourself');
+      setInputError(true);
+      return;
+    }
+
     try {
-      await updateDoc(doc(db, 'Users', currentUser.uid), {
-        friends: {
-          ...userFriends,
-          [newFriend.uid]: {
-            status: 'outgoing',
-            accepted: false,
-            balance: 0,
-          },
-        },
+      await updateFriend(currentUser.uid, `TEMP_${uuid.v4().toString()}`, {
+        status: 'outgoing',
+        accepted: false,
+        balance: 0,
+        email,
       });
       closeModal();
     } catch (exception) {
