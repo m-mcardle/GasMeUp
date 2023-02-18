@@ -66,6 +66,7 @@ async function handleOutgoingFriendRequest(
           status: "incoming",
           accepted: false,
           balance: 0,
+          email: afterData.email,
         },
       },
     });
