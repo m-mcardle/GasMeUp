@@ -88,7 +88,7 @@ export default function FriendsScreen() {
 
   const userFriends = userDocument ? userDocument.friends : undefined;
   const friendsUIDs = userFriends
-    ? Object.keys(userFriends).filter((uid) => !uid.includes("TEMP_"))
+    ? Object.keys(userFriends).filter((uid) => !uid.includes('TEMP_'))
     : undefined;
 
   const friendsQuery = friendsUIDs?.length ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
@@ -167,7 +167,7 @@ export default function FriendsScreen() {
   const Footer = () => FooterRow(() => validateCurrentUser(user) && setVisible(true));
 
   const friendRequestUIDs = Object.keys(userDocument?.friends ?? {})
-    .filter((uid: string) => userDocument?.friends[uid]?.status === "incoming") ?? [];
+    .filter((uid: string) => userDocument?.friends[uid]?.status === 'incoming') ?? [];
 
   const hasFriendRequests = friendRequestUIDs.length > 0;
   return (
