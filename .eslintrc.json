@@ -39,6 +39,12 @@
               "tsx": "never"
             }
         ],
+        "import/no-unresolved": [
+            "error",
+            {
+              "ignore": ["^firebase-admin/.+"]
+            }
+        ],
         "react/jsx-uses-react": "error",   
         "react/jsx-uses-vars": "error",
         "no-console": "off"

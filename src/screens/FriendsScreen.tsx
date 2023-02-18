@@ -86,8 +86,10 @@ export default function FriendsScreen() {
   const userDoc = user?.uid ? doc(db, 'Users', user.uid) : undefined;
   const [userDocument, , errorUserDB] = useDocumentData(userDoc);
 
-  const balances = userDocument ? userDocument.friends : undefined;
-  const friendsUIDs = balances ? Object.keys(balances) : undefined;
+  const userFriends = userDocument ? userDocument.friends : undefined;
+  const friendsUIDs = userFriends
+    ? Object.keys(userFriends).filter((uid) => !uid.includes('TEMP_'))
+    : undefined;
 
   const friendsQuery = friendsUIDs?.length ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
   const [friendsData, friendsDataLoading, errorFriendsDB] = useCollectionData(friendsQuery);
@@ -102,9 +104,15 @@ export default function FriendsScreen() {
       if (!currentFriend?.firstName) {
         return null;
       }
+
+      // If the current friend hasn't been accepted yet, then don't show them
+      if (!userFriends[currentFriend.uid].accepted) {
+        return null;
+      }
+
       return {
         name: `${currentFriend?.firstName} ${currentFriend?.lastName}`,
-        amount: balances[uid],
+        amount: userFriends[uid].balance,
         key: uid,
         uid,
       };
@@ -158,12 +166,10 @@ export default function FriendsScreen() {
   });
   const Footer = () => FooterRow(() => validateCurrentUser(user) && setVisible(true));
 
-  // Remove friend requests that are now friends, fixes race condition of Firebase Function
-  const sanitizedFriendRequests = userDocument?.incomingFriendRequests
-    ?.filter((uid: string) => userDocument?.friends[uid] === undefined) ?? [];
+  const friendRequestUIDs = Object.keys(userDocument?.friends ?? {})
+    .filter((uid: string) => userDocument?.friends[uid]?.status === 'incoming') ?? [];
 
-  const hasFriendRequests = sanitizedFriendRequests.length > 0;
-
+  const hasFriendRequests = friendRequestUIDs.length > 0;
   return (
     <Page>
       <View style={styles.main}>
@@ -194,7 +200,7 @@ export default function FriendsScreen() {
             onDismiss={() => setFriendRequestsVisible((state) => !state)}
           >
             <FriendRequestsSection
-              friendRequestUIDs={sanitizedFriendRequests}
+              friendRequestUIDs={friendRequestUIDs}
               closeModal={() => setFriendRequestsVisible(false)}
             />
           </Modal>
@@ -215,7 +221,7 @@ export default function FriendsScreen() {
               () => validateCurrentUser(user) && hasFriendRequests && setFriendRequestsVisible(true)
             }
           >
-            <Text style={{ color: colors.white }}>{sanitizedFriendRequests.length}</Text>
+            <Text style={{ color: colors.white }}>{friendRequestUIDs.length}</Text>
             <FontAwesome5 name="user-friends" size={24} color="white" />
           </TouchableOpacity>
         </View>

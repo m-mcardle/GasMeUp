@@ -6,11 +6,13 @@ import { Ionicons } from '@expo/vector-icons';
 
 // Firebase
 import {
-  doc, DocumentData, getDoc, updateDoc,
+  doc, DocumentData, getDoc,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useDocumentData } from 'react-firebase-hooks/firestore';
 import { auth, db } from '../../../firebase';
+
+// Helpers
+import { updateFriend } from '../../helpers/firestoreHelper';
 
 // Components
 import Text from '../Text';
@@ -35,9 +37,6 @@ export default function FriendRequestsSection({ friendRequestUIDs, closeModal } 
   const [currentUser] = useAuthState(auth);
   const [friendRequests, setFriendRequests] = useState<FriendObject[]>([]);
 
-  const userDoc = currentUser?.uid ? doc(db, 'Users', currentUser.uid) : undefined;
-  const [userDocument] = useDocumentData(userDoc);
-
   useEffect(() => {
     async function fetchUsers() {
       const requests = (await Promise.all(friendRequestUIDs.map((request: string) => {
@@ -57,19 +56,17 @@ export default function FriendRequestsSection({ friendRequestUIDs, closeModal } 
     };
   }, [friendRequestUIDs]);
 
-  const userFriends = userDocument?.friends ?? {};
-
-  const acceptFriendRequest = async (friendUID: string) => {
+  const acceptFriendRequest = async (friend: FriendObject) => {
     if (!currentUser) {
       return;
     }
 
     try {
-      await updateDoc(doc(db, 'Users', currentUser.uid), {
-        friends: {
-          ...userFriends,
-          [friendUID]: 0,
-        },
+      await updateFriend(currentUser.uid, friend.uid, {
+        status: 'accepted',
+        accepted: true,
+        balance: 0,
+        email: friend.email,
       });
       closeModal();
     } catch (exception) {
@@ -102,7 +99,7 @@ export default function FriendRequestsSection({ friendRequestUIDs, closeModal } 
             <Text style={globalStyles.h2}>{request.email}</Text>
             <Button
               style={styles.acceptFriendRequestButton}
-              onPress={() => acceptFriendRequest(request.uid)}
+              onPress={() => acceptFriendRequest(request)}
             >
               <Ionicons name="checkmark" size={14} color={colors.white} />
             </Button>

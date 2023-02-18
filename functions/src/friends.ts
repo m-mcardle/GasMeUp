@@ -1,75 +1,112 @@
+import * as admin from "firebase-admin";
+
+// This should trigger when a user creates a new friend with status:"outgoing"
 /**
  * Handles someone sending a friend request
- * @param {Object} db - The Firestore database
+ * @param {Firestore} db - The Firestore database
  * @param {Object} change - The change object
  */
-async function handleOutgoingFriendRequest(db, change) {
+async function handleOutgoingFriendRequest(
+    db: admin.firestore.Firestore,
+    change: any
+) {
   console.log("Handling outgoing friend request");
+  console.log("UID: ", change.after.id);
   const beforeData = change.before.data();
   const afterData = change.after.data();
-
   const uid = change.after.id;
+  // const uid = "1hiiw6Hfw2URZQVu1H2pOLeOwOR2";
+  const documentRef = change.after.ref;
+  // const documentRef = db.collection("Users").doc(uid);
+
 
   // Get value of the newly added friend request
-  const oldFriendsList = beforeData.outgoingFriendRequests ?? [];
-  const friendsList = afterData.outgoingFriendRequests ?? [];
-  const friendUID = friendsList.find((friend) =>
+  const oldFriendsList = Object.keys(beforeData.friends)
+      .filter((uid) => beforeData.friends[uid].status === "outgoing");
+  const friendsList = Object.keys(afterData.friends)
+      .filter((uid) => afterData.friends[uid].status === "outgoing");
+  const friendTempUID = friendsList.find((friend) =>
     !oldFriendsList.includes(friend),
-  );
+  ) ?? "Unknown";
+  const friendEmail = afterData.friends[friendTempUID]?.email ?? "";
 
   console.log("Old friends list:", oldFriendsList);
   console.log("New friends list:", friendsList);
-  console.log("New friend UID:", friendUID);
+  console.log("New friend (garbage) UID:", friendTempUID);
+  console.log("New friend email:", friendEmail);
 
-  if (!friendUID) {
+  const querySnapshot = await db.collection("Users")
+      .where("email", "==", friendEmail).get();
+
+  const friendDoc = querySnapshot.docs[0];
+  const friendData = friendDoc.data();
+  if (!friendData.uid) {
     console.log("Friend document not found");
     return;
   }
 
-  // Get a reference to the new friend
-  const friendRef = db.collection("Users").doc(friendUID);
+  const friendUID = friendData.uid;
+  console.log("New friend UID:", friendUID);
 
   // Update aggregations in a transaction
   await db.runTransaction(async (transaction) => {
-    const friendDoc = await transaction.get(friendRef);
-
     // Only need to run if this friend doesn't have this user as a friend
-    if (
-      friendDoc.data().friends[uid] ||
-      friendDoc.data().incomingFriendRequests?.includes(uid)
-    ) {
+    if (friendData.friends[uid]) {
       console.log(`Friend (${friendUID}) already has ${uid} as friend`);
       return;
     }
 
-    const friendsFriendRequests = friendDoc.data().incomingFriendRequests ?? [];
+    const friendsFriends = friendData.friends ?? {};
 
     // Update friend's friend request list
-    transaction.update(friendRef, {
-      incomingFriendRequests: [
-        ...friendsFriendRequests,
-        uid,
-      ],
+    transaction.update(friendDoc.ref, {
+      friends: {
+        ...friendsFriends,
+        [uid]: {
+          status: "incoming",
+          accepted: false,
+          balance: 0,
+          email: afterData.email,
+        },
+      },
+    });
+
+    const outgoingFriendData = {...afterData.friends[friendTempUID]};
+    delete afterData.friends[friendTempUID];
+
+    // Replace the garbage UID with the real UID
+    transaction.update(documentRef, {
+      friends: {
+        ...afterData.friends,
+        [friendUID]: {
+          ...outgoingFriendData,
+        },
+      },
     });
   });
 }
 
+// This should trigger when a user updates a friend with status:"accepted"
 /**
  * Handles someone accepting a friend request
  * @param {Object} db - The Firestore database
  * @param {Object} change - The change object
  */
-async function handleAcceptedFriendRequest(db, change) {
+async function handleAcceptedFriendRequest(
+    db: admin.firestore.Firestore,
+    change: any
+) {
   console.log("Handling accepted friend request");
-  const documentRef = change.after.ref;
   const beforeData = change.before.data();
   const afterData = change.after.data();
 
   const uid = change.after.id;
 
-  // Get value of the newly added transaction
-  const oldFriendsList = Object.keys(beforeData.friends);
-  const friendsList = Object.keys(afterData.friends);
+  // Get value of the newly accepted friend request
+  const oldFriendsList = Object.keys(beforeData.friends)
+      .filter((uid) => beforeData.friends[uid].status === "accepted");
+  const friendsList = Object.keys(afterData.friends)
+      .filter((uid) => afterData.friends[uid].status === "accepted");
   const friendUID = friendsList.find((friend) =>
     !oldFriendsList.includes(friend),
   );
@@ -90,44 +127,34 @@ async function handleAcceptedFriendRequest(db, change) {
     // Update aggregations in a transaction
     await db.runTransaction(async (transaction) => {
       const friendDoc = await transaction.get(friendRef);
+      const friendData = friendDoc.data() ?? {};
 
       // Only need to run if this friend doesn't have this user as a friend
-      if (friendDoc.data().friends[uid]) {
+      if (friendData.friends[uid]?.status === "accepted") {
         console.log(`Friend (${friendUID}) already has ${uid} as friend`);
         return;
       }
 
-      const friendsFriendsList = friendDoc.data().friends;
+      const friendsFriendsList = friendData.friends;
       console.log("Friend's friends list:", friendsFriendsList);
 
-      const newOutgoingFriendRequests = friendDoc.data().outgoingFriendRequests
-          .filter((friend) => friend !== uid);
-      console.log(
-          "Friend's new outgoing friend requests:",
-          newOutgoingFriendRequests,
-      );
+      const newFriendsList = {
+        ...friendsFriendsList,
+        [uid]: {
+          ...friendsFriendsList[uid],
+          status: "accepted",
+          accepted: true,
+          balance: 0,
+        },
+      };
 
-      const newIncomingFriendRequests = afterData.incomingFriendRequests
-          .filter((friend) => friend !== friendUID);
-
-      console.log("New incoming friend requests:", newIncomingFriendRequests);
+      console.log("Friend's new friends list:", newFriendsList);
 
       // Update friend's friends list and remove outgoing friend request
       transaction.update(friendRef, {
         friends: {
-          ...friendsFriendsList,
-          [uid]: 0,
+          ...newFriendsList,
         },
-        outgoingFriendRequests: [
-          ...newOutgoingFriendRequests,
-        ],
-      });
-
-      // Update user's incoming friend requests
-      transaction.update(documentRef, {
-        incomingFriendRequests: [
-          ...newIncomingFriendRequests,
-        ],
       });
     });
   } catch (e) {
@@ -143,7 +170,7 @@ async function handleAcceptedFriendRequest(db, change) {
  * @param {Object} db - The Firestore database
  * @param {Object} change - The change object
  */
-async function handleRemovedFriend(db, change) {
+async function handleRemovedFriend(db: admin.firestore.Firestore, change: any) {
   console.log("Handling removed friend");
   const beforeData = change.before.data();
   const afterData = change.after.data();
@@ -173,14 +200,15 @@ async function handleRemovedFriend(db, change) {
     // Update aggregations in a transaction
     await db.runTransaction(async (transaction) => {
       const friendDoc = await transaction.get(friendRef);
+      const friendData = friendDoc.data() ?? {};
 
       // Only need to run if this friend has this user as a friend
-      if (friendDoc.data().friends[uid] === undefined ) {
+      if (friendData.friends[uid] === undefined ) {
         console.log(`Friend (${friendUID}) doesn't have ${uid} as friend`);
         return;
       }
 
-      const friendsFriendsList = friendDoc.data().friends;
+      const friendsFriendsList = friendData.friends;
       delete friendsFriendsList[uid];
 
       console.log("Friend's new friends list:", friendsFriendsList);
@@ -199,7 +227,7 @@ async function handleRemovedFriend(db, change) {
   console.log("Done `handleRemovedFriend`");
 }
 
-module.exports = {
+export default {
   handleOutgoingFriendRequest,
   handleAcceptedFriendRequest,
   handleRemovedFriend,

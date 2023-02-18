@@ -1,0 +1,17 @@
+{
+  "name": "firebase",
+  "version": "1.0.0",
+  "description": "Firebase Admin SDK for GasMeUp",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "firebase-admin": "^11.5.0"
+  },
+  "type": "module"
+}

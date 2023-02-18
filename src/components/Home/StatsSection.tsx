@@ -194,7 +194,7 @@ export default function StatsSection(props: Props) {
                   <Text style={styles.statBoxText}>
                     {convertedStats.fuelEfficiency}
                     {'  '}
-                    <Ionicons name="chevron-up-circle" size={16} color={colors.gray} />
+                    <Ionicons name="chevron-up-circle" size={12} color={colors.gray} />
                   </Text>
                 )}
             </View>
@@ -219,7 +219,7 @@ export default function StatsSection(props: Props) {
                   <Text style={styles.statBoxText}>
                     {convertedStats.gasPrice}
                     {'  '}
-                    <Ionicons name="chevron-up-circle" size={16} color={useCustomGasPrice ? colors.action : colors.gray} />
+                    <Ionicons name="chevron-up-circle" size={12} color={useCustomGasPrice ? colors.action : colors.gray} />
                   </Text>
                 )}
             </View>

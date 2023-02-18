@@ -1,16 +1,19 @@
 /* eslint-disable max-len */
-const friends = require("./src/friends");
+import friends from "./src/friends";
 
-const functions = require("firebase-functions");
-const {Expo} = require("expo-server-sdk");
+import * as functions from "firebase-functions";
+import {Expo, ExpoPushMessage} from "expo-server-sdk";
 
-const admin = require("firebase-admin");
+import * as admin from "firebase-admin";
 admin.initializeApp();
 
 const db = admin.firestore();
 const expo = new Expo();
 
-exports.sendTransactionNotifications = functions.firestore
+type Transaction = admin.firestore.Transaction;
+type DocumentReference = admin.firestore.DocumentReference;
+
+export const sendTransactionNotifications = functions.firestore
     .document("Transactions/{transactionUID}")
     .onCreate(async (snapshot, context) => {
       // Get value of the newly added transaction
@@ -25,15 +28,15 @@ exports.sendTransactionNotifications = functions.firestore
       const costPerRider = Number((onlyRidersPay ? cost / payerUIDs.length : cost / (payerUIDs.length + 1)).toFixed(2));
 
       const creatorDoc = await db.collection("Users").doc(creatorUID).get();
-      const creatorData = await creatorDoc.data();
+      const creatorData = await creatorDoc.data() ?? {};
 
-      const messages = [];
+      const messages: Array<ExpoPushMessage> = [];
       const usersToNotify = [...payerUIDs, payeeUID].filter((uid) => uid !== newData.creator);
       console.log("Users to notify:", usersToNotify);
 
       await Promise.all(usersToNotify.map(async (uid) => {
         const doc = await db.collection("Users").doc(uid).get();
-        const data = await doc.data();
+        const data = await doc.data() ?? {};
 
         const expoPushToken = data.notificationToken;
         if (Expo.isExpoPushToken(expoPushToken)) {
@@ -57,7 +60,7 @@ exports.sendTransactionNotifications = functions.firestore
       expo.sendPushNotificationsAsync(messages);
     });
 
-exports.aggregateBalances = functions.firestore
+export const aggregateBalances = functions.firestore
     .document("Transactions/{transactionUID}")
     .onCreate(async (snapshot, context) => {
       // Get value of the newly added transaction
@@ -76,16 +79,16 @@ exports.aggregateBalances = functions.firestore
       const payeeRef = db.collection("Users").doc(payeeUID);
 
       // Get a reference to the payer
-      const payerRefs = payerUIDs.map((uid) => db.collection("Users").doc(uid));
+      const payerRefs = payerUIDs.map((uid: string) => db.collection("Users").doc(uid));
 
-      const newPayeeBalances = {};
+      const newPayeeBalances: Record<string, any> = {};
 
       // Update aggregations in a transaction
-      await db.runTransaction(async (transaction) => {
+      await db.runTransaction(async (transaction: Transaction) => {
         const payeeDoc = await transaction.get(payeeRef);
-        const payerDocs = await Promise.all(payerRefs.map(async (ref) => transaction.get(ref)));
+        const payerDocs = await Promise.all(payerRefs.map(async (ref: DocumentReference) => transaction.get(ref)));
 
-        const payeeData = payeeDoc.data();
+        const payeeData = payeeDoc.data() ?? {};
         const payersData = payerDocs.map((doc) => doc.data());
 
         // Compute new balances
@@ -128,30 +131,47 @@ exports.aggregateBalances = functions.firestore
       });
     });
 
-exports.updateFriendsList = functions.firestore
+export const updateFriendsList = functions.firestore
     .document("Users/{uid}")
-    .onUpdate(async (change, context) => {
+    .onUpdate(async (change: any, context: any) => {
+      console.log("updateFriendsList Triggered");
       const before = change.before.data();
       const after = change.after.data();
-      console.log("updateFriendsList Triggered");
 
+      const beforeFriends = before.friends;
+      const afterFriends = after.friends;
+
+      console.log("beforeFriends", beforeFriends);
+      console.log("afterFriends", afterFriends);
+
+      const beforeFriendUIDs = Object.keys(beforeFriends);
+      const afterFriendUIDs = Object.keys(afterFriends);
+
+      const beforeAcceptedFriends = beforeFriendUIDs.filter((uid) => beforeFriends[uid].status === "accepted");
+      const afterAcceptedFriends = afterFriendUIDs.filter((uid) => afterFriends[uid].status === "accepted");
+
+      const beforeOutgoingFriends = beforeFriendUIDs.filter((uid) => beforeFriends[uid].status === "outgoing");
+      const afterOutgoingFriends = afterFriendUIDs.filter((uid) => afterFriends[uid].status === "outgoing");
+
+      console.log("beforeOutgoingFriends", beforeOutgoingFriends);
+      console.log("afterOutgoingFriends", afterOutgoingFriends);
       /*
       The logic for friend requests are as follows:
-      1. Bill requests to be friends with Fred and an outgoingFriendRequest is added to Bill (frontend)
-      2. handleOutGoingFriendRequest is called and adds an incomingFriendRequest to Fred (functions)
-      3. Fred accepts Bill's friend request and Bill is added as a friend to Fred (frontend)
-      4. handleAcceptedFriendRequest is called and Bill is added as a friend to Fred, and both the incomingFriendRequest and outgoingFriendRequest are removed from Fred and Bill respectively (functions)
+      1. Bill requests to be friends with Fred and a new friend with status="outgoing" is added to Bill (frontend)
+      2. handleOutGoingFriendRequest is called and adds a new friend with status="incoming" to Fred (functions)
+      3. Fred accepts Bill's friend request and Bill's uid is set to status="accepted" on Fred's friends list (frontend)
+      4. handleAcceptedFriendRequest is called and Fred's uid is set to status="accepted" on Bill's friends list (functions)
       */
 
       // TODO - Do I need to care about the transactions being orphaned / lost when a friend is removed?
       if (
-        before.outgoingFriendRequests !== after.outgoingFriendRequests &&
-        after.outgoingFriendRequests?.length > before.outgoingFriendRequests?.length
+        beforeOutgoingFriends !== afterOutgoingFriends &&
+        beforeOutgoingFriends?.length < afterOutgoingFriends?.length
       ) {
         friends.handleOutgoingFriendRequest(db, change);
-      } else if (before.friends !== after.friends) {
-        const newFriendsLength = Object.keys(after.friends ?? {}).length;
-        const oldFriendsLength = Object.keys(before.friends ?? {}).length;
+      } else if (beforeAcceptedFriends !== afterAcceptedFriends) {
+        const newFriendsLength = afterAcceptedFriends.length;
+        const oldFriendsLength = beforeAcceptedFriends.length;
         if (newFriendsLength > oldFriendsLength) {
           // Right now this will fire twice, once for when the user adds it from the front-end and once from when the function adds it to the friend
           friends.handleAcceptedFriendRequest(db, change);

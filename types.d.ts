@@ -75,6 +75,13 @@ interface Transaction {
   country?: string,
 }
 
+interface Friend {
+  balance: number,
+  status: 'outgoing' | 'incoming' | 'accepted',
+  accepted: boolean,
+  email?: string
+}
+
 interface MapData {
   start: {
     lat: number;
