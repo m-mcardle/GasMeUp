@@ -52,9 +52,6 @@ export default function AddFriendsTable({ close }: Props) {
     Alert.alert('Friend Request Sent', `If a user exists with the email: "${friendEmail}", they will receive a friend request.`);
   };
 
-  // THIS NEEDS TO BE FIXED SO THAT WE CAN KEEP THE SECURE FIRESTORE RULES
-  // Need a way to add a friend without searching for them on the front-end
-  // Dumb idea - randomly generate temporary UID, then the function searches for friend
   const sendFriendRequest = useCallback(async () => {
     if (!currentUser?.uid || !validEmail) {
       return;

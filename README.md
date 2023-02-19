@@ -47,7 +47,7 @@ npm run deploy
 
 This project utilizes Firebase Functions for server-side actions in response to changes made in the Firestore database. These actions involve sending friend requests, updating balances after new transactions, and sending push notifications. The code for this is all stored under the `/functions` directory.
 
-# Firebase Admin SDK
+## Firebase Admin SDK
 
 Inside the `/firebase-admin` directory there is code to perform useful actions on the Firebase services for this project. This involves actions such as running migrations to restructure all documents in a collection programmatically.
 

@@ -1,6 +1,6 @@
 // React
 import React, { ComponentType, useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { ActivityIndicator, DataTable } from 'react-native-paper';
 
@@ -15,6 +15,7 @@ interface Props {
   itemsPerPage?: number,
   data: Array<any>,
   loading?: boolean,
+  scrollable?: boolean,
   Row: ComponentType,
   FooterRow?: ComponentType,
   EmptyState?: ComponentType,
@@ -36,13 +37,14 @@ export default function Table({
   title,
   headers,
   loading = false,
+  scrollable = false,
   style,
 }: Props) {
   const [page, setPage] = useState(0);
 
   const pageStart = page * itemsPerPage + 1;
-  const pageEnd = (page + 1) * itemsPerPage;
-  const numberOfPages = Math.ceil(data.length / itemsPerPage);
+  const pageEnd = scrollable ? data.length : (page + 1) * itemsPerPage;
+  const numberOfPages = scrollable ? 1 : Math.ceil(data.length / itemsPerPage);
 
   const pageData = data.length
     ? data.slice((pageStart - 1), (pageEnd))
@@ -74,33 +76,56 @@ export default function Table({
           }
         </DataTable.Header>
 
-        {
-          loading
-            ? (
-              <DataTable.Row style={{ minHeight: 250, alignContent: 'center' }}>
-                <DataTable.Cell style={{ alignContent: 'center', justifyContent: 'center' }}>
-                  <ActivityIndicator animating color={colors.action} size="large" />
-                </DataTable.Cell>
-              </DataTable.Row>
-            )
-            : pageData.map((rowData) => (
-              // eslint-disable-next-line react/jsx-props-no-spreading
-              <Row key={rowData.key} {...rowData} />
-            ))
-        }
+        {scrollable ? (
+          <ScrollView style={{ maxHeight: '85%' }}>
+            {
+            loading
+              ? (
+                <DataTable.Row style={{ minHeight: 250, alignContent: 'center' }}>
+                  <DataTable.Cell style={{ alignContent: 'center', justifyContent: 'center' }}>
+                    <ActivityIndicator animating color={colors.action} size="large" />
+                  </DataTable.Cell>
+                </DataTable.Row>
+              )
+              : pageData.map((rowData) => (
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                <Row key={rowData.key} {...rowData} />
+              ))
+          }
+          </ScrollView>
+        )
+          : (
+            <View>
+              {
+            loading
+              ? (
+                <DataTable.Row style={{ minHeight: 250, alignContent: 'center' }}>
+                  <DataTable.Cell style={{ alignContent: 'center', justifyContent: 'center' }}>
+                    <ActivityIndicator animating color={colors.action} size="large" />
+                  </DataTable.Cell>
+                </DataTable.Row>
+              )
+              : pageData.map((rowData) => (
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                <Row key={rowData.key} {...rowData} />
+              ))
+          }
+            </View>
+          )}
 
         {!pageData.length && !loading && (
-          <DataTable.Row style={{ minHeight: 250, alignContent: 'center' }}>
-            <DataTable.Cell style={{ alignContent: 'center', justifyContent: 'center' }}>
-              {EmptyState
-                ? <EmptyState />
-                : <Text style={{ color: colors.secondary }}>No Data</Text>}
-            </DataTable.Cell>
-          </DataTable.Row>
+        <DataTable.Row style={{ minHeight: 250, alignContent: 'center' }}>
+          <DataTable.Cell style={{ alignContent: 'center', justifyContent: 'center' }}>
+            {EmptyState
+              ? <EmptyState />
+              : <Text style={{ color: colors.secondary }}>No Data</Text>}
+          </DataTable.Cell>
+        </DataTable.Row>
         )}
 
         {FooterRow && <FooterRow />}
 
+        {!scrollable && (
         <DataTable.Pagination
           page={page}
           numberOfPages={numberOfPages}
@@ -109,6 +134,7 @@ export default function Table({
           selectPageDropdownLabel="Rows per page"
           numberOfItemsPerPage={itemsPerPage}
         />
+        )}
 
       </DataTable>
     </View>
@@ -122,4 +148,5 @@ Table.defaultProps = {
   EmptyState: undefined,
   loading: false,
   style: undefined,
+  scrollable: false,
 };

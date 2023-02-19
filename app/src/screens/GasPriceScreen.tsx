@@ -147,6 +147,7 @@ export default function GasPriceScreen() {
           ]}
           Row={(values) => Row({ ...values, setSelectedRegion })}
           style={styles.gasPriceTable}
+          scrollable
         />
         <SegmentedButtons
           style={styles.selectionButtons}

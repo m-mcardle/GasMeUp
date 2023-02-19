@@ -1,11 +1,3 @@
-/** TODO
-*
-* Get session tokens working (might b impossible)
-* Implement db to store cached queries
-* Highway vs City driving
-*
-*/
-
 // React imports
 import React, {
   useCallback,
@@ -262,7 +254,7 @@ function HomePage({ navigation }: Props) {
   }, [globalState['Enable Requests']]);
 
   const throttledUpdateSuggestions = useCallback(
-    throttle(500, updateSuggestions),
+    throttle(250, updateSuggestions),
     [updateSuggestions],
   );
   const debouncedUpdateSuggestions = useCallback(

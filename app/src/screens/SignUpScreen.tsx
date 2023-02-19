@@ -70,8 +70,6 @@ export default function SignUpScreen({ navigation }: Props) {
           lastName,
           transactions: [],
           friends: {},
-          incomingFriendRequests: [],
-          outgoingFriendRequests: [],
           notificationToken: globalState.expoToken,
         });
 

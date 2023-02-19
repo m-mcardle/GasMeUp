@@ -51,8 +51,6 @@ export default function AppleLogin() {
               lastName,
               transactions: [],
               friends: {},
-              incomingFriendRequests: [],
-              outgoingFriendRequests: [],
               appleUser: true,
             })
               .then(() => {

@@ -45,7 +45,15 @@ import { boldFont, colors } from '../styles/styles';
 
 function FooterRow(onPress: () => void) {
   return (
-    <DataTable.Row onPress={onPress}>
+    <DataTable.Row
+      style={{
+        borderTopWidth: 1,
+        borderTopColor: colors.darkestGray,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.darkestGray,
+      }}
+      onPress={onPress}
+    >
       <DataTable.Cell textStyle={{ color: colors.secondary, fontFamily: boldFont }}>
         Add Friend
       </DataTable.Cell>
@@ -227,7 +235,6 @@ export default function FriendsScreen() {
         </View>
         <Table
           title="Friends"
-          itemsPerPage={8}
           data={formattedBalances}
           headers={headers}
           Row={MyRow}
@@ -235,6 +242,7 @@ export default function FriendsScreen() {
           loading={friendsDataLoading || !friendsUIDs}
           style={styles.table}
           EmptyState={TableEmptyState}
+          scrollable
         />
       </View>
     </Page>

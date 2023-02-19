@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
 import Checkbox from 'expo-checkbox';
+import { Divider } from 'react-native-paper';
 
 // Firebase
 import {
@@ -41,7 +42,8 @@ export default function TripSettingsModal({
     <View style={{ height: '100%', width: '100%', padding: 12 }}>
       <Text style={globalStyles.h1}>Select Driver</Text>
       <Text style={globalStyles.h2}>This determines who is owed the money for this trip</Text>
-      <View style={{ marginTop: 24 }}>
+      <Text style={{ ...globalStyles.h1, marginTop: 12 }}>{`Total: $${cost.toFixed(2)}`}</Text>
+      <View style={{ marginTop: 24, marginLeft: 'auto', marginRight: 'auto' }}>
         <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }} onPress={() => setDriver(userDocument!)}>
           <Checkbox
             value={isDriver(userDocument!)}
@@ -50,9 +52,10 @@ export default function TripSettingsModal({
             style={{ marginHorizontal: 4 }}
           />
           <Text>
-            {`You - ${userDocument?.firstName} ${userDocument?.lastName}`}
+            {`${userDocument?.firstName} ${userDocument?.lastName} (You)`}
           </Text>
         </TouchableOpacity>
+        <Divider />
         {selectedFriends.map((friend: DocumentData) => (
           <TouchableOpacity key={friend.uid} style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }} onPress={() => setDriver(friend)}>
             <Checkbox
