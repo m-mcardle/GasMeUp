@@ -15,9 +15,7 @@ This function is responsible for updating the current balances of each friend wh
 
 This function is responsible for managing friend requests in the system.
 
-Each user has 3 fields associated with friends: `outgoingFriendRequests`, `incomingFriendRequests`, and `friends`. `outgoingFriendRequests` and `incomingFriendRequests` just store an array of user IDs whereas `friends` is an object with keys for each friend's ID and a number indicating the current balance between them.
-
-Each time a friend is added to `outgoingFriendRequests`, the function finds this friend and adds the invoking user's ID to their `incomingFriendRequests`. When a friend request is accepted and a new entry is added to a user's `friends` object, the function then adds the invoking user to the added friend's `friends` object and then removes the relevant entries in each of their `outgoingFriendRequests` and `incomingFriendRequests`.
+Each user has a `friends` property which contains a map between their friend's UID and values associated with that friend. The most important value is their `balance` which represents the current owed amount for that friend. Friend request logic is done through utilizing the `status` property which is a enum of outgoing, incoming, and accepted. Each time this status changes the appropriate Firebase function will fire to update the related friend's status accordingly.
 
 
 ## Development

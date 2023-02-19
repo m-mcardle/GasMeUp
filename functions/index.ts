@@ -81,7 +81,7 @@ export const aggregateBalances = functions.firestore
       // Get a reference to the payer
       const payerRefs = payerUIDs.map((uid: string) => db.collection("Users").doc(uid));
 
-      const newPayeeBalances: Record<string, any> = {};
+      const newPayeeObjects: Record<string, any> = {};
 
       // Update aggregations in a transaction
       await db.runTransaction(async (transaction: Transaction) => {
@@ -93,10 +93,12 @@ export const aggregateBalances = functions.firestore
 
         // Compute new balances
         payersData.forEach((payerData, i) => {
-          const oldPayeeBalance = payeeData.friends[payerData.uid] ?? 0;
+          const oldPayeeObject = payeeData.friends[payerData.uid] ?? {};
+          const oldPayeeBalance = oldPayeeObject.balance ?? 0;
           const newPayeeBalance = oldPayeeBalance + costPerRider;
 
-          const oldPayerBalance = payerData.friends[payeeDoc.id] ?? 0;
+          const oldPayerObject = payerData.friends[payeeDoc.id] ?? {};
+          const oldPayerBalance = oldPayerObject.balance ?? 0;
           const newPayerBalance = oldPayerBalance - costPerRider;
 
           const payerTransactions = payerData.transactions;
@@ -105,18 +107,26 @@ export const aggregateBalances = functions.firestore
           const oldPayerFriends = payerData.friends;
 
           // Update payee balances
-          newPayeeBalances[payerData.uid] = newPayeeBalance;
+          newPayeeObjects[payerData.uid] = {
+            ...oldPayeeObject,
+            balance: newPayeeBalance,
+          };
 
+          console.log(`Updating payer's (${payerUIDs[i]}) balance with: ${newPayerBalance}`);
           // Update payer info
           transaction.update(payerRefs[i], {
             transactions: [...payerTransactions],
             friends: {
               ...oldPayerFriends,
-              [payeeDoc.id]: newPayerBalance,
+              [payeeDoc.id]: {
+                ...oldPayerObject,
+                balance: newPayerBalance,
+              },
             },
           });
         });
 
+        console.log("Updating payee's balances with: ", newPayeeObjects);
         const oldPayeeFriends = payeeData.friends;
         const payeeTransactions = payeeData.transactions;
         payeeTransactions.push(snapshot.id);
@@ -125,7 +135,7 @@ export const aggregateBalances = functions.firestore
           transactions: [...payeeTransactions],
           friends: {
             ...oldPayeeFriends,
-            ...newPayeeBalances,
+            ...newPayeeObjects,
           },
         });
       });
@@ -141,9 +151,6 @@ export const updateFriendsList = functions.firestore
       const beforeFriends = before.friends;
       const afterFriends = after.friends;
 
-      console.log("beforeFriends", beforeFriends);
-      console.log("afterFriends", afterFriends);
-
       const beforeFriendUIDs = Object.keys(beforeFriends);
       const afterFriendUIDs = Object.keys(afterFriends);
 
@@ -153,8 +160,6 @@ export const updateFriendsList = functions.firestore
       const beforeOutgoingFriends = beforeFriendUIDs.filter((uid) => beforeFriends[uid].status === "outgoing");
       const afterOutgoingFriends = afterFriendUIDs.filter((uid) => afterFriends[uid].status === "outgoing");
 
-      console.log("beforeOutgoingFriends", beforeOutgoingFriends);
-      console.log("afterOutgoingFriends", afterOutgoingFriends);
       /*
       The logic for friend requests are as follows:
       1. Bill requests to be friends with Fred and a new friend with status="outgoing" is added to Bill (frontend)
