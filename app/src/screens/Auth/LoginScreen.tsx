@@ -13,25 +13,25 @@ import PropTypes from 'prop-types';
 // Firebase
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../../firebase';
+import { auth } from '../../../firebase';
 
 // Screen
 import SignUpScreen from './SignUpScreen';
 
 // Components
-import Page from '../components/Page';
-import Button from '../components/Button';
-import Input from '../components/Input';
-import Text from '../components/Text';
+import Page from '../../components/Page';
+import Button from '../../components/Button';
+import Input from '../../components/Input';
+import Text from '../../components/Text';
 
-import AppleLogin from '../components/Login/AppleLogin';
+import AppleLogin from '../../components/Login/AppleLogin';
 
 // Helpers
-import { maybeValidEmail } from '../helpers/emailHelper';
+import { maybeValidEmail } from '../../helpers/emailHelper';
 
 // Styles
-import styles from '../styles/LoginScreen.styles';
-import { colors } from '../styles/styles';
+import styles from '../../styles/LoginScreen.styles';
+import { colors, globalStyles } from '../../styles/styles';
 
 interface Props {
   navigation: {
@@ -79,8 +79,8 @@ function LoginPage({ navigation }: Props) {
     <Page keyboardAvoiding={false}>
       <View style={styles.main}>
         <View style={styles.headingSection}>
-          <Text style={styles.h1}>Sign In to GasMeUp</Text>
-          <Text style={styles.h2}>To save your trips and split them with your friends!</Text>
+          <Text style={globalStyles.h1}>Sign In to GasMeUp</Text>
+          <Text style={globalStyles.h3}>To save your trips and split them with your friends!</Text>
         </View>
         <Input
           placeholder="Email"

@@ -5,6 +5,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import dotenv from 'dotenv';
 
 import { migrateFriendsListsDown, migrateFriendsListsUp } from './migrations/FriendsStructure';
+import { unbreakBalances } from './migrations/BrokenBalance';
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ if (process.argv[2] === 'up') {
   migrateFriendsListsUp(db);
 } else if (process.argv[2] === 'down') {
   migrateFriendsListsDown(db);
+} else if (process.argv[2] === 'unbreak') {
+  unbreakBalances(db);
 } else {
   console.log("No operation specified. Use 'up' or 'down' as argument.");
 }

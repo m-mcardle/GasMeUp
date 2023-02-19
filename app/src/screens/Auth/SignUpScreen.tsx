@@ -10,23 +10,23 @@ import {
   createUserWithEmailAndPassword, sendEmailVerification, updateProfile,
 } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
-import { auth, db } from '../../firebase';
+import { auth, db } from '../../../firebase';
 
 // Global State
-import { useGlobalState } from '../hooks/hooks';
+import { useGlobalState } from '../../hooks/hooks';
 
 // Components
-import Page from '../components/Page';
-import Button from '../components/Button';
-import Input from '../components/Input';
-import Text from '../components/Text';
+import Page from '../../components/Page';
+import Button from '../../components/Button';
+import Input from '../../components/Input';
+import Text from '../../components/Text';
 
 // Helpers
-import { maybeValidEmail } from '../helpers/emailHelper';
+import { maybeValidEmail } from '../../helpers/emailHelper';
 
 // Styles
-import styles from '../styles/SignUpScreen.styles';
-import { globalStyles } from '../styles/styles';
+import styles from '../../styles/SignUpScreen.styles';
+import { globalStyles } from '../../styles/styles';
 
 interface Props {
   navigation: {

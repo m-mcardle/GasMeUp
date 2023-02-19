@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
   gasPriceTable: {
     width: '100%',
     marginTop: 16,
+    height: '80%',
   },
 });
 

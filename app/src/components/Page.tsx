@@ -42,7 +42,7 @@ export default function Page({
           ? (
             <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-              keyboardVerticalOffset={160}
+              keyboardVerticalOffset={120}
               style={globalStyles.page}
             >
               {children}

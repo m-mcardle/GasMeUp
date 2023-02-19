@@ -27,6 +27,12 @@ const styles = StyleSheet.create({
     padding: 4,
     width: '50%',
   },
+  settingValueText: {
+    textAlign: 'center',
+    fontSize: 12,
+    padding: 4,
+    width: '40%',
+  },
   settingItem: {
     width: '40%',
     alignSelf: 'center',

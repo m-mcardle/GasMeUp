@@ -10,6 +10,8 @@ To start the Expo development server run `npm run start`. This will provide a QR
 
 ## Build
 
+Before building you likely need to bump the versions. The versioning of our app is managed through `standard-version-expo`. To bump versions before creating a new build run `npm run bump`.
+
 To build the application run `npm run build`. This will start a build on EAS which can then be submit to either the Google Play Store or the Apple App Store.
 
 ### Submission

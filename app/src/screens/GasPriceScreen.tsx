@@ -140,7 +140,12 @@ export default function GasPriceScreen() {
         <Text style={styles.title}>Gas Prices</Text>
         <Table
           loading={loading}
-          data={gasPrices.map((obj) => ({ ...obj, price: gasPriceConversion(obj.price) }))}
+          data={gasPrices.map((obj) => (
+            {
+              ...obj,
+              price: gasPriceConversion(obj.price),
+            }
+          )).sort((a, b) => (a.text > b.text ? 1 : -1))}
           headers={[
             { text: 'Location', numeric: false },
             { text: (globalState.Locale === 'CA' ? 'Price ($/L)' : 'Price ($/gal)'), numeric: true },

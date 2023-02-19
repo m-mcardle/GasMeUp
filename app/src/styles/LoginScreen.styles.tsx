@@ -16,14 +16,6 @@ const styles = StyleSheet.create({
   navigateSection: {
     flexDirection: 'row',
   },
-  h1: {
-    fontSize: 24,
-    textAlign: 'center',
-  },
-  h2: {
-    fontSize: 10,
-    textAlign: 'center',
-  },
   headingSection: {
     paddingBottom: 24,
   },

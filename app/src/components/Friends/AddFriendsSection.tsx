@@ -95,7 +95,7 @@ export default function AddFriendsTable({ close }: Props) {
       <Text style={globalStyles.h1}>
         Add Friend
       </Text>
-      <Text style={globalStyles.h2}>
+      <Text style={globalStyles.h3}>
         Input your friends email to send them a friend request!
       </Text>
       <Input

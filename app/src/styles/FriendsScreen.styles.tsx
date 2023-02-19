@@ -17,6 +17,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
   },
+  friendInfoSubtitle: {
+    fontSize: 12,
+    textAlign: 'center',
+  },
   friendInfoButtonSection: {
     paddingTop: 24,
     flexDirection: 'row',
@@ -27,11 +31,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.action,
     padding: 10,
     borderRadius: 5,
-  },
-  headerSection: {
-    paddingHorizontal: 12,
-    justifyContent: 'space-between',
-    flexDirection: 'row',
   },
   deleteFriendButton: {
     paddingHorizontal: 0,

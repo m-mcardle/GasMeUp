@@ -8,7 +8,7 @@ An app to make splitting rides easier for everyone. A service to easily calculat
 
 ### Infrastructure 🏗️
 
-The front end of this app was written in React Native and built using the Expo project manager. The backend is a Node.js server that hosts an Express API that the client can fetch data from. On this server we calculate the distances of routes and provide autocomplete location suggestions by utilizing the Google Maps API. The server also fetches current gas prices from my [Gas Price API](https://rapidapi.com/mmcardle-drx9FYQNK/api/canadian-gas-prices/).
+The front end of this app was written in React Native and built using the Expo project manager. The backend is a Node.js server that hosts an Express API that the client can fetch data from. On this server we calculate the distances of routes and provide autocomplete location suggestions by utilizing the Google Maps API. The server also fetches current gas prices from my [Gas Price API](https://rapidapi.com/mmcardle-drx9FYQNK/api/canadian-gas-prices/). Also on the backend is a variety of Firebase services used to store data and manage user authentication. This is done through Firestore and Firebase Functions.
 
 ### Related Concepts / Learnings 💭
 
@@ -17,6 +17,7 @@ The front end of this app was written in React Native and built using the Expo p
 * Node.js
 * Mobile Development
 * Consuming APIs
+* Firebase
 
 <hr>
 <br>
@@ -31,7 +32,7 @@ npm run client
 
 ## Server
 
-The server for this application hosts an api using Express and Node.js. It fetches from an [API](https://rapidapi.com/mmcardle-drx9FYQNK/api/canadian-gas-prices/) I built for current gas prices and the Google Maps API for locations and route distances. To start the Node server, go to the `/server` directory and run:
+The server for this application hosts an API using Express and Node.js. It fetches from an [API](https://rapidapi.com/mmcardle-drx9FYQNK/api/canadian-gas-prices/) I built for current gas prices and the Google Maps API for locations and route distances. To start the Node server, go to the `/server` directory and run:
 
 ```
 npm run start
@@ -47,17 +48,24 @@ npm run deploy
 
 This project utilizes Firebase Functions for server-side actions in response to changes made in the Firestore database. These actions involve sending friend requests, updating balances after new transactions, and sending push notifications. The code for this is all stored under the `/functions` directory.
 
+To start a shell to test functions locally run:
+
+```
+npm run shell
+```
+
+To deploy the functions to Firebase run:
+
+```
+npm run deploy
+# OR
+npm run deploy:prod
+```
+
 ## Firebase Admin SDK
 
 Inside the `/firebase-admin` directory there is code to perform useful actions on the Firebase services for this project. This involves actions such as running migrations to restructure all documents in a collection programmatically.
 
-## Build
 
-Before building you likely need to bump the versions. The versioning of our app is managed through `standard-version-expo`. To bump versions before creating a new build run `npm run bump`.
-
-To build the application for iOS, run `npm run build` to use the `eas` CLI to compiled app to Expo.
-
-Once built, we can then run `npm run publish` to update the app on `App Store Connect`. 
-
-## Demo Video (Outdated)
-[![GasMeUp Thumbnail](https://i.ytimg.com/vi/z6_Ajiv4UBw/hqdefault.jpg)](https://youtube.com/shorts/z6_Ajiv4UBw?feature=share)
+## Demo Video
+[![GasMeUp Thumbnail](./assets/DemoThumbnail.jpeg)](https://youtu.be/QExssPr8QSU)

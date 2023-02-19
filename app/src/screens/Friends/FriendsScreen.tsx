@@ -17,31 +17,27 @@ import {
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 import { signOut } from 'firebase/auth';
-import { auth, db } from '../../firebase';
+import { auth, db } from '../../../firebase';
 
 // Global State
-import { useGlobalState } from '../hooks/hooks';
+import { useGlobalState } from '../../hooks/hooks';
 
 // Helpers
-import { validateCurrentUser } from '../helpers/authHelper';
-
-// Screens
-import LoginScreen from './LoginScreen';
+import { validateCurrentUser } from '../../helpers/authHelper';
 
 // Components
-import Page from '../components/Page';
-import Table from '../components/Table';
-import Text from '../components/Text';
-import Modal from '../components/Modal';
+import Page from '../../components/Page';
+import Table from '../../components/Table';
+import Text from '../../components/Text';
+import Modal from '../../components/Modal';
 
-import AddFriendsSection from '../components/Friends/AddFriendsSection';
-import FriendInfoSection from '../components/Friends/FriendInfoSection';
-import FriendRequestsSection from '../components/Friends/FriendRequestsSection';
-import Row from '../components/Friends/FriendRow';
+import AddFriendsSection from '../../components/Friends/AddFriendsSection';
+import FriendRequestsSection from '../../components/Friends/FriendRequestsSection';
+import Row from '../../components/Friends/FriendRow';
 
 // Styles
-import styles from '../styles/FriendsScreen.styles';
-import { boldFont, colors } from '../styles/styles';
+import styles from '../../styles/FriendsScreen.styles';
+import { boldFont, colors, globalStyles } from '../../styles/styles';
 
 function FooterRow(onPress: () => void) {
   return (
@@ -87,9 +83,17 @@ const logout = () => {
 
 const usersRef = collection(db, 'Users');
 
-export default function FriendsScreen() {
+interface Props {
+  setFriend: Function,
+  navigation: {
+    navigate: (str: string) => {},
+    goBack: () => {}
+  },
+}
+
+export default function FriendsScreen({ navigation, setFriend }: Props) {
   const [globalState] = useGlobalState();
-  const [user, loading, error] = useAuthState(auth);
+  const [user,, error] = useAuthState(auth);
 
   const userDoc = user?.uid ? doc(db, 'Users', user.uid) : undefined;
   const [userDocument, , errorUserDB] = useDocumentData(userDoc);
@@ -121,6 +125,7 @@ export default function FriendsScreen() {
       return {
         name: `${currentFriend?.firstName} ${currentFriend?.lastName}`,
         amount: userFriends[uid].balance,
+        email: currentFriend?.email,
         key: uid,
         uid,
       };
@@ -130,10 +135,7 @@ export default function FriendsScreen() {
     : [] as Array<object>;
 
   const [visible, setVisible] = useState(false);
-  const [friendInfoVisible, setFriendInfoVisible] = useState(false);
   const [friendRequestsVisible, setFriendRequestsVisible] = useState(false);
-
-  const [{ selectedFriendUID, selectedFriendName, selectedFriendAmount }, setSelectedFriend] = useState({ selectedFriendUID: '', selectedFriendName: '', selectedFriendAmount: 0 });
 
   // Set the user's notification token if possible
   useEffect(() => {
@@ -148,13 +150,8 @@ export default function FriendsScreen() {
     console.log(errorUserDB, errorFriendsDB, error);
   }
 
-  if (!user || loading || error) {
-    return (
-      <LoginScreen />
-    );
-  }
-
   const headers = [
+    { text: '', numeric: false, style: { maxWidth: '15%' } },
     { text: 'Friend', numeric: false },
     { text: 'Amount Owed', numeric: true },
   ];
@@ -163,13 +160,16 @@ export default function FriendsScreen() {
     name,
     amount,
     uid,
+    email,
   }: any) => Row({
+    email,
     name,
     amount,
     uid,
     onPress: (friend: any) => {
-      setSelectedFriend(friend);
-      setFriendInfoVisible(true);
+      console.log(friend.amount);
+      setFriend(friend);
+      navigation.navigate('Friend');
     },
   });
   const Footer = () => FooterRow(() => validateCurrentUser(user) && setVisible(true));
@@ -180,71 +180,54 @@ export default function FriendsScreen() {
   const hasFriendRequests = friendRequestUIDs.length > 0;
   return (
     <Page>
-      <View style={styles.main}>
-        <Portal>
-          <Modal
-            visible={visible}
-            onDismiss={() => setVisible((state) => !state)}
-          >
-            <AddFriendsSection
-              close={() => setVisible(false)}
-            />
-          </Modal>
-
-          <Modal
-            visible={friendInfoVisible}
-            onDismiss={() => setFriendInfoVisible((state) => !state)}
-          >
-            <FriendInfoSection
-              uid={selectedFriendUID}
-              name={selectedFriendName}
-              amount={selectedFriendAmount}
-              close={() => setFriendInfoVisible(false)}
-            />
-          </Modal>
-
-          <Modal
-            visible={friendRequestsVisible}
-            onDismiss={() => setFriendRequestsVisible((state) => !state)}
-          >
-            <FriendRequestsSection
-              friendRequestUIDs={friendRequestUIDs}
-              closeModal={() => setFriendRequestsVisible(false)}
-            />
-          </Modal>
-        </Portal>
-
-        <View
-          style={styles.headerSection}
+      <Portal>
+        <Modal
+          visible={visible}
+          onDismiss={() => setVisible((state) => !state)}
         >
-          <TouchableOpacity
-            onPress={logout}
-          >
-            <Ionicons name="log-out" size={24} color="white" />
-          </TouchableOpacity>
+          <AddFriendsSection
+            close={() => setVisible(false)}
+          />
+        </Modal>
+        <Modal
+          visible={friendRequestsVisible}
+          onDismiss={() => setFriendRequestsVisible((state) => !state)}
+        >
+          <FriendRequestsSection
+            friendRequestUIDs={friendRequestUIDs}
+            closeModal={() => setFriendRequestsVisible(false)}
+          />
+        </Modal>
+      </Portal>
 
-          <TouchableOpacity
-            style={{ flexDirection: 'row' }}
-            onPress={
-              () => validateCurrentUser(user) && hasFriendRequests && setFriendRequestsVisible(true)
-            }
-          >
-            <Text style={{ color: colors.white }}>{friendRequestUIDs.length}</Text>
-            <FontAwesome5 name="user-friends" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
-        <Table
-          title="Friends"
-          data={formattedBalances}
-          headers={headers}
-          Row={MyRow}
-          FooterRow={Footer}
-          loading={friendsDataLoading || !friendsUIDs}
-          style={styles.table}
-          EmptyState={TableEmptyState}
-          scrollable
-        />
+      <View style={globalStyles.headerSection}>
+        <TouchableOpacity
+          style={{ flexDirection: 'row' }}
+          onPress={
+            () => validateCurrentUser(user) && hasFriendRequests && setFriendRequestsVisible(true)
+          }
+        >
+          <Text style={{ color: colors.white }}>{friendRequestUIDs.length}</Text>
+          <FontAwesome5 name="user-friends" size={18} color="white" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={logout}
+        >
+          <Ionicons name="log-out" size={24} color="white" />
+        </TouchableOpacity>
       </View>
+      <Table
+        title="Friends"
+        data={formattedBalances}
+        headers={headers}
+        Row={MyRow}
+        FooterRow={Footer}
+        loading={friendsDataLoading || !friendsUIDs}
+        style={styles.table}
+        EmptyState={TableEmptyState}
+        scrollable
+      />
     </Page>
   );
 }

@@ -1,6 +1,8 @@
 // React
 import React, { useCallback, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import {
+  Alert, Image, ScrollView, View,
+} from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -15,10 +17,11 @@ import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firesto
 import { db, auth } from '../../../firebase';
 
 // Components
-import Text from '../Text';
-import Button from '../Button';
-import MapModal from '../MapModal';
-import Modal from '../Modal';
+import Text from '../../components/Text';
+import Button from '../../components/Button';
+import MapModal from '../../components/MapModal';
+import Modal from '../../components/Modal';
+import Page from '../../components/Page';
 
 // Styles
 import styles from '../../styles/FriendsScreen.styles';
@@ -27,19 +30,24 @@ import { colors, boldFont } from '../../styles/styles';
 // Helpers
 import { locationToLatLng } from '../../helpers/mapHelper';
 import { createTransaction } from '../../helpers/firestoreHelper';
-import TripDetailsModal from './TripDetailsModal';
+import TripDetailsModal from '../../components/Friends/TripDetailsModal';
+import { getIcon } from '../../helpers/iconHelper';
 
 const transactionsRef = collection(db, 'Transactions');
 
 interface Props {
   uid: string,
   name: string,
+  email: string,
   amount: number,
-  close: Function,
+  navigation: {
+    navigate: (str: string) => {},
+    goBack: () => {}
+  },
 }
 
-export default function FriendInfoSection({
-  uid, name, amount, close,
+export default function FriendInfoScreen({
+  uid, name, amount, email, navigation,
 }: Props) {
   const [currentUser] = useAuthState(auth);
   const [mapVisible, setMapVisible] = useState(false);
@@ -78,7 +86,7 @@ export default function FriendInfoSection({
         gasPrice: 0,
         creator: currentUser.uid,
       });
-      close();
+      navigation.goBack();
     } catch (exception) {
       console.log(exception);
     }
@@ -101,8 +109,25 @@ export default function FriendInfoSection({
     return `$${(transaction.amount * (userIsPayee ? 1 : -1)).toFixed(2)}`;
   };
 
+  const showSettleConfirmationAlert = () => Alert.alert(
+    'Settle Up',
+    `Are you sure you want to settle up with ${name} for $${amount.toFixed(2)}?`,
+    [
+      {
+        text: 'OK',
+        onPress: () => settleUp(),
+        style: 'default',
+      },
+      {
+        text: 'Cancel',
+        onPress: () => {},
+        style: 'cancel',
+      },
+    ],
+  );
+
   return (
-    <View style={{ height: '100%' }}>
+    <Page>
       <Portal>
         <Modal
           visible={viewMoreVisible}
@@ -136,7 +161,18 @@ export default function FriendInfoSection({
           )}
         </Modal>
       </Portal>
-      <Text style={styles.friendInfoTitle}>{name}</Text>
+      <View style={{ width: '100%', alignItems: 'center' }}>
+        <Image
+          style={{ width: 64, height: 64, marginHorizontal: 'auto' }}
+          source={getIcon({ email, name })}
+        />
+      </View>
+      <Text style={styles.friendInfoTitle}>
+        {name}
+      </Text>
+      <Text style={styles.friendInfoSubtitle}>
+        {email}
+      </Text>
 
       <DataTable>
         <DataTable.Header>
@@ -211,7 +247,23 @@ export default function FriendInfoSection({
           ))}
         </ScrollView>
 
-        <DataTable.Row>
+        {transactionsSinceLastSettle.length === 0 && (
+        <View style={{ justifyContent: 'center', alignItems: 'center', marginVertical: 24 }}>
+          <Text style={{ color: colors.secondary, fontSize: 24 }}>No Trips</Text>
+          <Text style={{ color: colors.secondary, fontSize: 10 }}>
+            You and this friend are all settled up!
+          </Text>
+        </View>
+        )}
+
+        <DataTable.Row
+          style={{
+            borderTopWidth: 1,
+            borderTopColor: colors.darkestGray,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.darkestGray,
+          }}
+        >
           <DataTable.Cell textStyle={{ fontFamily: boldFont }}>
             Balance
           </DataTable.Cell>
@@ -225,11 +277,11 @@ export default function FriendInfoSection({
         <Button
           style={styles.friendInfoButton}
           disabled={transactionsSinceLastSettle.length === 0 && amount === 0}
-          onPress={settleUp}
+          onPress={showSettleConfirmationAlert}
         >
           <Text style={{ color: 'white' }}>Settle Up</Text>
         </Button>
       </View>
-    </View>
+    </Page>
   );
 }

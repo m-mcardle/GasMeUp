@@ -1,6 +1,6 @@
 // React
 import React, { useCallback, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, View, Image } from 'react-native';
 
 import { FontAwesome5 } from '@expo/vector-icons';
 
@@ -16,12 +16,13 @@ import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firesto
 import { db, auth } from '../../../firebase';
 
 // Components
-import Table from '../Table';
-import Text from '../Text';
-import Button from '../Button';
-import Modal from '../Modal';
+import Table from '../../components/Table';
+import Text from '../../components/Text';
+import Button from '../../components/Button';
+import Modal from '../../components/Modal';
+import Page from '../../components/Page';
 
-import TripSettingsModal from './TripSettingsModal';
+import TripSettingsModal from '../../components/Home/TripSettingsModal';
 
 // Global State
 import { useGlobalState, Locale } from '../../hooks/hooks';
@@ -29,6 +30,7 @@ import { convertGasPrice, convertKMtoMiles, convertLtoGallons } from '../../help
 
 // Helpers
 import { createTransaction } from '../../helpers/firestoreHelper';
+import { getIcon } from '../../helpers/iconHelper';
 
 // Styles
 import styles from '../../styles/HomeScreen.styles';
@@ -38,7 +40,12 @@ function RowBuilder(
   selectedFriends: Array<DocumentData>,
   setSelectedFriend: (_ : Array<DocumentData>) => void,
 ) {
-  function Row({ firstName, lastName, uid }: DocumentData) {
+  function Row({
+    firstName,
+    lastName,
+    uid,
+    email,
+  }: DocumentData) {
     const updateSelectedFriends = (friend: DocumentData) => {
       const friendIndex = selectedFriends.findIndex((el) => el.uid === friend.uid);
       if (friendIndex === -1) {
@@ -48,6 +55,7 @@ function RowBuilder(
         setSelectedFriend([...selectedFriends]);
       }
     };
+    const name = `${firstName} ${lastName}`;
 
     const isSelected = !!selectedFriends.find((friend: DocumentData) => friend.uid === uid);
     return (
@@ -55,8 +63,14 @@ function RowBuilder(
         key={firstName + lastName + uid}
         onPress={() => updateSelectedFriends({ firstName, lastName, uid })}
       >
+        <DataTable.Cell style={{ maxWidth: '15%', justifyContent: 'center', alignContent: 'center' }}>
+          <Image
+            style={{ width: 32, height: 32, borderRadius: 64 }}
+            source={getIcon({ email, name })}
+          />
+        </DataTable.Cell>
         <DataTable.Cell>
-          {`${firstName} ${lastName}`}
+          {name}
         </DataTable.Cell>
         <DataTable.Cell numeric>
           <Checkbox
@@ -93,11 +107,14 @@ interface Props {
   distance: number,
   gasMileage: number,
   waypoints: Array<Location>,
-  closeModal: Function,
+  navigation: {
+    navigate: (str: string) => {},
+    goBack: () => {}
+  },
 }
 
-export default function SaveTripModal({
-  start, end, cost, gasPrice, distance, closeModal, gasMileage, waypoints,
+export default function SaveTripScreen({
+  start, end, cost, gasPrice, distance, gasMileage, waypoints, navigation,
 }: Props) {
   const [globalState] = useGlobalState();
   const [selectedFriends, setSelectedFriends] = useState<Array<DocumentData>>([]);
@@ -172,11 +189,11 @@ export default function SaveTripModal({
         type: 'trip',
       });
       Alert.alert('Success', 'Trip was saved!');
-      closeModal();
+      navigation.goBack();
     } catch (exception) {
       console.log(exception);
       Alert.alert('Error', 'Something went wrong. Please try again later.');
-      closeModal();
+      navigation.goBack();
     }
   }, [currentUser, cost, distance, gasPrice]);
 
@@ -185,6 +202,7 @@ export default function SaveTripModal({
   }
 
   const headers = [
+    { text: '', numeric: false, style: { maxWidth: '15%' } },
     { text: 'Name', numeric: false },
     { text: 'Split Trip', numeric: true },
   ];
@@ -198,7 +216,7 @@ export default function SaveTripModal({
   const gasUsageString = useCanadianUnits ? `${(gasUsed).toFixed(1)}L` : `${convertLtoGallons(gasUsed).toFixed(1)}gal`;
   const distanceString = useCanadianUnits ? `${distance.toFixed(1)}km` : `${convertKMtoMiles(distance).toFixed(1)}mi`;
   return (
-    <View style={{ height: '100%' }}>
+    <Page>
       <Portal>
         <Modal
           visible={splitTypeVisible}
@@ -215,7 +233,11 @@ export default function SaveTripModal({
           )}
         </Modal>
       </Portal>
-      <Text style={globalStyles.h1}>Save Trip</Text>
+      <Text
+        style={{ ...globalStyles.h2, marginBottom: 12 }}
+      >
+        Select your friends who were on this trip
+      </Text>
       <View style={styles.saveTripLocationHeaderContainer}>
         <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
           {'Start: '}
@@ -280,6 +302,7 @@ export default function SaveTripModal({
         loading={usersDataLoading}
         style={{ marginTop: 16 }}
         EmptyState={TableEmptyState}
+        scrollable
       />
       <View style={styles.saveTripButtonSection}>
         <Button
@@ -291,6 +314,6 @@ export default function SaveTripModal({
           </Text>
         </Button>
       </View>
-    </View>
+    </Page>
   );
 }

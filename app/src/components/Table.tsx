@@ -26,6 +26,7 @@ interface Props {
 interface Header {
   text: string,
   numeric: boolean,
+  style?: object,
 }
 
 export default function Table({
@@ -69,6 +70,7 @@ export default function Table({
                 key={header.text}
                 numeric={header.numeric}
                 textStyle={{ color: colors.secondary }}
+                style={header.style}
               >
                 {header.text}
               </DataTable.Title>
@@ -77,7 +79,7 @@ export default function Table({
         </DataTable.Header>
 
         {scrollable ? (
-          <ScrollView style={{ maxHeight: '85%' }}>
+          <ScrollView style={{ maxHeight: '100%' }}>
             {
             loading
               ? (

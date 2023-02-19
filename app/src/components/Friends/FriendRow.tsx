@@ -1,6 +1,6 @@
 // React
 import React, { useCallback, useRef } from 'react';
-import { Animated, Alert } from 'react-native';
+import { Animated, Alert, Image } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -20,6 +20,7 @@ import { auth, db } from '../../../firebase';
 
 // Helpers
 import { validateCurrentUser } from '../../helpers/authHelper';
+import { getIcon } from '../../helpers/iconHelper';
 
 // Components
 import Text from '../Text';
@@ -29,6 +30,7 @@ import styles from '../../styles/FriendsScreen.styles';
 import { colors } from '../../styles/styles';
 
 interface Props {
+  email: string,
   name: string,
   amount: number,
   uid: string,
@@ -38,7 +40,7 @@ interface Props {
 const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
 
 export default function Row({
-  name, amount, uid, onPress,
+  name, amount, uid, onPress, email,
 }: Props) {
   const [user] = useAuthState(auth);
   const ref = useRef<Swipeable>(null);
@@ -117,11 +119,18 @@ export default function Row({
       <DataTable.Row
         key={name}
         onPress={() => validateCurrentUser(user) && onPress({
-          selectedFriendUID: uid,
-          selectedFriendName: name,
-          selectedFriendAmount: amount,
+          uid,
+          name,
+          amount,
+          email,
         })}
       >
+        <DataTable.Cell style={{ maxWidth: '15%', justifyContent: 'center', alignContent: 'center' }}>
+          <Image
+            style={{ width: 32, height: 32, borderRadius: 64 }}
+            source={getIcon({ email, name })}
+          />
+        </DataTable.Cell>
         <DataTable.Cell textStyle={{ color: colors.secondary }}>
           {name}
         </DataTable.Cell>

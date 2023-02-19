@@ -158,7 +158,11 @@ export const globalStyles = StyleSheet.create({
     textAlign: 'center',
   },
   h2: {
-    fontSize: 10,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  h3: {
+    fontSize: 12,
     textAlign: 'center',
   },
   smallText: {
@@ -182,5 +186,15 @@ export const globalStyles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  headerSection: {
+    paddingHorizontal: 16,
+    justifyContent: 'space-between',
+    flexDirection: 'row-reverse',
+    position: 'absolute',
+    top: 24,
+    left: 0,
+    width: '100%',
+    zIndex: 1,
   },
 });

@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '70%',
     justifyContent: 'center',
+    marginBottom: 64,
   },
   calculateButton: {
     width: '50%',
@@ -176,6 +177,8 @@ const styles = StyleSheet.create({
     borderColor: 'white',
   },
   settingsButton: {
+    backgroundColor: 'blue',
+    paddingHorizontal: 12,
     position: 'absolute',
     top: 0,
     right: 0,

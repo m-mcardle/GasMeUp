@@ -28,8 +28,8 @@ import firebase from './firebase';
 import { GlobalContext, initialState } from './src/hooks/hooks';
 
 // Screens
-import HomeScreen from './src/screens/HomeScreen';
-import FriendsScreen from './src/screens/FriendsScreen';
+import HomeTab from './src/screens/HomeTab';
+import FriendsTab from './src/screens/FriendsTab';
 import GasPriceScreen from './src/screens/GasPriceScreen';
 
 // Styles
@@ -196,7 +196,7 @@ export default function App() {
     <GlobalContext.Provider value={state}>
       <NavigationContainer>
         <Tab.Navigator
-          initialRouteName="Add"
+          initialRouteName="Calculate"
           screenOptions={({ route }: { route: any }) => ({
             headerShown: false,
             tabBarIcon: ({ focused, color, size }:
@@ -213,8 +213,8 @@ export default function App() {
             tabBarStyle: { backgroundColor: colors.primary },
           })}
         >
-          <Tab.Screen name="Friends" component={FriendsScreen} />
-          <Tab.Screen name="Calculate" component={HomeScreen} />
+          <Tab.Screen name="Friends" component={FriendsTab} />
+          <Tab.Screen name="Calculate" component={HomeTab} />
           <Tab.Screen name="Gas Prices" component={GasPriceScreen} />
         </Tab.Navigator>
       </NavigationContainer>

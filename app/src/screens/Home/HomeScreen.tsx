@@ -12,7 +12,6 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
 
 // External Components
 import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -26,35 +25,33 @@ import uuid from 'react-native-uuid';
 
 // Firebase
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../../firebase';
+import { auth } from '../../../firebase';
 
 // Helpers
-import { validateCurrentUser } from '../helpers/authHelper';
-import { convertGasPrice } from '../helpers/unitsHelper';
+import { validateCurrentUser } from '../../helpers/authHelper';
+import { convertGasPrice } from '../../helpers/unitsHelper';
 
 // Global State Stuff
-import { useGlobalState, changeSetting } from '../hooks/hooks';
+import { useGlobalState, changeSetting } from '../../hooks/hooks';
 
 // Components
-import Page from '../components/Page';
-import Text from '../components/Text';
-import Button from '../components/Button';
-import MapContainer from '../components/MapContainer';
-import Modal from '../components/Modal';
-import AutocompleteInput from '../components/AutocompleteInput';
-import MapModal from '../components/MapModal';
+import Page from '../../components/Page';
+import Text from '../../components/Text';
+import Button from '../../components/Button';
+import MapContainer from '../../components/MapContainer';
+import Modal from '../../components/Modal';
+import AutocompleteInput from '../../components/AutocompleteInput';
+import MapModal from '../../components/MapModal';
 
-import StatsSection from '../components/Home/StatsSection';
-import SaveTripModal from '../components/Home/SaveTripModal';
-import SettingsModal from '../components/Home/SettingsModal';
+import StatsSection from '../../components/Home/StatsSection';
+import SettingsModal from '../../components/Home/SettingsModal';
 
 // Styles
-import { colors } from '../styles/styles';
-import styles from '../styles/HomeScreen.styles';
+import { colors, globalStyles } from '../../styles/styles';
+import styles from '../../styles/HomeScreen.styles';
 
 // Mock Data
-import { fetchData } from '../data/data';
-import SettingsScreen from './SettingsScreen';
+import { fetchData } from '../../data/data';
 
 enum ActiveInput {
   None,
@@ -65,13 +62,14 @@ enum ActiveInput {
 let sessionToken = uuid.v4();
 
 interface Props {
+  setTrip: Function,
   navigation: {
     navigate: (str: string) => {},
     goBack: () => {}
   },
 }
 
-function HomePage({ navigation }: Props) {
+export default function HomeScreen({ navigation, setTrip }: Props) {
   const [user] = useAuthState(auth);
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
   const [{
@@ -107,7 +105,7 @@ function HomePage({ navigation }: Props) {
   const [fuelModalVisible, setFuelModalVisible] = useState<boolean>(false);
   const [useCustomGasPrice, setUseCustomGasPrice] = useState<boolean>(false);
   const [globalState, updateGlobalState] = useGlobalState();
-  const [modalVisible, setModalVisible] = useState(false);
+  // const [modalVisible, setModalVisible] = useState(false);
   const [mapModalVisible, setMapModalVisible] = useState(false);
 
   const [startLocationError, setStartLocationError] = useState<boolean>(false);
@@ -357,22 +355,6 @@ function HomePage({ navigation }: Props) {
       />
       <Portal>
         <Modal
-          visible={modalVisible}
-          onDismiss={() => setModalVisible(false)}
-        >
-          <SaveTripModal
-            cost={cost}
-            distance={distance}
-            gasPrice={gasPrice}
-            start={start.address}
-            end={end.address}
-            waypoints={waypoints}
-            gasMileage={GAS_MILEAGE}
-            closeModal={() => setModalVisible(false)}
-          />
-        </Modal>
-
-        <Modal
           visible={mapModalVisible}
           onDismiss={() => setMapModalVisible(false)}
         >
@@ -386,9 +368,9 @@ function HomePage({ navigation }: Props) {
           />
         </Modal>
       </Portal>
-      <View style={styles.settingsButton}>
-        <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={{ margin: 24 }}>
-          <Ionicons name="settings" size={30} color={colors.gray} />
+      <View style={globalStyles.headerSection}>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+          <Ionicons name="settings" size={24} color="white" />
         </TouchableOpacity>
       </View>
       <View style={styles.dataContainer}>
@@ -470,7 +452,17 @@ function HomePage({ navigation }: Props) {
           </Button>
           <Button
             style={styles.saveButton}
-            onPress={() => validateCurrentUser(user) && setModalVisible(true)}
+            onPress={() => validateCurrentUser(user)
+              && (setTrip({
+                cost,
+                distance,
+                gasPrice,
+                start: start.address,
+                end: end.address,
+                waypoints,
+                gasMileage: GAS_MILEAGE,
+              })
+              || navigation.navigate('Save Trip'))}
             disabled={!canSaveTrip}
           >
             <Text
@@ -483,28 +475,5 @@ function HomePage({ navigation }: Props) {
         </View>
       </View>
     </Page>
-  );
-}
-
-const RootStack = createStackNavigator();
-
-export default function HomeScreen() {
-  return (
-    <RootStack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colors.purple,
-          height: 80,
-        },
-        headerTitleStyle: { color: colors.white },
-      }}
-    >
-      <RootStack.Group screenOptions={{ headerShown: false }}>
-        <RootStack.Screen name="Home" component={HomePage} />
-      </RootStack.Group>
-      <RootStack.Group>
-        <RootStack.Screen name="Settings" component={SettingsScreen} />
-      </RootStack.Group>
-    </RootStack.Navigator>
   );
 }
