@@ -2,9 +2,10 @@
   "name": "firebase",
   "version": "1.0.0",
   "description": "Firebase Admin SDK for GasMeUp",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node lib/index.js",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -13,5 +14,7 @@
     "dotenv": "^16.0.3",
     "firebase-admin": "^11.5.0"
   },
-  "type": "module"
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
 }

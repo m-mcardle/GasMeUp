@@ -1,5 +1,12 @@
 import admin from 'firebase-admin';
 
+interface Friend {
+  balance: number,
+  status: 'outgoing' | 'incoming' | 'accepted',
+  accepted: boolean,
+  email?: string
+}
+
 // Migrate to new version
 export const migrateFriendsListsUp = async (db: admin.firestore.Firestore) => {
   const usersCollection = db.collection('Users');
@@ -29,7 +36,7 @@ export const migrateFriendsListsUp = async (db: admin.firestore.Firestore) => {
     });
   });
 
-  await batch.commit();
+  // await batch.commit();
 };
 
 // Migrate back
@@ -57,7 +64,7 @@ export const migrateFriendsListsDown = async (db: admin.firestore.Firestore) => 
     });
   });
 
-  await batch.commit();
+  // await batch.commit();
 };
 
 export default {
