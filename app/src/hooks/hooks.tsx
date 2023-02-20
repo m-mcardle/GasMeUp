@@ -23,6 +23,10 @@ interface Option {
   options: Array<any>,
 }
 
+export const PERSISTED_VALUES: Record<string, string> = {
+  splitwiseToken: '',
+};
+
 export const OPTIONS_SETTINGS: Record<string, Option> = {
   Locale: {
     label: 'Units (Metric/Imperial)',
@@ -55,6 +59,12 @@ if (Platform.OS === 'ios') {
     initialSettings[setting] = Settings.get(setting) !== undefined
       ? Settings.get(setting)
       : NUMERIC_SETTINGS[setting];
+  });
+
+  Object.keys(PERSISTED_VALUES).forEach((setting) => {
+    initialSettings[setting] = Settings.get(setting) !== undefined
+      ? Settings.get(setting)
+      : PERSISTED_VALUES[setting];
   });
 } else {
   initialSettings = {

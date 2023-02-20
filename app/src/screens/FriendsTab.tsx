@@ -8,7 +8,8 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../firebase';
 
 // Screens
-import FriendsScreen from './Friends/FriendsScreen';
+// import FriendsScreen from './Friends/FriendsScreen';
+import SplitwiseScreen from './Friends/SplitwiseScreen';
 import LoginScreen from './Auth/LoginScreen';
 import FriendInfoScreen from './Friends/FriendInfoScreen';
 
@@ -51,8 +52,11 @@ export default function FriendsTab() {
           headerShown: false,
           title: 'All Friends',
         }}
+        component={SplitwiseScreen}
       >
+        {/*
         {({ navigation }) => <FriendsScreen navigation={navigation} setFriend={setFriend} />}
+        */}
       </RootStack.Screen>
       <RootStack.Screen
         name="Friend"

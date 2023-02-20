@@ -10,6 +10,10 @@ export const ENV = expoConstants
     USE_DEV_API: expoConstants.useDevAPI,
     DEV_API_URL: expoConstants.devAPIURL,
     EXCHANGE_RATE_API_KEY: expoConstants.exchangeRateAPIKey,
+    SPLITWISE_CLIENT_ID: expoConstants.splitwiseClientID,
+    SPLITWISE_CONSUMER_SECRET: expoConstants.splitwiseConsumerSecret,
+    SPLITWISE_AUTHORIZE_URL: expoConstants.splitwiseAuthorizeURL,
+    SPLITWISE_TOKEN_URL: expoConstants.splitwiseTokenURL,
   }
   : {
     FIREBASE_API_KEY: '',
@@ -18,6 +22,10 @@ export const ENV = expoConstants
     USE_DEV_API: 'false',
     DEV_API_URL: '',
     EXCHANGE_RATE_API_KEY: '',
+    SPLITWISE_CLIENT_ID: '',
+    SPLITWISE_CONSUMER_SECRET: '',
+    SPLITWISE_AUTHORIZE_URL: '',
+    SPLITWISE_TOKEN_URL: '',
   };
 
 async function checkDevAPI() {

@@ -18,22 +18,32 @@ import Button from '../Button';
 import styles from '../../styles/HomeScreen.styles';
 import { colors, globalStyles } from '../../styles/styles';
 
+interface User {
+  uid: string | number,
+  firstName: string,
+  lastName: string,
+}
+
 interface Props {
   cost: number,
-  userDocument: DocumentData,
-  selectedFriends: Array<DocumentData>,
+  currentUser: User,
+  selectedFriends: Array<User>,
   saveTrip: (
-    friends: Array<DocumentData>,
-    driver: DocumentData,
+    friends: Array<User>,
+    driver: User,
     splitType: 'split' | 'full',
   ) => void,
   closeModal: () => void,
 }
 
 export default function TripSettingsModal({
-  cost, selectedFriends, userDocument, saveTrip, closeModal,
+  cost, selectedFriends, currentUser, saveTrip, closeModal,
 }: Props) {
-  const [driver, setDriver] = useState<DocumentData>({});
+  const [driver, setDriver] = useState<User>({
+    uid: '',
+    firstName: '',
+    lastName: '',
+  });
 
   const evenSplitCost = cost / (selectedFriends.length + 1);
   const ridersCost = cost / selectedFriends.length;
@@ -44,19 +54,19 @@ export default function TripSettingsModal({
       <Text style={globalStyles.h2}>This determines who is owed the money for this trip</Text>
       <Text style={{ ...globalStyles.h1, marginTop: 12 }}>{`Total: $${cost.toFixed(2)}`}</Text>
       <View style={{ marginTop: 24, marginLeft: 'auto', marginRight: 'auto' }}>
-        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }} onPress={() => setDriver(userDocument!)}>
+        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }} onPress={() => setDriver(currentUser!)}>
           <Checkbox
-            value={isDriver(userDocument!)}
-            onValueChange={() => setDriver(userDocument!)}
+            value={isDriver(currentUser!)}
+            onValueChange={() => setDriver(currentUser!)}
             color={colors.action}
             style={{ marginHorizontal: 4 }}
           />
           <Text>
-            {`${userDocument?.firstName} ${userDocument?.lastName} (You)`}
+            {`${currentUser?.firstName} ${currentUser?.lastName} (You)`}
           </Text>
         </TouchableOpacity>
         <Divider />
-        {selectedFriends.map((friend: DocumentData) => (
+        {selectedFriends.map((friend: User) => (
           <TouchableOpacity key={friend.uid} style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }} onPress={() => setDriver(friend)}>
             <Checkbox
               value={isDriver(friend)}

@@ -57,6 +57,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
   },
+  splitwiseButton: {
+    backgroundColor: '#5BBFA1',
+    width: '40%',
+    alignSelf: 'center',
+    paddingHorizontal: 10,
+  },
 });
 
 export default styles;

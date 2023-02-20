@@ -5,7 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 // Screens
 import HomeScreen from './Home/HomeScreen';
 import SettingsScreen from './Home/SettingsScreen';
-import SaveTripScreen from './Home/SaveTripScreen';
+import SaveTripScreen from './Home/SaveTripSplitwiseScreen';
 
 // Styles
 import { colors } from '../styles/styles';
@@ -20,7 +20,7 @@ export default function HomeTab() {
     gasPrice,
     distance,
     gasMileage,
-    waypoints,
+    // waypoints,
   }, setTrip] = useState({
     start: 'string',
     end: '',
@@ -64,7 +64,7 @@ export default function HomeTab() {
             gasPrice={gasPrice}
             distance={distance}
             gasMileage={gasMileage}
-            waypoints={waypoints}
+            // waypoints={waypoints}
           />
         )}
       </RootStack.Screen>

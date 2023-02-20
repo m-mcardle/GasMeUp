@@ -42,6 +42,7 @@ import MapContainer from '../../components/MapContainer';
 import Modal from '../../components/Modal';
 import AutocompleteInput from '../../components/AutocompleteInput';
 import MapModal from '../../components/MapModal';
+import SplitwiseLogin from '../../components/SplitwiseLogin';
 
 import StatsSection from '../../components/Home/StatsSection';
 import SettingsModal from '../../components/Home/SettingsModal';
@@ -368,6 +369,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           />
         </Modal>
       </Portal>
+      <SplitwiseLogin />
       <View style={globalStyles.headerSection}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Ionicons name="settings" size={24} color="white" />
