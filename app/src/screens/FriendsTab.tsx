@@ -21,7 +21,7 @@ export default function FriendsTab() {
   const [user, loading, error] = useAuthState(auth);
   const [{
     uid, email, name, amount,
-  }, setFriend] = useState({
+  }, setFriend] = useState<FriendObject>({
     uid: '',
     email: '',
     name: '',

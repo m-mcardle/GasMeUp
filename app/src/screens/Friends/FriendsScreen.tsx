@@ -84,7 +84,7 @@ const logout = () => {
 const usersRef = collection(db, 'Users');
 
 interface Props {
-  setFriend: Function,
+  setFriend: (friend: FriendObject) => void,
   navigation: {
     navigate: (str: string) => {},
     goBack: () => {}
@@ -166,8 +166,7 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
     name,
     amount,
     uid,
-    onPress: (friend: any) => {
-      console.log(friend.amount);
+    onPress: (friend: FriendObject) => {
       setFriend(friend);
       navigation.navigate('Friend');
     },

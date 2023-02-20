@@ -38,7 +38,7 @@ const transactionsRef = collection(db, 'Transactions');
 interface Props {
   uid: string,
   name: string,
-  email: string,
+  email: string | undefined,
   amount: number,
   navigation: {
     navigate: (str: string) => {},
@@ -247,7 +247,7 @@ export default function FriendInfoScreen({
           ))}
         </ScrollView>
 
-        {transactionsSinceLastSettle.length === 0 && (
+        {!transactionsLoading && transactionsSinceLastSettle.length === 0 && (
         <View style={{ justifyContent: 'center', alignItems: 'center', marginVertical: 24 }}>
           <Text style={{ color: colors.secondary, fontSize: 24 }}>No Trips</Text>
           <Text style={{ color: colors.secondary, fontSize: 10 }}>
