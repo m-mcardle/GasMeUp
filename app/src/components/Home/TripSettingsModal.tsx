@@ -22,6 +22,7 @@ interface User {
   uid: string | number,
   firstName: string,
   lastName: string,
+  email: string,
 }
 
 interface Props {
@@ -43,6 +44,7 @@ export default function TripSettingsModal({
     uid: '',
     firstName: '',
     lastName: '',
+    email: '',
   });
 
   const evenSplitCost = cost / (selectedFriends.length + 1);

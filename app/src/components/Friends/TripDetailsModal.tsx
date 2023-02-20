@@ -24,7 +24,7 @@ import { convertAllToString } from '../../helpers/unitsHelper';
 interface Props {
   setMapVisible: () => void,
   transaction: DocumentData,
-  transactionAmount: string,
+  transactionAmount: number,
   transactionWaypoints: Array<Location>,
 }
 
@@ -68,7 +68,7 @@ export default function TripDetailsModal({
         }}
         >
           <Text>{`Total: $${transaction.cost.toFixed(2)}`}</Text>
-          <Text>{`Amount Owed: ${transactionAmount}`}</Text>
+          <Text>{`Amount Owed: $${transactionAmount.toFixed(2)}`}</Text>
         </View>
         <View style={{
           flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 12,

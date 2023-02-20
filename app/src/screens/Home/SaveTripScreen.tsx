@@ -36,6 +36,9 @@ import { getIcon } from '../../helpers/iconHelper';
 import styles from '../../styles/HomeScreen.styles';
 import { boldFont, colors, globalStyles } from '../../styles/styles';
 
+// @ts-ignore
+import SplitwiseLogo from '../../../assets/splitwise-logo.png';
+
 function RowBuilder(
   selectedFriends: Array<User>,
   setSelectedFriend: (_ : Array<User>) => void,
@@ -61,7 +64,9 @@ function RowBuilder(
     return (
       <DataTable.Row
         key={firstName + lastName + uid}
-        onPress={() => updateSelectedFriends({ firstName, lastName, uid })}
+        onPress={() => updateSelectedFriends({
+          firstName, lastName, uid, email,
+        })}
       >
         <DataTable.Cell style={{ maxWidth: '15%', justifyContent: 'center', alignContent: 'center' }}>
           <Image
@@ -74,7 +79,9 @@ function RowBuilder(
         </DataTable.Cell>
         <DataTable.Cell numeric>
           <Checkbox
-            onValueChange={() => updateSelectedFriends({ firstName, lastName, uid })}
+            onValueChange={() => updateSelectedFriends({
+              firstName, lastName, uid, email,
+            })}
             value={isSelected}
             color={colors.action}
           />
@@ -103,6 +110,7 @@ interface User {
   uid: string | number,
   firstName: string,
   lastName: string,
+  email: string,
 }
 
 interface Props {
@@ -125,11 +133,17 @@ export default function SaveTripScreen({
   const [globalState] = useGlobalState();
   const [selectedFriends, setSelectedFriends] = useState<Array<User>>([]);
   const [splitTypeVisible, setSplitTypeVisible] = useState(false);
+  const [useSplitwise, setUseSplitwise] = useState(false);
 
   const [currentUser] = useAuthState(auth);
 
   const userDoc = currentUser?.uid ? doc(db, 'Users', currentUser.uid) : undefined;
   const [userDocument] = useDocumentData(userDoc);
+
+  const secureUserDoc = currentUser?.uid ? doc(db, 'SecureUsers', currentUser.uid) : undefined;
+  const [secureUserDocument] = useDocumentData(secureUserDoc);
+
+  const splitwiseToken = secureUserDocument?.splitwiseToken ?? '';
 
   const userFriends = userDocument?.friends ?? {};
   const friendsUIDs = Object.keys(userFriends);
@@ -165,6 +179,7 @@ export default function SaveTripScreen({
     if (!currentUser?.uid) {
       return;
     }
+    const isDriver = (user: any) => user.uid === driver.uid;
     const userIsDriver = driver.uid === currentUser.uid;
     const friendUIDs = friends.map((friend) => String(friend.uid));
 
@@ -194,6 +209,62 @@ export default function SaveTripScreen({
         country: globalState.country,
         type: 'trip',
       });
+
+      if (useSplitwise && userDocument?.splitwiseUID && splitwiseToken) {
+        const splitAmount = splitType === 'full'
+          ? (cost / friendUIDs.length).toFixed(2)
+          : (cost / (friendUIDs.length + 1)).toFixed(2);
+        const fullAmount = splitType === 'full'
+          ? (Number(splitAmount) * (friendUIDs.length)).toFixed(2)
+          : (Number(splitAmount) * (friendUIDs.length + 1)).toFixed(2);
+
+        let totalOwed = 0;
+        const friendObject: Record<string, any> = {};
+        friendObject.users__0__user_id = userDocument.splitwiseUID;
+        friendObject.users__0__paid_share = userIsDriver ? fullAmount : '0';
+        friendObject.users__0__owed_share = userIsDriver && splitType === 'full' ? '0' : splitAmount;
+        totalOwed += Number(friendObject.users__0__owed_share);
+
+        friends.forEach((friend, i) => {
+          friendObject[`users__${i + 1}__paid_share`] = isDriver(friend) ? fullAmount : '0';
+          friendObject[`users__${i + 1}__owed_share`] = isDriver(friend) && splitType === 'full' ? '0' : splitAmount;
+          friendObject[`users__${i + 1}__email`] = friend.email ?? 'Unknown@email.com';
+          friendObject[`users__${i + 1}__first_name`] = friend.firstName;
+          friendObject[`users__${i + 1}__last_name`] = friend.lastName;
+          totalOwed += Number(friendObject[`users__${i + 1}__owed_share`]);
+        });
+
+        if (totalOwed !== Number(fullAmount)) {
+          console.log("ERROR: Total Owed doesn't match Full Amount");
+          console.log('Total Owed:', totalOwed);
+          console.log('Full Amount:', fullAmount);
+          console.log('Difference:', totalOwed - Number(fullAmount));
+        }
+
+        const body = JSON.stringify({
+          cost: fullAmount,
+          description: 'GasMeUp Trip',
+          details: `Start: ${start}\nEnd: ${end}\nDistance: ${distance}km\nGas Mileage: ${gasMileage}L/100km\nGas Price: $${canadianGasPrice}/L`,
+          group_id: 0, // Personal Expense
+          date: new Date().toISOString(),
+          category_id: 31, // Transportation
+          currency_code: 'CAD',
+          split_equally: false,
+          ...friendObject,
+        });
+
+        const response = await fetch('https://www.splitwise.com/api/v3.0/create_expense', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${splitwiseToken}`,
+            'Content-Type': 'application/json',
+          },
+          body,
+        });
+        const json = await response.json();
+        console.log('Splitwise Response:', json);
+      }
+
       Alert.alert('Success', 'Trip was saved!');
       navigation.goBack();
     } catch (exception) {
@@ -201,7 +272,7 @@ export default function SaveTripScreen({
       Alert.alert('Error', 'Something went wrong. Please try again later.');
       navigation.goBack();
     }
-  }, [currentUser, cost, distance, gasPrice]);
+  }, [currentUser, cost, distance, gasPrice, useSplitwise]);
 
   if (errorUsersDB) {
     console.log(errorUsersDB);
@@ -310,6 +381,18 @@ export default function SaveTripScreen({
         EmptyState={TableEmptyState}
         scrollable
       />
+      {splitwiseToken && userDocument?.splitwiseUID && (
+      <View style={styles.checkBoxSection}>
+        <Image source={SplitwiseLogo} style={{ width: 16, height: 16 }} />
+        <Text style={{ color: colors.secondary, fontSize: 14 }}>Save on Splitwise:</Text>
+        <Checkbox
+          color={colors.action}
+          value={useSplitwise}
+          onValueChange={setUseSplitwise}
+          style={styles.modalCheckBox}
+        />
+      </View>
+      )}
       <View style={styles.saveTripButtonSection}>
         <Button
           disabled={selectedFriends.length < 1}
