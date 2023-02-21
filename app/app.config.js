@@ -58,6 +58,8 @@ module.exports = {
     splitwiseAuthorizeURL: process.env.SPLITWISE_AUTHORIZE_URL,
     splitwiseClientID: process.env.SPLITWISE_CLIENT_ID,
     splitwiseConsumerSecret: process.env.SPLITWISE_CONSUMER_SECRET,
+    splitwiseDevClientID: process.env.DEV_SPLITWISE_CLIENT_ID,
+    splitwiseDevConsumerSecret: process.env.DEV_SPLITWISE_CONSUMER_SECRET,
 
     // Other
     exchangeRateAPIKey: process.env.EXCHANGE_RATE_API_KEY,

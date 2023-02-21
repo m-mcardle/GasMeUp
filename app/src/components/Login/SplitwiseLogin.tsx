@@ -12,7 +12,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { db, auth } from '../../../firebase';
 
 // Helpers
-import { ENV } from '../../helpers/env';
+import { DEV, ENV } from '../../helpers/env';
 
 // Components
 import Button from '../Button';
@@ -33,9 +33,10 @@ export default function SplitwiseLogin() {
   const userDoc = currentUser?.uid ? doc(db, 'Users', currentUser.uid) : undefined;
   const secureUserDoc = currentUser?.uid ? doc(db, 'SecureUsers', currentUser.uid) : undefined;
 
-  const useProxy = true;
+  const useProxy = DEV;
   const redirectUri = AuthSession.makeRedirectUri({
     useProxy,
+    path: 'redirect',
   });
 
   const discovery = {
