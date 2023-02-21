@@ -137,7 +137,7 @@ export default function Row({
         <DataTable.Cell numeric>
           <Text style={amount < 0 ? { color: 'red' } : { color: colors.secondary }}>
             $
-            {amount.toFixed(2)}
+            {amount < 0 ? (amount * -1).toFixed(2) : amount.toFixed(2)}
           </Text>
         </DataTable.Cell>
       </DataTable.Row>

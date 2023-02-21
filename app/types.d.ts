@@ -92,3 +92,10 @@ interface MapData {
     lng: number;
   }
 }
+
+interface FriendObject {
+  email: string | undefined,
+  uid: string,
+  amount: number,
+  name: string,
+}
