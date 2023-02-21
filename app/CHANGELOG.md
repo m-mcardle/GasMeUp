@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.12](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.11...v1.0.12) (2023-02-21)
 
+* Refactor Friends structure
+* Change Modals to Stack Pages
+* Scrollable Tables
+* Splitwise Integration
+
 ### [1.0.11](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.10...v1.0.11) (2023-02-15)
 
 * Add notifications
