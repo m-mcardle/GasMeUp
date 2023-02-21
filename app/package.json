@@ -72,7 +72,6 @@
     "react-native-screens": "~3.18.0",
     "react-native-uuid": "^2.0.1",
     "react-native-web": "~0.18.7",
-    "splitwise": "^1.0.0",
     "throttle-debounce": "^5.0.0",
     "expo-linking": "~3.3.0"
   },
@@ -82,7 +81,6 @@
     "@types/react": "~18.0.24",
     "@types/react-native": "~0.70.6",
     "@types/react-native-autocomplete-input": "^5.1.1",
-    "@types/simple-oauth2": "^5.0.2",
     "@types/throttle-debounce": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^5.23.0",
     "@typescript-eslint/parser": "^5.23.0",
