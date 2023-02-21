@@ -22,6 +22,7 @@ export const colors = {
   secondaryAction: '#7851a9',
   purple: '#22133c',
   action: '#603fef',
+  splitwiseGreen: '#5BBFA1',
 };
 
 export const fonts = {

@@ -9,6 +9,7 @@ import { auth } from '../../firebase';
 
 // Screens
 import FriendsScreen from './Friends/FriendsScreen';
+import SplitwiseScreen from './Friends/SplitwiseScreen';
 import LoginScreen from './Auth/LoginScreen';
 import FriendInfoScreen from './Friends/FriendInfoScreen';
 
@@ -52,8 +53,17 @@ export default function FriendsTab() {
           title: 'All Friends',
         }}
       >
+
         {({ navigation }) => <FriendsScreen navigation={navigation} setFriend={setFriend} />}
       </RootStack.Screen>
+      <RootStack.Screen
+        name="IndexSplitwise"
+        options={{
+          headerShown: false,
+          title: 'All Friends',
+        }}
+        component={SplitwiseScreen}
+      />
       <RootStack.Screen
         name="Friend"
         options={{ headerShown: true }}

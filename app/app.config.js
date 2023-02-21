@@ -4,6 +4,7 @@ module.exports = {
   name: 'GasMeUp',
   slug: 'gas-me-up',
   owner: 'mmcardle',
+  originalFullName: '@mmcardle/GasMeUp',
   version: '1.0.11',
   orientation: 'portrait',
   icon: './assets/car.png',
@@ -43,11 +44,22 @@ module.exports = {
     eas: {
       projectId: 'ca421c93-c21f-4e6b-a62c-52b626a5bbac',
     },
+    // Firebase
     firebaseAPIKey: process.env.FIREBASE_API_KEY,
     prodFirebaseAPIKey: process.env.PROD_FIREBASE_API_KEY,
+
+    // `/server` API
     apiKey: process.env.API_KEY,
     useDevAPI: process.env.USE_DEV_API,
     devAPIURL: process.env.DEV_API_URL,
+
+    // Splitwise
+    splitwiseTokenURL: process.env.SPLITWISE_TOKEN_URL,
+    splitwiseAuthorizeURL: process.env.SPLITWISE_AUTHORIZE_URL,
+    splitwiseClientID: process.env.SPLITWISE_CLIENT_ID,
+    splitwiseConsumerSecret: process.env.SPLITWISE_CONSUMER_SECRET,
+
+    // Other
     exchangeRateAPIKey: process.env.EXCHANGE_RATE_API_KEY,
   },
   runtimeVersion: {
@@ -57,6 +69,7 @@ module.exports = {
     'expo-apple-authentication',
     'expo-notifications',
   ],
+  scheme: 'gas-me-up',
   privacy: 'public',
   jsEngine: 'hermes',
 };

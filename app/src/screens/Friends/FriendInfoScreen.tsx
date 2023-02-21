@@ -106,7 +106,7 @@ export default function FriendInfoScreen({
   // Helper method to calculate the amount associated with this friend on this transaction
   const getTransactionAmount = (transaction: DocumentData) => {
     const userIsPayee = transaction.payeeUID === currentUser?.uid;
-    return `$${(transaction.amount * (userIsPayee ? 1 : -1)).toFixed(2)}`;
+    return transaction.amount * (userIsPayee ? 1 : -1);
   };
 
   const showSettleConfirmationAlert = () => Alert.alert(
@@ -234,14 +234,20 @@ export default function FriendInfoScreen({
                 {transaction.date.toDate().toLocaleDateString()}
               </DataTable.Cell>
               <DataTable.Cell
-                textStyle={{ fontSize: 10 }}
+                textStyle={{
+                  fontSize: 10,
+                  color: getTransactionAmount(transaction) > 0 ? colors.white : colors.red,
+                }}
                 numeric
                 onPress={() => {
                   setSelectedTransaction(transaction);
                   setViewMoreVisible(true);
                 }}
               >
-                {getTransactionAmount(transaction)}
+                $
+                {getTransactionAmount(transaction) > 0
+                  ? getTransactionAmount(transaction).toFixed(2)
+                  : (getTransactionAmount(transaction) * -1).toFixed(2)}
               </DataTable.Cell>
             </DataTable.Row>
           ))}

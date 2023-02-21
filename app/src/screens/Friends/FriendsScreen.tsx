@@ -7,7 +7,7 @@ import {
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
 import {
-  DataTable, Portal,
+  DataTable, Portal, SegmentedButtons,
 } from 'react-native-paper';
 
 // Firebase
@@ -38,6 +38,11 @@ import Row from '../../components/Friends/FriendRow';
 // Styles
 import styles from '../../styles/FriendsScreen.styles';
 import { boldFont, colors, globalStyles } from '../../styles/styles';
+
+// @ts-ignore
+import SplitwiseLogo from '../../../assets/splitwise-logo.png';
+// @ts-ignore
+import GasMeUpLogo from '../../../assets/car.png';
 
 function FooterRow(onPress: () => void) {
   return (
@@ -226,6 +231,25 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
         style={styles.table}
         EmptyState={TableEmptyState}
         scrollable
+      />
+      <SegmentedButtons
+        style={{ width: '70%', alignSelf: 'center', marginTop: 'auto' }}
+        buttons={[
+          {
+            value: 'GasMeUp',
+            label: 'GasMeUp',
+            style: { backgroundColor: colors.action },
+            icon: GasMeUpLogo,
+          },
+          {
+            value: 'Splitwise',
+            label: 'Splitwise',
+            style: { backgroundColor: colors.primary },
+            icon: SplitwiseLogo,
+          },
+        ]}
+        onValueChange={() => navigation.navigate('IndexSplitwise')}
+        value="GasMeUp"
       />
     </Page>
   );

@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
   table: {
     flex: 1,
     paddingVertical: 48,
+    maxHeight: '90%',
   },
   friendInfoTitle: {
     fontSize: 24,
@@ -56,6 +57,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flex: 1,
     justifyContent: 'flex-end',
+  },
+  splitwiseButton: {
+    backgroundColor: colors.splitwiseGreen,
+    width: '40%',
+    alignSelf: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
 });
 
