@@ -73,6 +73,10 @@ export default function SignUpScreen({ navigation }: Props) {
           notificationToken: globalState.expoToken,
         });
 
+        await setDoc(doc(db, 'SecureUsers', user.uid), {
+          uid: user.uid,
+        });
+
         console.log('All done!');
         navigation.goBack();
       })

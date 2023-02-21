@@ -36,7 +36,7 @@ export const migrateFriendsListsUp = async (db: admin.firestore.Firestore) => {
     });
   });
 
-  // await batch.commit();
+  await batch.commit();
 };
 
 // Migrate back
@@ -64,7 +64,7 @@ export const migrateFriendsListsDown = async (db: admin.firestore.Firestore) => 
     });
   });
 
-  // await batch.commit();
+  await batch.commit();
 };
 
 export default {

@@ -22,7 +22,7 @@ if (process.argv[2] === 'up') {
   migrateFriendsListsDown(db);
 } else if (process.argv[2] === 'secureup') {
   migrateSecureUsersTableUp(db);
-} else if (process.argv[2] === 'secureupdown') {
+} else if (process.argv[2] === 'securedown') {
   migrateSecureUsersTableDown(db);
 } else if (process.argv[2] === 'unbreak') {
   unbreakBalances(db);
