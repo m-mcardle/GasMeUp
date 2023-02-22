@@ -151,8 +151,8 @@ export const updateFriendsList = functions.firestore
       const beforeFriends = before.friends;
       const afterFriends = after.friends;
 
-      const beforeFriendUIDs = Object.keys(beforeFriends);
-      const afterFriendUIDs = Object.keys(afterFriends);
+      const beforeFriendUIDs = Object.keys(beforeFriends ?? {});
+      const afterFriendUIDs = Object.keys(afterFriends ?? {});
 
       const beforeAcceptedFriends = beforeFriendUIDs.filter((uid) => beforeFriends[uid].status === "accepted");
       const afterAcceptedFriends = afterFriendUIDs.filter((uid) => afterFriends[uid].status === "accepted");

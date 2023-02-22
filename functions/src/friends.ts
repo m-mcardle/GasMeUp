@@ -15,15 +15,13 @@ async function handleOutgoingFriendRequest(
   const beforeData = change.before.data();
   const afterData = change.after.data();
   const uid = change.after.id;
-  // const uid = "1hiiw6Hfw2URZQVu1H2pOLeOwOR2";
   const documentRef = change.after.ref;
-  // const documentRef = db.collection("Users").doc(uid);
 
 
   // Get value of the newly added friend request
-  const oldFriendsList = Object.keys(beforeData.friends)
+  const oldFriendsList = Object.keys(beforeData.friends ?? {})
       .filter((uid) => beforeData.friends[uid].status === "outgoing");
-  const friendsList = Object.keys(afterData.friends)
+  const friendsList = Object.keys(afterData.friends ?? {})
       .filter((uid) => afterData.friends[uid].status === "outgoing");
   const friendTempUID = friendsList.find((friend) =>
     !oldFriendsList.includes(friend),
@@ -42,6 +40,7 @@ async function handleOutgoingFriendRequest(
   const friendData = friendDoc.data();
   if (!friendData.uid) {
     console.log("Friend document not found");
+    // Perform logic here to send an email to the user
     return;
   }
 
@@ -103,9 +102,9 @@ async function handleAcceptedFriendRequest(
   const uid = change.after.id;
 
   // Get value of the newly accepted friend request
-  const oldFriendsList = Object.keys(beforeData.friends)
+  const oldFriendsList = Object.keys(beforeData.friends ?? {})
       .filter((uid) => beforeData.friends[uid].status === "accepted");
-  const friendsList = Object.keys(afterData.friends)
+  const friendsList = Object.keys(afterData.friends ?? {})
       .filter((uid) => afterData.friends[uid].status === "accepted");
   const friendUID = friendsList.find((friend) =>
     !oldFriendsList.includes(friend),
@@ -178,8 +177,8 @@ async function handleRemovedFriend(db: admin.firestore.Firestore, change: any) {
   const uid = change.after.id;
 
   // Get value of the newly added transaction
-  const oldFriendsList = Object.keys(beforeData.friends);
-  const friendsList = Object.keys(afterData.friends);
+  const oldFriendsList = Object.keys(beforeData.friends ?? {});
+  const friendsList = Object.keys(afterData.friends ?? {});
   const friendUID = oldFriendsList.find((friend) =>
     !friendsList.includes(friend),
   );
