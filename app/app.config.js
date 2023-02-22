@@ -9,9 +9,9 @@ module.exports = {
   orientation: 'portrait',
   icon: './assets/car.png',
   splash: {
-    image: './assets/splash.png',
+    image: './assets/splash-screen.png',
     resizeMode: 'contain',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#603fef',
   },
   updates: {
     fallbackToCacheTimeout: 0,
