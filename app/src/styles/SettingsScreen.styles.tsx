@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   },
   settingValueText: {
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: 14,
     padding: 4,
     width: '40%',
   },

@@ -3,13 +3,19 @@ import { View, Alert } from 'react-native';
 
 import md5 from 'md5';
 
-import { signInWithCredential, OAuthProvider, updateProfile } from 'firebase/auth';
+import {
+  AuthCredential, signInWithCredential, OAuthProvider, updateProfile,
+} from 'firebase/auth';
 import { setDoc, getDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../../firebase';
 
 import { isDarkMode } from '../../styles/styles';
 
-export default function AppleLogin() {
+interface Props {
+  onLogin?: (credential: AuthCredential) => void,
+}
+
+export default function AppleLogin({ onLogin }: Props) {
   const signInWithApple = async () => {
     try {
       const appleCredential = await AppleAuthentication.signInAsync({
@@ -56,6 +62,10 @@ export default function AppleLogin() {
               .then(() => {
                 console.log('All done! Created user!');
               });
+
+            if (onLogin) {
+              onLogin(credential);
+            }
           }
         })
         .catch((exception) => {
@@ -84,3 +94,7 @@ export default function AppleLogin() {
     </View>
   );
 }
+
+AppleLogin.defaultProps = {
+  onLogin: undefined,
+};

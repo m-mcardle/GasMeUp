@@ -4,10 +4,11 @@
   "scripts": {
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
-    "shell": "firebase functions:shell",
+    "shell": "firebase use default; firebase functions:shell",
+    "shell:prod": "firebase use production; firebase functions:shell",
     "build": "tsc",
     "start": "npm run shell",
-    "deploy": "firebase deploy --only functions",
+    "deploy": "firebase use default; firebase deploy --only functions",
     "deploy:prod": "firebase use production; firebase deploy --only functions",
     "logs": "firebase functions:log"
   },

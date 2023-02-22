@@ -5,6 +5,7 @@ import * as functions from "firebase-functions";
 import {Expo, ExpoPushMessage} from "expo-server-sdk";
 
 import * as admin from "firebase-admin";
+import {DocumentSnapshot} from "firebase-admin/firestore";
 admin.initializeApp();
 
 const db = admin.firestore();
@@ -12,6 +13,8 @@ const expo = new Expo();
 
 type Transaction = admin.firestore.Transaction;
 type DocumentReference = admin.firestore.DocumentReference;
+
+console.log(process.env.NODE_ENV);
 
 export const sendTransactionNotifications = functions.firestore
     .document("Transactions/{transactionUID}")
@@ -147,9 +150,11 @@ export const updateFriendsList = functions.firestore
       console.log("updateFriendsList Triggered");
       const before = change.before.data();
       const after = change.after.data();
+      const documentUID = "LH4gkGLhXnS20cHSIwvGkIzV7Tw2";
+      // const documentUID = context.params.uid;
 
-      const beforeFriends = before.friends;
-      const afterFriends = after.friends;
+      const beforeFriends = before.friends ?? {};
+      const afterFriends = after.friends ?? {};
 
       const beforeFriendUIDs = Object.keys(beforeFriends ?? {});
       const afterFriendUIDs = Object.keys(afterFriends ?? {});
@@ -173,16 +178,27 @@ export const updateFriendsList = functions.firestore
         beforeOutgoingFriends !== afterOutgoingFriends &&
         beforeOutgoingFriends?.length < afterOutgoingFriends?.length
       ) {
-        friends.handleOutgoingFriendRequest(db, change);
+        friends.handleOutgoingFriendRequest(db, documentUID, after, beforeFriends, afterFriends);
       } else if (beforeAcceptedFriends !== afterAcceptedFriends) {
         const newFriendsLength = afterAcceptedFriends.length;
         const oldFriendsLength = beforeAcceptedFriends.length;
         if (newFriendsLength > oldFriendsLength) {
           // Right now this will fire twice, once for when the user adds it from the front-end and once from when the function adds it to the friend
-          friends.handleAcceptedFriendRequest(db, change);
+          friends.handleAcceptedFriendRequest(db, documentUID, beforeFriends, afterFriends);
         } else if (newFriendsLength < oldFriendsLength) {
           // Right now this will fire twice, once for when the user removes it from the front-end and once from when the function removes it from the friend
-          friends.handleRemovedFriend(db, change);
+          friends.handleRemovedFriend(db, documentUID, beforeFriends, afterFriends);
         }
+      } else {
+        console.log("No friends list changes detected");
       }
+    });
+
+export const updateFriendsListDeletion = functions.firestore
+    .document("Users/{uid}")
+    .onDelete(async (oldDocument: DocumentSnapshot, context: any) => {
+      console.log("updateFriendsListDeletion Triggered");
+      const before = oldDocument.data() ?? {};
+
+      friends.handleRemovedFriend(db, oldDocument.id, before.friends, {});
     });

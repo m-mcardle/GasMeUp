@@ -1,32 +1,38 @@
+/* eslint-disable max-len */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as admin from "firebase-admin";
 
 // This should trigger when a user creates a new friend with status:"outgoing"
 /**
  * Handles someone sending a friend request
  * @param {Firestore} db - The Firestore database
- * @param {Object} change - The change object
+ * @param {String} uid - The UID of the changed document
+ * @param {Object} document - The new document
+ * @param {Object} beforeFriends - The friends object before
+ * @param {Object} afterFriends - The friends object after
  */
 async function handleOutgoingFriendRequest(
     db: admin.firestore.Firestore,
-    change: any
+    uid: string,
+    document: any,
+    beforeFriends: any,
+    afterFriends: any,
 ) {
   console.log("Handling outgoing friend request");
-  console.log("UID: ", change.after.id);
-  const beforeData = change.before.data();
-  const afterData = change.after.data();
-  const uid = change.after.id;
-  const documentRef = change.after.ref;
+  console.log("UID: ", uid);
+
+  const documentRef = db.collection("Users").doc(uid);
 
 
   // Get value of the newly added friend request
-  const oldFriendsList = Object.keys(beforeData.friends ?? {})
-      .filter((uid) => beforeData.friends[uid].status === "outgoing");
-  const friendsList = Object.keys(afterData.friends ?? {})
-      .filter((uid) => afterData.friends[uid].status === "outgoing");
+  const oldFriendsList = Object.keys(beforeFriends ?? {})
+      .filter((uid) => beforeFriends[uid].status === "outgoing");
+  const friendsList = Object.keys(afterFriends ?? {})
+      .filter((uid) => afterFriends[uid].status === "outgoing");
   const friendTempUID = friendsList.find((friend) =>
     !oldFriendsList.includes(friend),
   ) ?? "Unknown";
-  const friendEmail = afterData.friends[friendTempUID]?.email ?? "";
+  const friendEmail = afterFriends[friendTempUID]?.email ?? "";
 
   console.log("Old friends list:", oldFriendsList);
   console.log("New friends list:", friendsList);
@@ -65,18 +71,18 @@ async function handleOutgoingFriendRequest(
           status: "incoming",
           accepted: false,
           balance: 0,
-          email: afterData.email,
+          email: document.email,
         },
       },
     });
 
-    const outgoingFriendData = {...afterData.friends[friendTempUID]};
-    delete afterData.friends[friendTempUID];
+    const outgoingFriendData = {...afterFriends[friendTempUID]};
+    delete afterFriends[friendTempUID];
 
     // Replace the garbage UID with the real UID
     transaction.update(documentRef, {
       friends: {
-        ...afterData.friends,
+        ...afterFriends,
         [friendUID]: {
           ...outgoingFriendData,
         },
@@ -85,27 +91,27 @@ async function handleOutgoingFriendRequest(
   });
 }
 
+
 // This should trigger when a user updates a friend with status:"accepted"
 /**
  * Handles someone accepting a friend request
  * @param {Object} db - The Firestore database
- * @param {Object} change - The change object
+ * @param {String} uid - The UID of the changed document
+ * @param {Object} beforeFriends - The friends object before
+ * @param {Object} afterFriends - The friends object after
  */
 async function handleAcceptedFriendRequest(
     db: admin.firestore.Firestore,
-    change: any
+    uid: string,
+    beforeFriends: any,
+    afterFriends: any,
 ) {
   console.log("Handling accepted friend request");
-  const beforeData = change.before.data();
-  const afterData = change.after.data();
-
-  const uid = change.after.id;
-
   // Get value of the newly accepted friend request
-  const oldFriendsList = Object.keys(beforeData.friends ?? {})
-      .filter((uid) => beforeData.friends[uid].status === "accepted");
-  const friendsList = Object.keys(afterData.friends ?? {})
-      .filter((uid) => afterData.friends[uid].status === "accepted");
+  const oldFriendsList = Object.keys(beforeFriends ?? {})
+      .filter((uid) => beforeFriends[uid].status === "accepted");
+  const friendsList = Object.keys(afterFriends ?? {})
+      .filter((uid) => afterFriends[uid].status === "accepted");
   const friendUID = friendsList.find((friend) =>
     !oldFriendsList.includes(friend),
   );
@@ -167,18 +173,16 @@ async function handleAcceptedFriendRequest(
 /**
  * Handles someone removing a friend
  * @param {Object} db - The Firestore database
- * @param {Object} change - The change object
+ * @param {String} uid - The UID of the changed document
+ * @param {Object} beforeFriends - The friends object before
+ * @param {Object} afterFriends - The friends object after
  */
-async function handleRemovedFriend(db: admin.firestore.Firestore, change: any) {
+async function handleRemovedFriend(db: admin.firestore.Firestore, uid: string, beforeFriends: any, afterFriends: any) {
   console.log("Handling removed friend");
-  const beforeData = change.before.data();
-  const afterData = change.after.data();
-
-  const uid = change.after.id;
 
   // Get value of the newly added transaction
-  const oldFriendsList = Object.keys(beforeData.friends ?? {});
-  const friendsList = Object.keys(afterData.friends ?? {});
+  const oldFriendsList = Object.keys(beforeFriends ?? {});
+  const friendsList = Object.keys(afterFriends ?? {});
   const friendUID = oldFriendsList.find((friend) =>
     !friendsList.includes(friend),
   );
