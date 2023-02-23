@@ -1,6 +1,8 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import * as admin from "firebase-admin";
+import {DocumentReference} from "firebase-admin/firestore";
+
 import {FriendsField, User} from "../global";
 
 // This should trigger when a user creates a new friend with status:"outgoing"
@@ -212,19 +214,18 @@ async function handleRemovedFriends(db: admin.firestore.Firestore, uid: string, 
     return;
   }
 
+  const friendRefs = friendUIDs.map((friendUID) => db.collection("Users").doc(friendUID));
+
   try {
     // Update aggregations in a transaction
     await db.runTransaction(async (transaction) => {
-      for (const friendUID of friendUIDs) {
-        // Get a reference to the new friend
-        const friendRef = db.collection("Users").doc(friendUID);
-
-        const friendDoc = await transaction.get(friendRef);
+      const friendDocs = await Promise.all(friendRefs.map(async (ref: DocumentReference) => transaction.get(ref)));
+      for (const friendDoc of friendDocs) {
         const friendData = friendDoc.data() ?? {};
 
         // Only need to run if this friend has this user as a friend
         if (!friendData.friends || !friendData.friends[uid] === undefined ) {
-          console.log(`Friend (${friendUID}) doesn't have ${uid} as friend`);
+          console.log(`Friend (${friendDoc.id}) doesn't have ${uid} as friend`);
           return;
         }
 
@@ -234,7 +235,7 @@ async function handleRemovedFriends(db: admin.firestore.Firestore, uid: string, 
         console.log("Friend's new friends list:", friendsFriendsList);
 
         // Update friend's friends list
-        transaction.update(friendRef, {
+        transaction.update(friendDoc.ref, {
           friends: {
             ...friendsFriendsList,
           },

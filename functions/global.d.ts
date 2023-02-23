@@ -12,10 +12,32 @@ export interface FriendsField {
 export interface User {
   email: string
   friends: FriendsField
-  transactions: any[]
+  transactions: Transaction[]
   uid: string
   firstName: string
   lastName: string
   notificationToken?: string
   splitwiseUID?: string
+}
+
+interface Waypoint {
+  latitude: number
+  longitude: number
+}
+
+export interface Transaction {
+  amount: number
+  cost: number
+  country: "CA" | "US"
+  creator: string
+  date: Date
+  distance: number
+  startLocation: string
+  endLocation: string
+  payeers: string[]
+  payee: string
+  splitType: "full" | "split"
+  type: string
+  users: string[]
+  waypoints: Waypoint[]
 }
