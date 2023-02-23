@@ -6,6 +6,9 @@ import {Expo, ExpoPushMessage} from "expo-server-sdk";
 
 import * as admin from "firebase-admin";
 import {DocumentSnapshot, QueryDocumentSnapshot} from "firebase-admin/firestore";
+
+import {Friend, User} from "./global";
+
 admin.initializeApp();
 
 const db = admin.firestore();
@@ -82,7 +85,7 @@ export const aggregateBalances = functions.firestore
       // Get a reference to the payer
       const payerRefs = payerUIDs.map((uid: string) => db.collection("Users").doc(uid));
 
-      const newPayeeObjects: Record<string, any> = {};
+      const newPayeeObjects: Record<string, Friend> = {};
 
       // Update aggregations in a transaction
       await db.runTransaction(async (transaction: Transaction) => {
@@ -144,12 +147,11 @@ export const aggregateBalances = functions.firestore
 
 export const updateFriendsList = functions.firestore
     .document("Users/{uid}")
-    .onUpdate(async (change: functions.Change<QueryDocumentSnapshot>) => {
+    .onUpdate(async (change: functions.Change<QueryDocumentSnapshot>, context: functions.EventContext) => {
       console.log("updateFriendsList Triggered");
       const before = change.before.data();
       const after = change.after.data();
-      const documentUID = "LH4gkGLhXnS20cHSIwvGkIzV7Tw2";
-      // const documentUID = context.params.uid;
+      const documentUID = context.params.uid;
 
       const beforeFriends = before.friends ?? {};
       const afterFriends = after.friends ?? {};
@@ -176,7 +178,7 @@ export const updateFriendsList = functions.firestore
         beforeOutgoingFriends !== afterOutgoingFriends &&
         beforeOutgoingFriends?.length < afterOutgoingFriends?.length
       ) {
-        await friends.handleOutgoingFriendRequest(db, documentUID, after, beforeFriends, afterFriends);
+        await friends.handleOutgoingFriendRequest(db, documentUID, after as User, beforeFriends, afterFriends);
       } else if (beforeAcceptedFriends !== afterAcceptedFriends) {
         const newFriendsLength = afterAcceptedFriends.length;
         const oldFriendsLength = beforeAcceptedFriends.length;
@@ -185,7 +187,7 @@ export const updateFriendsList = functions.firestore
           await friends.handleAcceptedFriendRequest(db, documentUID, beforeFriends, afterFriends);
         } else if (newFriendsLength < oldFriendsLength) {
           // Right now this will fire twice, once for when the user removes it from the front-end and once from when the function removes it from the friend
-          await friends.handleRemovedFriend(db, documentUID, beforeFriends, afterFriends);
+          await friends.handleRemovedFriends(db, documentUID, beforeFriends, afterFriends);
         }
       } else {
         console.log("No friends list changes detected");
@@ -198,5 +200,5 @@ export const updateFriendsListDeletion = functions.firestore
       console.log("updateFriendsListDeletion Triggered");
       const before = oldDocument.data() ?? {};
 
-      await friends.handleRemovedFriend(db, oldDocument.id, before.friends, {});
+      await friends.handleRemovedFriends(db, oldDocument.id, before.friends, {});
     });
