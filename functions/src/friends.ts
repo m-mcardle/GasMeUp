@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import * as admin from "firebase-admin";
+import {FriendsField} from "../global";
 
 // This should trigger when a user creates a new friend with status:"outgoing"
 /**
@@ -8,15 +9,15 @@ import * as admin from "firebase-admin";
  * @param {Firestore} db - The Firestore database
  * @param {String} uid - The UID of the changed document
  * @param {Object} document - The new document
- * @param {Object} beforeFriends - The friends object before
- * @param {Object} afterFriends - The friends object after
+ * @param {FriendsField} beforeFriends - The friends object before
+ * @param {FriendsField} afterFriends - The friends object after
  */
 async function handleOutgoingFriendRequest(
     db: admin.firestore.Firestore,
     uid: string,
     document: any,
-    beforeFriends: any,
-    afterFriends: any,
+    beforeFriends: FriendsField,
+    afterFriends: FriendsField,
 ) {
   console.log("Handling outgoing friend request");
   console.log("UID: ", uid);
@@ -43,14 +44,21 @@ async function handleOutgoingFriendRequest(
       .where("email", "==", friendEmail).get();
 
   const friendDoc = querySnapshot.docs[0];
-  const friendData = friendDoc.data();
-  if (!friendData.uid) {
-    console.log("Friend document not found");
-    // Perform logic here to send an email to the user
+  if (!friendDoc || !friendDoc.exists) {
+    console.log("Friend document not found - deleting friend request");
+    // TODO: Perform logic here to send an email to the user instead of removing friend request
+    const cleanedFriends = {...afterFriends};
+    delete cleanedFriends[friendTempUID];
+    await documentRef.update({
+      friends: {
+        ...cleanedFriends,
+      },
+    });
     return;
   }
 
-  const friendUID = friendData.uid;
+  const friendData = friendDoc.data();
+  const friendUID = friendDoc.id;
   console.log("New friend UID:", friendUID);
 
   // Update aggregations in a transaction
@@ -97,14 +105,14 @@ async function handleOutgoingFriendRequest(
  * Handles someone accepting a friend request
  * @param {Object} db - The Firestore database
  * @param {String} uid - The UID of the changed document
- * @param {Object} beforeFriends - The friends object before
- * @param {Object} afterFriends - The friends object after
+ * @param {FriendsField} beforeFriends - The friends object before
+ * @param {FriendsField} afterFriends - The friends object after
  */
 async function handleAcceptedFriendRequest(
     db: admin.firestore.Firestore,
     uid: string,
-    beforeFriends: any,
-    afterFriends: any,
+    beforeFriends: FriendsField,
+    afterFriends: FriendsField,
 ) {
   console.log("Handling accepted friend request");
   // Get value of the newly accepted friend request
@@ -174,10 +182,10 @@ async function handleAcceptedFriendRequest(
  * Handles someone removing a friend
  * @param {Object} db - The Firestore database
  * @param {String} uid - The UID of the changed document
- * @param {Object} beforeFriends - The friends object before
- * @param {Object} afterFriends - The friends object after
+ * @param {FriendsField} beforeFriends - The friends object before
+ * @param {FriendsField} afterFriends - The friends object after
  */
-async function handleRemovedFriend(db: admin.firestore.Firestore, uid: string, beforeFriends: any, afterFriends: any) {
+async function handleRemovedFriend(db: admin.firestore.Firestore, uid: string, beforeFriends: FriendsField, afterFriends: FriendsField) {
   console.log("Handling removed friend");
 
   // Get value of the newly added transaction
