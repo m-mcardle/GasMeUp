@@ -70,7 +70,7 @@ if (process.env.NODE_ENV !== 'development') {
 
 export const initialState = {
   ...initialSettings,
-  region: 'ON',
+  region: 'Ontario',
   country: 'CA',
   userLocation: {
     lat: undefined,
