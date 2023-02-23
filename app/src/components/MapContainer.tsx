@@ -5,11 +5,11 @@ import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 
 import { useGlobalState } from '../hooks/hooks';
 
-import { customMapStyle } from '../helpers/mapHelper';
+import { customMapStyle, locationToLatLng } from '../helpers/mapHelper';
+
 import { colors, globalStyles } from '../styles/styles';
 
 interface Props {
-  data: MapData;
   showUserLocation: boolean;
   waypoints: Array<Location>,
   style?: object,
@@ -17,16 +17,23 @@ interface Props {
 }
 
 export default function MapContainer({
-  data, showUserLocation, waypoints, style, onPress,
+  showUserLocation, waypoints, style, onPress,
 }: Props) {
   const [globalState] = useGlobalState();
   const hasUserLocation = globalState.userLocation.lat && globalState.userLocation.lng;
 
-  const latDelta = Math.abs(data.start.lat - data.end.lat) * 1.5;
-  const lngDelta = Math.abs(data.start.lng - data.end.lng) * 1.5;
+  const start = waypoints.length
+    ? locationToLatLng(waypoints[0])
+    : { lat: 0, lng: 0 };
+  const end = waypoints.length
+    ? locationToLatLng(waypoints[waypoints.length - 1])
+    : { lat: 0, lng: 0 };
 
-  const middleLat = (data.start.lat + data.end.lat) / 2;
-  const middleLng = (data.start.lng + data.end.lng) / 2;
+  const latDelta = Math.abs(start.lat - end.lat) * 1.5 ?? 5;
+  const lngDelta = Math.abs(start.lng - end.lng) * 1.5 ?? 5;
+
+  const middleLat = (start.lat + end.lat) / 2;
+  const middleLng = (start.lng + end.lng) / 2;
 
   const mapRegion = {
     latitude: middleLat,
@@ -57,8 +64,8 @@ export default function MapContainer({
       >
         <Marker
           coordinate={{
-            latitude: data.start.lat,
-            longitude: data.start.lng,
+            latitude: start.lat,
+            longitude: start.lng,
           }}
           title="Start"
           description="Start Location of Trip"
@@ -66,8 +73,8 @@ export default function MapContainer({
         />
         <Marker
           coordinate={{
-            latitude: data.end.lat,
-            longitude: data.end.lng,
+            latitude: end.lat,
+            longitude: end.lng,
           }}
           title="End"
           description="End Location of Trip"

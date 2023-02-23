@@ -18,7 +18,6 @@ import MapContainer from '../MapContainer';
 import styles from '../../styles/FriendsScreen.styles';
 
 // Helpers
-import { locationToLatLng } from '../../helpers/mapHelper';
 import { convertAllToString } from '../../helpers/unitsHelper';
 
 interface Props {
@@ -49,14 +48,6 @@ export default function TripDetailsModal({
       >
         {transactionWaypoints.length > 0 && (
         <MapContainer
-          data={{
-            start: {
-              ...locationToLatLng(transactionWaypoints[0]),
-            },
-            end: {
-              ...locationToLatLng(transactionWaypoints[transactionWaypoints.length - 1]),
-            },
-          }}
           showUserLocation={false}
           waypoints={transactionWaypoints}
           style={{ height: '50%', width: '90%', backgroundColor: 'white' }}
