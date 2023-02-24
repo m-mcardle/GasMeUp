@@ -143,14 +143,14 @@ export default function App() {
       const readableLocation = (await Location.reverseGeocodeAsync(location.coords))[0];
 
       if (readableLocation.country === 'Canada') {
-        const provinceCode = lookupProvince(readableLocation.region ?? 'ON');
+        const provinceCode = lookupProvince(readableLocation.region ?? 'Ontario');
         updateGlobalState('region', provinceCode);
         updateGlobalState('country', 'CA');
       } else if (readableLocation.country === 'United States') {
         updateGlobalState('region', readableLocation.region);
         updateGlobalState('country', 'US');
       } else {
-        updateGlobalState('region', 'ON');
+        updateGlobalState('region', 'Ontario');
         updateGlobalState('country', 'CA');
       }
     })();
