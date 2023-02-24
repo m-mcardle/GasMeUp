@@ -19,6 +19,7 @@ import styles from '../../styles/FriendsScreen.styles';
 
 // Helpers
 import { convertAllToString } from '../../helpers/unitsHelper';
+import { truncateString } from '../../helpers/truncationHelper';
 
 interface Props {
   setMapVisible: () => void,
@@ -55,7 +56,14 @@ export default function TripDetailsModal({
         />
         )}
         <View style={{
-          flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 64,
+          flexDirection: 'column', justifyContent: 'center', alignContent: 'center', alignItems: 'center', width: '100%', marginTop: 64,
+        }}
+        >
+          <Text>{`Start: ${truncateString(transaction.startLocation, 40)}`}</Text>
+          <Text>{`End: ${truncateString(transaction.endLocation, 40)}`}</Text>
+        </View>
+        <View style={{
+          flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 12,
         }}
         >
           <Text>{`Total: $${transaction.cost.toFixed(2)}`}</Text>

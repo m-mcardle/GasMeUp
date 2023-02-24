@@ -95,9 +95,9 @@ export default function Row({
     `Are you sure you want to remove ${name} from your list of friends?`,
     [
       {
-        text: 'OK',
+        text: 'Remove',
         onPress: () => removeFriend(),
-        style: 'default',
+        style: 'destructive',
       },
       {
         text: 'Cancel',

@@ -32,6 +32,7 @@ import { locationToLatLng } from '../../helpers/mapHelper';
 import { createTransaction } from '../../helpers/firestoreHelper';
 import TripDetailsModal from '../../components/Friends/TripDetailsModal';
 import { getIcon } from '../../helpers/iconHelper';
+import { truncateString } from '../../helpers/truncationHelper';
 
 const transactionsRef = collection(db, 'Transactions');
 
@@ -216,10 +217,10 @@ export default function FriendInfoScreen({
               >
                 <View style={{ justifyContent: 'center' }}>
                   <Text style={{ fontSize: 8 }}>
-                    {`Start: ${(transaction.startLocation.length > 30 ? `${transaction.startLocation.substring(0, 30)}...` : transaction.startLocation)}`}
+                    {`Start: ${truncateString(transaction.startLocation, 30)}`}
                   </Text>
                   <Text style={{ fontSize: 8, paddingTop: 4 }}>
-                    {`End: ${(transaction.endLocation.length > 30 ? `${transaction.endLocation.substring(0, 30)}...` : transaction.endLocation)}`}
+                    {`End: ${truncateString(transaction.endLocation, 30)}`}
                   </Text>
                 </View>
               </DataTable.Cell>

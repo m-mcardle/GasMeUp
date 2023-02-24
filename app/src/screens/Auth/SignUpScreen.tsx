@@ -28,13 +28,7 @@ import { maybeValidEmail } from '../../helpers/emailHelper';
 import styles from '../../styles/SignUpScreen.styles';
 import { globalStyles } from '../../styles/styles';
 
-interface Props {
-  navigation: {
-    goBack: () => {}
-  },
-}
-
-export default function SignUpScreen({ navigation }: Props) {
+export default function SignUpScreen() {
   const [globalState] = useGlobalState();
 
   const [email, setEmail] = useState('');
@@ -78,7 +72,6 @@ export default function SignUpScreen({ navigation }: Props) {
         });
 
         console.log('All done!');
-        navigation.goBack();
       })
       .catch((exception) => {
         Alert.alert('Error', exception.message);
