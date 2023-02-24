@@ -10,7 +10,9 @@ import {
 import { Portal, SegmentedButtons } from 'react-native-paper';
 
 // Firebase
-import { AuthCredential, deleteUser, reauthenticateWithCredential } from 'firebase/auth';
+import {
+  AuthCredential, deleteUser, reauthenticateWithCredential, sendEmailVerification,
+} from 'firebase/auth';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '../../../firebase';
@@ -50,12 +52,13 @@ export default function SettingsScreen() {
     reauthenticateWithCredential(user, credential).then(() => {
       console.log('User reauthenticated');
       console.log(userDoc.id, secureUserDoc.id, user.uid);
+
       deleteDoc(userDoc).then(() => {
         console.log('User document deleted');
         deleteDoc(secureUserDoc).then(() => {
           console.log('SecureUser document deleted');
           deleteUser(user).then(() => {
-            Alert.alert('Account Deleted', 'Your account has been successefully deleted.');
+            Alert.alert('Account Deleted', 'Your account has been successfully deleted.');
           }).catch((error) => {
             console.log(error);
           });
@@ -65,6 +68,19 @@ export default function SettingsScreen() {
       }).catch((error) => {
         console.log(error);
       });
+    });
+  };
+
+  const sendEmailVerificationEmail = () => {
+    if (!user) {
+      console.log("Can't send email verification, not signed in");
+      return;
+    }
+
+    sendEmailVerification(user).then(() => {
+      Alert.alert('Email Verification Sent', 'A verification email has been sent to your email address.');
+    }).catch((error) => {
+      console.log(error);
     });
   };
 
@@ -97,7 +113,7 @@ export default function SettingsScreen() {
   ), [value, name, globalState]);
 
   return (
-    <Page>
+    <Page keyboardAvoiding={false}>
       <Portal>
         <MyModal
           visible={modalVisible}
@@ -111,58 +127,93 @@ export default function SettingsScreen() {
       </Portal>
       <View style={styles.mainContainer}>
         {user && (
-        <>
+        <View style={styles.settingGroup}>
           <View style={styles.settingContainer}>
-            <Text style={styles.settingsText}>Your name:</Text>
-            <Text style={styles.settingValueText}>{user?.displayName ?? 'Unknown'}</Text>
-          </View>
-          <View style={styles.settingContainer}>
-            <Text style={styles.settingsText}>Your UID:</Text>
-            <Text style={{ ...styles.settingValueText, fontSize: 8 }}>{user?.uid ?? 'Unknown'}</Text>
+            <Text style={styles.settingHeader}>User Details</Text>
           </View>
           <View style={styles.settingContainer}>
-            <Text style={styles.settingsText}>Your email:</Text>
-            <Text style={styles.settingValueText}>{user?.email ?? 'Unknown'}</Text>
+            <Text style={styles.settingsText}>Name:</Text>
+            <View style={styles.settingItem}>
+              <Text style={styles.settingValueText}>{user?.displayName ?? 'Unknown'}</Text>
+            </View>
           </View>
           <View style={styles.settingContainer}>
-            <Text style={styles.settingsText}>Email verified?</Text>
-            <Text style={styles.settingValueText}>{user?.emailVerified === true ? 'Yes' : 'No'}</Text>
+            <Text style={styles.settingsText}>UID:</Text>
+            <View style={styles.settingItem}>
+              <Text style={styles.settingValueText}>{user?.uid ?? 'Unknown'}</Text>
+            </View>
           </View>
-        </>
-        )}
-        {process.env.NODE_ENV === 'development' && Object.keys(DEV_TOGGLE_SETTINGS).map((setting) => (
-          <View key={setting} style={styles.settingContainer}>
-            <Text style={styles.settingsText}>{setting}</Text>
-            <SettingsSwitch name={setting} value={globalState[setting]} />
+          <View style={styles.settingContainer}>
+            <Text style={styles.settingsText}>Email:</Text>
+            <View style={styles.settingItem}>
+              <Text style={styles.settingValueText}>{user?.email ?? 'Unknown'}</Text>
+            </View>
           </View>
-        ))}
-        {Object.keys(OPTIONS_SETTINGS).map((setting) => (
-          <View key={setting} style={styles.settingContainer}>
-            <Text style={styles.settingsText}>{OPTIONS_SETTINGS[setting].label ?? setting}</Text>
-            <SegmentedButtons
-              buttons={OPTIONS_SETTINGS[setting].options.map((option) => ({
-                label: option,
-                value: option,
-              }))}
-              value={globalState[setting]}
-              onValueChange={(val: any) => changeSetting(setting, val, updateGlobalState)}
-              style={styles.settingItem}
-            />
+          <View style={styles.settingContainer}>
+            <Text style={styles.settingsText}>Email Verified</Text>
+            <View style={styles.settingItem}>
+              <Text style={styles.settingValueText}>{user?.emailVerified === true ? 'Yes' : 'No'}</Text>
+            </View>
           </View>
-        ))}
-        {user && (
-        <View style={styles.settingContainer}>
-          <Text style={styles.settingsText}>Delete Account?</Text>
-          <Button
-            style={{
-              ...styles.settingItem, backgroundColor: 'red', paddingHorizontal: 0, margin: 0,
-            }}
-            onPress={showDeleteConfirmationAlert}
-          >
-            <Text style={{ color: 'white' }}>Delete</Text>
-          </Button>
         </View>
         )}
+
+        <View style={styles.settingGroup}>
+          {process.env.NODE_ENV === 'development' && Object.keys(DEV_TOGGLE_SETTINGS).map((setting) => (
+            <View key={setting} style={styles.settingContainer}>
+              <Text style={styles.settingsText}>{`${setting}:`}</Text>
+              <SettingsSwitch name={setting} value={globalState[setting]} />
+            </View>
+          ))}
+          {Object.keys(OPTIONS_SETTINGS).map((setting) => (
+            <View key={setting} style={styles.settingContainer}>
+              <Text style={styles.settingsText}>{`${OPTIONS_SETTINGS[setting].label ?? setting}:`}</Text>
+              <View style={styles.settingItem}>
+                <SegmentedButtons
+                  buttons={OPTIONS_SETTINGS[setting].options.map((option) => ({
+                    label: option,
+                    value: option,
+                    style: {
+                      backgroundColor: (option === globalState[setting]
+                        ? colors.action
+                        : colors.primary
+                      ),
+                    },
+                  }))}
+                  value={globalState[setting]}
+                  onValueChange={(val: any) => changeSetting(setting, val, updateGlobalState)}
+                  style={styles.settingItem}
+                />
+              </View>
+            </View>
+          ))}
+          {user && !user.emailVerified && (
+          <View style={styles.settingContainer}>
+            <Text style={styles.settingsText}>Resend Email Verification:</Text>
+            <View style={styles.settingItem}>
+              <Button
+                style={{ paddingHorizontal: 0, margin: 0 }}
+                onPress={sendEmailVerificationEmail}
+              >
+                <Text style={{ color: 'white' }}>Request</Text>
+              </Button>
+            </View>
+          </View>
+          )}
+          {user && (
+          <View style={styles.settingContainer}>
+            <Text style={styles.settingsText}>Delete Account:</Text>
+            <View style={styles.settingItem}>
+              <Button
+                style={{ backgroundColor: 'red', margin: 0 }}
+                onPress={showDeleteConfirmationAlert}
+              >
+                <Text style={{ color: 'white' }}>Delete</Text>
+              </Button>
+            </View>
+          </View>
+          )}
+        </View>
       </View>
     </Page>
   );
