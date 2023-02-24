@@ -7,6 +7,11 @@ import {Expo, ExpoPushMessage} from "expo-server-sdk";
 import * as admin from "firebase-admin";
 import {DocumentSnapshot, QueryDocumentSnapshot} from "firebase-admin/firestore";
 
+import jwt from "jsonwebtoken";
+import fs from "fs";
+import axios from "axios";
+import qs from "qs";
+
 import {Friend, User} from "./global";
 
 admin.initializeApp();
@@ -202,3 +207,86 @@ export const updateFriendsListDeletion = functions.firestore
 
       await friends.handleRemovedFriends(db, oldDocument.id, before.friends, {});
     });
+
+
+/**
+ * Creates a JWT
+ * @return {string} JWT token
+ */
+function makeJWT() {
+  // Path to download key file from developer.apple.com/account/resources/authkeys/list
+  const privateKey = fs.readFileSync("B34ZDLHVDF.p8");
+
+  // Sign with your team ID and key ID information.
+  const token = jwt.sign({
+    iss: "2Q4CXG64VY",
+    iat: Math.floor(Date.now() / 1000),
+    exp: Math.floor(Date.now() / 1000) + 120,
+    aud: "https://appleid.apple.com",
+    sub: "com.Virintus.GasMeUp",
+
+  }, privateKey, {
+    algorithm: "ES256",
+    header: {
+      alg: "ES256",
+      kid: "B34ZDLHVDF",
+    }});
+
+  console.log(token);
+  return token;
+}
+
+// https://github.com/jooyoungho/apple-token-revoke-in-firebase
+export const getRefreshToken = functions.https.onRequest(async (request, response) => {
+  const code = request.query.code;
+  const clientSecret = makeJWT();
+
+  const data = {
+    "code": code,
+    "client_id": "com.Virintus.GasMeUp",
+    "client_secret": clientSecret,
+    "grant_type": "authorization_code",
+  };
+
+  return axios.post("https://appleid.apple.com/auth/token", qs.stringify(data), {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  })
+      .then(async (res) => {
+        const refreshToken = res.data.refresh_token;
+        response.send(refreshToken);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+});
+
+
+export const revokeToken = functions.https.onRequest(async (request, response) => {
+  const refreshToken = request.query.refresh_token;
+  const clientSecret = makeJWT();
+
+  const data = {
+    "token": refreshToken,
+    "client_id": "com.Virintus.GasMeUp",
+    "client_secret": clientSecret,
+    "token_type_hint": "refresh_token",
+  };
+
+  console.log(qs.stringify(data));
+
+  return axios.post("https://appleid.apple.com/auth/revoke", qs.stringify(data), {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  })
+      .then(async (res) => {
+        console.log(res.data);
+        response.send("Complete");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+});
+

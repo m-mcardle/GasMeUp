@@ -25,7 +25,7 @@ import { maybeValidEmail } from '../../helpers/emailHelper';
 import styles from '../../styles/LoginScreen.styles';
 
 interface Props {
-  onLogin?: (credential: AuthCredential) => void,
+  onLogin?: (credential: AuthCredential, refreshToken?: string) => void,
 }
 
 export default function LoginSection({ onLogin }: Props) {

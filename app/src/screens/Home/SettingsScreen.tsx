@@ -30,6 +30,9 @@ import {
   useGlobalState, changeSetting, DEV_TOGGLE_SETTINGS, OPTIONS_SETTINGS,
 } from '../../hooks/hooks';
 
+// Helpers
+import { DEV } from '../../helpers/env';
+
 // Styles
 import styles from '../../styles/SettingsScreen.styles';
 import { colors, globalStyles } from '../../styles/styles';
@@ -42,7 +45,7 @@ export default function SettingsScreen() {
   const userDoc = user?.uid ? doc(db, 'Users', user.uid) : undefined;
   const secureUserDoc = user?.uid ? doc(db, 'SecureUsers', user.uid) : undefined;
 
-  const deleteAccount = (credential: AuthCredential) => {
+  const deleteAccount = (credential: AuthCredential, refreshToken?: string) => {
     if (!user || !userDoc || !secureUserDoc) {
       console.log("Can't delete user, not signed in");
       return;
@@ -52,6 +55,18 @@ export default function SettingsScreen() {
     reauthenticateWithCredential(user, credential).then(() => {
       console.log('User reauthenticated');
       console.log(userDoc.id, secureUserDoc.id, user.uid);
+
+      if (!DEV && refreshToken) {
+        console.log('Revoking Apple token');
+        fetch(`https://us-central1-northern-bot-301518.cloudfunctions.net/revokeToken?refresh_token=${refreshToken}`)
+          .then(async (response) => {
+            const data = await response.text();
+            console.log('Token revoke response:', data);
+          })
+          .catch((error) => {
+            console.log('Error when revoking Apple token:', error);
+          });
+      }
 
       deleteDoc(userDoc).then(() => {
         console.log('User document deleted');

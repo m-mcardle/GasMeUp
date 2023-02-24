@@ -9,10 +9,12 @@ import {
 import { setDoc, getDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../../firebase';
 
+import { DEV } from '../../helpers/env';
+
 import { isDarkMode } from '../../styles/styles';
 
 interface Props {
-  onLogin?: (credential: AuthCredential) => void,
+  onLogin?: (credential: AuthCredential, refreshToken?: string) => void,
 }
 
 export default function AppleLogin({ onLogin }: Props) {
@@ -25,7 +27,7 @@ export default function AppleLogin({ onLogin }: Props) {
         ],
       });
       const nonce = Math.random().toString(36).substring(2, 10);
-      const { identityToken } = appleCredential;
+      const { identityToken, authorizationCode } = appleCredential;
 
       const provider = new OAuthProvider('apple.com');
       const credential = provider.credential({
@@ -44,6 +46,13 @@ export default function AppleLogin({ onLogin }: Props) {
           const { uid } = user;
 
           const userDocument = await getDoc(doc(db, 'Users', uid));
+          let refreshToken;
+          if (!DEV) {
+            const response = await fetch(`https://us-central1-northern-bot-301518.cloudfunctions.net/getRefreshToken?code=${authorizationCode}`);
+            refreshToken = await response.text();
+            console.log('Apple refresh token:', refreshToken);
+          }
+
           if (!userDocument.exists()) {
             await updateProfile(user, {
               displayName: `${firstName} ${lastName}`,
@@ -58,14 +67,14 @@ export default function AppleLogin({ onLogin }: Props) {
               transactions: [],
               friends: {},
               appleUser: true,
+              refreshToken,
             })
               .then(() => {
                 console.log('All done! Created user!');
               });
-
-            if (onLogin) {
-              onLogin(credential);
-            }
+          }
+          if (onLogin) {
+            onLogin(credential, refreshToken);
           }
         })
         .catch((exception) => {
