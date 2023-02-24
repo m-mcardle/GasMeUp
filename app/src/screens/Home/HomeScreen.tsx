@@ -377,10 +377,6 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         <MapContainer
           waypoints={waypoints}
           showUserLocation={!start.address || !end.address}
-          data={{
-            start,
-            end,
-          }}
           style={styles.mapView}
           onPress={() => setMapModalVisible(true)}
         />

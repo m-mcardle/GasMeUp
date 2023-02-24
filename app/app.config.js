@@ -9,9 +9,9 @@ module.exports = {
   orientation: 'portrait',
   icon: './assets/car.png',
   splash: {
-    image: './assets/splash.png',
+    image: './assets/splash-screen.png',
     resizeMode: 'contain',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#6F61FE',
   },
   updates: {
     fallbackToCacheTimeout: 0,
@@ -27,6 +27,10 @@ module.exports = {
     config: {
       googleMapsApiKey: process.env.GOOGLE_IOS_SDK_KEY,
       usesNonExemptEncryption: false,
+    },
+    infoPlist: {
+      NSLocationWhenInUseUsageDescription: "GasMeUp will access your location for functionality purposes only. Some examples of this would be to allow you to use your 'Current Location' as a start or end point or to determine which region's gas price to default to.",
+      NSLocationAlwaysAndWhenInUseUsageDescription: "GasMeUp will access your location for functionality purposes only. Some examples of this would be to allow you to use your 'Current Location' as a start or end point or to determine which region's gas price to default to.",
     },
   },
   android: {
