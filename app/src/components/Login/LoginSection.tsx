@@ -26,9 +26,10 @@ import styles from '../../styles/LoginScreen.styles';
 
 interface Props {
   onLogin?: (credential: AuthCredential, refreshToken?: string) => void,
+  mode?: 'login' | 'refresh',
 }
 
-export default function LoginSection({ onLogin }: Props) {
+export default function LoginSection({ onLogin, mode = 'login' }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [, , error] = useAuthState(auth);
@@ -97,11 +98,12 @@ export default function LoginSection({ onLogin }: Props) {
       >
         <Text style={styles.loginButtonText}>Login</Text>
       </Button>
-      {platform === 'ios' ? <AppleLogin onLogin={onLogin} /> : undefined}
+      {platform === 'ios' ? <AppleLogin onLogin={onLogin} mode={mode} /> : undefined}
     </>
   );
 }
 
 LoginSection.defaultProps = {
   onLogin: undefined,
+  mode: 'login',
 };

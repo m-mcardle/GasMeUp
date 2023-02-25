@@ -15,9 +15,10 @@ import { isDarkMode } from '../../styles/styles';
 
 interface Props {
   onLogin?: (credential: AuthCredential, refreshToken?: string) => void,
+  mode?: 'login' | 'refresh',
 }
 
-export default function AppleLogin({ onLogin }: Props) {
+export default function AppleLogin({ onLogin, mode = 'login' }: Props) {
   const signInWithApple = async () => {
     try {
       const appleCredential = await AppleAuthentication.signInAsync({
@@ -35,51 +36,59 @@ export default function AppleLogin({ onLogin }: Props) {
         rawNonce: nonce,
       });
 
-      signInWithCredential(auth, credential)
-        .then(async (firebaseCredential) => {
-          console.log('signed in!');
+      let refreshToken: string | undefined;
+      if (!DEV && mode === 'refresh') {
+        const response = await fetch(`https://us-central1-northern-bot-301518.cloudfunctions.net/getRefreshToken?code=${authorizationCode}`);
+        refreshToken = await response.text();
+        console.log('Apple refresh token:', refreshToken);
 
-          const { user } = firebaseCredential;
-          const firstName = appleCredential.fullName?.givenName ?? 'Unknown';
-          const lastName = appleCredential.fullName?.familyName ?? 'Unknown';
-          const email = appleCredential.email ?? 'Unknown';
-          const { uid } = user;
+        if (onLogin) {
+          onLogin(credential, refreshToken);
+        }
+        return;
+      }
 
-          const userDocument = await getDoc(doc(db, 'Users', uid));
-          let refreshToken;
-          if (!DEV) {
-            const response = await fetch(`https://us-central1-northern-bot-301518.cloudfunctions.net/getRefreshToken?code=${authorizationCode}`);
-            refreshToken = await response.text();
-            console.log('Apple refresh token:', refreshToken);
-          }
+      if (mode === 'login') {
+        signInWithCredential(auth, credential)
+          .then(async (firebaseCredential) => {
+            console.log('signed in!');
 
-          if (!userDocument.exists()) {
-            await updateProfile(user, {
-              displayName: `${firstName} ${lastName}`,
-              photoURL: `https://www.gravatar.com/avatar/${md5(email.toLowerCase())}?d=identicon`,
-            });
+            const { user } = firebaseCredential;
+            const firstName = appleCredential.fullName?.givenName ?? 'Unknown';
+            const lastName = appleCredential.fullName?.familyName ?? 'Unknown';
+            const email = appleCredential.email ?? 'Unknown';
+            const { uid } = user;
 
-            setDoc(doc(db, 'Users', user.uid), {
-              uid: user.uid,
-              email,
-              firstName,
-              lastName,
-              transactions: [],
-              friends: {},
-              appleUser: true,
-              refreshToken,
-            })
-              .then(() => {
-                console.log('All done! Created user!');
+            const userDocument = await getDoc(doc(db, 'Users', uid));
+
+            if (!userDocument.exists()) {
+              await updateProfile(user, {
+                displayName: `${firstName} ${lastName}`,
+                photoURL: `https://www.gravatar.com/avatar/${md5(email.toLowerCase())}?d=identicon`,
               });
-          }
-          if (onLogin) {
-            onLogin(credential, refreshToken);
-          }
-        })
-        .catch((exception) => {
-          Alert.alert('Error', exception.message);
-        });
+
+              setDoc(doc(db, 'Users', user.uid), {
+                uid: user.uid,
+                email,
+                firstName,
+                lastName,
+                transactions: [],
+                friends: {},
+                appleUser: true,
+                refreshToken,
+              })
+                .then(() => {
+                  console.log('All done! Created user!');
+                });
+            }
+            if (onLogin) {
+              onLogin(credential, refreshToken);
+            }
+          })
+          .catch((exception) => {
+            Alert.alert('Error', exception.message);
+          });
+      }
     } catch (e: any) {
       if (e.code === 'ERR_CANCELED') {
         // handle that the user canceled the sign-in flow
@@ -106,4 +115,5 @@ export default function AppleLogin({ onLogin }: Props) {
 
 AppleLogin.defaultProps = {
   onLogin: undefined,
+  mode: 'login',
 };

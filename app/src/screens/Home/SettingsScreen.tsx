@@ -136,7 +136,7 @@ export default function SettingsScreen() {
         >
           <View style={globalStyles.centered}>
             <Text style={globalStyles.h2}>Please login again before you delete your account</Text>
-            <LoginSection onLogin={deleteAccount} />
+            <LoginSection onLogin={deleteAccount} mode="refresh" />
           </View>
         </MyModal>
       </Portal>
