@@ -23,6 +23,8 @@ import MapModal from '../../components/MapModal';
 import Modal from '../../components/Modal';
 import Page from '../../components/Page';
 
+import TripDetailsModal from '../../components/Friends/TripDetailsModal';
+
 // Styles
 import styles from '../../styles/FriendsScreen.styles';
 import { colors, boldFont } from '../../styles/styles';
@@ -30,9 +32,7 @@ import { colors, boldFont } from '../../styles/styles';
 // Helpers
 import { locationToLatLng } from '../../helpers/mapHelper';
 import { createTransaction } from '../../helpers/firestoreHelper';
-import TripDetailsModal from '../../components/Friends/TripDetailsModal';
 import { getIcon } from '../../helpers/iconHelper';
-import { truncateString } from '../../helpers/truncationHelper';
 
 const transactionsRef = collection(db, 'Transactions');
 
@@ -216,11 +216,11 @@ export default function FriendInfoScreen({
                 }}
               >
                 <View style={{ justifyContent: 'center' }}>
-                  <Text style={{ fontSize: 8 }}>
-                    {`Start: ${truncateString(transaction.startLocation, 30)}`}
+                  <Text style={{ fontSize: 8 }} numberOfLines={1}>
+                    {`Start: ${transaction.startLocation}`}
                   </Text>
-                  <Text style={{ fontSize: 8, paddingTop: 4 }}>
-                    {`End: ${truncateString(transaction.endLocation, 30)}`}
+                  <Text style={{ fontSize: 8, paddingTop: 4 }} numberOfLines={1}>
+                    {`End: ${transaction.endLocation}`}
                   </Text>
                 </View>
               </DataTable.Cell>
