@@ -88,7 +88,7 @@ export default function SplitwiseLogin() {
 
   return (
     <View style={{ height: '80%', justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ ...globalStyles.h1, color: 'white' }}>Please Sign in!</Text>
+      <Text style={{ ...globalStyles.h1, color: 'white' }}>Connect your Splitwise account</Text>
       <Text style={{ ...globalStyles.h3, color: 'white' }}>Sign in to your Splitwise account to view your friends here</Text>
       <Button
         disabled={!request}

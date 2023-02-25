@@ -92,6 +92,7 @@ interface Props {
   setFriend: (friend: FriendObject) => void,
   navigation: {
     navigate: (str: string) => {},
+    replace: (str: string) => {},
     goBack: () => {}
   },
 }
@@ -248,7 +249,7 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
             icon: SplitwiseLogo,
           },
         ]}
-        onValueChange={() => navigation.navigate('IndexSplitwise')}
+        onValueChange={() => navigation.replace('IndexSplitwise')}
         value="GasMeUp"
       />
     </Page>

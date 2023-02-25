@@ -146,7 +146,9 @@ export default function SaveTripScreen({
   const splitwiseToken = secureUserDocument?.splitwiseToken ?? '';
 
   const userFriends = userDocument?.friends ?? {};
-  const friendsUIDs = Object.keys(userFriends);
+  const friendsUIDs = userFriends
+    ? Object.keys(userFriends).filter((uid) => !uid.includes('TEMP_'))
+    : [];
 
   const usersQuery = friendsUIDs.length ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
   const [usersData = [], usersDataLoading, errorUsersDB] = useCollectionData(usersQuery);
@@ -287,8 +289,6 @@ export default function SaveTripScreen({
   const gasUsed = (distance * gasMileage) / 100;
   const convertedGasPrice = convertGasPrice(gasPrice, globalState.country, useCanadianUnits ? 'CA' : 'US');
 
-  const truncatedStart = start.length > 50 ? `${start.substring(0, 50)}...` : start;
-  const truncatedEnd = end.length > 50 ? `${end.substring(0, 50)}...` : end;
   const gasPriceString = useCanadianUnits ? `$${convertedGasPrice.toFixed(2)}/L` : `$${convertedGasPrice.toFixed(2)}/gal`;
   const gasUsageString = useCanadianUnits ? `${(gasUsed).toFixed(1)}L` : `${convertLtoGallons(gasUsed).toFixed(1)}gal`;
   const distanceString = useCanadianUnits ? `${distance.toFixed(1)}km` : `${convertKMtoMiles(distance).toFixed(1)}mi`;
@@ -319,16 +319,16 @@ export default function SaveTripScreen({
         <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
           {'Start: '}
         </Text>
-        <Text style={globalStyles.smallText}>
-          {truncatedStart}
+        <Text style={globalStyles.smallText} numberOfLines={1}>
+          {start}
         </Text>
       </View>
       <View style={styles.saveTripLocationHeaderContainer}>
         <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
           {'End: '}
         </Text>
-        <Text style={globalStyles.smallText}>
-          {truncatedEnd}
+        <Text style={globalStyles.smallText} numberOfLines={1}>
+          {end}
         </Text>
       </View>
       <View style={[styles.saveTripHeaderContainer, { marginTop: 8 }]}>

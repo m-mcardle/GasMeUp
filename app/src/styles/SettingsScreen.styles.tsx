@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-import { colors } from './styles';
+import { boldFont, colors } from './styles';
 
 // Styles
 const styles = StyleSheet.create({
@@ -19,26 +19,43 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    margin: 8,
+    padding: 8,
+    backgroundColor: colors.softBlack,
   },
   settingsText: {
     textAlign: 'right',
-    fontSize: 16,
-    padding: 4,
-    width: '50%',
-  },
-  settingValueText: {
-    textAlign: 'center',
     fontSize: 12,
     padding: 4,
-    width: '40%',
+    width: '50%',
+    fontFamily: boldFont,
+  },
+  settingValueText: {
+    textAlign: 'left',
+    fontSize: 10,
+    padding: 4,
+    width: '100%',
+    borderRadius: 5,
+    borderColor: colors.secondary,
   },
   settingItem: {
-    width: '40%',
+    width: '50%',
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 'auto',
+    backgroundColor: colors.softBlack,
+    borderColor: colors.secondary,
+  },
+  settingGroup: {
+    borderWidth: 1,
+    borderColor: 'white',
+    margin: 8,
+  },
+  settingHeader: {
+    width: '100%',
+    textAlign: 'center',
+    fontSize: 24,
+    fontFamily: boldFont,
   },
 });
 

@@ -54,24 +54,19 @@ export default function TripDetailsModal({
           onPress={() => setMapVisible()}
         />
         )}
-        <View style={{
-          flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 64,
-        }}
-        >
+        <View style={styles.tripDetailsLocationSection}>
+          <Text numberOfLines={1}>{`Start: ${transaction.startLocation}`}</Text>
+          <Text numberOfLines={1}>{`End: ${transaction.endLocation}`}</Text>
+        </View>
+        <View style={styles.tripDetailsStatsSection}>
           <Text>{`Total: $${transaction.cost.toFixed(2)}`}</Text>
           <Text>{`Amount Owed: $${transactionAmount.toFixed(2)}`}</Text>
         </View>
-        <View style={{
-          flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 12,
-        }}
-        >
+        <View style={styles.tripDetailsStatsSection}>
           <Text>{`Distance: ${convertedStats.distance}`}</Text>
           <Text>{`Gas Price: ${convertedStats.gasPrice}`}</Text>
         </View>
-        <View style={{
-          flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 12,
-        }}
-        >
+        <View style={styles.tripDetailsStatsSection}>
           <Text>{`Date: ${transaction.date?.toDate().toLocaleDateString()}`}</Text>
         </View>
       </View>

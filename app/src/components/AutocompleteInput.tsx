@@ -110,7 +110,7 @@ export default function AutocompleteInput(props: Props) {
                 }}
                 style={globalStyles.autocompleteListItem}
               >
-                <Text style={{ fontSize: 12 }}>{title}</Text>
+                <Text style={{ fontSize: 12 }} numberOfLines={1}>{title}</Text>
               </TouchableOpacity>
             ),
           }}

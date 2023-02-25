@@ -5,6 +5,15 @@ import * as functions from "firebase-functions";
 import {Expo, ExpoPushMessage} from "expo-server-sdk";
 
 import * as admin from "firebase-admin";
+import {DocumentSnapshot, QueryDocumentSnapshot} from "firebase-admin/firestore";
+
+import jwt from "jsonwebtoken";
+import fs from "fs";
+import axios from "axios";
+import qs from "qs";
+
+import {Friend, User} from "./global";
+
 admin.initializeApp();
 
 const db = admin.firestore();
@@ -15,7 +24,7 @@ type DocumentReference = admin.firestore.DocumentReference;
 
 export const sendTransactionNotifications = functions.firestore
     .document("Transactions/{transactionUID}")
-    .onCreate(async (snapshot, context) => {
+    .onCreate(async (snapshot) => {
       // Get value of the newly added transaction
       const newData = snapshot.data();
       const payeeUID = newData.payeeUID;
@@ -62,7 +71,7 @@ export const sendTransactionNotifications = functions.firestore
 
 export const aggregateBalances = functions.firestore
     .document("Transactions/{transactionUID}")
-    .onCreate(async (snapshot, context) => {
+    .onCreate(async (snapshot) => {
       // Get value of the newly added transaction
       const newData = snapshot.data();
       const payeeUID = newData.payeeUID;
@@ -81,7 +90,7 @@ export const aggregateBalances = functions.firestore
       // Get a reference to the payer
       const payerRefs = payerUIDs.map((uid: string) => db.collection("Users").doc(uid));
 
-      const newPayeeObjects: Record<string, any> = {};
+      const newPayeeObjects: Record<string, Friend> = {};
 
       // Update aggregations in a transaction
       await db.runTransaction(async (transaction: Transaction) => {
@@ -143,13 +152,14 @@ export const aggregateBalances = functions.firestore
 
 export const updateFriendsList = functions.firestore
     .document("Users/{uid}")
-    .onUpdate(async (change: any, context: any) => {
+    .onUpdate(async (change: functions.Change<QueryDocumentSnapshot>, context: functions.EventContext) => {
       console.log("updateFriendsList Triggered");
       const before = change.before.data();
       const after = change.after.data();
+      const documentUID = context.params.uid;
 
-      const beforeFriends = before.friends;
-      const afterFriends = after.friends;
+      const beforeFriends = before.friends ?? {};
+      const afterFriends = after.friends ?? {};
 
       const beforeFriendUIDs = Object.keys(beforeFriends ?? {});
       const afterFriendUIDs = Object.keys(afterFriends ?? {});
@@ -173,16 +183,110 @@ export const updateFriendsList = functions.firestore
         beforeOutgoingFriends !== afterOutgoingFriends &&
         beforeOutgoingFriends?.length < afterOutgoingFriends?.length
       ) {
-        friends.handleOutgoingFriendRequest(db, change);
+        await friends.handleOutgoingFriendRequest(db, documentUID, after as User, beforeFriends, afterFriends);
       } else if (beforeAcceptedFriends !== afterAcceptedFriends) {
         const newFriendsLength = afterAcceptedFriends.length;
         const oldFriendsLength = beforeAcceptedFriends.length;
         if (newFriendsLength > oldFriendsLength) {
           // Right now this will fire twice, once for when the user adds it from the front-end and once from when the function adds it to the friend
-          friends.handleAcceptedFriendRequest(db, change);
+          await friends.handleAcceptedFriendRequest(db, documentUID, beforeFriends, afterFriends);
         } else if (newFriendsLength < oldFriendsLength) {
           // Right now this will fire twice, once for when the user removes it from the front-end and once from when the function removes it from the friend
-          friends.handleRemovedFriend(db, change);
+          await friends.handleRemovedFriends(db, documentUID, beforeFriends, afterFriends);
         }
+      } else {
+        console.log("No friends list changes detected");
       }
     });
+
+export const updateFriendsListDeletion = functions.firestore
+    .document("Users/{uid}")
+    .onDelete(async (oldDocument: DocumentSnapshot) => {
+      console.log("updateFriendsListDeletion Triggered");
+      const before = oldDocument.data() ?? {};
+
+      await friends.handleRemovedFriends(db, oldDocument.id, before.friends, {});
+    });
+
+
+/**
+ * Creates a JWT
+ * @return {string} JWT token
+ */
+function makeJWT() {
+  // Path to download key file from developer.apple.com/account/resources/authkeys/list
+  const privateKey = fs.readFileSync("B34ZDLHVDF.p8");
+
+  // Sign with your team ID and key ID information.
+  const token = jwt.sign({
+    iss: "2Q4CXG64VY",
+    iat: Math.floor(Date.now() / 1000),
+    exp: Math.floor(Date.now() / 1000) + 120,
+    aud: "https://appleid.apple.com",
+    sub: "com.Virintus.GasMeUp",
+
+  }, privateKey, {
+    algorithm: "ES256",
+    header: {
+      alg: "ES256",
+      kid: "B34ZDLHVDF",
+    }});
+
+  console.log(token);
+  return token;
+}
+
+// https://github.com/jooyoungho/apple-token-revoke-in-firebase
+export const getRefreshToken = functions.https.onRequest(async (request, response) => {
+  const code = request.query.code;
+  const clientSecret = makeJWT();
+
+  const data = {
+    "code": code,
+    "client_id": "com.Virintus.GasMeUp",
+    "client_secret": clientSecret,
+    "grant_type": "authorization_code",
+  };
+
+  return axios.post("https://appleid.apple.com/auth/token", qs.stringify(data), {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  })
+      .then(async (res) => {
+        const refreshToken = res.data.refresh_token;
+        response.send(refreshToken);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+});
+
+
+export const revokeToken = functions.https.onRequest(async (request, response) => {
+  const refreshToken = request.query.refresh_token;
+  const clientSecret = makeJWT();
+
+  const data = {
+    "token": refreshToken,
+    "client_id": "com.Virintus.GasMeUp",
+    "client_secret": clientSecret,
+    "token_type_hint": "refresh_token",
+  };
+
+  console.log(qs.stringify(data));
+
+  return axios.post("https://appleid.apple.com/auth/revoke", qs.stringify(data), {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  })
+      .then(async (res) => {
+        console.log(res.data);
+        response.send("Complete");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+});
+

@@ -65,6 +65,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
+  tripDetailsLocationSection: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    marginTop: 48,
+    padding: 12,
+  },
+  tripDetailsStatsSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: 12,
+  },
 });
 
 export default styles;

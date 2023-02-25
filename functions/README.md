@@ -34,19 +34,21 @@ or
 ```
 updateFriendsList({
   before: {
-    uid: '1hiiw6Hfw2URZQVu1H2pOLeOwOR2',
-    friends: {}
+    uid: 'LH4gkGLhXnS20cHSIwvGkIzV7Tw2',
+    friends: {},
+    email: 'verify4@melen.com'
   },
   after: {
-    uid: '1hiiw6Hfw2URZQVu1H2pOLeOwOR2',
+    uid: 'LH4gkGLhXnS20cHSIwvGkIzV7Tw2',
     friends: { 
-      garbo: {
+      __TEMPxxxxxx: {
         status: 'outgoing',
         balance: 0,
         accepted: false,
-        email: 'verify4@melen.com'  
+        email: 'new@matt.com'  
       }
-    }
+    },
+    email: 'verify4@melen.com'
   }
 })
 ```
@@ -54,19 +56,19 @@ or
 ```
 updateFriendsList({
   before: {
-    uid: 'LH4gkGLhXnS20cHSIwvGkIzV7Tw2',
+    uid: 'Ftom0KXgqQTo5Pbq7gArtQAJr1B2',
     friends: { 
-      '1hiiw6Hfw2URZQVu1H2pOLeOwOR2': {
+      'LH4gkGLhXnS20cHSIwvGkIzV7Tw2': {
         status: 'incoming',
         balance: 0,
-        accepted: false  
+        accepted: false
       }
     }
   },
   after: {
-    uid: 'LH4gkGLhXnS20cHSIwvGkIzV7Tw2',
+    uid: 'Ftom0KXgqQTo5Pbq7gArtQAJr1B2',
     friends: { 
-      '1hiiw6Hfw2URZQVu1H2pOLeOwOR2': {
+      'LH4gkGLhXnS20cHSIwvGkIzV7Tw2': {
         status: 'accepted',
         balance: 0,
         accepted: true  

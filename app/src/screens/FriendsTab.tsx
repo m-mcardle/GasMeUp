@@ -51,6 +51,7 @@ export default function FriendsTab() {
         options={{
           headerShown: false,
           title: 'All Friends',
+          gestureDirection: 'horizontal-inverted',
         }}
       >
 
@@ -61,6 +62,7 @@ export default function FriendsTab() {
         options={{
           headerShown: false,
           title: 'All Friends',
+          gestureDirection: 'horizontal',
         }}
         component={SplitwiseScreen}
       />

@@ -99,7 +99,15 @@ function FooterRow() {
   );
 }
 
-export default function SplitwiseScreen({ navigation } : any) {
+interface Props {
+  navigation: {
+    navigate: (str: string) => {},
+    replace: (str: string) => {},
+    goBack: () => {}
+  },
+}
+
+export default function SplitwiseScreen({ navigation } : Props) {
   const [friendsData, setFriendsData] = useState<Array<any>>([]);
 
   const [user] = useAuthState(auth);
@@ -185,7 +193,7 @@ export default function SplitwiseScreen({ navigation } : any) {
             icon: SplitwiseLogo,
           },
         ]}
-        onValueChange={() => navigation.navigate('Index')}
+        onValueChange={() => navigation.replace('Index')}
         value="Splitwise"
       />
     </Page>
