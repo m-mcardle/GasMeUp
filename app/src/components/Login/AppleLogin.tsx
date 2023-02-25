@@ -88,7 +88,7 @@ export default function AppleLogin({ onLogin, mode = 'login' }: Props) {
                 });
             }
             if (onLogin) {
-              onLogin(credential, refreshToken);
+              onLogin(credential);
             }
           })
           .catch((exception) => {
