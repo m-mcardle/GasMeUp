@@ -58,7 +58,7 @@ export default function SettingsScreen() {
 
       if (!DEV && refreshToken) {
         console.log('Revoking Apple token');
-        fetch(`https://us-central1-northern-bot-301518.cloudfunctions.net/revokeToken?refresh_token=${refreshToken}`)
+        fetch(`https://us-central1-gasmeup-7ce5f.cloudfunctions.net/revokeToken?refresh_token=${refreshToken}`)
           .then(async (response) => {
             const data = await response.text();
             console.log('Token revoke response:', data);

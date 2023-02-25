@@ -38,7 +38,7 @@ export default function AppleLogin({ onLogin, mode = 'login' }: Props) {
 
       let refreshToken: string | undefined;
       if (!DEV && mode === 'refresh') {
-        const response = await fetch(`https://us-central1-northern-bot-301518.cloudfunctions.net/getRefreshToken?code=${authorizationCode}`);
+        const response = await fetch(`https://us-central1-gasmeup-7ce5f.cloudfunctions.net/getRefreshToken?code=${authorizationCode}`);
         refreshToken = await response.text();
         console.log('Apple refresh token:', refreshToken);
 
