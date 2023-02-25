@@ -322,16 +322,51 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     }
   }, [useCustomGasPrice]);
 
-  const tripCalculated = !!distance && !!gasPrice;
-
   // Represents if the user has entered all the required data to save a trip's cost
-  const canSaveTrip = tripCalculated && !!user;
+  const canSaveTrip = !!distance && !!gasPrice && !!cost;
 
   const endLocationRef = useRef<TextInput>(null);
 
   const selectNextInput = () => {
     setSuggestions([]);
     endLocationRef?.current?.focus();
+  };
+
+  const showPleaseSignInAlert = () => Alert.alert(
+    'Please Sign In',
+    'Sign in to your GasMeUp account to start saving your trips!',
+    [
+      {
+        text: 'Sign In',
+        onPress: () => navigation.navigate('Friends'),
+        style: 'default',
+      },
+      {
+        text: 'Cancel',
+        onPress: () => {},
+        style: 'cancel',
+      },
+    ],
+  );
+
+  const handleSaveButtonPress = () => {
+    if (!user) {
+      showPleaseSignInAlert();
+      return;
+    }
+
+    if (validateCurrentUser(user)) {
+      setTrip({
+        cost,
+        distance,
+        gasPrice,
+        start: start.address,
+        end: end.address,
+        waypoints,
+        gasMileage: GAS_MILEAGE,
+      });
+      navigation.navigate('Save Trip');
+    }
   };
 
   return (
@@ -448,17 +483,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           </Button>
           <Button
             style={styles.saveButton}
-            onPress={() => validateCurrentUser(user)
-              && (setTrip({
-                cost,
-                distance,
-                gasPrice,
-                start: start.address,
-                end: end.address,
-                waypoints,
-                gasMileage: GAS_MILEAGE,
-              })
-              || navigation.navigate('Save Trip'))}
+            onPress={handleSaveButtonPress}
             disabled={!canSaveTrip}
           >
             <Text

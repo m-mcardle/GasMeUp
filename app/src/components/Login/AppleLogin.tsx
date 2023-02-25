@@ -75,10 +75,16 @@ export default function AppleLogin({ onLogin, mode = 'login' }: Props) {
                 transactions: [],
                 friends: {},
                 appleUser: true,
-                refreshToken,
               })
                 .then(() => {
-                  console.log('All done! Created user!');
+                  console.log('Created `Users` document');
+                });
+
+              setDoc(doc(db, 'SecureUsers', user.uid), {
+                uid: user.uid,
+              })
+                .then(() => {
+                  console.log('Created `SecureUsers` document');
                 });
             }
             if (onLogin) {

@@ -48,16 +48,16 @@ export default function SignUpScreen() {
 
         const { user } = userCredential;
 
-        await updateProfile(user, {
+        updateProfile(user, {
           displayName: `${firstName} ${lastName}`,
           photoURL: `https://www.gravatar.com/avatar/${md5(email.toLowerCase())}?d=identicon`,
         });
 
         await sendEmailVerification(user);
 
-        Alert.alert('Successfully Created Account', `A verification email has been sent to ${email}. You must verify your account before you can save any trips!`);
+        Alert.alert('Welcome!', `A verification email has been sent to ${email}. You must verify your account before you can save any trips!`);
 
-        await setDoc(doc(db, 'Users', user.uid), {
+        setDoc(doc(db, 'Users', user.uid), {
           uid: user.uid,
           email,
           firstName,
@@ -65,11 +65,17 @@ export default function SignUpScreen() {
           transactions: [],
           friends: {},
           notificationToken: globalState.expoToken,
-        });
+        })
+          .then(() => {
+            console.log('Created `Users` document');
+          });
 
-        await setDoc(doc(db, 'SecureUsers', user.uid), {
+        setDoc(doc(db, 'SecureUsers', user.uid), {
           uid: user.uid,
-        });
+        })
+          .then(() => {
+            console.log('Created `SecureUsers` document');
+          });
 
         console.log('All done!');
       })

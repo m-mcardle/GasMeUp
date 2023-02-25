@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     fontSize: 12,
     padding: 4,
-    width: '45%',
+    width: '50%',
     fontFamily: boldFont,
   },
   settingValueText: {
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     borderColor: colors.secondary,
   },
   settingItem: {
-    width: '55%',
+    width: '50%',
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
