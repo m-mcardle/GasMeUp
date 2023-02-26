@@ -31,6 +31,7 @@ import { GlobalContext, initialState } from './src/hooks/hooks';
 import HomeTab from './src/screens/HomeTab';
 import FriendsTab from './src/screens/FriendsTab';
 import GasPriceScreen from './src/screens/GasPriceScreen';
+import CarScreen from './src/screens/CarScreen';
 
 // Styles
 import { colors } from './src/styles/styles';
@@ -74,6 +75,11 @@ function TabIcon({
       iconName = focused
         ? 'ios-people'
         : 'ios-people-outline';
+      break;
+    case 'Car':
+      iconName = focused
+        ? 'ios-car'
+        : 'ios-car-outline';
       break;
     case 'Gas Prices':
       return <FontAwesome5 name="gas-pump" size={size} color={color} />;
@@ -216,6 +222,7 @@ export default function App() {
           <Tab.Screen name="Friends" component={FriendsTab} />
           <Tab.Screen name="Calculate" component={HomeTab} />
           <Tab.Screen name="Gas Prices" component={GasPriceScreen} />
+          <Tab.Screen name="Car" component={CarScreen} />
         </Tab.Navigator>
       </NavigationContainer>
     </GlobalContext.Provider>
