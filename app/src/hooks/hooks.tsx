@@ -35,6 +35,13 @@ export const NUMERIC_SETTINGS: Record<string, number> = {
   'Gas Mileage': 10,
 };
 
+export const PERSISTED_VALUES: Record<string, any> = {
+  'Custom Gas Price': {
+    price: 1,
+    enabled: false,
+  },
+};
+
 let initialSettings: any = {};
 
 if (Platform.OS === 'ios') {
@@ -56,11 +63,21 @@ if (Platform.OS === 'ios') {
       ? Settings.get(setting)
       : NUMERIC_SETTINGS[setting];
   });
+
+  Object.keys(PERSISTED_VALUES).forEach((setting) => {
+    initialSettings[setting] = Settings.get(setting) !== undefined
+      ? Settings.get(setting)
+      : PERSISTED_VALUES[setting];
+  });
 } else {
   initialSettings = {
     ...DEV_TOGGLE_SETTINGS,
     ...NUMERIC_SETTINGS,
   };
+
+  Object.keys(OPTIONS_SETTINGS).forEach((setting) => {
+    initialSettings[setting] = OPTIONS_SETTINGS[setting].default;
+  });
 }
 
 // Force enable requests in production

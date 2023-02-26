@@ -215,7 +215,7 @@ app.get('/trip-cost', async (req, res) => {
     return;
   }
 
-  const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
+  const startLocation = req.query?.start ?? 'Ottawa';
   const endLocation = req.query?.end ?? 'Toronto';
   const manualGasPrice = req.query?.price ?? '';
   const country = req.query?.country ?? 'CA';
@@ -267,7 +267,7 @@ app.get('/distance', async (req, res) => {
     return;
   }
 
-  const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
+  const startLocation = req.query?.start ?? 'Ottawa';
   const endLocation = req.query?.end ?? 'Toronto';
 
   res.set('Access-Control-Allow-Origin', '*');
@@ -371,7 +371,7 @@ app.get('/models', async (req, res) => {
   }
 
   const year = req.query?.year ?? '2022';
-  const make = req.query?.make ?? 'Acura';
+  const make = req.query?.make ?? 'Honda';
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
@@ -391,8 +391,8 @@ app.get('/model-options', async (req, res) => {
   }
 
   const year = req.query?.year ?? '2022';
-  const make = req.query?.make ?? 'Acura';
-  const model = req.query?.model ?? 'ILX';
+  const make = req.query?.make ?? 'Honda';
+  const model = req.query?.model ?? 'Civic 5dr';
   
   res.set('Access-Control-Allow-Origin', '*');
   try {
@@ -415,9 +415,9 @@ app.get('/vehicle', async (req, res) => {
 
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const vehicle = await GetVehicle(id);
-    Log(`[vehicle] Vehicle: ${JSON.stringify(vehicle)}`);
-    res.json({ vehicle, mpg: vehicle.comb08, city: vehicle.city08, highway: vehicle.highway08, type: vehicle.fuelType });
+    const { comb08, city08, highway08, fuelType } = await GetVehicle(id);
+    Log(`[vehicle] Vehicle: ${comb08, city08, highway08, fuelType}`);
+    res.json({ mpg: Number(comb08), city: Number(city08), highway: Number(highway08), fuelType });
   } catch (exception) {
     LogError(exception);
     res.status(500).send({ error: exception });

@@ -11,12 +11,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { DataTable, SegmentedButtons } from 'react-native-paper';
 
 // Global State Stuff
-import { useGlobalState } from '../hooks/hooks';
+import { useGlobalState, changeSetting } from '../hooks/hooks';
 
 // Components
 import Page from '../components/Page';
 import Table from '../components/Table';
 import Text from '../components/Text';
+import Button from '../components/Button';
 
 // Styles
 import styles from '../styles/GasPriceScreen.styles';
@@ -27,15 +28,19 @@ import { fetchData } from '../data/data';
 
 // Helpers
 import { provinces, states } from '../helpers/locationHelper';
-import { convertDollarsPerGalToDollarsPerL, convertDollarsPerLToDollarsPerGal } from '../helpers/unitsHelper';
+import { convertDollarsPerGalToDollarsPerL, convertDollarsPerLToDollarsPerGal, convertGasPrice } from '../helpers/unitsHelper';
 
 interface RequestLookup {
   [key: string]: Array<any>
 }
 
-function Row({ text, price, setSelectedRegion }: any) {
+function Row({
+  text, price, setSelectedRegion, useAsGasPrice, locale,
+}: any) {
   const isProvince = provinces.includes(text);
   const isState = !isProvince && states.includes(text);
+  const roundedPrice = price.toFixed(2);
+  const roundedCanadianPrice = Number(convertGasPrice(price, locale, 'CA').toFixed(2));
   return (
     <DataTable.Row
       key={text}
@@ -48,14 +53,22 @@ function Row({ text, price, setSelectedRegion }: any) {
       </DataTable.Cell>
       <DataTable.Cell numeric>
         $
-        {price.toFixed(2)}
+        {roundedPrice}
+      </DataTable.Cell>
+      <DataTable.Cell style={{ maxWidth: 64, justifyContent: 'center' }} numeric>
+        <Button
+          style={{ paddingHorizontal: 8, padding: 2, margin: 0 }}
+          onPress={() => useAsGasPrice(roundedCanadianPrice)}
+        >
+          <Text>Use</Text>
+        </Button>
       </DataTable.Cell>
     </DataTable.Row>
   );
 }
 
-export default function GasPriceScreen() {
-  const [globalState] = useGlobalState();
+export default function GasPriceScreen({ navigation }: any) {
+  const [globalState, updateGlobalState] = useGlobalState();
   const [{ selectedCountry, selectedRegion }, setSelected] = useState({ selectedCountry: 'CA', selectedRegion: '' });
   const setSelectedRegion = (region: string) => setSelected((prev) => (
     { ...prev, selectedRegion: region }
@@ -134,6 +147,11 @@ export default function GasPriceScreen() {
     );
   }
 
+  const useAsGasPrice = (price: number) => {
+    changeSetting('Custom Gas Price', { price, enabled: true }, updateGlobalState);
+    navigation.navigate('Calculate');
+  };
+
   return (
     <Page>
       <View style={styles.main}>
@@ -149,8 +167,14 @@ export default function GasPriceScreen() {
           headers={[
             { text: 'Location', numeric: false },
             { text: (globalState.Locale === 'CA' ? 'Price ($/L)' : 'Price ($/gal)'), numeric: true },
+            { text: 'Use', numeric: true, style: { justifyContent: 'center', maxWidth: 64 } },
           ]}
-          Row={(values) => Row({ ...values, setSelectedRegion })}
+          Row={(values) => Row({
+            ...values,
+            setSelectedRegion,
+            useAsGasPrice,
+            locale: globalState.Locale,
+          })}
           style={styles.gasPriceTable}
           scrollable
         />

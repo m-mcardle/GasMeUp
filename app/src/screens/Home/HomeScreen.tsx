@@ -71,6 +71,8 @@ interface Props {
 
 export default function HomeScreen({ navigation, setTrip }: Props) {
   const [user] = useAuthState(auth);
+  const [globalState, updateGlobalState] = useGlobalState();
+
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
   const [{
     distance,
@@ -97,15 +99,16 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     },
   );
   const [waypoints, setWaypoints] = useState<any>([]);
-  const [customGasPrice, setCustomGasPrice] = useState<number>(1.5);
+
+  const customGasPrice = globalState['Custom Gas Price'].price;
+  const useCustomGasPrice = globalState['Custom Gas Price'].enabled;
   const [fetchedGasPrice, setFetchedGasPrice] = useState<number>(0);
+
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });
-  const [visible, setVisible] = useState<boolean>(false);
+
+  const [gasModalVisible, setGasModalVisible] = useState<boolean>(false);
   const [fuelModalVisible, setFuelModalVisible] = useState<boolean>(false);
-  const [useCustomGasPrice, setUseCustomGasPrice] = useState<boolean>(false);
-  const [globalState, updateGlobalState] = useGlobalState();
-  // const [modalVisible, setModalVisible] = useState(false);
   const [mapModalVisible, setMapModalVisible] = useState(false);
 
   const [startLocationError, setStartLocationError] = useState<boolean>(false);
@@ -123,17 +126,11 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   };
 
   const updateCustomGasPrice = (newPrice: number) => {
-    setCustomGasPrice(newPrice);
-    if (useCustomGasPrice) {
-      setGasPrice(newPrice);
-    }
+    changeSetting('Custom Gas Price', { price: newPrice, enabled: useCustomGasPrice }, updateGlobalState);
   };
 
   const configureCustomGasPrice = (value: boolean) => {
-    setUseCustomGasPrice(value);
-    if (value) {
-      setGasPrice(customGasPrice);
-    }
+    changeSetting('Custom Gas Price', { price: customGasPrice, enabled: value }, updateGlobalState);
   };
 
   const submit = useCallback(async () => {
@@ -315,12 +312,14 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     setSuggestions([]);
   };
 
-  // Reset to last server gas price each time the use disables custom gas price
+  // Reset to last server gas price each time the user changes custom gas price settings
   useEffect(() => {
     if (!useCustomGasPrice) {
       setGasPrice(fetchedGasPrice);
+    } else {
+      setGasPrice(customGasPrice);
     }
-  }, [useCustomGasPrice]);
+  }, [useCustomGasPrice, customGasPrice]);
 
   // Represents if the user has entered all the required data to save a trip's cost
   const canSaveTrip = !!distance && !!gasPrice && !!cost;
@@ -373,8 +372,8 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     <Page>
       <SettingsModal
         setting="Gas Price"
-        visible={visible}
-        setVisible={setVisible}
+        visible={gasModalVisible}
+        setVisible={setGasModalVisible}
         data={customGasPrice}
         setData={updateCustomGasPrice}
         useCustomValue={useCustomGasPrice}
@@ -423,7 +422,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           cost={cost}
           gasMileage={GAS_MILEAGE}
           locale={globalState.Locale}
-          openModal={() => setVisible(true)}
+          openModal={() => setGasModalVisible(true)}
           openFuelModal={() => setFuelModalVisible(true)}
         />
         <AutocompleteInput

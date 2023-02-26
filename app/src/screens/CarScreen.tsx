@@ -9,25 +9,75 @@ import {
 
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
+import { DataTable } from 'react-native-paper';
+
 // Global State Stuff
 import { useGlobalState, changeSetting } from '../hooks/hooks';
 
 // Components
 import Page from '../components/Page';
 import Text from '../components/Text';
-
+import Button from '../components/Button';
+import Table from '../components/Table';
 import AutocompleteInput from '../components/AutocompleteInput';
-
-// Styles
-import styles from '../styles/GasPriceScreen.styles';
-import { colors } from '../styles/styles';
 
 // Mock Data
 import { fetchData } from '../data/data';
-import Button from '../components/Button';
 
 // Helpers
-import { convertFuelEfficiency } from '../helpers/unitsHelper';
+import { convertFuelEfficiency, convertFuelEfficiencyToString } from '../helpers/unitsHelper';
+
+// Styles
+import styles from '../styles/CarScreen.styles';
+import { colors } from '../styles/styles';
+
+function Row({
+  label, text, value, useAsFuelEfficiency,
+}: any) {
+  return (
+    <DataTable.Row
+      key={text}
+    >
+      <DataTable.Cell>
+        {label}
+      </DataTable.Cell>
+      <DataTable.Cell numeric>
+        {text}
+      </DataTable.Cell>
+      <DataTable.Cell style={{ maxWidth: 64, justifyContent: 'center' }} numeric>
+        <Button
+          style={{ paddingHorizontal: 8, padding: 2, margin: 0 }}
+          onPress={() => useAsFuelEfficiency(value)}
+        >
+          <Text>Use</Text>
+        </Button>
+      </DataTable.Cell>
+    </DataTable.Row>
+  );
+}
+
+function FooterRow({ label, text }: any) {
+  return (
+    <DataTable.Row
+      key={text}
+    >
+      <DataTable.Cell>
+        {label}
+      </DataTable.Cell>
+      <DataTable.Cell numeric style={{ justifyContent: 'center' }} textStyle={{ textAlign: 'center' }}>
+        {text}
+      </DataTable.Cell>
+    </DataTable.Row>
+  );
+}
+
+function EmptyState() {
+  return (
+    <Text>
+      No vehicle selected
+    </Text>
+  );
+}
 
 enum ActiveInput {
   None,
@@ -37,8 +87,8 @@ enum ActiveInput {
   Trim,
 }
 
-export default function CarScreen() {
-  const [, updateGlobalState] = useGlobalState();
+export default function CarScreen({ navigation }: any) {
+  const [globalState, updateGlobalState] = useGlobalState();
 
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
 
@@ -114,7 +164,7 @@ export default function CarScreen() {
     if (selectedTrim.value) { fetchVehicle(); }
   }, [selectedTrim.value]);
 
-  // Clear out the selected values if the previous one is cleared
+  // Clear out the selected values if a previous one is cleared
   useEffect(() => {
     if (!selectedYear) {
       setSelectedMake('');
@@ -151,6 +201,61 @@ export default function CarScreen() {
       setActiveInput(ActiveInput.None);
     }
   };
+
+  const headers = [
+    { text: 'Statistic', numeric: false },
+    { text: 'Value', numeric: true },
+    { text: 'Use', numeric: false, style: { justifyContent: 'center', maxWidth: 64 } },
+  ];
+
+  const fuelEfficiencyString = vehicle.mpg ? convertFuelEfficiencyToString(vehicle.mpg, 'US', globalState.Locale) : '';
+  const cityFuelEfficiencyString = vehicle.city ? convertFuelEfficiencyToString(vehicle.city, 'US', globalState.Locale) : '';
+  const highwayFuelEfficiencyString = vehicle.highway ? convertFuelEfficiencyToString(vehicle.highway, 'US', globalState.Locale) : '';
+
+  const fuelEfficiency = vehicle.mpg ? convertFuelEfficiency(vehicle.mpg, 'US', globalState.Locale) : 1;
+  const cityFuelEfficiency = vehicle.city ? convertFuelEfficiency(vehicle.city, 'US', globalState.Locale) : 1;
+  const highwayFuelEfficiency = vehicle.highway ? convertFuelEfficiency(vehicle.highway, 'US', globalState.Locale) : 1;
+
+  const tableData = vehicle.mpg
+    ? [
+      {
+        label: 'Milage',
+        text: fuelEfficiencyString,
+        value: fuelEfficiency,
+        key: 'Milage',
+      },
+      {
+        label: 'Milage (City)',
+        text: cityFuelEfficiencyString,
+        value: cityFuelEfficiency,
+        key: 'City',
+      },
+      {
+        label: 'Milage (Highway)',
+        text: highwayFuelEfficiencyString,
+        value: highwayFuelEfficiency,
+        key: 'Highway',
+      },
+    ]
+    : [];
+
+  const useAsFuelEfficiency = (value: number) => {
+    if (value) {
+      changeSetting('Gas Mileage', value, updateGlobalState);
+      navigation.navigate('Calculate');
+    }
+  };
+
+  const MyRow = ({
+    label,
+    text,
+    value,
+  }: any) => Row({
+    label,
+    text,
+    value,
+    useAsFuelEfficiency,
+  });
 
   return (
     <Page>
@@ -305,24 +410,18 @@ export default function CarScreen() {
             />
            )}
         />
-        <Text>
-          {`Average MPG: ${vehicle.mpg}`}
-        </Text>
-        <Text>
-          {`City MPG: ${vehicle.city}`}
-        </Text>
-        <Text>
-          {`Highway MPG: ${vehicle.highway}`}
-        </Text>
-        <Text>
-          {`Fuel Type: ${vehicle.type}`}
-        </Text>
-        <Button
-          disabled={!vehicle.mpg}
-          onPress={() => changeSetting('Gas Mileage', Number(convertFuelEfficiency(Number(vehicle.mpg)).toFixed(2)), updateGlobalState)}
-        >
-          <Text>Use</Text>
-        </Button>
+        <Table
+          headers={headers}
+          data={tableData}
+          Row={MyRow}
+          EmptyState={EmptyState}
+          FooterRow={(vehicle.fuelType
+            ? () => FooterRow({ label: 'Fuel Type', text: vehicle.fuelType })
+            : undefined
+          )}
+          style={{ width: '90%', marginTop: 48 }}
+          scrollable
+        />
       </View>
     </Page>
   );
