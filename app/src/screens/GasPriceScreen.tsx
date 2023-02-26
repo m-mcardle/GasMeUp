@@ -28,7 +28,12 @@ import { fetchData } from '../data/data';
 
 // Helpers
 import { provinces, states } from '../helpers/locationHelper';
-import { convertDollarsPerGalToDollarsPerL, convertDollarsPerLToDollarsPerGal, convertGasPrice } from '../helpers/unitsHelper';
+import {
+  convertDollarsPerGalToDollarsPerL,
+  convertDollarsPerLToDollarsPerGal,
+  convertGasPrice,
+  convertGasPriceToString,
+} from '../helpers/unitsHelper';
 
 interface RequestLookup {
   [key: string]: Array<any>
@@ -46,7 +51,7 @@ function Row({
       key={text}
       onPress={() => (isProvince ? setSelectedRegion(text) : setSelectedRegion(''))}
     >
-      <DataTable.Cell>
+      <DataTable.Cell style={{ minWidth: 150 }}>
         {!isProvince && !isState && <Ionicons name="chevron-back" size={12} color={colors.secondary} />}
         {text}
         {isProvince && <Ionicons name="chevron-forward" size={12} color={colors.secondary} />}
@@ -55,7 +60,11 @@ function Row({
         $
         {roundedPrice}
       </DataTable.Cell>
-      <DataTable.Cell style={{ maxWidth: 64, justifyContent: 'center' }} numeric>
+      <DataTable.Cell
+        style={{ maxWidth: 64, justifyContent: 'center' }}
+        onPress={() => useAsGasPrice(roundedCanadianPrice)}
+        numeric
+      >
         <Button
           style={{ paddingHorizontal: 8, padding: 2, margin: 0 }}
           onPress={() => useAsGasPrice(roundedCanadianPrice)}
@@ -149,7 +158,12 @@ export default function GasPriceScreen({ navigation }: any) {
 
   const useAsGasPrice = (price: number) => {
     changeSetting('Custom Gas Price', { price, enabled: true }, updateGlobalState);
-    navigation.navigate('Calculate');
+    Alert.alert('Gas Price Updated', `Your gas price has been updated to ${convertGasPriceToString(price, 'CA', globalState.Locale)}`, [
+      {
+        text: 'OK',
+        onPress: () => navigation.navigate('Calculate'),
+      },
+    ]);
   };
 
   return (
@@ -165,7 +179,7 @@ export default function GasPriceScreen({ navigation }: any) {
             }
           )).sort((a, b) => (a.text > b.text ? 1 : -1))}
           headers={[
-            { text: 'Location', numeric: false },
+            { text: 'Location', numeric: false, style: { minWidth: 150 } },
             { text: (globalState.Locale === 'CA' ? 'Price ($/L)' : 'Price ($/gal)'), numeric: true },
             { text: 'Use', numeric: true, style: { justifyContent: 'center', maxWidth: 64 } },
           ]}

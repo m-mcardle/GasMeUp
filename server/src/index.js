@@ -405,13 +405,13 @@ app.get('/model-options', async (req, res) => {
   }
 });
 
-app.get('/vehicle', async (req, res) => {
+app.get('/vehicle/:vehicleId', async (req, res) => {
   if (!validateAPIKey(req.query?.api_key)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
 
-  const id = req.query?.id ?? '41385';
+  const id = req.params?.vehicleId ?? '41385';
 
   res.set('Access-Control-Allow-Origin', '*');
   try {

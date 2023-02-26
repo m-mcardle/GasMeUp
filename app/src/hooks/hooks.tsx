@@ -40,6 +40,13 @@ export const PERSISTED_VALUES: Record<string, any> = {
     price: 1,
     enabled: false,
   },
+  Vehicle: {
+    year: undefined,
+    make: undefined,
+    model: undefined,
+    trimText: undefined,
+    trimValue: undefined,
+  },
 };
 
 let initialSettings: any = {};
@@ -77,6 +84,10 @@ if (Platform.OS === 'ios') {
 
   Object.keys(OPTIONS_SETTINGS).forEach((setting) => {
     initialSettings[setting] = OPTIONS_SETTINGS[setting].default;
+  });
+
+  Object.keys(PERSISTED_VALUES).forEach((setting) => {
+    initialSettings[setting] = PERSISTED_VALUES[setting];
   });
 }
 

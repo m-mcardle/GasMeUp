@@ -52,6 +52,12 @@ export const convertGasPrice = (price: number, inputCountry: 'CA' | 'US', output
   return price;
 };
 
+export const convertGasPriceToString = (price: number, inputCountry: 'CA' | 'US', outputCountry: 'CA' | 'US') => {
+  const convertedPrice = convertGasPrice(price, inputCountry, outputCountry);
+  const units = outputCountry === 'CA' ? '/L' : '/gal';
+  return `$${convertedPrice.toFixed(2)}${units}`;
+};
+
 export function convertAll(
   distance: number,
   fuelEfficiency: number,
