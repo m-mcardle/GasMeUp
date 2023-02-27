@@ -35,6 +35,7 @@ export const ENV = expoConstants
   };
 
 async function checkDevAPI() {
+  console.log('Checking:', ENV.DEV_API_URL);
   try {
     const response = await fetch(ENV.DEV_API_URL);
 

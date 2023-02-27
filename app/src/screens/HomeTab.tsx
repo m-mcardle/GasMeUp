@@ -39,6 +39,7 @@ export default function HomeTab() {
           height: 80,
         },
         headerTitleStyle: { color: colors.white },
+        headerTintColor: colors.white,
       }}
       initialRouteName="Index"
     >

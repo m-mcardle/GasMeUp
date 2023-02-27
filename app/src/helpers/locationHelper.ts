@@ -77,6 +77,11 @@ export const stateCodes = Object.keys(stateCodeLookup);
 export const lookupProvince = (code: string) => provinceCodeLookup[code] ?? 'Ontario';
 export const lookupState = (code: string) => stateCodeLookup[code] ?? 'New York';
 
+export const lookupStateCode = (state: string) => {
+  const code = Object.keys(stateCodeLookup).find((key) => stateCodeLookup[key] === state);
+  return code ?? 'NY';
+};
+
 export default {
   provinceCodeLookup,
   lookupProvince,

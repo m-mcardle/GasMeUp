@@ -16,6 +16,13 @@ const {
   AmericanGasPricesRequest,
   ProvincialGasPricesRequest,
 } = require('./queries/gasprice');
+const {
+  YearRequest,
+  MakeRequest,
+  ModelRequest,
+  ModelOptionRequest,
+  VehicleRequest
+} = require('./queries/fueleconomy');
 
 const { GasCostForDistance } = require('./calculations/fuel');
 
@@ -156,6 +163,47 @@ async function GetGasPrices(country, region) {
   return prices;
 }
 
+async function GetYears() {
+  const { data } = await api(YearRequest());
+  const { menuItem } = data;
+
+  const yearObjects = menuItem.length ? menuItem : [menuItem];
+  const years = yearObjects.map((el) => el.text);
+  return years;
+}
+
+async function GetMakes(year) {
+  const { data } = await api(MakeRequest(year));
+  const { menuItem } = data;
+
+  const makeObjects = menuItem.length ? menuItem : [menuItem];
+  const makes = makeObjects.map((el) => el.text);
+  return makes;
+}
+
+async function GetModels(year, make) {
+  const { data } = await api(ModelRequest(year, make));
+  const { menuItem } = data;
+
+  const modelObjects = menuItem.length ? menuItem : [menuItem];
+  const models = modelObjects.map((el) => el.text);
+  return models;
+}
+
+async function GetModelOptions(year, make, model) {
+  const { data } = await api(ModelOptionRequest(year, make, model));
+  const { menuItem } = data;
+
+  const modelOptionObjects = menuItem.length ? menuItem : [menuItem];
+  return modelOptionObjects;
+}
+
+async function GetVehicle(id) {
+  const { data } = await api(VehicleRequest(id));
+  return data;
+}
+
+
 /*
 Express API Endpoints
 */
@@ -167,7 +215,7 @@ app.get('/trip-cost', async (req, res) => {
     return;
   }
 
-  const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
+  const startLocation = req.query?.start ?? 'Ottawa';
   const endLocation = req.query?.end ?? 'Toronto';
   const manualGasPrice = req.query?.price ?? '';
   const country = req.query?.country ?? 'CA';
@@ -219,7 +267,7 @@ app.get('/distance', async (req, res) => {
     return;
   }
 
-  const startLocation = req.query?.start ?? '212 Golf Course Road Conestogo Ontario';
+  const startLocation = req.query?.start ?? 'Ottawa';
   const endLocation = req.query?.end ?? 'Toronto';
 
   res.set('Access-Control-Allow-Origin', '*');
@@ -274,6 +322,102 @@ app.get('/gas', async (req, res) => {
     const gasPrice = await GetGasPrice(country, region);
     Log(`[gas] Gas Price: $${gasPrice}`);
     res.json({ price: gasPrice });
+  } catch (exception) {
+    LogError(exception);
+    res.status(500).send({ error: exception });
+  }
+});
+
+app.get('/years', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
+  res.set('Access-Control-Allow-Origin', '*');
+  try {
+    const years = await GetYears();
+    Log(`[years] Years: ${JSON.stringify(years)}`);
+    res.json({ years });
+  } catch (exception) {
+    LogError(exception);
+    res.status(500).send({ error: exception });
+  }
+});
+
+app.get('/makes', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
+  const year = req.query?.year ?? '2022';
+
+  res.set('Access-Control-Allow-Origin', '*');
+  try {
+    const makes = await GetMakes(year);
+    Log(`[makes] Makes: ${makes}`);
+    res.json({ makes });
+  } catch (exception) {
+    LogError(exception);
+    res.status(500).send({ error: exception });
+  }
+});
+
+app.get('/models', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
+  const year = req.query?.year ?? '2022';
+  const make = req.query?.make ?? 'Honda';
+
+  res.set('Access-Control-Allow-Origin', '*');
+  try {
+    const models = await GetModels(year, make);
+    Log(`[models] Models: ${JSON.stringify(models)}`);
+    res.json({ models });
+  } catch (exception) {
+    LogError(exception);
+    res.status(500).send({ error: exception });
+  }
+});
+
+app.get('/model-options', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
+  const year = req.query?.year ?? '2022';
+  const make = req.query?.make ?? 'Honda';
+  const model = req.query?.model ?? 'Civic 5dr';
+  
+  res.set('Access-Control-Allow-Origin', '*');
+  try {
+    const modelOptions = await GetModelOptions(year, make, model);
+    Log(`[model-options] ModelOptions: ${JSON.stringify(modelOptions)}`);
+    res.json({ modelOptions });
+  } catch (exception) {
+    LogError(exception);
+    res.status(500).send({ error: exception });
+  }
+});
+
+app.get('/vehicle/:vehicleId', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
+  const id = req.params?.vehicleId ?? '41385';
+
+  res.set('Access-Control-Allow-Origin', '*');
+  try {
+    const { comb08, city08, highway08, fuelType } = await GetVehicle(id);
+    Log(`[vehicle] Vehicle: ${comb08, city08, highway08, fuelType}`);
+    res.json({ mpg: Number(comb08), city: Number(city08), highway: Number(highway08), fuelType });
   } catch (exception) {
     LogError(exception);
     res.status(500).send({ error: exception });

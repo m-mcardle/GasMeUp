@@ -22,6 +22,8 @@ interface Props {
   error?: boolean,
   blurOnSubmit?: boolean,
   myRef?: React.RefObject<TextInput>,
+  editable?: boolean,
+  onClear?: () => void,
   onChangeText: (arg: string) => void,
   onPressIn?: () => void,
   onSubmitEditing?: () => void,
@@ -32,6 +34,7 @@ export default function Input(props: Props) {
     onChangeText,
     onPressIn,
     onSubmitEditing,
+    onClear,
     placeholder,
     containerStyle,
     style,
@@ -45,7 +48,15 @@ export default function Input(props: Props) {
     blurOnSubmit = true,
     keyboardType = 'default',
     autoComplete = 'off',
+    editable = true,
   } = props;
+
+  const clearInput = () => {
+    onChangeText('');
+    if (onClear) {
+      onClear();
+    }
+  };
 
   // Logic to resize the input based on the presence of an icon and clear button
   let numWidth = clearButton ? 90 : 100;
@@ -75,9 +86,13 @@ export default function Input(props: Props) {
         onSubmitEditing={onSubmitEditing}
         secureTextEntry={password}
         autoComplete={autoComplete}
+        editable={editable}
       />
       {clearButton && (
-        <TouchableOpacity style={globalStyles.clearInputButton} onPress={() => onChangeText('')}>
+        <TouchableOpacity
+          style={globalStyles.clearInputButton}
+          onPress={clearInput}
+        >
           <MaterialIcons name="clear" size={15} color={colors.primary} />
         </TouchableOpacity>
       )}
@@ -101,4 +116,6 @@ Input.defaultProps = {
   keyboardType: 'default',
   myRef: undefined,
   onSubmitEditing: undefined,
+  editable: true,
+  onClear: undefined,
 };

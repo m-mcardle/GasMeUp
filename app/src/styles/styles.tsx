@@ -93,7 +93,6 @@ export const globalStyles = StyleSheet.create({
   },
   autocompleteListItem: {
     padding: 4,
-    paddingLeft: 52,
   },
   autocompleteNestedContainer: {
     width: '100%',

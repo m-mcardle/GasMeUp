@@ -1,7 +1,7 @@
 // React
 import React, { useCallback, useState } from 'react';
 import {
-  Alert, Image, ScrollView, View,
+  Alert, Image, ScrollView, View, Platform,
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -193,7 +193,13 @@ export default function FriendInfoScreen({
 
         <ScrollView style={{ maxHeight: 300 }}>
           {transactionsSinceLastSettle?.map((transaction) => (
-            <DataTable.Row key={transaction.payeeUID + transaction.amount + transaction.date}>
+            <DataTable.Row
+              key={transaction.payeeUID + transaction.amount + transaction.date}
+              onPress={() => {
+                setSelectedTransaction(transaction);
+                setViewMoreVisible(true);
+              }}
+            >
               <DataTable.Cell
                 style={{ maxWidth: '10%' }}
                 onPress={() => {
@@ -210,27 +216,19 @@ export default function FriendInfoScreen({
               </DataTable.Cell>
               <DataTable.Cell
                 style={{ minWidth: '35%' }}
-                onPress={() => {
-                  setSelectedTransaction(transaction);
-                  setViewMoreVisible(true);
-                }}
               >
                 <View style={{ justifyContent: 'center' }}>
                   <Text style={{ fontSize: 8 }} numberOfLines={1}>
-                    {`Start: ${transaction.startLocation}`}
+                    {`Start: ${Platform.OS !== 'ios' && transaction.startLocation.length > 35 ? `${transaction.startLocation.slice(0, 32)}...` : transaction.startLocation}`}
                   </Text>
                   <Text style={{ fontSize: 8, paddingTop: 4 }} numberOfLines={1}>
-                    {`End: ${transaction.endLocation}`}
+                    {`End: ${Platform.OS !== 'ios' && transaction.endLocation.length > 35 ? `${transaction.endLocation.slice(0, 32)}...` : transaction.endLocation}`}
                   </Text>
                 </View>
               </DataTable.Cell>
               <DataTable.Cell
                 textStyle={{ fontSize: 8 }}
                 numeric
-                onPress={() => {
-                  setSelectedTransaction(transaction);
-                  setViewMoreVisible(true);
-                }}
               >
                 {transaction.date.toDate().toLocaleDateString()}
               </DataTable.Cell>
@@ -240,10 +238,6 @@ export default function FriendInfoScreen({
                   color: getTransactionAmount(transaction) > 0 ? colors.white : colors.red,
                 }}
                 numeric
-                onPress={() => {
-                  setSelectedTransaction(transaction);
-                  setViewMoreVisible(true);
-                }}
               >
                 $
                 {getTransactionAmount(transaction) > 0
