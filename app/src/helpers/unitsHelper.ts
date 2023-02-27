@@ -58,27 +58,32 @@ export const convertGasPriceToString = (price: number, inputCountry: 'CA' | 'US'
   return `$${convertedPrice.toFixed(2)}${units}`;
 };
 
+// Because all values are stored in Canadian Units, we only need to convert to US
 export function convertAll(
   distance: number,
   fuelEfficiency: number,
   gasPrice: number,
-  inputCountry: 'CA' | 'US',
   outputCountry: 'CA' | 'US',
 ) {
   const convertToUS = outputCountry === 'US';
-  // Distance and fuel are always in KM and L/100KM (for now)
-  return {
-    distance: convertToUS ? convertKMtoMiles(distance) : distance,
-    fuelEfficiency: convertToUS ? convertFuelEfficiency(fuelEfficiency, 'CA', 'US') : fuelEfficiency,
-    gasPrice: convertGasPrice(gasPrice, inputCountry, outputCountry),
-  };
+
+  return convertToUS
+    ? {
+      distance: convertKMtoMiles(distance),
+      fuelEfficiency: convertFuelEfficiency(fuelEfficiency, 'CA', 'US'),
+      gasPrice: convertGasPrice(gasPrice, 'CA', outputCountry),
+    }
+    : {
+      distance,
+      fuelEfficiency,
+      gasPrice,
+    };
 }
 
 export function convertAllToString(
   distance: number,
   fuelEfficiency: number,
   gasPrice: number,
-  inputCountry: 'CA' | 'US',
   outputCountry: 'CA' | 'US',
 ) {
   const {
@@ -89,7 +94,6 @@ export function convertAllToString(
     distance,
     fuelEfficiency,
     gasPrice,
-    inputCountry,
     outputCountry,
   );
 

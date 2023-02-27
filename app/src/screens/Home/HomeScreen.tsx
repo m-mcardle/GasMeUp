@@ -118,7 +118,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const cost = (
     ((distance * GAS_MILEAGE) / 100) // This get's the L of gas used
-    * convertGasPrice(gasPrice, globalState.country, 'CA') // This gets the cost of the gas used and converts it to $/L if it is $/gal
+    * gasPrice // This gets the cost of the gas used (it should always be stored in $/L)
   );
 
   const setGasPrice = (newPrice: number) => {
@@ -199,8 +199,10 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         }
 
         const { price } = await gasPriceResponse.json();
-        setFetchedGasPrice(price);
-        newGasPrice = price;
+
+        // Convert the gas price to $/L
+        newGasPrice = convertGasPrice(price, globalState.country, 'CA');
+        setFetchedGasPrice(newGasPrice);
       }
 
       setStartLocationError(false);

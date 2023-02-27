@@ -1,6 +1,11 @@
 // React
 import React, { useCallback, useRef } from 'react';
-import { Animated, Alert, Image } from 'react-native';
+import {
+  View,
+  Animated,
+  Alert,
+  Image,
+} from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -126,10 +131,12 @@ export default function Row({
         })}
       >
         <DataTable.Cell style={{ maxWidth: '15%', justifyContent: 'center', alignContent: 'center' }}>
-          <Image
-            style={{ width: 32, height: 32, borderRadius: 64 }}
-            source={getIcon({ email, name })}
-          />
+          <View>
+            <Image
+              style={{ width: 32, height: 32, borderRadius: 64 }}
+              source={getIcon({ email, name })}
+            />
+          </View>
         </DataTable.Cell>
         <DataTable.Cell textStyle={{ color: colors.secondary }}>
           {name}

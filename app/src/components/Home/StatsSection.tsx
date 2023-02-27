@@ -8,9 +8,6 @@ import {
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator } from 'react-native-paper';
 
-// Global State Stuff
-import { useGlobalState } from '../../hooks/hooks';
-
 // Helpers
 import {
   convertLtoGallons, convertAllToString,
@@ -48,7 +45,6 @@ export default function StatsSection(props: Props) {
     openModal,
     openFuelModal,
   } = props;
-  const [globalState] = useGlobalState();
 
   const fadeAnim = useRef(new Animated.Value(0.5)).current;
   const fadeIn = Animated.timing(fadeAnim, {
@@ -85,7 +81,6 @@ export default function StatsSection(props: Props) {
     distance,
     gasMileage,
     gasPrice,
-    globalState.country,
     locale,
   );
   const gasUsedString = locale === 'CA'

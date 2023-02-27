@@ -18,6 +18,7 @@ import * as Notifications from 'expo-notifications';
 import React, {
   useState, useMemo, useEffect, useRef,
 } from 'react';
+import { Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -37,7 +38,7 @@ import CarScreen from './src/screens/CarScreen';
 import { colors } from './src/styles/styles';
 
 // Helpers
-import { lookupProvince } from './src/helpers/locationHelper';
+import { lookupProvince, lookupStateCode } from './src/helpers/locationHelper';
 import { registerForPushNotificationsAsync } from './src/helpers/notificationHelper';
 import { getExchangeRate } from './src/helpers/unitsHelper';
 
@@ -138,6 +139,8 @@ export default function App() {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         console.log('Permission to access location was denied');
+        updateGlobalState('region', 'Ontario');
+        updateGlobalState('country', 'CA');
         return;
       }
 
@@ -148,12 +151,15 @@ export default function App() {
       });
       const readableLocation = (await Location.reverseGeocodeAsync(location.coords))[0];
 
-      if (readableLocation.country === 'Canada') {
-        const provinceCode = lookupProvince(readableLocation.region ?? 'Ontario');
-        updateGlobalState('region', provinceCode);
+      const userCountry = readableLocation.country ?? 'Canada';
+      const userRegion = readableLocation.region ?? 'Ontario';
+      if (userCountry === 'Canada') {
+        const regionCode = Platform.OS === 'ios' ? lookupProvince(userRegion) : userRegion;
+        updateGlobalState('region', regionCode);
         updateGlobalState('country', 'CA');
-      } else if (readableLocation.country === 'United States') {
-        updateGlobalState('region', readableLocation.region);
+      } else if (userCountry === 'United States') {
+        const regionCode = Platform.OS === 'ios' ? userRegion : lookupStateCode(userRegion);
+        updateGlobalState('region', regionCode);
         updateGlobalState('country', 'US');
       } else {
         updateGlobalState('region', 'Ontario');

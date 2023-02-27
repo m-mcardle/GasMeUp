@@ -272,7 +272,6 @@ export default function CarScreen({ navigation }: any) {
 
   const useAsFuelEfficiency = (value: number) => {
     if (value) {
-      console.log(value);
       changeSetting('Gas Mileage', value, updateGlobalState);
       Alert.alert('Gas Mileage Updated', `Your gas milage has been updated to ${convertFuelEfficiencyToString(value, 'CA', globalState.Locale)}`, [
         {
