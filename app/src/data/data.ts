@@ -37,6 +37,8 @@ export const mockDistance = {
 // Helper method to easily mock requests
 // Ex: route = '/suggestion?start=Toronto&end=Waterloo'
 export async function fetchData(route: string, mock = false) {
+  const url = `${serverUrl + route}`;
+  const keySuffix = url.includes('?') ? `&api_key=${ENV.API_KEY}` : `?api_key=${ENV.API_KEY}`;
   if (mock) {
     const resp = new Response();
     resp.json = () => new Promise((resolve) => {
@@ -50,12 +52,12 @@ export async function fetchData(route: string, mock = false) {
         resolve(mockTripCost);
       } else {
         console.warn('No mock data for this route - actually fetching data');
-        resolve(fetch(`${serverUrl + route}&api_key=${ENV.API_KEY}`));
+        resolve(fetch(`${url}${keySuffix}}`));
       }
     });
     return resp;
   }
-  return fetch(`${serverUrl + route}&api_key=${ENV.API_KEY}`);
+  return fetch(`${url}${keySuffix}`);
 }
 
 export default {

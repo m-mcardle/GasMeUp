@@ -53,10 +53,12 @@ function Row({ name, email, amount }: any) {
       key={name}
     >
       <DataTable.Cell style={{ maxWidth: '15%', justifyContent: 'center', alignContent: 'center' }}>
-        <Image
-          style={{ width: 32, height: 32, borderRadius: 64 }}
-          source={getIcon({ email, name })}
-        />
+        <View>
+          <Image
+            style={{ width: 32, height: 32, borderRadius: 64 }}
+            source={getIcon({ email, name })}
+          />
+        </View>
       </DataTable.Cell>
       <DataTable.Cell textStyle={{ color: colors.secondary }}>
         {name}

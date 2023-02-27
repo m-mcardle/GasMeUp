@@ -35,7 +35,6 @@ export default function TripDetailsModal({
     transaction.distance,
     transaction.gasMilage ?? 10,
     transaction.gasPrice,
-    'CA', // DB records are always in CA
     globalState.Locale,
   );
   return (

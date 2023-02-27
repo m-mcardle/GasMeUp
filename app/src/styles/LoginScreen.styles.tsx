@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
     ...globalStyles.centered,
   },
   loginButtonText: {
-    color: colors.primary,
+    color: colors.white,
     textAlign: 'center',
   },
   navigateSection: {

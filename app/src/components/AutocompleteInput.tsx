@@ -17,6 +17,7 @@ interface Props {
   z?: number,
   value?: string,
   placeholder?: string,
+  listContainerStyle?: object,
   containerStyle?: object,
   style?: object,
   password?: boolean,
@@ -28,7 +29,10 @@ interface Props {
   icon?: ReactComponentElement<typeof MaterialIcons>,
   error?: boolean,
   blurOnSubmit?: boolean,
+  showRedundantSuggestion?: boolean,
+  editable?: boolean,
   myRef?: React.RefObject<TextInput>,
+  onClear?: () => void,
   onChangeText: (arg: string) => void,
   onPressIn?: () => void,
   onSubmitEditing?: () => void,
@@ -41,7 +45,9 @@ export default function AutocompleteInput(props: Props) {
     onPressIn,
     onSubmitEditing,
     onSuggestionPress,
+    onClear,
     placeholder,
+    listContainerStyle,
     containerStyle,
     style,
     value,
@@ -56,6 +62,8 @@ export default function AutocompleteInput(props: Props) {
     blurOnSubmit = true,
     keyboardType = 'default',
     autoComplete = 'off',
+    showRedundantSuggestion = false,
+    editable = true,
   } = props;
 
   return (
@@ -80,9 +88,11 @@ export default function AutocompleteInput(props: Props) {
               blurOnSubmit={blurOnSubmit}
               keyboardType={keyboardType}
               autoComplete={autoComplete}
+              editable={editable}
+              onClear={onClear}
             />
           )}
-          data={(suggestions.length === 1 && suggestions[0] === value
+          data={(suggestions.length === 1 && suggestions[0] === value && !showRedundantSuggestion
             ? []
             : suggestions.map((s) => ({ title: s, id: s }))
           )}
@@ -98,7 +108,7 @@ export default function AutocompleteInput(props: Props) {
             { backgroundColor: colors.tertiary },
             error ? { borderColor: colors.red } : { borderWidth: 0 },
           ]}
-          listContainerStyle={globalStyles.autocompleteListContainer}
+          listContainerStyle={[globalStyles.autocompleteListContainer, listContainerStyle]}
           containerStyle={[globalStyles.autocompleteNestedContainer, { zIndex: z }]}
           flatListProps={{
             keyboardShouldPersistTaps: 'always',
@@ -108,7 +118,7 @@ export default function AutocompleteInput(props: Props) {
                 onPress={() => {
                   if (onSuggestionPress) onSuggestionPress(title);
                 }}
-                style={globalStyles.autocompleteListItem}
+                style={[globalStyles.autocompleteListItem, (icon ? { paddingLeft: 52 } : {})]}
               >
                 <Text style={{ fontSize: 12 }} numberOfLines={1}>{title}</Text>
               </TouchableOpacity>
@@ -124,6 +134,7 @@ AutocompleteInput.defaultProps = {
   z: undefined,
   value: undefined,
   placeholder: undefined,
+  listContainerStyle: undefined,
   style: undefined,
   containerStyle: undefined,
   onPressIn: undefined,
@@ -138,4 +149,7 @@ AutocompleteInput.defaultProps = {
   myRef: undefined,
   onSubmitEditing: undefined,
   onSuggestionPress: undefined,
+  editable: true,
+  showRedundantSuggestion: false,
+  onClear: undefined,
 };

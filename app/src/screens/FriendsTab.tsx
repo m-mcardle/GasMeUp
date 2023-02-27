@@ -43,6 +43,7 @@ export default function FriendsTab() {
           height: 80,
         },
         headerTitleStyle: { color: colors.white },
+        headerTintColor: colors.white,
       }}
       initialRouteName="Index"
     >
