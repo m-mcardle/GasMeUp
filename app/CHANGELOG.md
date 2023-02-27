@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.14](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.13...v1.0.14) (2023-02-27)
 
+* Add Car Selection screen
+* Use gas price button added
+* Android UI fixes
+* Unit improvements
+* Denied location fixes
+
 ### [1.0.13](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.12...v1.0.13) (2023-02-25)
 
 * Add account deletion
