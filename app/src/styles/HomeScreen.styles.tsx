@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '70%',
     justifyContent: 'center',
+    marginTop: 12,
     marginBottom: 64,
   },
   calculateButton: {
