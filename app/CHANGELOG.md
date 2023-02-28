@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.15](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.14...v1.0.15) (2023-02-28)
 
+* Bug fixes (Gas Price modal + error handling)
+* Response layout improvements
+
 ### [1.0.14](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.13...v1.0.14) (2023-02-27)
 
 * Add Car Selection screen
