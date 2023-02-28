@@ -101,7 +101,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   const [waypoints, setWaypoints] = useState<any>([]);
 
   const customGasPrice = globalState['Custom Gas Price'].price;
-  const useCustomGasPrice = globalState['Custom Gas Price'].enabled;
+  const useCustomGasPrice = globalState['Custom Gas Price'].enabled === 'true';
   const [fetchedGasPrice, setFetchedGasPrice] = useState<number>(0);
 
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
@@ -126,11 +126,11 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   };
 
   const updateCustomGasPrice = (newPrice: number) => {
-    changeSetting('Custom Gas Price', { price: newPrice, enabled: useCustomGasPrice }, updateGlobalState);
+    changeSetting('Custom Gas Price', { price: newPrice, enabled: String(useCustomGasPrice) }, updateGlobalState);
   };
 
   const configureCustomGasPrice = (value: boolean) => {
-    changeSetting('Custom Gas Price', { price: customGasPrice, enabled: value }, updateGlobalState);
+    changeSetting('Custom Gas Price', { price: customGasPrice, enabled: String(value) }, updateGlobalState);
   };
 
   const submit = useCallback(async () => {
@@ -146,13 +146,13 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     }
 
     Keyboard.dismiss();
-    setCostRequest({
+    setCostRequest((oldState) => ({
+      ...oldState,
       loading: true,
       distance: 0,
-      gasPrice: 0,
       start: { lat: 0, lng: 0, address: '' },
       end: { lat: 0, lng: 0, address: '' },
-    });
+    }));
 
     const parsedStartLocation = startLocation === 'Current Location' ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : startLocation;
     const parsedEndLocation = endLocation === 'Current Location' ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : endLocation;
@@ -218,13 +218,13 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       }));
     } catch (err: any) {
       Alert.alert(err.message);
-      setCostRequest({
+      setCostRequest((oldState) => ({
+        ...oldState,
         loading: false,
         distance: 0,
-        gasPrice: 0,
         start: { lat: 0, lng: 0, address: '' },
         end: { lat: 0, lng: 0, address: '' },
-      });
+      }));
     }
     return null;
   }, [startLocation, endLocation, useCustomGasPrice, customGasPrice, gasPrice, globalState['Enable Requests']]);
@@ -330,6 +330,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const selectNextInput = () => {
     setSuggestions([]);
+    setActiveInput(ActiveInput.End);
     endLocationRef?.current?.focus();
   };
 
@@ -374,6 +375,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     <Page>
       <SettingsModal
         setting="Gas Price"
+        units="$/L"
         visible={gasModalVisible}
         setVisible={setGasModalVisible}
         data={customGasPrice}
@@ -383,6 +385,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       />
       <SettingsModal
         setting="Fuel Efficiency"
+        units="L/100km"
         visible={fuelModalVisible}
         setVisible={setFuelModalVisible}
         data={globalState['Gas Mileage']}

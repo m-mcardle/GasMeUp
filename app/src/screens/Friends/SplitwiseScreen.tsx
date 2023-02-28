@@ -180,7 +180,7 @@ export default function SplitwiseScreen({ navigation } : Props) {
         <SplitwiseLogin />
       )}
       <SegmentedButtons
-        style={{ width: '70%', alignSelf: 'center', marginTop: 'auto' }}
+        style={styles.toggleButton}
         buttons={[
           {
             value: 'GasMeUp',

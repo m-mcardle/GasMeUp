@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
   },
   table: {
     flex: 1,
-    paddingVertical: 48,
+    paddingVertical: '5%',
     maxHeight: '90%',
   },
   friendInfoTitle: {
@@ -79,6 +79,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: '100%',
     marginTop: 12,
+  },
+  toggleButton: {
+    width: '70%',
+    alignSelf: 'center',
+    marginTop: 'auto',
+    marginBottom: 16,
   },
 });
 

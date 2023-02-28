@@ -379,7 +379,7 @@ export default function SaveTripScreen({
         headers={headers}
         Row={RowBuilder(selectedFriends, setSelectedFriends)}
         loading={usersDataLoading}
-        style={{ marginTop: 16 }}
+        style={{ marginTop: 4, maxHeight: '60%' }}
         EmptyState={TableEmptyState}
         scrollable
       />

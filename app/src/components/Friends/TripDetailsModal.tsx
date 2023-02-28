@@ -37,6 +37,8 @@ export default function TripDetailsModal({
     transaction.gasPrice,
     globalState.Locale,
   );
+
+  const formattedAmountOwed = transactionAmount < 0 ? `-$${Math.abs(transactionAmount).toFixed(2)}` : `$${transactionAmount.toFixed(2)}`;
   return (
     <View style={{ height: '100%', width: '100%' }}>
       <Text style={styles.friendInfoTitle}>Trip Details</Text>
@@ -59,7 +61,7 @@ export default function TripDetailsModal({
         </View>
         <View style={styles.tripDetailsStatsSection}>
           <Text>{`Total: $${transaction.cost.toFixed(2)}`}</Text>
-          <Text>{`Amount Owed: $${transactionAmount.toFixed(2)}`}</Text>
+          <Text>{`Amount Owed: ${formattedAmountOwed}`}</Text>
         </View>
         <View style={styles.tripDetailsStatsSection}>
           <Text>{`Distance: ${convertedStats.distance}`}</Text>

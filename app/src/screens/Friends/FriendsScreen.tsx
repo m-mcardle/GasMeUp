@@ -234,7 +234,7 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
         scrollable
       />
       <SegmentedButtons
-        style={{ width: '70%', alignSelf: 'center', marginTop: 'auto' }}
+        style={styles.toggleButton}
         buttons={[
           {
             value: 'GasMeUp',

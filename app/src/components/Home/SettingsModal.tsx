@@ -16,6 +16,7 @@ import { colors, globalStyles } from '../../styles/styles';
 interface Props {
   setting: string,
   visible: boolean,
+  units: string,
   setVisible: (_: any) => void,
   data: number,
   setData: (_: any) => void,
@@ -28,6 +29,7 @@ export default function SettingModal(props: Props) {
   const {
     setting = 'Gas Price',
     visible,
+    units,
     setVisible,
     data,
     setData,
@@ -46,6 +48,9 @@ export default function SettingModal(props: Props) {
       <View style={styles.modalContainer}>
         <Text style={styles.heading}>
           {`Configure ${setting}`}
+        </Text>
+        <Text style={styles.subHeading}>
+          {units}
         </Text>
         <View style={{ alignSelf: 'center', margin: 8 }}>
           <NumericInput

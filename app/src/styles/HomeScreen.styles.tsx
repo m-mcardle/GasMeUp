@@ -15,6 +15,10 @@ const styles = StyleSheet.create({
     fontFamily: boldFont,
     textAlign: 'center',
   },
+  subHeading: {
+    fontSize: 12,
+    textAlign: 'center',
+  },
   container: {
     flex: 1,
     alignItems: 'center',
@@ -126,8 +130,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '70%',
     justifyContent: 'center',
-    marginTop: 12,
-    marginBottom: 64,
+    marginTop: 4,
+    marginBottom: '5%',
   },
   calculateButton: {
     width: '50%',

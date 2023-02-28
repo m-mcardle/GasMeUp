@@ -18,13 +18,13 @@ const styles = StyleSheet.create({
   },
   selectionButtons: {
     marginTop: 'auto',
-    marginBottom: 0,
+    marginBottom: 16,
     width: '50%',
   },
   gasPriceTable: {
     width: '100%',
-    marginTop: 16,
-    height: '80%',
+    marginTop: 8,
+    height: '75%',
   },
 });
 

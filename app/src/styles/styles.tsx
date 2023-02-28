@@ -43,7 +43,7 @@ export const semiBoldFont = fonts[600];
 export const globalStyles = StyleSheet.create({
   page: {
     flex: 1,
-    paddingVertical: 20,
+    paddingTop: 20,
   },
   text: {
     fontFamily: font,

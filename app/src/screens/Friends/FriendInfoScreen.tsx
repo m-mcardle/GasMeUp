@@ -127,6 +127,8 @@ export default function FriendInfoScreen({
     ],
   );
 
+  const formattedAmount = amount < 0 ? `-$${Math.abs(amount).toFixed(2)}` : `$${amount.toFixed(2)}`;
+
   return (
     <Page>
       <Portal>
@@ -269,7 +271,7 @@ export default function FriendInfoScreen({
             Balance
           </DataTable.Cell>
           <DataTable.Cell textStyle={{ fontFamily: boldFont }} numeric>
-            {`$${amount.toFixed(2)}`}
+            {formattedAmount}
           </DataTable.Cell>
         </DataTable.Row>
       </DataTable>

@@ -157,7 +157,7 @@ export default function GasPriceScreen({ navigation }: any) {
   }
 
   const useAsGasPrice = (price: number) => {
-    changeSetting('Custom Gas Price', { price, enabled: true }, updateGlobalState);
+    changeSetting('Custom Gas Price', { price, enabled: 'true' }, updateGlobalState);
     Alert.alert('Gas Price Updated', `Your gas price has been updated to ${convertGasPriceToString(price, 'CA', globalState.Locale)}`, [
       {
         text: 'OK',
