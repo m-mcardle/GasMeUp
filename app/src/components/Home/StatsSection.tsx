@@ -109,6 +109,16 @@ export default function StatsSection(props: Props) {
     colors.tertiary,
   ];
 
+  const formatter = new Intl.NumberFormat('en-CA', {
+    style: 'currency',
+    currency: 'CAD',
+  });
+  const costString = formatter.format(cost);
+  const costStringLength = costString.length;
+
+  // Set the font size based on the length of the cost
+  const costFontSize = 64 - Math.min(48, Math.max(0, costStringLength - 8) * 8);
+
   return (
     <View style={styles.statsSection}>
       <AnimatedGradient
@@ -120,9 +130,8 @@ export default function StatsSection(props: Props) {
         {loading
           ? <ActivityIndicator animating size="large" />
           : (
-            <Text style={styles.costText}>
-              $
-              {cost.toFixed(2)}
+            <Text style={{ ...styles.costText, fontSize: costFontSize }}>
+              {costString}
             </Text>
           )}
       </AnimatedGradient>

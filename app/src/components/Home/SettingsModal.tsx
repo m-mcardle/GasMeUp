@@ -17,6 +17,7 @@ interface Props {
   setting: string,
   visible: boolean,
   units: string,
+  maxValue?: number,
   setVisible: (_: any) => void,
   data: number,
   setData: (_: any) => void,
@@ -30,6 +31,7 @@ export default function SettingModal(props: Props) {
     setting = 'Gas Price',
     visible,
     units,
+    maxValue,
     setVisible,
     data,
     setData,
@@ -62,6 +64,7 @@ export default function SettingModal(props: Props) {
             inputStyle={globalStyles.numericInput as ViewStyle}
             valueType="real"
             minValue={0.01}
+            maxValue={maxValue}
             leftButtonBackgroundColor={colors.lightGray}
             rightButtonBackgroundColor={colors.action}
             textColor={colors.primary}
@@ -80,7 +83,11 @@ export default function SettingModal(props: Props) {
           />
         </View>
         )}
-        <Button style={{ alignSelf: 'center' }} onPress={() => setVisible(false)}>
+        <Button
+          style={{ alignSelf: 'center' }}
+          onPress={() => setVisible(false)}
+          disabled={(!!maxValue && data > maxValue) || data <= 0.1}
+        >
           <Text style={{ color: colors.secondary }}>Done</Text>
         </Button>
       </View>
@@ -92,4 +99,5 @@ SettingModal.defaultProps = {
   useCustomValue: false,
   setUseCustomValue: undefined,
   inputStep: 0.01,
+  maxValue: undefined,
 };

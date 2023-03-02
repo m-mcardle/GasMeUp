@@ -64,7 +64,7 @@ export default function SignUpScreen() {
           lastName,
           transactions: [],
           friends: {},
-          notificationToken: globalState.expoToken,
+          notificationToken: globalState.expoToken ?? '',
         })
           .then(() => {
             console.log('Created `Users` document');

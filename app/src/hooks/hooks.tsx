@@ -108,6 +108,7 @@ export const initialState = {
     lng: undefined,
   },
   exchangeRate: 1,
+  expoToken: '',
 };
 
 export function changeSetting(
