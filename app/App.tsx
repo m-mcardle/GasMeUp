@@ -11,14 +11,12 @@ import {
   Inter_800ExtraBold,
   Inter_900Black,
 } from '@expo-google-fonts/inter';
-import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 
 // React imports
 import React, {
   useState, useMemo, useEffect, useRef,
 } from 'react';
-import { Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -38,7 +36,7 @@ import CarScreen from './src/screens/CarScreen';
 import { colors } from './src/styles/styles';
 
 // Helpers
-import { lookupProvince, lookupStateCode } from './src/helpers/locationHelper';
+import { getUserLocation } from './src/helpers/locationHelper';
 import { registerForPushNotificationsAsync } from './src/helpers/notificationHelper';
 import { getExchangeRate } from './src/helpers/unitsHelper';
 
@@ -135,37 +133,7 @@ export default function App() {
 
   // Location initialization
   useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Permission to access location was denied');
-        updateGlobalState('region', 'Ontario');
-        updateGlobalState('country', 'CA');
-        return;
-      }
-
-      const location = await Location.getCurrentPositionAsync({});
-      updateGlobalState('userLocation', {
-        lat: location.coords.latitude,
-        lng: location.coords.longitude,
-      });
-      const readableLocation = (await Location.reverseGeocodeAsync(location.coords))[0];
-
-      const userCountry = readableLocation.country ?? 'Canada';
-      const userRegion = readableLocation.region ?? 'Ontario';
-      if (userCountry === 'Canada') {
-        const regionCode = Platform.OS === 'ios' ? lookupProvince(userRegion) : userRegion;
-        updateGlobalState('region', regionCode);
-        updateGlobalState('country', 'CA');
-      } else if (userCountry === 'United States') {
-        const regionCode = Platform.OS === 'ios' ? userRegion : lookupStateCode(userRegion);
-        updateGlobalState('region', regionCode);
-        updateGlobalState('country', 'US');
-      } else {
-        updateGlobalState('region', 'Ontario');
-        updateGlobalState('country', 'CA');
-      }
-    })();
+    getUserLocation(updateGlobalState);
   }, []);
 
   const [, setNotification] = useState<Notifications.Notification | undefined>();

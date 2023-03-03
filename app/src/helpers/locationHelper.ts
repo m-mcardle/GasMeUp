@@ -1,3 +1,6 @@
+import { Platform } from 'react-native';
+import * as Location from 'expo-location';
+
 export const provinceCodeLookup: Record<string, string> = {
   ON: 'Ontario',
   QC: 'Quebec',
@@ -81,6 +84,40 @@ export const lookupStateCode = (state: string) => {
   const code = Object.keys(stateCodeLookup).find((key) => stateCodeLookup[key] === state);
   return code ?? 'NY';
 };
+
+export async function getUserLocation(updateGlobalState: Function) {
+  console.log('Getting user location...');
+  const { status } = await Location.requestForegroundPermissionsAsync();
+  if (status !== 'granted') {
+    console.log('Permission to access location was denied');
+    updateGlobalState('region', 'Ontario');
+    updateGlobalState('country', 'CA');
+    return;
+  }
+
+  const location = await Location.getCurrentPositionAsync({});
+  updateGlobalState('userLocation', {
+    lat: location.coords.latitude,
+    lng: location.coords.longitude,
+  });
+  console.log('User location: ', location.coords);
+  const readableLocation = (await Location.reverseGeocodeAsync(location.coords))[0];
+
+  const userCountry = readableLocation.country ?? 'Canada';
+  const userRegion = readableLocation.region ?? 'Ontario';
+  if (userCountry === 'Canada') {
+    const regionCode = Platform.OS === 'ios' ? lookupProvince(userRegion) : userRegion;
+    updateGlobalState('region', regionCode);
+    updateGlobalState('country', 'CA');
+  } else if (userCountry === 'United States') {
+    const regionCode = Platform.OS === 'ios' ? userRegion : lookupStateCode(userRegion);
+    updateGlobalState('region', regionCode);
+    updateGlobalState('country', 'US');
+  } else {
+    updateGlobalState('region', 'Ontario');
+    updateGlobalState('country', 'CA');
+  }
+}
 
 export default {
   provinceCodeLookup,

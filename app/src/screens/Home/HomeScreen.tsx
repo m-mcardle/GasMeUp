@@ -30,6 +30,7 @@ import { auth } from '../../../firebase';
 // Helpers
 import { validateCurrentUser } from '../../helpers/authHelper';
 import { convertGasPrice } from '../../helpers/unitsHelper';
+import { getUserLocation } from '../../helpers/locationHelper';
 
 // Global State Stuff
 import { useGlobalState, changeSetting } from '../../hooks/hooks';
@@ -303,8 +304,9 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     setActiveInput(input);
   };
 
-  const useCurrentLocation = (input: ActiveInput) => {
+  const useCurrentLocation = async (input: ActiveInput) => {
     Keyboard.dismiss();
+    await getUserLocation(updateGlobalState);
 
     if (input === ActiveInput.Start) {
       setLocations((state) => ({ ...state, startLocation: (state.startLocation === 'Current Location' ? '' : 'Current Location') }));
