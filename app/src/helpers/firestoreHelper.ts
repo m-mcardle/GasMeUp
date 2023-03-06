@@ -21,6 +21,19 @@ export async function updateFriend(uid: string, friendUID: string, friend: Frien
   });
 }
 
+export async function removeFriend(uid: string, friendUID: string) {
+  const userRef = doc(db, 'Users', uid);
+  const userDoc = await getDoc(userRef);
+  const user = userDoc.data();
+  const userFriends = user?.friends;
+  delete userFriends[friendUID];
+  await updateDoc(doc(db, 'Users', uid), {
+    friends: {
+      ...userFriends,
+    },
+  });
+}
+
 export default {
   createTransaction,
 };

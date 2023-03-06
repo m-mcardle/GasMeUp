@@ -12,7 +12,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '../../../firebase';
 
 // Helpers
-import { updateFriend } from '../../helpers/firestoreHelper';
+import { updateFriend, removeFriend } from '../../helpers/firestoreHelper';
 
 // Components
 import Text from '../Text';
@@ -74,6 +74,19 @@ export default function FriendRequestsSection({ friendRequestUIDs, closeModal } 
     }
   };
 
+  const removeFriendRequest = async (friend: FriendObject) => {
+    if (!currentUser) {
+      return;
+    }
+
+    try {
+      await removeFriend(currentUser.uid, friend.uid);
+      closeModal();
+    } catch (exception) {
+      console.log(exception);
+    }
+  };
+
   return (
     <View style={{ height: '100%' }}>
       <Text style={styles.friendInfoTitle}>Friend Requests</Text>
@@ -84,8 +97,8 @@ export default function FriendRequestsSection({ friendRequestUIDs, closeModal } 
         <View
           style={styles.friendRequestsSection}
         >
-          <Text style={{ fontFamily: boldFont, ...globalStyles.h2 }}>Name</Text>
-          <Text style={{ fontFamily: boldFont, ...globalStyles.h2 }}>Email</Text>
+          <Text style={{ fontFamily: boldFont, ...globalStyles.h3, width: '40%' }}>Name</Text>
+          <Text style={{ fontFamily: boldFont, ...globalStyles.h3, width: '40%' }}>Email</Text>
           <View
             style={styles.acceptFriendRequestButton}
           />
@@ -95,13 +108,19 @@ export default function FriendRequestsSection({ friendRequestUIDs, closeModal } 
             key={request.uid}
             style={styles.friendRequestsSection}
           >
-            <Text style={globalStyles.h2}>{request.fullName}</Text>
-            <Text style={globalStyles.h2}>{request.email}</Text>
+            <Text style={{ ...globalStyles.h3, width: '40%' }} numberOfLines={1}>{request.fullName}</Text>
+            <Text style={{ ...globalStyles.h3, width: '40%' }} numberOfLines={1}>{request.email}</Text>
             <Button
               style={styles.acceptFriendRequestButton}
               onPress={() => acceptFriendRequest(request)}
             >
               <Ionicons name="checkmark" size={14} color={colors.white} />
+            </Button>
+            <Button
+              style={styles.removeFriendRequestButton}
+              onPress={() => removeFriendRequest(request)}
+            >
+              <Ionicons name="remove" size={14} color={colors.white} />
             </Button>
           </View>
         ))}

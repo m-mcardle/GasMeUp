@@ -43,10 +43,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
+    width: '100%',
+  },
+  removeFriendRequestButton: {
+    paddingHorizontal: 4,
+    paddingVertical: 4,
+    width: '10%',
+    alignItems: 'center',
+    backgroundColor: 'red',
   },
   acceptFriendRequestButton: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 4,
     paddingVertical: 4,
+    width: '10%',
+    alignItems: 'center',
   },
   actionIcon: {
     width: 30,

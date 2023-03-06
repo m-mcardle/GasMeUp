@@ -1,5 +1,5 @@
 // React
-import React, { useCallback, useRef } from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Animated,
@@ -16,16 +16,13 @@ import {
 } from 'react-native-paper';
 
 // Firebase
-import {
-  doc, updateDoc,
-} from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useDocumentData } from 'react-firebase-hooks/firestore';
-import { auth, db } from '../../../firebase';
+import { auth } from '../../../firebase';
 
 // Helpers
 import { validateCurrentUser } from '../../helpers/authHelper';
 import { getIcon } from '../../helpers/iconHelper';
+import { removeFriend } from '../../helpers/firestoreHelper';
 
 // Components
 import Text from '../Text';
@@ -49,9 +46,6 @@ export default function Row({
 }: Props) {
   const [user] = useAuthState(auth);
   const ref = useRef<Swipeable>(null);
-
-  const userDoc = user?.uid ? doc(db, 'Users', user.uid) : undefined;
-  const [userDocument] = useDocumentData(userDoc);
 
   const renderRightActions = (
     _progress: Animated.AnimatedInterpolation<number>,
@@ -77,40 +71,24 @@ export default function Row({
     );
   };
 
-  const removeFriend = useCallback(async () => {
-    if (!user?.uid || !userDoc) {
-      return;
-    }
-    try {
-      const newFriendsList = userDocument?.friends;
-      delete newFriendsList[uid];
-
-      await updateDoc(userDoc, {
-        friends: {
-          ...newFriendsList,
+  const showRemoveConfirmationAlert = () => (user?.uid && uid
+    ? Alert.alert(
+      'Remove Friend',
+      `Are you sure you want to remove ${name} from your list of friends?`,
+      [
+        {
+          text: 'Remove',
+          onPress: () => removeFriend(user?.uid, uid),
+          style: 'destructive',
         },
-      });
-    } catch (exception) {
-      console.log(exception);
-    }
-  }, [userDocument, userDoc, user?.uid, uid]);
-
-  const showRemoveConfirmationAlert = () => Alert.alert(
-    'Remove Friend',
-    `Are you sure you want to remove ${name} from your list of friends?`,
-    [
-      {
-        text: 'Remove',
-        onPress: () => removeFriend(),
-        style: 'destructive',
-      },
-      {
-        text: 'Cancel',
-        onPress: () => ref?.current?.close(),
-        style: 'cancel',
-      },
-    ],
-  );
+        {
+          text: 'Cancel',
+          onPress: () => ref?.current?.close(),
+          style: 'cancel',
+        },
+      ],
+    )
+    : null);
 
   return (
     <Swipeable
