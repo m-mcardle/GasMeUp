@@ -191,7 +191,7 @@ export const globalStyles = StyleSheet.create({
   headerSection: {
     paddingHorizontal: 16,
     justifyContent: 'space-between',
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     position: 'absolute',
     top: 24,
     left: 0,

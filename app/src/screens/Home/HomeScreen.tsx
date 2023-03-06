@@ -453,7 +453,6 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         setData={updateCustomGasPrice}
         useCustomValue={useCustomGasPrice}
         setUseCustomValue={configureCustomGasPrice}
-        maxValue={5}
       />
       <SettingsModal
         setting="Fuel Efficiency"
@@ -463,7 +462,6 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         data={globalState['Gas Mileage']}
         setData={(value) => changeSetting('Gas Mileage', value, updateGlobalState)}
         inputStep={0.5}
-        maxValue={40}
       />
       <Portal>
         <Modal

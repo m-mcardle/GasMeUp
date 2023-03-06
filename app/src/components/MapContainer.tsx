@@ -68,8 +68,6 @@ export default function MapContainer({
     longitudeDelta: hasStartOrEnd && !hasStartAndEnd ? 0.5 : lngDelta,
   };
 
-  console.log(mapRegion);
-
   const userLocationRegion = {
     latitude: globalState.userLocation.lat,
     longitude: globalState.userLocation.lng,

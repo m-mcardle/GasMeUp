@@ -207,6 +207,12 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
 
       <View style={globalStyles.headerSection}>
         <TouchableOpacity
+          onPress={logout}
+        >
+          <Ionicons name="log-out" size={24} color="white" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
           style={{ flexDirection: 'row' }}
           onPress={
             () => validateCurrentUser(user) && hasFriendRequests && setFriendRequestsVisible(true)
@@ -214,12 +220,6 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
         >
           <Text style={{ color: colors.white }}>{friendRequestUIDs.length}</Text>
           <FontAwesome5 name="user-friends" size={18} color="white" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={logout}
-        >
-          <Ionicons name="log-out" size={24} color="white" />
         </TouchableOpacity>
       </View>
       <Table
