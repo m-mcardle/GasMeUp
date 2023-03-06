@@ -234,37 +234,6 @@ async function GetVehicle(id) {
 Express API Endpoints
 */
 
-// Handle GET requests for total gas cost for a trip
-app.get('/trip-cost', async (req, res) => {
-  if (!validateAPIKey(req.query?.api_key)) {
-    res.status(401).send({ error: 'Invalid API Key' });
-    return;
-  }
-
-  const startLocation = req.query?.start ?? 'Ottawa';
-  const endLocation = req.query?.end ?? 'Toronto';
-  const manualGasPrice = req.query?.price ?? '';
-  const country = req.query?.country ?? 'CA';
-  const region = req.query?.region ?? 'Ontario';
-
-  res.set('Access-Control-Allow-Origin', '*');
-  try {
-    const [distance, gasPrice] = manualGasPrice
-      ? [await GetDistance(startLocation, endLocation), Number(manualGasPrice)]
-      : await Promise.all([
-        GetDistance(startLocation, endLocation),
-        GetGasPrice(country, region),
-      ]);
-    Log(`[trip-cost] Distance: ${distance}km and Gas Price: $${gasPrice}`);
-
-    const cost = GasCostForDistance(distance, gasPrice);
-    res.json({ cost, distance, gasPrice });
-  } catch (exception) {
-    LogError(exception);
-    res.status(500).send({ error: exception });
-  }
-});
-
 // Handle autocomplete suggestions for locations
 app.get('/suggestions', async (req, res) => {
   if (!validateAPIKey(req.query?.api_key)) {
