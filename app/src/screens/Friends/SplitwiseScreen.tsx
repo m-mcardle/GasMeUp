@@ -1,9 +1,10 @@
 // React
 import React, { useEffect, useState } from 'react';
 import {
-  View, Image,
+  View, Image, TouchableOpacity,
 } from 'react-native';
 
+import { Ionicons } from '@expo/vector-icons';
 import { openURL } from 'expo-linking';
 
 import { DataTable, SegmentedButtons } from 'react-native-paper';
@@ -23,12 +24,13 @@ import { getIcon } from '../../helpers/iconHelper';
 import Page from '../../components/Page';
 import Table from '../../components/Table';
 import Text from '../../components/Text';
+import Button from '../../components/Button';
+
 import SplitwiseLogin from '../../components/Login/SplitwiseLogin';
 
 // Styles
 import styles from '../../styles/FriendsScreen.styles';
-import { colors } from '../../styles/styles';
-import Button from '../../components/Button';
+import { colors, globalStyles } from '../../styles/styles';
 
 // @ts-ignore
 import SplitwiseLogo from '../../../assets/splitwise-logo.png';
@@ -114,12 +116,26 @@ export default function SplitwiseScreen({ navigation } : Props) {
 
   const [user] = useAuthState(auth);
 
+  const userDoc = user?.uid ? doc(db, 'Users', user.uid) : undefined;
+
   const secureUserDoc = user?.uid ? doc(db, 'SecureUsers', user.uid) : undefined;
   const [secureUserDocument, secureUserDocLoading] = useDocumentData(secureUserDoc);
 
   const splitwiseToken = secureUserDocument?.splitwiseToken;
 
   const [loading, setLoading] = useState(true);
+
+  const logout = () => {
+    if (!secureUserDoc || !userDoc) { return; }
+
+    updateDoc(secureUserDoc, {
+      splitwiseToken: '',
+    });
+
+    updateDoc(userDoc, {
+      splitwiseUID: '',
+    });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -165,17 +181,26 @@ export default function SplitwiseScreen({ navigation } : Props) {
   return (
     <Page>
       {secureUserDocLoading || splitwiseToken ? (
-        <Table
-          title="Friends"
-          data={formattedBalances}
-          headers={headers}
-          Row={Row}
-          style={styles.table}
-          loading={loading || secureUserDocLoading}
-          EmptyState={TableEmptyState}
-          FooterRow={FooterRow}
-          scrollable
-        />
+        <>
+          <View style={globalStyles.headerSection}>
+            <TouchableOpacity
+              onPress={logout}
+            >
+              <Ionicons name="log-out" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
+          <Table
+            title="Friends"
+            data={formattedBalances}
+            headers={headers}
+            Row={Row}
+            style={styles.table}
+            loading={loading || secureUserDocLoading}
+            EmptyState={TableEmptyState}
+            FooterRow={FooterRow}
+            scrollable
+          />
+        </>
       ) : (
         <SplitwiseLogin />
       )}
@@ -195,7 +220,7 @@ export default function SplitwiseScreen({ navigation } : Props) {
             icon: SplitwiseLogo,
           },
         ]}
-        onValueChange={() => navigation.replace('Index')}
+        onValueChange={(value) => (value === 'GasMeUp' ? navigation.replace('Index') : null)}
         value="Splitwise"
       />
     </Page>
