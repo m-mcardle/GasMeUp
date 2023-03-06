@@ -84,7 +84,7 @@ export const globalStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    height: 60,
+    height: 75,
   },
   autocompleteListContainer: {
     backgroundColor: colors.tertiary,

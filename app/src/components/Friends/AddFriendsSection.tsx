@@ -99,7 +99,7 @@ export default function AddFriendsTable({ close }: Props) {
         Input your friends email to send them a friend request!
       </Text>
       <Input
-        containerStyle={{ marginTop: 40 }}
+        viewStyle={{ marginTop: 40 }}
         style={{ borderColor: 'white' }}
         placeholder="Friend's Email"
         autoComplete="email"
@@ -108,7 +108,6 @@ export default function AddFriendsTable({ close }: Props) {
         value={friendEmail}
         onChangeText={setFriendEmail}
         onSubmitEditing={sendFriendRequest}
-        icon={(<Ionicons name="person-add" size={24} color={colors.secondary} />)}
         error={inputError}
         clearButton
       />
@@ -116,9 +115,12 @@ export default function AddFriendsTable({ close }: Props) {
         disabled={!validEmail}
         onPress={sendFriendRequest}
       >
-        <Text>
-          Send
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Ionicons name="person-add" size={24} color={colors.secondary} />
+          <Text>
+            Send
+          </Text>
+        </View>
       </Button>
     </View>
   );

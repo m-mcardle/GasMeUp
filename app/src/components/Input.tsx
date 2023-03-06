@@ -6,11 +6,15 @@ import {
   TextInput, TouchableOpacity, View,
 } from 'react-native';
 
+import Text from './Text';
+
 import { colors, globalStyles } from '../styles/styles';
 
 interface Props {
   value?: string,
   placeholder?: string,
+  viewStyle?: object,
+  labelStyle?: object,
   containerStyle?: object,
   style?: object,
   password?: boolean,
@@ -36,6 +40,8 @@ export default function Input(props: Props) {
     onSubmitEditing,
     onClear,
     placeholder,
+    labelStyle,
+    viewStyle,
     containerStyle,
     style,
     value,
@@ -65,37 +71,42 @@ export default function Input(props: Props) {
   }
   const width = `${numWidth}%`;
   return (
-    <View style={[globalStyles.inputView, containerStyle]}>
-      {icon}
-      <TextInput
-        ref={myRef}
-        value={value}
-        blurOnSubmit={blurOnSubmit}
-        style={[
-          globalStyles.input,
-          { width },
-          error ? { ...globalStyles.errorInput } : undefined,
-          style,
-        ]}
-        keyboardType={keyboardType}
-        returnKeyType={returnKeyType}
-        placeholder={placeholder}
-        placeholderTextColor={colors.secondary}
-        onChangeText={onChangeText}
-        onPressIn={onPressIn}
-        onSubmitEditing={onSubmitEditing}
-        secureTextEntry={password}
-        autoComplete={autoComplete}
-        editable={editable}
-      />
-      {clearButton && (
-        <TouchableOpacity
-          style={globalStyles.clearInputButton}
-          onPress={clearInput}
-        >
-          <MaterialIcons name="clear" size={15} color={colors.primary} />
-        </TouchableOpacity>
+    <View style={viewStyle}>
+      {placeholder && (
+      <Text style={{ margin: 4, paddingLeft: (icon ? 42 : 0), ...labelStyle }}>
+        {placeholder}
+      </Text>
       )}
+      <View style={[globalStyles.inputView, containerStyle]}>
+        {icon}
+        <TextInput
+          ref={myRef}
+          value={value}
+          blurOnSubmit={blurOnSubmit}
+          style={[
+            globalStyles.input,
+            { width },
+            error ? { ...globalStyles.errorInput } : undefined,
+            style,
+          ]}
+          keyboardType={keyboardType}
+          returnKeyType={returnKeyType}
+          onChangeText={onChangeText}
+          onPressIn={onPressIn}
+          onSubmitEditing={onSubmitEditing}
+          secureTextEntry={password}
+          autoComplete={autoComplete}
+          editable={editable}
+        />
+        {clearButton && (
+          <TouchableOpacity
+            style={globalStyles.clearInputButton}
+            onPress={clearInput}
+          >
+            <MaterialIcons name="clear" size={15} color={colors.primary} />
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 }
@@ -104,6 +115,8 @@ Input.defaultProps = {
   value: undefined,
   placeholder: undefined,
   style: undefined,
+  viewStyle: undefined,
+  labelStyle: undefined,
   containerStyle: undefined,
   onPressIn: undefined,
   password: false,

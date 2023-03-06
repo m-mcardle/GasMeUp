@@ -20,6 +20,7 @@ interface Props {
   listContainerStyle?: object,
   containerStyle?: object,
   style?: object,
+  labelStyle?: object,
   password?: boolean,
   autoComplete?: TextInput['props']['autoComplete'],
   suggestions: Array<string>,
@@ -48,6 +49,7 @@ export default function AutocompleteInput(props: Props) {
     onClear,
     placeholder,
     listContainerStyle,
+    labelStyle,
     containerStyle,
     style,
     value,
@@ -77,6 +79,7 @@ export default function AutocompleteInput(props: Props) {
               onSubmitEditing={onSubmitEditing}
               placeholder={placeholder}
               style={[style, { borderWidth: 0 }]}
+              labelStyle={labelStyle}
               containerStyle={{ ...containerStyle, width: '100%', paddingHorizontal: 8 }}
               value={value}
               password={password}
@@ -136,6 +139,7 @@ AutocompleteInput.defaultProps = {
   placeholder: undefined,
   listContainerStyle: undefined,
   style: undefined,
+  labelStyle: undefined,
   containerStyle: undefined,
   onPressIn: undefined,
   password: false,
