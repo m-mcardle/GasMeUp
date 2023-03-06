@@ -15,6 +15,7 @@ import {
 
 // External Components
 import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { MapPressEvent, PoiClickEvent } from 'react-native-maps';
 import {
   Portal,
 } from 'react-native-paper';
@@ -130,6 +131,31 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const configureCustomGasPrice = (value: boolean) => {
     changeSetting('Custom Gas Price', { price: customGasPrice, enabled: String(value) }, updateGlobalState);
+  };
+
+  const clearCurrentTrip = ({ resetStart, resetEnd } = { resetStart: false, resetEnd: false }) => {
+    setWaypoints([]);
+    setCostRequest((state) => ({
+      ...state,
+      loading: false,
+      start: (resetStart ? { lat: 0, lng: 0, address: '' } : state.start),
+      end: (resetEnd ? { lat: 0, lng: 0, address: '' } : state.end),
+      distance: 0,
+    }));
+  };
+
+  const updateTripStart = (newStart: any) => {
+    setCostRequest((state) => ({
+      ...state,
+      start: { ...newStart },
+    }));
+  };
+
+  const updateTripEnd = (newEnd: any) => {
+    setCostRequest((state) => ({
+      ...state,
+      end: { ...newEnd },
+    }));
   };
 
   const submit = useCallback(async () => {
@@ -315,6 +341,50 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     setSuggestions([]);
   };
 
+  const setLocationToPressedLocation = (address: string, latitude: number, longitude: number) => {
+    if (!startLocation) {
+      // If there is no start location, set the start location to the pressed location
+      clearCurrentTrip();
+      updateTripStart({ lat: latitude, lng: longitude, address });
+      setLocations((state) => ({ ...state, startLocation: address }));
+    } else if (!endLocation) {
+      // If there is a start location but no end location,
+      // set the end location to the pressed location
+      clearCurrentTrip();
+      updateTripEnd({ lat: latitude, lng: longitude, address });
+      setLocations((state) => ({ ...state, endLocation: address }));
+    } else {
+      // If there is a start and end location, set the start location to the pressed location,
+      // and clear the end location
+      clearCurrentTrip({ resetStart: true, resetEnd: true });
+      updateTripStart({ lat: latitude, lng: longitude, address });
+      setLocations((state) => ({ ...state, startLocation: address, endLocation: '' }));
+    }
+  };
+
+  const setUnknownLocationToPressedLocation = async (event: MapPressEvent) => {
+    const coordinate = event?.nativeEvent.coordinate;
+    if (!coordinate) { return; }
+
+    const { latitude, longitude } = coordinate;
+    const response = await fetchData('/geocode', { latlng: `${latitude},${longitude}` });
+    const address = await response.json();
+
+    setLocationToPressedLocation(address, latitude, longitude);
+  };
+
+  const setLocationToPressedPOI = async (event: PoiClickEvent) => {
+    const coordinate = event?.nativeEvent.coordinate;
+    const placeId = event?.nativeEvent.placeId;
+    if (!coordinate) { return; }
+
+    const response = await fetchData('/place', { placeId });
+    const address = await response.json();
+
+    const { latitude, longitude } = coordinate;
+    setLocationToPressedLocation(address, latitude, longitude);
+  };
+
   // Reset to last server gas price each time the user changes custom gas price settings
   useEffect(() => {
     if (!useCustomGasPrice) {
@@ -401,12 +471,15 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           onDismiss={() => setMapModalVisible(false)}
         >
           <MapModal
-            data={{
-              start,
-              end,
-            }}
+            description="Tap on the map to manually set your start and end points"
             showUserLocation={!start.address || !end.address}
             waypoints={waypoints}
+            handleMapPress={setUnknownLocationToPressedLocation}
+            handlePoiPress={setLocationToPressedPOI}
+            customStart={start}
+            customEnd={end}
+            startAddress={start.address}
+            endAddress={end.address}
           />
         </Modal>
       </Portal>
@@ -421,6 +494,9 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           showUserLocation={!start.address || !end.address}
           style={styles.mapView}
           onPress={() => setMapModalVisible(true)}
+          onPoiClick={() => setMapModalVisible(true)}
+          customStart={start}
+          customEnd={end}
         />
         <StatsSection
           loading={loading}
@@ -452,6 +528,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
             />
            )}
           clearButton
+          onClear={() => clearCurrentTrip({ resetStart: true, resetEnd: false })}
           error={startLocationError}
           autoComplete="street-address"
           blurOnSubmit={false}
@@ -478,6 +555,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
             />
            )}
           clearButton
+          onClear={() => clearCurrentTrip({ resetStart: false, resetEnd: true })}
           error={endLocationError}
           autoComplete="street-address"
           onSubmitEditing={submit}

@@ -30,7 +30,6 @@ import styles from '../../styles/FriendsScreen.styles';
 import { colors, boldFont } from '../../styles/styles';
 
 // Helpers
-import { locationToLatLng } from '../../helpers/mapHelper';
 import { createTransaction } from '../../helpers/firestoreHelper';
 import { getIcon } from '../../helpers/iconHelper';
 
@@ -150,14 +149,6 @@ export default function FriendInfoScreen({
         >
           {transactionWaypoints.length > 0 && (
             <MapModal
-              data={{
-                start: {
-                  ...locationToLatLng(transactionWaypoints[0]),
-                },
-                end: {
-                  ...locationToLatLng(transactionWaypoints[transactionWaypoints.length - 1]),
-                },
-              }}
               showUserLocation={false}
               waypoints={transactionWaypoints}
             />

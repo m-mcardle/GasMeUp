@@ -1,7 +1,9 @@
 import React from 'react';
 import { View } from 'react-native';
 
-import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
+import MapView, {
+  PROVIDER_GOOGLE, Marker, Polyline, MapPressEvent, PoiClickEvent,
+} from 'react-native-maps';
 
 import { useGlobalState } from '../hooks/hooks';
 
@@ -10,37 +12,63 @@ import { customMapStyle, locationToLatLng } from '../helpers/mapHelper';
 import { colors, globalStyles } from '../styles/styles';
 
 interface Props {
+  customStart?: LatLng,
+  customEnd?: LatLng,
   showUserLocation: boolean;
   waypoints: Array<Location>,
   style?: object,
-  onPress?: () => void,
+  onPress?: (event: MapPressEvent) => void,
+  onPoiClick?: (event: PoiClickEvent) => void,
 }
 
 export default function MapContainer({
-  showUserLocation, waypoints, style, onPress,
+  showUserLocation,
+  waypoints,
+  style,
+  customStart = undefined,
+  customEnd = undefined,
+  onPress = (event) => console.log(event?.nativeEvent.coordinate),
+  onPoiClick = (event) => console.log(event.nativeEvent.name),
 }: Props) {
   const [globalState] = useGlobalState();
   const hasUserLocation = globalState.userLocation.lat && globalState.userLocation.lng;
 
+  const fallbackStart = customStart?.lat ? customStart : undefined;
+  const fallbackEnd = customEnd?.lat ? customEnd : undefined;
+
   const start = waypoints.length
     ? locationToLatLng(waypoints[0])
-    : { lat: 0, lng: 0 };
+    : fallbackStart;
   const end = waypoints.length
     ? locationToLatLng(waypoints[waypoints.length - 1])
-    : { lat: 0, lng: 0 };
+    : fallbackEnd;
 
-  const latDelta = Math.abs(start.lat - end.lat) * 1.5 ?? 5;
-  const lngDelta = Math.abs(start.lng - end.lng) * 1.5 ?? 5;
+  const hasStartAndEnd = !!start && !!end;
+  const hasStartOrEnd = !!start || !!end;
 
-  const middleLat = (start.lat + end.lat) / 2;
-  const middleLng = (start.lng + end.lng) / 2;
+  const latDelta = hasStartAndEnd ? Math.abs(start.lat - end.lat) * 1.5 : 100;
+  const lngDelta = hasStartAndEnd ? Math.abs(start.lng - end.lng) * 1.5 : 100;
+
+  const middleLat = hasStartAndEnd ? (start.lat + end.lat) / 2 : 0;
+  const middleLng = hasStartAndEnd ? (start.lng + end.lng) / 2 : 0;
+
+  let regionLatitude = middleLat;
+  if (!middleLat) {
+    regionLatitude = start?.lat || end?.lat || 0;
+  }
+  let regionLongitude = middleLng;
+  if (!middleLng) {
+    regionLongitude = start?.lng || end?.lng || 0;
+  }
 
   const mapRegion = {
-    latitude: middleLat,
-    longitude: middleLng,
-    latitudeDelta: latDelta,
-    longitudeDelta: lngDelta,
+    latitude: regionLatitude,
+    longitude: regionLongitude,
+    latitudeDelta: hasStartOrEnd && !hasStartAndEnd ? 0.5 : latDelta,
+    longitudeDelta: hasStartOrEnd && !hasStartAndEnd ? 0.5 : lngDelta,
   };
+
+  console.log(mapRegion);
 
   const userLocationRegion = {
     latitude: globalState.userLocation.lat,
@@ -61,25 +89,30 @@ export default function MapContainer({
         region={fallbackToUserRegion ? userLocationRegion : mapRegion}
         customMapStyle={customMapStyle}
         onPress={onPress}
+        onPoiClick={onPoiClick}
       >
-        <Marker
-          coordinate={{
-            latitude: start.lat,
-            longitude: start.lng,
-          }}
-          title="Start"
-          description="Start Location of Trip"
-          pinColor={colors.action}
-        />
-        <Marker
-          coordinate={{
-            latitude: end.lat,
-            longitude: end.lng,
-          }}
-          title="End"
-          description="End Location of Trip"
-          pinColor={colors.action}
-        />
+        {(!!start && !!start.lat && !!start.lng) && (
+          <Marker
+            coordinate={{
+              latitude: start.lat,
+              longitude: start.lng,
+            }}
+            title="Start"
+            description="Start Location of Trip"
+            pinColor={colors.action}
+          />
+        )}
+        {(!!end && !!end.lat && !!end.lng) && (
+          <Marker
+            coordinate={{
+              latitude: end.lat,
+              longitude: end.lng,
+            }}
+            title="End"
+            description="End Location of Trip"
+            pinColor={colors.action}
+          />
+        )}
         {showUserLocation && hasUserLocation && (
           <Marker
             coordinate={{
@@ -88,7 +121,7 @@ export default function MapContainer({
             }}
             title="You"
             description="Your Current Location"
-            pinColor="blue"
+            pinColor="white"
           />
         )}
         {waypoints.length > 0 && (
@@ -102,4 +135,7 @@ export default function MapContainer({
 MapContainer.defaultProps = {
   style: undefined,
   onPress: undefined,
+  onPoiClick: undefined,
+  customStart: undefined,
+  customEnd: undefined,
 };
