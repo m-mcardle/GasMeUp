@@ -7,6 +7,8 @@ const pkg = require('axios-cache-adapter');
 const {
   LocationAutocomplete,
   Directions,
+  Place,
+  Geocode,
   mockLocations,
 } = require('./queries/google');
 const {
@@ -79,9 +81,9 @@ async function GetDistanceV2(startLocation, endLocation) {
     const { data } = response;
     if (data.status !== 'OK') {
       if (data.status === 'ZERO_RESULTS') {
-        throw Error('Route not found', { cause: 404 });
+        throw Error(`Route not found (${startLocation} to ${endLocation})`, { cause: 404 });
       } else if (data.status === 'NOT_FOUND') {
-        throw Error('Location not found', { cause: 404 });
+        throw Error(`Location not found (${startLocation} or ${endLocation})`, { cause: 404 });
       } else {
         throw Error(`An unknown error occurred (${data.status})`, { cause: 500 });
       }
@@ -119,9 +121,33 @@ async function GetDistanceV2(startLocation, endLocation) {
   };
 }
 
-async function GetSuggestions(input, sessionId) {
+async function GetPlace(placeId) {
+  const response = await api(Place(placeId));
+
+  const { data } = response;
+  if (data.status !== 'OK') {
+    throw Error(`Invalid Request to Google (${data.status})`);
+  }
+
+  const address = data.result.formatted_address;
+  return address;
+}
+
+async function ReverseGeocode(latlng) {
+  const response = await api(Geocode(latlng));
+
+  const { data } = response;
+  if (data.status !== 'OK') {
+    throw Error(`Invalid Request to Google (${data.status})`);
+  }
+
+  const address = data.results[0].formatted_address;
+  return address;
+}
+
+async function GetSuggestions(input, sessionId, location) {
   if (useGoogleAPI) {
-    const response = await api(LocationAutocomplete(input, sessionId));
+    const response = await api(LocationAutocomplete(input, sessionId, location));
 
     const { data } = response;
     if (data.status !== 'OK') {
@@ -246,14 +272,70 @@ app.get('/suggestions', async (req, res) => {
     return;
   }
 
-  const input = req.query?.input ?? 'Toronto';
+  const input = req.query?.input;
+  if (!input) {
+    res.status(400).send({ error: 'Missing input' });
+    return;
+  }
+
   const sessionId = req.query?.session;
+  const location = req.query?.location;
+
   res.set('Access-Control-Allow-Origin', '*');
   try {
-    const suggestions = await GetSuggestions(input, sessionId);
+    const suggestions = await GetSuggestions(input, sessionId, location);
 
-    Log(`[suggestions] ${suggestions.length} suggestions for ${input}`);
+    Log(`[suggestions] ${suggestions.length} suggestions for ${input} \t (session: ${sessionId}, location: ${location})`);
     res.json({ suggestions });
+  } catch (err) {
+    LogError(err);
+    res.status(500).send({ error: 'An error occurred' });
+  }
+});
+
+// Handle request for place details
+app.get('/place', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
+  const placeId = req.query?.placeId;
+  if (!placeId) {
+    res.status(400).send({ error: 'Missing placeId' });
+    return;
+  }
+
+  res.set('Access-Control-Allow-Origin', '*');
+
+  try {
+    const place = await GetPlace(placeId);
+    Log(`[place] ${JSON.stringify(place)} (${placeId})`);
+    res.json(place);
+  } catch (err) {
+    LogError(err);
+    res.status(500).send({ error: 'An error occurred' });
+  }
+});
+
+app.get('/geocode', async (req, res) => {
+  if (!validateAPIKey(req.query?.api_key)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
+  const latlng = req.query?.latlng;
+  if (!latlng) {
+    res.status(400).send({ error: 'Missing latlng' });
+    return;
+  }
+
+  res.set('Access-Control-Allow-Origin', '*');
+
+  try {
+    const address = await ReverseGeocode(latlng);
+    Log(`[geocode] ${address}`);
+    res.json(address);
   } catch (err) {
     LogError(err);
     res.status(500).send({ error: 'An error occurred' });

@@ -6,10 +6,17 @@ function DistanceMatrix(startLocation, endLocation) {
   };
 }
 
-function LocationAutocomplete(input, sessionId) {
+function LocationAutocomplete(input, sessionId, location) {
   return {
     method: 'get',
-    url: encodeURI(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&key=${process.env.GOOGLE_API_KEY}&sessiontoken=${sessionId}`),
+    url: encodeURI('https://maps.googleapis.com/maps/api/place/autocomplete/json'),
+    params: {
+      input,
+      key: process.env.GOOGLE_API_KEY,
+      sessiontoken: sessionId,
+      location,
+      radius: 40000,
+    }
   };
 }
 
@@ -19,6 +26,28 @@ function Directions(startLocation, endLocation) {
     url: encodeURI(`https://maps.googleapis.com/maps/api/directions/json?mode=driving&origin=${startLocation}&destination=${endLocation}&key=${process.env.GOOGLE_API_KEY}`),
     headers: { },
   };
+}
+
+function Place(placeId) {
+  return {
+    method: 'get',
+    url: encodeURI('https://maps.googleapis.com/maps/api/place/details/json'),
+    params: {
+      placeid: placeId,
+      key: process.env.GOOGLE_API_KEY,
+    }
+  }
+}
+
+function Geocode(latlng) {
+  return {
+    method: 'get',
+    url: encodeURI('https://maps.googleapis.com/maps/api/geocode/json'),
+    params: {
+      latlng,
+      key: process.env.GOOGLE_API_KEY,
+    }
+  }
 }
 
 const mockTrip = {
@@ -103,6 +132,8 @@ module.exports = {
   DistanceMatrix,
   LocationAutocomplete,
   Directions,
+  Place,
+  Geocode,
   mockTrip,
   mockLocations,
 };

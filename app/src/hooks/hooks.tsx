@@ -11,10 +11,6 @@ export const GlobalContext = createContext<any>(null);
 
 export const useGlobalState = () => useContext(GlobalContext);
 
-export const DEV_TOGGLE_SETTINGS: Record<string, boolean> = {
-  'Enable Requests': true,
-};
-
 export const Locale = {
   CA: 'CA',
   US: 'US',
@@ -55,13 +51,6 @@ export const PERSISTED_VALUES: Record<string, Record<string, SafeStoredValue>> =
 let initialSettings: any = {};
 
 if (Platform.OS === 'ios') {
-  // The settings are stored as numbers and so to convert them to booleans we must use `!!`
-  Object.keys(DEV_TOGGLE_SETTINGS).forEach((setting) => {
-    initialSettings[setting] = Settings.get(setting) !== undefined
-      ? !!Settings.get(setting)
-      : DEV_TOGGLE_SETTINGS[setting];
-  });
-
   Object.keys(OPTIONS_SETTINGS).forEach((setting) => {
     initialSettings[setting] = Settings.get(setting) !== undefined
       ? Settings.get(setting)
@@ -81,7 +70,6 @@ if (Platform.OS === 'ios') {
   });
 } else {
   initialSettings = {
-    ...DEV_TOGGLE_SETTINGS,
     ...NUMERIC_SETTINGS,
   };
 
@@ -92,11 +80,6 @@ if (Platform.OS === 'ios') {
   Object.keys(PERSISTED_VALUES).forEach((setting) => {
     initialSettings[setting] = PERSISTED_VALUES[setting];
   });
-}
-
-// Force enable requests in production
-if (process.env.NODE_ENV !== 'development') {
-  initialSettings['Enable Requests'] = true;
 }
 
 export const initialState = {

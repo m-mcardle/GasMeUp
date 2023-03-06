@@ -99,8 +99,7 @@ export default function GasPriceScreen({ navigation }: any) {
         return;
       }
 
-      const regionQueryParam = selectedRegion ? `&region=${selectedRegion}` : '';
-      const gasPricesResponse = await fetchData(`/gas-prices?country=${selectedCountry}${regionQueryParam}`, !globalState['Enable Requests']);
+      const gasPricesResponse = await fetchData('/gas-prices', { country: selectedCountry, region: selectedRegion });
 
       if (!gasPricesResponse?.ok || !gasPricesResponse) {
         console.log(`Request for gas prices failed (${gasPricesResponse.status})`);
@@ -139,7 +138,7 @@ export default function GasPriceScreen({ navigation }: any) {
       setGasPrices([]);
     }
     setLoading(false);
-  }, [selectedRegion, selectedCountry, globalState['Enable Requests']]);
+  }, [selectedRegion, selectedCountry]);
 
   useEffect(() => {
     fetchGasPrices();

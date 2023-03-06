@@ -135,7 +135,7 @@ export default function CarScreen({ navigation }: any) {
   useEffect(() => {
     async function fetchMakes() {
       setLoading(true);
-      const data = await fetchData(`/makes?year=${selectedYear}`);
+      const data = await fetchData('/makes', { year: selectedYear });
       const { makes: validMakes } = await data.json();
 
       setMakes(validMakes);
@@ -148,7 +148,7 @@ export default function CarScreen({ navigation }: any) {
   useEffect(() => {
     async function fetchModels() {
       setLoading(true);
-      const data = await fetchData(`/models?year=${selectedYear}&make=${selectedMake}`);
+      const data = await fetchData('/models', { year: selectedYear, make: selectedMake });
       const { models: validModels } = await data.json();
 
       setModels(validModels);
@@ -161,7 +161,7 @@ export default function CarScreen({ navigation }: any) {
   useEffect(() => {
     async function fetchTrims() {
       setLoading(true);
-      const data = await fetchData(`/model-options?year=${selectedYear}&make=${selectedMake}&model=${selectedModel}`);
+      const data = await fetchData('/model-options', { year: selectedYear, make: selectedMake, model: selectedModel });
       const { modelOptions: validTrims } = await data.json();
 
       setTrims(validTrims);
@@ -312,6 +312,7 @@ export default function CarScreen({ navigation }: any) {
         </Text>
         <AutocompleteInput
           z={4}
+          labelStyle={{ paddingLeft: 0 }}
           containerStyle={{
             borderColor: (selectedYear ? colors.action : colors.white),
             borderWidth: 1,
@@ -349,6 +350,7 @@ export default function CarScreen({ navigation }: any) {
         <AutocompleteInput
           myRef={makeRef}
           z={3}
+          labelStyle={{ paddingLeft: 0 }}
           containerStyle={{
             borderColor: getBorderColor(!!selectedYear, !!selectedMake),
             borderWidth: 1,
@@ -386,6 +388,7 @@ export default function CarScreen({ navigation }: any) {
         <AutocompleteInput
           myRef={modelRef}
           z={2}
+          labelStyle={{ paddingLeft: 0 }}
           containerStyle={{
             borderColor: getBorderColor(!!selectedMake, !!selectedModel),
             borderWidth: 1,
@@ -423,6 +426,7 @@ export default function CarScreen({ navigation }: any) {
         <AutocompleteInput
           myRef={trimRef}
           z={1}
+          labelStyle={{ paddingLeft: 0 }}
           containerStyle={{
             borderColor: getBorderColor(!!selectedModel, !!selectedTrim.text),
             borderWidth: 1,

@@ -15,7 +15,6 @@ import {
 
 // External Components
 import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
-
 import {
   Portal,
 } from 'react-native-paper';
@@ -60,8 +59,6 @@ enum ActiveInput {
   End,
 }
 
-let sessionToken = uuid.v4();
-
 interface Props {
   setTrip: Function,
   navigation: {
@@ -74,6 +71,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   const [user] = useAuthState(auth);
   const [globalState, updateGlobalState] = useGlobalState();
 
+  const [sessionToken, setSessionToken] = useState<string>(uuid.v4() as string);
   const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
   const [{
     distance,
@@ -151,15 +149,13 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       ...oldState,
       loading: true,
       distance: 0,
-      start: { lat: 0, lng: 0, address: '' },
-      end: { lat: 0, lng: 0, address: '' },
     }));
 
     const parsedStartLocation = startLocation === 'Current Location' ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : startLocation;
     const parsedEndLocation = endLocation === 'Current Location' ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : endLocation;
 
     try {
-      const distanceResponse = await fetchData(`/distance/?start=${parsedStartLocation}&end=${parsedEndLocation}`, !globalState['Enable Requests']);
+      const distanceResponse = await fetchData('/distance', { start: parsedStartLocation, end: parsedEndLocation });
 
       if (!distanceResponse?.ok || !distanceResponse) {
         console.log(`Request for distance failed (${distanceResponse.status})`);
@@ -192,7 +188,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       let newGasPrice = gasPrice;
 
       if (!useCustomGasPrice) {
-        const gasPriceResponse = await fetchData(`/gas?country=${globalState.country}&region=${globalState.region}`, !globalState['Enable Requests']);
+        const gasPriceResponse = await fetchData('/gas', { country: globalState.country, region: globalState.region });
 
         if (!gasPriceResponse?.ok || !gasPriceResponse) {
           console.log(`Request for gas price failed (${gasPriceResponse.status})`);
@@ -228,7 +224,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       }));
     }
     return null;
-  }, [startLocation, endLocation, useCustomGasPrice, customGasPrice, gasPrice, globalState['Enable Requests']]);
+  }, [startLocation, endLocation, useCustomGasPrice, customGasPrice, gasPrice]);
 
   const updateSuggestions = useCallback((input: string) => {
     // If empty or using `Current Location` then just clear the suggestions
@@ -237,7 +233,10 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       return;
     }
 
-    fetchData(`/suggestions/?input=${input}&session=${sessionToken}`, !globalState['Enable Requests'])
+    const location = globalState.userLocation.lat && globalState.userLocation.lng
+      ? `${globalState.userLocation.lat},${globalState.userLocation.lng}`
+      : undefined;
+    fetchData('/suggestions', { input, location, session: sessionToken })
       .then((res) => {
         if (!res?.ok || !res) {
           console.log(`Request for suggestions failed (${res.status})`);
@@ -249,7 +248,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       .catch((err) => {
         Alert.alert(err);
       });
-  }, [globalState['Enable Requests']]);
+  }, []);
 
   const throttledUpdateSuggestions = useCallback(
     throttle(250, updateSuggestions),
@@ -281,7 +280,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   const setInputToPickedLocation = (item: string) => {
     Keyboard.dismiss();
     // Create new session token after selecting an autocomplete result
-    sessionToken = uuid.v4();
+    setSessionToken(uuid.v4() as string);
 
     if (activeInput === ActiveInput.Start) {
       setLocations((state) => ({ ...state, startLocation: item }));
@@ -326,7 +325,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   }, [useCustomGasPrice, customGasPrice]);
 
   // Represents if the user has entered all the required data to save a trip's cost
-  const canSaveTrip = !!distance && !!gasPrice && !!cost;
+  const canSaveTrip = !!distance && !!gasPrice && !!cost && !!start.address && !!end.address;
 
   const endLocationRef = useRef<TextInput>(null);
 
@@ -436,6 +435,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         />
         <AutocompleteInput
           z={2}
+          style={{ backgroundColor: colors.darkestGray }}
           suggestions={activeInput === ActiveInput.Start ? suggestions : []}
           onSuggestionPress={setInputToPickedLocation}
           placeholder="Start Location"
@@ -461,6 +461,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         <AutocompleteInput
           myRef={endLocationRef}
           z={1}
+          style={{ backgroundColor: colors.darkestGray }}
           suggestions={activeInput === ActiveInput.End ? suggestions : []}
           onSuggestionPress={setInputToPickedLocation}
           placeholder="End Location"
