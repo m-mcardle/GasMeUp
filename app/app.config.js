@@ -5,7 +5,7 @@ module.exports = {
   slug: 'gas-me-up',
   owner: 'mmcardle',
   originalFullName: '@mmcardle/GasMeUp',
-  version: '1.0.15',
+  version: '1.0.16',
   orientation: 'portrait',
   icon: './assets/car.png',
   splash: {
