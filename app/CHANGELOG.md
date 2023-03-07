@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.16](https://github.com/m-mcardle/GasMeUp/compare/v1.0.15...v1.0.16) (2023-03-07)
 
+* Fix account creation when user denies push notifications
+* Change input placeholders to labels
+* Allow user to press on map and use point as location
+* Allow users to reject friend requests
+* Fix layout when prices get stupidly large (thanks Max)
+* Allow sign out of Splitwise account
+* Weigh autocomplete suggestions based on user's location
+
 ### [1.0.15](https://github.com/m-mcardle/CalculatorCalc/compare/v1.0.14...v1.0.15) (2023-02-28)
 
 * Bug fixes (Gas Price modal + error handling)

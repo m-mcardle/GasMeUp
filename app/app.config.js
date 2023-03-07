@@ -23,7 +23,7 @@ module.exports = {
   ios: {
     supportsTablet: false,
     bundleIdentifier: 'com.Virintus.GasMeUp',
-    buildNumber: '1.0.15',
+    buildNumber: '1.0.16',
     config: {
       googleMapsApiKey: process.env.GOOGLE_IOS_SDK_KEY,
       usesNonExemptEncryption: false,
@@ -39,7 +39,7 @@ module.exports = {
       backgroundColor: '#FFFFFF',
     },
     package: 'com.Virintus.GasMeUp',
-    versionCode: 470010015,
+    versionCode: 470010016,
   },
   web: {
     favicon: './assets/favicon.png',
