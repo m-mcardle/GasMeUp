@@ -170,6 +170,9 @@ export const updateFriendsList = functions.firestore
       const beforeOutgoingFriends = beforeFriendUIDs.filter((uid) => beforeFriends[uid].status === "outgoing");
       const afterOutgoingFriends = afterFriendUIDs.filter((uid) => afterFriends[uid].status === "outgoing");
 
+      const beforeIncomingFriends = beforeFriendUIDs.filter((uid) => beforeFriends[uid].status === "incoming");
+      const afterIncomingFriends = afterFriendUIDs.filter((uid) => afterFriends[uid].status === "incoming");
+
       /*
       The logic for friend requests are as follows:
       1. Bill requests to be friends with Fred and a new friend with status="outgoing" is added to Bill (frontend)
@@ -180,20 +183,24 @@ export const updateFriendsList = functions.firestore
 
       // TODO - Do I need to care about the transactions being orphaned / lost when a friend is removed?
       if (
-        beforeOutgoingFriends !== afterOutgoingFriends &&
-        beforeOutgoingFriends?.length < afterOutgoingFriends?.length
+        beforeOutgoingFriends.length < afterOutgoingFriends.length
       ) {
         await friends.handleOutgoingFriendRequest(db, documentUID, after as User, beforeFriends, afterFriends);
-      } else if (beforeAcceptedFriends !== afterAcceptedFriends) {
-        const newFriendsLength = afterAcceptedFriends.length;
-        const oldFriendsLength = beforeAcceptedFriends.length;
-        if (newFriendsLength > oldFriendsLength) {
-          // Right now this will fire twice, once for when the user adds it from the front-end and once from when the function adds it to the friend
-          await friends.handleAcceptedFriendRequest(db, documentUID, beforeFriends, afterFriends);
-        } else if (newFriendsLength < oldFriendsLength) {
-          // Right now this will fire twice, once for when the user removes it from the front-end and once from when the function removes it from the friend
-          await friends.handleRemovedFriends(db, documentUID, beforeFriends, afterFriends);
-        }
+      } else if (
+        beforeAcceptedFriends.length < afterAcceptedFriends.length
+      ) {
+        // Right now this will fire twice, once for when the user adds it from the front-end and once from when the function adds it to the friend
+        await friends.handleAcceptedFriendRequest(db, documentUID, beforeFriends, afterFriends);
+      } else if (
+        beforeAcceptedFriends.length > afterAcceptedFriends.length
+      ) {
+        // Right now this will fire twice, once for when the user removes it from the front-end and once from when the function removes it from the friend
+        await friends.handleRemovedFriends(db, documentUID, beforeFriends, afterFriends);
+      } else if (
+        beforeIncomingFriends.length > afterIncomingFriends.length
+      ) {
+        // Order of operations is important here - must check for the accepted path before this one
+        await friends.handleRemovedFriends(db, documentUID, beforeFriends, afterFriends);
       } else {
         console.log("No friends list changes detected");
       }
