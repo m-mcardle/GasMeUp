@@ -12,11 +12,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   main: {
-    ...globalStyles.centered,
-    paddingBottom: 80,
+    ...globalStyles.centeredHorizontal,
+    paddingTop: 20,
+    paddingBottom: 120,
   },
   signUpButtonText: {
-    color: colors.primary,
+    color: colors.secondary,
     textAlign: 'center',
   },
   errorText: {

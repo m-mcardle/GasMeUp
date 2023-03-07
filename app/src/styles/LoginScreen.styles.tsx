@@ -8,6 +8,7 @@ import {
 const styles = StyleSheet.create({
   main: {
     ...globalStyles.centered,
+    paddingBottom: 48,
   },
   loginButtonText: {
     color: colors.white,

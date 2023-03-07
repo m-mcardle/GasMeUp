@@ -138,6 +138,10 @@ export const globalStyles = StyleSheet.create({
     marginVertical: 'auto',
     height: '100%',
   },
+  centeredHorizontal: {
+    alignItems: 'center',
+    marginHorizontal: 'auto',
+  },
   table: {
     maxHeight: '100%',
   },

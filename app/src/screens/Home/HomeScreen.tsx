@@ -54,7 +54,7 @@ import styles from '../../styles/HomeScreen.styles';
 // Mock Data
 import { fetchData } from '../../data/data';
 
-enum ActiveInput {
+enum InputEnum {
   None,
   Start,
   End,
@@ -73,7 +73,8 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   const [globalState, updateGlobalState] = useGlobalState();
 
   const [sessionToken, setSessionToken] = useState<string>(uuid.v4() as string);
-  const [activeInput, setActiveInput] = useState<ActiveInput>(ActiveInput.None);
+  const [activeInput, setActiveInput] = useState<InputEnum>(InputEnum.None);
+  const [usingCurrentLocation, setUsingCurrentLocation] = useState<InputEnum>(InputEnum.None);
   const [{
     distance,
     gasPrice,
@@ -142,6 +143,14 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       end: (resetEnd ? { lat: 0, lng: 0, address: '' } : state.end),
       distance: 0,
     }));
+
+    if (resetStart && usingCurrentLocation === InputEnum.Start) {
+      setUsingCurrentLocation(InputEnum.None);
+    }
+
+    if (resetEnd && usingCurrentLocation === InputEnum.End) {
+      setUsingCurrentLocation(InputEnum.None);
+    }
   };
 
   const updateTripStart = (newStart: any) => {
@@ -160,13 +169,15 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const submit = useCallback(async () => {
     setSuggestions([]);
-    if (!startLocation) {
+    const invalidStart = !startLocation && usingCurrentLocation !== InputEnum.Start;
+    const invalidEnd = !endLocation && usingCurrentLocation !== InputEnum.End;
+    if (invalidStart) {
       setStartLocationError(true);
     }
-    if (!endLocation) {
+    if (invalidEnd) {
       setEndLocationError(true);
     }
-    if (!startLocation || !endLocation) {
+    if (invalidStart || invalidEnd) {
       return null;
     }
 
@@ -177,8 +188,8 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       distance: 0,
     }));
 
-    const parsedStartLocation = startLocation === 'Current Location' ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : startLocation;
-    const parsedEndLocation = endLocation === 'Current Location' ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : endLocation;
+    const parsedStartLocation = usingCurrentLocation === InputEnum.Start ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : startLocation;
+    const parsedEndLocation = usingCurrentLocation === InputEnum.End ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : endLocation;
 
     try {
       const distanceResponse = await fetchData('/distance', { start: parsedStartLocation, end: parsedEndLocation });
@@ -250,7 +261,14 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       }));
     }
     return null;
-  }, [startLocation, endLocation, useCustomGasPrice, customGasPrice, gasPrice]);
+  }, [
+    usingCurrentLocation,
+    startLocation,
+    endLocation,
+    useCustomGasPrice,
+    customGasPrice,
+    gasPrice,
+  ]);
 
   const updateSuggestions = useCallback((input: string) => {
     // If empty or using `Current Location` then just clear the suggestions
@@ -309,56 +327,59 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     // Create new session token after selecting an autocomplete result
     setSessionToken(uuid.v4() as string);
 
-    if (activeInput === ActiveInput.Start) {
+    if (activeInput === InputEnum.Start) {
       setLocations((state) => ({ ...state, startLocation: item }));
       setSuggestions([]);
-      setActiveInput(ActiveInput.End);
-    } else if (activeInput === ActiveInput.End) {
+      setActiveInput(InputEnum.End);
+    } else if (activeInput === InputEnum.End) {
       setLocations((state) => ({ ...state, endLocation: item }));
       setSuggestions([]);
-      setActiveInput(ActiveInput.Start);
+      setActiveInput(InputEnum.Start);
     }
   };
 
-  const changeActiveInput = (input: ActiveInput) => {
+  const changeActiveInput = (input: InputEnum) => {
     setSuggestions([]);
-    if (input === ActiveInput.Start && startLocation === 'Current Location') {
-      setLocations((state) => ({ ...state, startLocation: '' }));
-    } else if (input === ActiveInput.End && endLocation === 'Current Location') {
-      setLocations((state) => ({ ...state, endLocation: '' }));
+    if (input === usingCurrentLocation) {
+      setUsingCurrentLocation(InputEnum.None);
     }
     setActiveInput(input);
   };
 
-  const useCurrentLocation = async (input: ActiveInput) => {
+  const useCurrentLocation = async (input: InputEnum) => {
     Keyboard.dismiss();
     await getUserLocation(updateGlobalState);
 
-    if (input === ActiveInput.Start) {
-      const currentLocationAlreadySet = startLocation === 'Current Location';
+    if (!globalState.userLocation.lat || !globalState.userLocation.lng) {
+      Alert.alert('Location Unavailable', 'Please enable location services to use this feature');
+      return;
+    }
+
+    if (input === InputEnum.Start) {
+      const currentLocationAlreadySet = usingCurrentLocation === InputEnum.Start;
       updateTripStart((currentLocationAlreadySet
         ? { lat: 0, lng: 0, address: '' }
         : { lat: globalState.userLocation.lat, lng: globalState.userLocation.lng, address: 'Current Location' }
       ));
-      setLocations((state) => ({ ...state, startLocation: (currentLocationAlreadySet ? '' : 'Current Location') }));
+      setUsingCurrentLocation(currentLocationAlreadySet ? InputEnum.None : InputEnum.Start);
     } else {
-      const currentLocationAlreadySet = endLocation === 'Current Location';
+      const currentLocationAlreadySet = usingCurrentLocation === InputEnum.End;
       updateTripEnd((currentLocationAlreadySet
         ? { lat: 0, lng: 0, address: '' }
         : { lat: globalState.userLocation.lat, lng: globalState.userLocation.lng, address: 'Current Location' }
       ));
-      setLocations((state) => ({ ...state, endLocation: (currentLocationAlreadySet ? '' : 'Current Location') }));
+      setUsingCurrentLocation(currentLocationAlreadySet ? InputEnum.None : InputEnum.End);
     }
     setSuggestions([]);
   };
 
   const setLocationToPressedLocation = (address: string, latitude: number, longitude: number) => {
-    if (!startLocation) {
+    if (!startLocation && usingCurrentLocation !== InputEnum.Start) {
       // If there is no start location, set the start location to the pressed location
       clearCurrentTrip();
       updateTripStart({ lat: latitude, lng: longitude, address });
       setLocations((state) => ({ ...state, startLocation: address }));
-    } else if (!endLocation) {
+    } else if (!endLocation && usingCurrentLocation !== InputEnum.End) {
       // If there is a start location but no end location,
       // set the end location to the pressed location
       clearCurrentTrip();
@@ -412,7 +433,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const selectNextInput = () => {
     setSuggestions([]);
-    setActiveInput(ActiveInput.End);
+    setActiveInput(InputEnum.End);
     endLocationRef?.current?.focus();
   };
 
@@ -521,19 +542,19 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         <AutocompleteInput
           z={2}
           style={{ backgroundColor: colors.darkestGray }}
-          suggestions={activeInput === ActiveInput.Start ? suggestions : []}
+          suggestions={activeInput === InputEnum.Start ? suggestions : []}
           onSuggestionPress={setInputToPickedLocation}
           placeholder="Start Location"
           onChangeText={updateStartLocation}
-          onPressIn={() => changeActiveInput(ActiveInput.Start)}
-          value={startLocation}
+          onPressIn={() => changeActiveInput(InputEnum.Start)}
+          value={usingCurrentLocation === InputEnum.Start ? 'Current Location' : startLocation}
           icon={(
             <MaterialIcons
               name="my-location"
               size={30}
-              color={(startLocation === 'Current Location' ? colors.action : colors.secondary)}
-              disabled={!globalState.userLocation.lat || !globalState.userLocation.lng || endLocation === 'Current Location'}
-              onPress={() => useCurrentLocation(ActiveInput.Start)}
+              color={(usingCurrentLocation === InputEnum.Start ? colors.action : colors.secondary)}
+              disabled={usingCurrentLocation === InputEnum.End}
+              onPress={() => useCurrentLocation(InputEnum.Start)}
             />
            )}
           clearButton
@@ -548,19 +569,19 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           myRef={endLocationRef}
           z={1}
           style={{ backgroundColor: colors.darkestGray }}
-          suggestions={activeInput === ActiveInput.End ? suggestions : []}
+          suggestions={activeInput === InputEnum.End ? suggestions : []}
           onSuggestionPress={setInputToPickedLocation}
           placeholder="End Location"
           onChangeText={updateEndLocation}
-          onPressIn={() => changeActiveInput(ActiveInput.End)}
-          value={endLocation}
+          onPressIn={() => changeActiveInput(InputEnum.End)}
+          value={usingCurrentLocation === InputEnum.End ? 'Current Location' : endLocation}
           icon={(
             <MaterialIcons
               name="my-location"
               size={30}
-              color={(endLocation === 'Current Location' ? colors.action : colors.secondary)}
-              disabled={!globalState.userLocation.lat || !globalState.userLocation.lng || startLocation === 'Current Location'}
-              onPress={() => useCurrentLocation(ActiveInput.End)}
+              color={(usingCurrentLocation === InputEnum.End ? colors.action : colors.secondary)}
+              disabled={usingCurrentLocation === InputEnum.Start}
+              onPress={() => useCurrentLocation(InputEnum.End)}
             />
            )}
           clearButton
