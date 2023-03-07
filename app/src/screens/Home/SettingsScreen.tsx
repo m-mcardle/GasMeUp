@@ -27,7 +27,7 @@ import LoginSection from '../../components/Login/LoginSection';
 
 // Global state stuff
 import {
-  useGlobalState, changeSetting, DEV_TOGGLE_SETTINGS, OPTIONS_SETTINGS,
+  useGlobalState, changeSetting, OPTIONS_SETTINGS,
 } from '../../hooks/hooks';
 
 // Helpers
@@ -116,6 +116,7 @@ export default function SettingsScreen() {
     ],
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const SettingsSwitch = ({ name = '', value = false }) => useMemo(() => (
     <View style={styles.settingItem}>
       <Switch
@@ -174,20 +175,14 @@ export default function SettingsScreen() {
         )}
 
         <View style={styles.settingGroup}>
-          {process.env.NODE_ENV === 'development' && Object.keys(DEV_TOGGLE_SETTINGS).map((setting) => (
-            <View key={setting} style={styles.settingContainer}>
-              <Text style={styles.settingsText}>{`${setting}:`}</Text>
-              <SettingsSwitch name={setting} value={globalState[setting]} />
-            </View>
-          ))}
           {Object.keys(OPTIONS_SETTINGS).map((setting) => (
             <View key={setting} style={styles.settingContainer}>
               <Text style={styles.settingsText}>{`${OPTIONS_SETTINGS[setting].label ?? setting}:`}</Text>
               <View style={styles.settingItem}>
                 <SegmentedButtons
                   buttons={OPTIONS_SETTINGS[setting].options.map((option) => ({
-                    label: option,
-                    value: option,
+                    label: option.toString(),
+                    value: option.toString(),
                     style: {
                       backgroundColor: (option === globalState[setting]
                         ? colors.action

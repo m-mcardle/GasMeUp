@@ -5,7 +5,8 @@ import {
 import { Settings, Platform } from 'react-native';
 
 // These are the only types that can be stored in the Settings API
-type SafeStoredValue = string | number | undefined;
+type SafeStoredValue = string | number;
+type UndefinedSafeStoredValue = SafeStoredValue | undefined;
 
 export const GlobalContext = createContext<any>(null);
 
@@ -34,7 +35,7 @@ export const NUMERIC_SETTINGS: Record<string, number> = {
   'Gas Mileage': 10,
 };
 
-export const PERSISTED_VALUES: Record<string, Record<string, SafeStoredValue>> = {
+export const PERSISTED_VALUES: Record<string, Record<string, UndefinedSafeStoredValue>> = {
   'Custom Gas Price': {
     price: 1,
     enabled: 'false',

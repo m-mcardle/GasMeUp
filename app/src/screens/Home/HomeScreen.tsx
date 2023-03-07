@@ -259,9 +259,10 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       return;
     }
 
-    const location = globalState.userLocation.lat && globalState.userLocation.lng
+    const location = (globalState.userLocation.lat && globalState.userLocation.lng
       ? `${globalState.userLocation.lat},${globalState.userLocation.lng}`
-      : undefined;
+      : undefined);
+
     fetchData('/suggestions', { input, location, session: sessionToken })
       .then((res) => {
         if (!res?.ok || !res) {
@@ -334,9 +335,19 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     await getUserLocation(updateGlobalState);
 
     if (input === ActiveInput.Start) {
-      setLocations((state) => ({ ...state, startLocation: (state.startLocation === 'Current Location' ? '' : 'Current Location') }));
+      const currentLocationAlreadySet = startLocation === 'Current Location';
+      updateTripStart((currentLocationAlreadySet
+        ? { lat: 0, lng: 0, address: '' }
+        : { lat: globalState.userLocation.lat, lng: globalState.userLocation.lng, address: 'Current Location' }
+      ));
+      setLocations((state) => ({ ...state, startLocation: (currentLocationAlreadySet ? '' : 'Current Location') }));
     } else {
-      setLocations((state) => ({ ...state, endLocation: (state.endLocation === 'Current Location' ? '' : 'Current Location') }));
+      const currentLocationAlreadySet = endLocation === 'Current Location';
+      updateTripEnd((currentLocationAlreadySet
+        ? { lat: 0, lng: 0, address: '' }
+        : { lat: globalState.userLocation.lat, lng: globalState.userLocation.lng, address: 'Current Location' }
+      ));
+      setLocations((state) => ({ ...state, endLocation: (currentLocationAlreadySet ? '' : 'Current Location') }));
     }
     setSuggestions([]);
   };
@@ -489,10 +500,10 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       <View style={styles.dataContainer}>
         <MapContainer
           waypoints={waypoints}
-          showUserLocation={!start.address || !end.address}
+          showUserLocation={!start.address && !end.address}
           style={styles.mapView}
-          onPress={() => setMapModalVisible(true)}
-          onPoiClick={() => setMapModalVisible(true)}
+          onPress={() => { Keyboard.dismiss(); setMapModalVisible(true); }}
+          onPoiClick={() => { Keyboard.dismiss(); setMapModalVisible(true); }}
           customStart={start}
           customEnd={end}
         />
