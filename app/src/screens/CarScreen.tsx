@@ -476,7 +476,7 @@ export default function CarScreen({ navigation }: any) {
             ? () => FooterRow({ label: 'Fuel Type', text: vehicle.fuelType })
             : undefined
           )}
-          style={{ width: '90%', marginTop: 48 }}
+          style={{ height: '30%', width: '90%', marginTop: 48 }}
           loading={loading && selectedTrim.value}
           scrollable
         />

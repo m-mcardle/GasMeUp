@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     height: '100%',
-    paddingTop: 24,
+    paddingTop: 8,
     alignItems: 'center',
   },
   selectionButtons: {

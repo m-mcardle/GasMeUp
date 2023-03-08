@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
   table: {
     flex: 1,
     paddingVertical: '5%',
-    maxHeight: '90%',
+    maxHeight: '80%',
   },
   friendInfoTitle: {
     fontSize: 24,
