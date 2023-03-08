@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.17](https://github.com/m-mcardle/GasMeUp/compare/v1.0.16...v1.0.17) (2023-03-08)
 
+* Improve layout on small screen
+
 ### [1.0.16](https://github.com/m-mcardle/GasMeUp/compare/v1.0.15...v1.0.16) (2023-03-07)
 
 * Fix account creation when user denies push notifications
