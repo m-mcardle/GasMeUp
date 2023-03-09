@@ -80,12 +80,20 @@ export default function SignUpScreen() {
         console.log('All done!');
       })
       .catch((exception) => {
-        Alert.alert('Error', exception.message);
-        if (exception.code === 'auth/invalid-email') {
-          setEmailError(true);
-        } else if (exception.code === 'auth/weak-password') {
+        let errorMessage = 'An error occurred when trying to log you in. Please try again.';
+        if (exception.code === 'auth/weak-password') {
+          errorMessage = 'Password must be at least 6 characters. Please try again.';
           setPasswordError(true);
+        } else if (exception.code === 'auth/email-already-in-use') {
+          errorMessage = 'The email you entered is already associated with an account. Please try and sign in with your existing account.';
+          setEmailError(true);
+        } else if (exception.code === 'auth/invalid-email') {
+          errorMessage = 'The email you entered is not valid. Please try again.';
+          setEmailError(true);
+        } else if (exception.code === 'auth/too-many-requests') {
+          errorMessage = 'You have tried to log in too many times. Please try again later.';
         }
+        Alert.alert('Error', errorMessage);
       });
   };
 
@@ -118,7 +126,6 @@ export default function SignUpScreen() {
           autoComplete="name-family"
           onSubmitEditing={() => emailRef?.current?.focus()}
         />
-        {emailError && <Text style={styles.errorText}>Invalid email</Text>}
         <Input
           myRef={emailRef}
           placeholder="Email"
@@ -130,7 +137,6 @@ export default function SignUpScreen() {
           returnKeyType="next"
           onSubmitEditing={() => passwordRef?.current?.focus()}
         />
-        {passwordError && <Text style={styles.errorText}>Password is too weak</Text>}
         <Input
           myRef={passwordRef}
           placeholder="Password"

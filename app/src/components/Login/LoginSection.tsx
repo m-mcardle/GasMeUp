@@ -51,12 +51,20 @@ export default function LoginSection({ onLogin, mode = 'login' }: Props) {
         }
       })
       .catch((exception) => {
-        Alert.alert('Error', exception.message);
+        let errorMessage = 'An error occurred when trying to log you in. Please try again.';
         if (exception.code === 'auth/wrong-password') {
+          errorMessage = 'The password you entered is incorrect. Please try again.';
           setPasswordError(true);
-        } else {
+        } else if (exception.code === 'auth/user-not-found') {
+          errorMessage = 'The email you entered is not associated with an account. Please try again.';
           setEmailError(true);
+        } else if (exception.code === 'auth/invalid-email') {
+          errorMessage = 'The email you entered is not valid. Please try again.';
+          setEmailError(true);
+        } else if (exception.code === 'auth/too-many-requests') {
+          errorMessage = 'You have tried to log in too many times. Please try again later.';
         }
+        Alert.alert('Error', errorMessage);
       });
   };
 

@@ -149,7 +149,7 @@ export default function SaveTripScreen({
 
   const userFriends = userDocument?.friends ?? {};
   const friendsUIDs = userFriends
-    ? Object.keys(userFriends).filter((uid) => !uid.includes('TEMP_'))
+    ? Object.keys(userFriends).filter((uid) => !uid.includes('TEMP_') && userFriends[uid].accepted)
     : [];
 
   const usersQuery = friendsUIDs.length ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;

@@ -270,16 +270,16 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     gasPrice,
   ]);
 
+  const location = (globalState.userLocation.lat && globalState.userLocation.lng
+    ? `${globalState.userLocation.lat},${globalState.userLocation.lng}`
+    : undefined);
+
   const updateSuggestions = useCallback((input: string) => {
     // If empty or using `Current Location` then just clear the suggestions
     if (!input || input === 'Current Location') {
       setSuggestions([]);
       return;
     }
-
-    const location = (globalState.userLocation.lat && globalState.userLocation.lng
-      ? `${globalState.userLocation.lat},${globalState.userLocation.lng}`
-      : undefined);
 
     fetchData('/suggestions', { input, location, session: sessionToken })
       .then((res) => {
@@ -293,7 +293,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       .catch((err) => {
         Alert.alert(err);
       });
-  }, []);
+  }, [location]);
 
   const throttledUpdateSuggestions = useCallback(
     throttle(250, updateSuggestions),

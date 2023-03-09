@@ -49,6 +49,8 @@ interface Props {
 export default function FriendInfoScreen({
   uid, name, amount, email, navigation,
 }: Props) {
+  const formattedAmount = amount < 0 ? `-$${Math.abs(amount).toFixed(2)}` : `$${amount.toFixed(2)}`;
+
   const [currentUser] = useAuthState(auth);
   const [mapVisible, setMapVisible] = useState(false);
   const [viewMoreVisible, setViewMoreVisible] = useState(false);
@@ -111,7 +113,7 @@ export default function FriendInfoScreen({
 
   const showSettleConfirmationAlert = () => Alert.alert(
     'Settle Up',
-    `Are you sure you want to settle up with ${name} for $${amount.toFixed(2)}?`,
+    `Are you sure you want to settle up with ${name} for ${formattedAmount}?`,
     [
       {
         text: 'OK',
@@ -125,8 +127,6 @@ export default function FriendInfoScreen({
       },
     ],
   );
-
-  const formattedAmount = amount < 0 ? `-$${Math.abs(amount).toFixed(2)}` : `$${amount.toFixed(2)}`;
 
   return (
     <Page>
