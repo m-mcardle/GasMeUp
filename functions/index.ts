@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import friends from "./src/friends";
+import {createTripNotification, createSettleNotification} from "./src/notificationMessages";
 
 import * as functions from "firebase-functions";
 import {Expo, ExpoPushMessage} from "expo-server-sdk";
@@ -31,6 +32,7 @@ export const sendTransactionNotifications = functions.firestore
       const payerUIDs = newData.payers;
       const creatorUID = newData.creator;
 
+      const settledUp = newData.type === "settle";
       const cost = newData.cost;
       const splitType = newData.splitType;
       const onlyRidersPay = splitType === "full";
@@ -52,15 +54,16 @@ export const sendTransactionNotifications = functions.firestore
           console.log("Sending notification to", expoPushToken, "for", uid);
           const isDriver = uid === payeeUID;
           const amountOwed = isDriver ? costPerRider * payerUIDs.length : costPerRider;
-          messages.push({
-            to: expoPushToken,
-            sound: "default",
-            title: "New Trip",
-            body: `${creatorData.firstName} ${creatorData.lastName} added a new trip! You ${isDriver ? "are owed" : "owe"} $${amountOwed}.`,
-            data: {
-              transactionUID: snapshot.id,
-            },
-          });
+
+          if (settledUp) {
+            messages.push(
+                createSettleNotification(expoPushToken, creatorData.firstName, creatorData.lastName, amountOwed, snapshot.id)
+            );
+          } else {
+            messages.push(
+                createTripNotification(expoPushToken, creatorData.firstName, creatorData.lastName, amountOwed, isDriver, snapshot.id)
+            );
+          }
         } else {
           console.log("Not a valid token:", expoPushToken, "for", uid);
         }
