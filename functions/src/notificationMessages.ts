@@ -47,3 +47,23 @@ export function createSettleNotification(expoPushToken: string, firstName: strin
     },
   });
 }
+
+/**
+ * Creates a new Friend Request Notification
+ * @param {string} expoPushToken Expo push token
+ * @param {string} firstName First name of the user
+ * @param {string} lastName Last name of the user
+ * @param {string} uid UID of the user sending the request
+ * @return {ExpoPushMessage} Expo Message object
+ */
+export function createFriendRequestNotification(expoPushToken: string, firstName: string, lastName: string, uid: string): ExpoPushMessage {
+  return ({
+    to: expoPushToken,
+    sound: "default",
+    title: "Friend Request",
+    body: `${firstName} ${lastName} wants to be your friend! Come back to GasMeUp to start sharing trips with them!`,
+    data: {
+      friendUID: uid,
+    },
+  });
+}

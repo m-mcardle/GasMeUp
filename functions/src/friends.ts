@@ -2,8 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import * as admin from "firebase-admin";
 import {DocumentReference} from "firebase-admin/firestore";
+import {Expo} from "expo-server-sdk";
 
+import {expo} from "../index";
 import {FriendsField, User} from "../global";
+
+import {createFriendRequestNotification} from "./notificationMessages";
 
 // This should trigger when a user creates a new friend with status:"outgoing"
 /**
@@ -69,6 +73,13 @@ async function handleOutgoingFriendRequest(
     if (friendData.friends[uid]) {
       console.log(`Friend (${friendUID}) already has ${uid} as friend`);
       return;
+    }
+
+    const friendNotificationToken = friendData.notificationToken;
+    if (Expo.isExpoPushToken(friendNotificationToken)) {
+      console.log(`Sending push notification to friend (${friendNotificationToken})`);
+      const notification = createFriendRequestNotification(friendNotificationToken, document.firstName, document.lastName, uid);
+      expo.sendPushNotificationsAsync([notification]);
     }
 
     const friendsFriends = friendData.friends ?? {};

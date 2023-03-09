@@ -1,7 +1,4 @@
 /* eslint-disable max-len */
-import friends from "./src/friends";
-import {createTripNotification, createSettleNotification} from "./src/notificationMessages";
-
 import * as functions from "firebase-functions";
 import {Expo, ExpoPushMessage} from "expo-server-sdk";
 
@@ -15,10 +12,13 @@ import qs from "qs";
 
 import {Friend, User} from "./global";
 
+import friends from "./src/friends";
+import {createTripNotification, createSettleNotification} from "./src/notificationMessages";
+
 admin.initializeApp();
 
 const db = admin.firestore();
-const expo = new Expo();
+export const expo = new Expo();
 
 type Transaction = admin.firestore.Transaction;
 type DocumentReference = admin.firestore.DocumentReference;
