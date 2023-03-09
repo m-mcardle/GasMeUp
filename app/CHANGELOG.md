@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.18](https://github.com/m-mcardle/GasMeUp/compare/v1.0.17...v1.0.18) (2023-03-09)
 
+* Fix callback for `/suggestions` so it works when user initially doesn't provide location
+* Improve auth error messaging alerts
+* Filter out pending friends on Save Trip screen
+
 ### [1.0.17](https://github.com/m-mcardle/GasMeUp/compare/v1.0.16...v1.0.17) (2023-03-08)
 
 * Improve layout on small screen
