@@ -163,7 +163,7 @@ function getDistanceFromLatLonInKm(pos1: LatLng, pos2: LatLng) {
   return d;
 }
 
-export function calcPathLength(path: Array<LatLng>) {
+export function calculatePathLength(path: Array<LatLng>) {
   let total = 0;
   for (let i = 0; i < path.length - 1; i += 1) {
     const pos1 = path[i];
@@ -173,6 +173,19 @@ export function calcPathLength(path: Array<LatLng>) {
   console.log(total);
   return total;
 }
+
+export const convertLatLngToLocation = (latLng: LatLng) => ({
+  latitude: latLng.lat,
+  longitude: latLng.lng,
+});
+
+// Waypoints are required to be in latitude/longitude format
+// whereas the API returns them in lat/lng format
+// --- This can be used to convert back to lat/lng ---
+export const convertLocationToLatLng = (location: Location) => ({
+  lat: location.latitude,
+  lng: location.longitude,
+});
 
 export default {
   provinceCodeLookup,

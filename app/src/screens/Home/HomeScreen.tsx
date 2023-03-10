@@ -31,7 +31,12 @@ import { auth } from '../../../firebase';
 // Helpers
 import { validateCurrentUser } from '../../helpers/authHelper';
 import { convertGasPrice } from '../../helpers/unitsHelper';
-import { getUserLocation, getLocationSubscription, calcPathLength } from '../../helpers/locationHelper';
+import {
+  getUserLocation,
+  getLocationSubscription,
+  calculatePathLength,
+  convertLatLngToLocation,
+} from '../../helpers/locationHelper';
 
 // Global State Stuff
 import { useGlobalState, changeSetting } from '../../hooks/hooks';
@@ -324,8 +329,8 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     }
     setManualTripInProgress(false);
 
-    setWaypoints(currentRoute.map((point) => ({ latitude: point.lat, longitude: point.lng })));
-    setDistance(calcPathLength(currentRoute));
+    setWaypoints(currentRoute.map(convertLatLngToLocation));
+    setDistance(calculatePathLength(currentRoute));
     const routeStart = currentRoute[0];
     const routeEnd = currentRoute[currentRoute.length - 1];
 
@@ -407,6 +412,11 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   const updateEndLocation = (input: string) => {
     setLocations((state) => ({ ...state, endLocation: input }));
     autocompleteSearch(input);
+  };
+
+  const handleMapPress = () => {
+    Keyboard.dismiss();
+    if (!manualTripUsed) { setMapModalVisible(true); }
   };
 
   const setInputToPickedLocation = (item: string) => {
@@ -613,11 +623,11 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       </View>
       <View style={styles.dataContainer}>
         <MapContainer
-          waypoints={waypoints}
-          showUserLocation={!startPoint.address && !endPoint.address}
-          style={styles.mapView}
-          onPress={() => { Keyboard.dismiss(); setMapModalVisible(true); }}
-          onPoiClick={() => { Keyboard.dismiss(); setMapModalVisible(true); }}
+          waypoints={manualTripInProgress ? currentRoute.map(convertLatLngToLocation) : waypoints}
+          showUserLocation={!startPoint.address && !endPoint.address && !manualTripInProgress}
+          style={{ ...styles.mapView, borderColor: manualTripInProgress ? 'red' : 'white' }}
+          onPress={handleMapPress}
+          onPoiClick={handleMapPress}
           customStart={startPoint}
           customEnd={endPoint}
         />

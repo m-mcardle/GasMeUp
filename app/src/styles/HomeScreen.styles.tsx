@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   mapView: {
-    height: '30%',
+    height: '25%',
     width: '70%',
     borderWidth: 1,
     borderColor: 'white',
