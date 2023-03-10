@@ -127,6 +127,7 @@ export const globalStyles = StyleSheet.create({
     padding: 10,
     paddingHorizontal: 60,
     textAlign: 'center',
+    alignItems: 'center',
   },
   disabledButton: {
     backgroundColor: colors.darkestGray,

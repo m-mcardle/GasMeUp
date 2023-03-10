@@ -119,6 +119,61 @@ export async function getUserLocation(updateGlobalState: Function) {
   }
 }
 
+export async function getLocationSubscription(updatePath: Function) {
+  const { status } = await Location.requestForegroundPermissionsAsync();
+  if (status !== 'granted') {
+    console.log('Permission to access location was denied');
+    return undefined;
+  }
+
+  const subscription = await Location.watchPositionAsync(
+    {
+      accuracy: Location.Accuracy.Balanced,
+      timeInterval: 5000,
+      distanceInterval: 1,
+    },
+    (location) => {
+      console.log('Updating user location: ', location.coords);
+      updatePath({
+        lat: location.coords.latitude,
+        lng: location.coords.longitude,
+      });
+    },
+  );
+
+  return subscription;
+}
+
+function deg2rad(deg: number) {
+  return deg * (Math.PI / 180);
+}
+
+function getDistanceFromLatLonInKm(pos1: LatLng, pos2: LatLng) {
+  const { lat: lat1, lng: lon1 } = pos1;
+  const { lat: lat2, lng: lon2 } = pos2;
+
+  const R = 6371; // Radius of the earth in km
+  const dLat = deg2rad(lat2 - lat1); // deg2rad below
+  const dLon = deg2rad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+    + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2))
+    * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c; // Distance in km
+  return d;
+}
+
+export function calcPathLength(path: Array<LatLng>) {
+  let total = 0;
+  for (let i = 0; i < path.length - 1; i += 1) {
+    const pos1 = path[i];
+    const pos2 = path[i + 1];
+    total += getDistanceFromLatLonInKm(pos1, pos2);
+  }
+  console.log(total);
+  return total;
+}
+
 export default {
   provinceCodeLookup,
   lookupProvince,
