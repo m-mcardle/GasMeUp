@@ -226,6 +226,8 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   }, []);
 
   const fetchGasPrice = useCallback(async () => {
+    if (useCustomGasPrice) { return customGasPrice; }
+
     const gasPriceResponse = await fetchData('/gas', { country: globalState.country, region: globalState.region });
 
     if (!gasPriceResponse?.ok || !gasPriceResponse) {
@@ -239,7 +241,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     const tripGasPrice = convertGasPrice(price, globalState.country, 'CA');
     setFetchedGasPrice(tripGasPrice);
     return tripGasPrice;
-  }, [globalState.country, globalState.region]);
+  }, [globalState.country, globalState.region, customGasPrice, useCustomGasPrice]);
 
   const submit = useCallback(async () => {
     setSuggestions([]);
@@ -266,16 +268,13 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     const parsedEndLocation = usingCurrentLocation === InputEnum.End ? `${globalState.userLocation.lat}, ${globalState.userLocation.lng}` : endLocation;
 
     try {
-      const {
-        distance: tripDistance,
-        start: tripStart,
-        end: tripEnd,
-      } = await fetchDistance(parsedStartLocation, parsedEndLocation);
-
-      let tripGasPrice = gasPrice;
-      if (!useCustomGasPrice) {
-        tripGasPrice = await fetchGasPrice();
-      }
+      const [
+        { distance: tripDistance, start: tripStart, end: tripEnd },
+        tripGasPrice,
+      ] = await Promise.all([
+        fetchDistance(parsedStartLocation, parsedEndLocation),
+        fetchGasPrice(),
+      ]);
 
       setStartLocationError(false);
       setEndLocationError(false);
@@ -311,9 +310,14 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   const startFollowingNewTrip = async () => {
     setManualTripUsed(true);
     setManualTripInProgress(true);
+    setCurrentRoute([]);
     clearCurrentTrip({ resetStart: true, resetEnd: true });
     setLocations({ startLocation: '', endLocation: '' });
     setSuggestions([]);
+
+    const tripGasPrice = await fetchGasPrice();
+
+    setGasPrice(tripGasPrice);
 
     const subscription = await getLocationSubscription(
       (newPoint: LatLng) => setCurrentRoute((oldRoute) => [...oldRoute, newPoint]),
@@ -331,6 +335,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
     setWaypoints(currentRoute.map(convertLatLngToLocation));
     setDistance(calculatePathLength(currentRoute));
+
     const routeStart = currentRoute[0];
     const routeEnd = currentRoute[currentRoute.length - 1];
 
@@ -343,13 +348,6 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     const tripStart = { lat: routeStart.lat, lng: routeStart.lng, address: startAddress };
     const tripEnd = { lat: routeEnd.lat, lng: routeEnd.lng, address: endAddress };
 
-    let tripGasPrice = gasPrice;
-    if (!useCustomGasPrice) {
-      tripGasPrice = await fetchGasPrice();
-    }
-
-    setGasPrice(tripGasPrice);
-
     setPoints(tripStart, tripEnd);
     setLocations({ startLocation: tripStart.address, endLocation: tripEnd.address });
   };
@@ -360,6 +358,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     clearCurrentTrip({ resetStart: true, resetEnd: true });
     setLocations({ startLocation: '', endLocation: '' });
     setSuggestions([]);
+    setCurrentRoute([]);
   };
 
   const location = (globalState.userLocation.lat && globalState.userLocation.lng
@@ -557,6 +556,40 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     ],
   );
 
+  const showStartTrackingAlert = () => Alert.alert(
+    'Start Trip',
+    'GasMeUp will start following your location and recording your trip. You can stop tracking at any time. Are you sure you want to start a new trip?',
+    [
+      {
+        text: 'Start',
+        onPress: () => startFollowingNewTrip(),
+        style: 'default',
+      },
+      {
+        text: 'Cancel',
+        onPress: () => {},
+        style: 'cancel',
+      },
+    ],
+  );
+
+  const showStopTrackingAlert = () => Alert.alert(
+    'End Trip',
+    'Are you sure you want to stop tracking your location? This will finish your trip and you cannot undo this action.',
+    [
+      {
+        text: 'Finish',
+        onPress: () => stopFollowingNewTrip(),
+        style: 'default',
+      },
+      {
+        text: 'Cancel',
+        onPress: () => {},
+        style: 'cancel',
+      },
+    ],
+  );
+
   const handleSaveButtonPress = () => {
     if (!user) {
       showPleaseSignInAlert();
@@ -685,8 +718,8 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         )}
         {manualTripInProgress ? (
           <Button
-            style={{ width: '60%', backgroundColor: colors.lightTertiary }}
-            onPress={() => stopFollowingNewTrip()}
+            style={{ width: '60%', backgroundColor: colors.secondaryAction }}
+            onPress={() => showStopTrackingAlert()}
           >
             <View style={{ flexDirection: 'row' }}>
               <FontAwesome5 name="stop-circle" size={16} color="red" />
@@ -695,22 +728,24 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           </Button>
         ) : (
           <Button
-            style={{ width: '60%', paddingHorizontal: 0, backgroundColor: colors.lightTertiary }}
-            onPress={() => startFollowingNewTrip()}
+            style={{ width: '60%', paddingHorizontal: 0, backgroundColor: colors.secondaryAction }}
+            onPress={() => showStartTrackingAlert()}
           >
             <View style={{ flexDirection: 'row' }}>
               <FontAwesome5 name="route" size={16} color="white" />
-              <Text style={{ marginLeft: 4 }}>Start Tracking</Text>
+              <Text style={{ marginLeft: 4 }}>{`Start Tracking${currentRoute.length ? ' New Trip' : ''}`}</Text>
             </View>
           </Button>
         )}
         <View style={styles.buttonSection}>
           {manualTripUsed ? (
             <Button
+              style={{ ...styles.calculateButton, backgroundColor: colors.red }}
               onPress={clearManualTrip}
               disabled={manualTripInProgress}
             >
-              <Text>Clear</Text>
+              <Ionicons name="ios-close" size={12} color="white" />
+              <Text>Clear Trip</Text>
             </Button>
           ) : (
             <CalculateButton

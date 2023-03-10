@@ -134,6 +134,9 @@ const styles = StyleSheet.create({
     marginBottom: '5%',
   },
   calculateButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     width: '50%',
     paddingHorizontal: 20,
   },

@@ -18,7 +18,7 @@ export const colors = {
   teal: '#29A8AB',
   green: '#118C4F',
   darkGreen: '#1f584e',
-  red: '#DC143C',
+  red: '#af4154',
   secondaryAction: '#7851a9',
   purple: '#22133c',
   action: '#603fef',
