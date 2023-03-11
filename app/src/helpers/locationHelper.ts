@@ -1,5 +1,17 @@
 import { Platform } from 'react-native';
-import * as Location from 'expo-location';
+import {
+  requestForegroundPermissionsAsync,
+  requestBackgroundPermissionsAsync,
+  reverseGeocodeAsync,
+  watchPositionAsync,
+  startLocationUpdatesAsync,
+  stopLocationUpdatesAsync,
+  Accuracy,
+  ActivityType,
+  LocationObject,
+  LocationObjectCoords as Coords,
+} from 'expo-location';
+import * as TaskManager from 'expo-task-manager';
 
 export const provinceCodeLookup: Record<string, string> = {
   ON: 'Ontario',
@@ -85,23 +97,20 @@ export const lookupStateCode = (state: string) => {
   return code ?? 'NY';
 };
 
-export async function getUserLocation(updateGlobalState: Function) {
-  console.log('Getting user location...');
-  const { status } = await Location.requestForegroundPermissionsAsync();
-  if (status !== 'granted') {
-    console.log('Permission to access location was denied');
-    updateGlobalState('region', 'Ontario');
-    updateGlobalState('country', 'CA');
-    return;
+export async function getFullLocationPermissions() {
+  const { status: foregroundStatus } = await requestForegroundPermissionsAsync();
+  if (foregroundStatus === 'granted') {
+    const { status: backgroundStatus } = await requestBackgroundPermissionsAsync();
+    if (backgroundStatus === 'granted') {
+      return true;
+    }
   }
 
-  const location = await Location.getCurrentPositionAsync({});
-  updateGlobalState('userLocation', {
-    lat: location.coords.latitude,
-    lng: location.coords.longitude,
-  });
-  console.log('User location: ', location.coords);
-  const readableLocation = (await Location.reverseGeocodeAsync(location.coords))[0];
+  return false;
+}
+
+async function setUserRegion(userLocation: Coords, updateGlobalState: Function) {
+  const readableLocation = (await reverseGeocodeAsync(userLocation))[0];
 
   const userCountry = readableLocation.country ?? 'Canada';
   const userRegion = readableLocation.region ?? 'Ontario';
@@ -118,6 +127,127 @@ export async function getUserLocation(updateGlobalState: Function) {
     updateGlobalState('country', 'CA');
   }
 }
+
+export async function updateUserLocation(location: LocationObject, updateGlobalState: Function) {
+  updateGlobalState('userLocation', {
+    lat: location.coords.latitude,
+    lng: location.coords.longitude,
+  });
+  await setUserRegion(location.coords, updateGlobalState);
+}
+
+export async function getUserLocationSubscription(updateGlobalState: Function) {
+  const { status } = await requestForegroundPermissionsAsync();
+  if (status !== 'granted') {
+    console.log('Permission to access location was denied');
+    return undefined;
+  }
+
+  const subscription = await watchPositionAsync(
+    {
+      accuracy: Accuracy.Balanced,
+      timeInterval: 60000,
+      distanceInterval: 100,
+    },
+    (location) => {
+      console.log('(Subscription) Updating user location: ', location.coords);
+      updateUserLocation(location, updateGlobalState);
+    },
+  );
+
+  return subscription;
+}
+
+const taskName = 'background-location';
+export function createBackgroundLocationTask(updateRoute: Function) {
+  TaskManager.defineTask(taskName, ({ data: { locations }, error }: any) => {
+    if (error) {
+      console.warn('Error getting background location', error);
+      return;
+    }
+
+    console.log(`Received ${locations.length} new locations`);
+    locations.forEach((location: LocationObject) => {
+      const { latitude, longitude } = location.coords;
+      const point = {
+        latitude,
+        longitude,
+      };
+
+      console.log('(Background) Updating user location: ', point);
+      updateRoute({ lat: latitude, lng: longitude });
+    });
+  });
+}
+
+export async function startBackgroundLocationUpdates() {
+  const granted = await getFullLocationPermissions();
+
+  if (!granted) {
+    console.log('Permission to access location was denied');
+    return undefined;
+  }
+
+  await startLocationUpdatesAsync('background-location', {
+    accuracy: Accuracy.Balanced,
+    activityType: ActivityType.AutomotiveNavigation,
+    timeInterval: 5000,
+    distanceInterval: 15,
+    foregroundService: {
+      notificationTitle: 'Background location tracking',
+      notificationBody: 'We are tracking your location in the background',
+    },
+    showsBackgroundLocationIndicator: true,
+  });
+
+  return true;
+}
+
+export async function stopBackgroundLocationUpdates() {
+  await stopLocationUpdatesAsync('background-location');
+}
+
+function deg2rad(deg: number) {
+  return deg * (Math.PI / 180);
+}
+
+function getDistanceFromLatLngInKm(pos1: LatLng, pos2: LatLng) {
+  const { lat: lat1, lng: lng1 } = pos1;
+  const { lat: lat2, lng: lng2 } = pos2;
+
+  const R = 6371; // Radius of the earth in km
+  const dLat = deg2rad(lat2 - lat1);
+  const dLon = deg2rad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+    + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2))
+    * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c; // Distance in km
+  return d;
+}
+
+export function calculatePathLength(path: Array<LatLng>) {
+  let total = 0;
+  for (let i = 0; i < path.length - 1; i += 1) {
+    const pos1 = path[i];
+    const pos2 = path[i + 1];
+    total += getDistanceFromLatLngInKm(pos1, pos2);
+  }
+  return total;
+}
+
+export const convertLatLngToLocation = (latLng: LatLng) => ({
+  latitude: latLng.lat,
+  longitude: latLng.lng,
+});
+
+// Waypoints are required to be in latitude/longitude format
+// whereas the API returns them in lat/lng format
+// --- This can be used to convert back to lat/lng ---
+export const convertLocationToLatLng = (location: Location) => ({
+  lat: location.latitude,
+  lng: location.longitude,
+});
 
 export default {
   provinceCodeLookup,

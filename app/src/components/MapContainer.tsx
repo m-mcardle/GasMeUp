@@ -7,7 +7,8 @@ import MapView, {
 
 import { useGlobalState } from '../hooks/hooks';
 
-import { customMapStyle, locationToLatLng } from '../helpers/mapHelper';
+import { customMapStyle } from '../helpers/mapHelper';
+import { convertLocationToLatLng } from '../helpers/locationHelper';
 
 import { colors, globalStyles } from '../styles/styles';
 
@@ -37,10 +38,10 @@ export default function MapContainer({
   const fallbackEnd = customEnd?.lat ? customEnd : undefined;
 
   const start = waypoints.length
-    ? locationToLatLng(waypoints[0])
+    ? convertLocationToLatLng(waypoints[0])
     : fallbackStart;
   const end = waypoints.length
-    ? locationToLatLng(waypoints[waypoints.length - 1])
+    ? convertLocationToLatLng(waypoints[waypoints.length - 1])
     : fallbackEnd;
 
   const hasStartAndEnd = !!start && !!end;

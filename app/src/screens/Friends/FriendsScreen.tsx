@@ -1,7 +1,7 @@
 // React
 import React, { useEffect, useState } from 'react';
 import {
-  Alert, TouchableOpacity, View,
+  TouchableOpacity, View,
 } from 'react-native';
 
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
@@ -30,6 +30,7 @@ import Page from '../../components/Page';
 import Table from '../../components/Table';
 import Text from '../../components/Text';
 import Modal from '../../components/Modal';
+import Alert from '../../components/Alert';
 
 import AddFriendsSection from '../../components/Friends/AddFriendsSection';
 import FriendRequestsSection from '../../components/Friends/FriendRequestsSection';
@@ -82,7 +83,7 @@ const logout = () => {
       console.log('signed out!');
     })
     .catch((exception) => {
-      Alert.alert('Error', exception.message);
+      Alert('Error', exception.message);
     });
 };
 
@@ -184,7 +185,7 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
 
   const hasFriendRequests = friendRequestUIDs.length > 0;
   return (
-    <Page>
+    <Page keyboardAvoiding={false}>
       <Portal>
         <Modal
           visible={visible}

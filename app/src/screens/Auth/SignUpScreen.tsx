@@ -1,6 +1,6 @@
 // React
 import React, { useState, useRef } from 'react';
-import { View, Alert, TextInput } from 'react-native';
+import { View, TextInput } from 'react-native';
 import PropTypes from 'prop-types';
 
 import md5 from 'md5';
@@ -20,6 +20,7 @@ import Page from '../../components/Page';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Text from '../../components/Text';
+import Alert from '../../components/Alert';
 
 // Helpers
 import { maybeValidEmail } from '../../helpers/emailHelper';
@@ -55,7 +56,7 @@ export default function SignUpScreen() {
 
         await sendEmailVerification(user);
 
-        Alert.alert('Welcome!', `A verification email has been sent to ${email}. You must verify your account before you can save any trips!`);
+        Alert('Welcome!', `A verification email has been sent to ${email}. You must verify your account before you can save any trips!`);
 
         setDoc(doc(db, 'Users', user.uid), {
           uid: user.uid,
@@ -93,7 +94,7 @@ export default function SignUpScreen() {
         } else if (exception.code === 'auth/too-many-requests') {
           errorMessage = 'You have tried to log in too many times. Please try again later.';
         }
-        Alert.alert('Error', errorMessage);
+        Alert('Error', errorMessage);
       });
   };
 

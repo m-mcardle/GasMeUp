@@ -1,7 +1,6 @@
 // React
 import React, { useMemo, useState } from 'react';
 import {
-  Alert,
   View,
   Switch,
 } from 'react-native';
@@ -22,6 +21,7 @@ import Page from '../../components/Page';
 import Text from '../../components/Text';
 import Button from '../../components/Button';
 import MyModal from '../../components/Modal';
+import Alert from '../../components/Alert';
 
 import LoginSection from '../../components/Login/LoginSection';
 
@@ -73,7 +73,7 @@ export default function SettingsScreen() {
         deleteDoc(secureUserDoc).then(() => {
           console.log('SecureUser document deleted');
           deleteUser(user).then(() => {
-            Alert.alert('Account Deleted', 'Your account has been successfully deleted.');
+            Alert('Account Deleted', 'Your account has been successfully deleted.');
           }).catch((error) => {
             console.log(error);
           });
@@ -93,13 +93,13 @@ export default function SettingsScreen() {
     }
 
     sendEmailVerification(user).then(() => {
-      Alert.alert('Email Verification Sent', 'A verification email has been sent to your email address.');
+      Alert('Email Verification Sent', 'A verification email has been sent to your email address.');
     }).catch((error) => {
       console.log(error);
     });
   };
 
-  const showDeleteConfirmationAlert = () => Alert.alert(
+  const showDeleteConfirmationAlert = () => Alert(
     'Delete Account',
     'Are you sure you want to delete your account? This action cannot be undone.',
     [

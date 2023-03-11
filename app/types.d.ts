@@ -19,12 +19,12 @@ interface CostRequest {
   loading: boolean,
   distance: number,
   gasPrice: number,
-  start: {
+  startPoint: {
     lat: number,
     lng: number,
     address: string,
   },
-  end: {
+  endPoint: {
     lat: number,
     lng: number,
     address: string,
@@ -54,6 +54,12 @@ interface LatLng {
 interface Location {
   latitude: number,
   longitude: number,
+}
+
+interface Point {
+  lat: number,
+  lng: number,
+  address: string,
 }
 
 interface Transaction {

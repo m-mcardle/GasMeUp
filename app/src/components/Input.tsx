@@ -97,6 +97,7 @@ export default function Input(props: Props) {
           secureTextEntry={password}
           autoComplete={autoComplete}
           editable={editable}
+          keyboardAppearance="dark"
         />
         {clearButton && (
           <TouchableOpacity

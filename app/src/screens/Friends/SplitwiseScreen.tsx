@@ -179,7 +179,7 @@ export default function SplitwiseScreen({ navigation } : Props) {
   ];
 
   return (
-    <Page>
+    <Page keyboardAvoiding={false}>
       {secureUserDocLoading || splitwiseToken ? (
         <>
           <View style={globalStyles.headerSection}>

@@ -3,7 +3,6 @@ import React, {
   useState, useEffect, useRef,
 } from 'react';
 import {
-  Alert,
   View,
   TextInput,
 } from 'react-native';
@@ -21,6 +20,7 @@ import Text from '../components/Text';
 import Button from '../components/Button';
 import Table from '../components/Table';
 import AutocompleteInput from '../components/AutocompleteInput';
+import Alert from '../components/Alert';
 
 // Mock Data
 import { fetchData } from '../data/data';
@@ -273,7 +273,7 @@ export default function CarScreen({ navigation }: any) {
   const useAsFuelEfficiency = (value: number) => {
     if (value) {
       changeSetting('Gas Mileage', value, updateGlobalState);
-      Alert.alert('Gas Mileage Updated', `Your gas milage has been updated to ${convertFuelEfficiencyToString(value, 'CA', globalState.Locale)}`, [
+      Alert('Gas Mileage Updated', `Your gas milage has been updated to ${convertFuelEfficiencyToString(value, 'CA', globalState.Locale)}`, [
         {
           text: 'OK',
           onPress: () => navigation.navigate('Calculate'),

@@ -1,11 +1,11 @@
-import { Alert } from 'react-native';
-
 import { User } from 'firebase/auth';
+
+import Alert from '../components/Alert';
 
 export function validateCurrentUserEmail(user: User) {
   if (!user.emailVerified) {
     user.reload();
-    Alert.alert('Email Not Verified', 'You must verify your email before you can do that');
+    Alert('Email Not Verified', 'You must verify your email before you can do that');
     return false;
   }
 
@@ -14,7 +14,7 @@ export function validateCurrentUserEmail(user: User) {
 
 export function validateCurrentUserSignedIn(user: User | null | undefined) {
   if (!user) {
-    Alert.alert('Please Log In', 'You must log in before you can do that');
+    Alert('Please Log In', 'You must log in before you can do that');
     return false;
   }
 
