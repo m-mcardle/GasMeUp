@@ -1,6 +1,8 @@
-import { Alert, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+
+import Alert from '../components/Alert';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -36,7 +38,7 @@ export async function registerForPushNotificationsAsync() {
       }
       token = (await Notifications.getExpoPushTokenAsync()).data;
     } else {
-      Alert.alert('Must use physical device for Push Notifications');
+      Alert('Warning', 'Must use physical device for Push Notifications');
     }
 
     return token;

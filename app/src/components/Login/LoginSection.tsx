@@ -1,7 +1,6 @@
 // React
 import React, { useState, useRef } from 'react';
 import {
-  Alert,
   Platform,
   TextInput,
 } from 'react-native';
@@ -15,6 +14,7 @@ import { auth } from '../../../firebase';
 import Button from '../Button';
 import Input from '../Input';
 import Text from '../Text';
+import Alert from '../Alert';
 
 import AppleLogin from './AppleLogin';
 
@@ -64,7 +64,7 @@ export default function LoginSection({ onLogin, mode = 'login' }: Props) {
         } else if (exception.code === 'auth/too-many-requests') {
           errorMessage = 'You have tried to log in too many times. Please try again later.';
         }
-        Alert.alert('Error', errorMessage);
+        Alert('Error', errorMessage);
       });
   };
 

@@ -3,7 +3,6 @@ import React, { useRef } from 'react';
 import {
   View,
   Animated,
-  Alert,
   Image,
 } from 'react-native';
 
@@ -26,6 +25,7 @@ import { removeFriend } from '../../helpers/firestoreHelper';
 
 // Components
 import Text from '../Text';
+import Alert from '../Alert';
 
 // Styles
 import styles from '../../styles/FriendsScreen.styles';
@@ -72,7 +72,7 @@ export default function Row({
   };
 
   const showRemoveConfirmationAlert = () => (user?.uid && uid
-    ? Alert.alert(
+    ? Alert(
       'Remove Friend',
       `Are you sure you want to remove ${name} from your list of friends?`,
       [

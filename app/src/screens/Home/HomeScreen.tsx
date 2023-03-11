@@ -7,7 +7,6 @@ import React, {
 } from 'react';
 import {
   View,
-  Alert,
   Keyboard,
   TextInput,
   TouchableOpacity,
@@ -48,6 +47,7 @@ import Button from '../../components/Button';
 import MapContainer from '../../components/MapContainer';
 import Modal from '../../components/Modal';
 import MapModal from '../../components/MapModal';
+import Alert from '../../components/Alert';
 
 import StatsSection from '../../components/Home/StatsSection';
 import SettingsModal from '../../components/Home/SettingsModal';
@@ -295,7 +295,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         endPoint: tripEnd,
       }));
     } catch (err: any) {
-      Alert.alert(err.message);
+      Alert(err.message);
       setCostRequest((oldState) => ({
         ...oldState,
         loading: false,
@@ -318,7 +318,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     const success = await startBackgroundLocationUpdates();
 
     if (!success) {
-      Alert.alert('Error', 'Unable to start trip tracking');
+      Alert('Error', 'Unable to start trip tracking');
       return;
     }
 
@@ -335,7 +335,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const stopFollowingNewTrip = async () => {
     if (currentRoute.length < 2) {
-      Alert.alert('Trip too short', 'Please travel a bit further before stopping your trip');
+      Alert('Trip too short', 'Please travel a bit further before stopping your trip');
       return;
     }
 
@@ -391,7 +391,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       })
       .then((data) => setSuggestions(data.suggestions ?? []))
       .catch((err) => {
-        Alert.alert(err);
+        Alert(err);
       });
   }, [location]);
 
@@ -455,7 +455,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     Keyboard.dismiss();
 
     if (!globalState.userLocation.lat || !globalState.userLocation.lng) {
-      Alert.alert('Location Unavailable', 'Please enable location services to use this feature');
+      Alert('Location Unavailable', 'Please enable location services to use this feature');
       return;
     }
 
@@ -547,7 +547,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     endLocationRef?.current?.focus();
   };
 
-  const showPleaseSignInAlert = () => Alert.alert(
+  const showPleaseSignInAlert = () => Alert(
     'Please Sign In',
     'Sign in to your GasMeUp account to start saving your trips!',
     [
@@ -564,7 +564,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     ],
   );
 
-  const showStartTrackingAlert = () => Alert.alert(
+  const showStartTrackingAlert = () => Alert(
     'Start Trip',
     'GasMeUp will start following your location and recording your trip. You can stop tracking at any time. Are you sure you want to start a new trip?',
     [
@@ -581,7 +581,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     ],
   );
 
-  const showStopTrackingAlert = () => Alert.alert(
+  const showStopTrackingAlert = () => Alert(
     'End Trip',
     'Are you sure you want to stop tracking your location? This will finish your trip and you cannot undo this action.',
     [

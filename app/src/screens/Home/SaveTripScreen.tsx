@@ -1,6 +1,6 @@
 // React
 import React, { useCallback, useState } from 'react';
-import { Alert, View, Image } from 'react-native';
+import { View, Image } from 'react-native';
 
 import { FontAwesome5 } from '@expo/vector-icons';
 
@@ -21,6 +21,7 @@ import Text from '../../components/Text';
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
 import Page from '../../components/Page';
+import Alert from '../../components/Alert';
 
 import TripSettingsModal from '../../components/Home/TripSettingsModal';
 
@@ -269,11 +270,11 @@ export default function SaveTripScreen({
         console.log('Splitwise Response:', json);
       }
 
-      Alert.alert('Success', 'Trip was saved!');
+      Alert('Success', 'Trip was saved!');
       navigation.goBack();
     } catch (exception) {
       console.log(exception);
-      Alert.alert('Error', 'Something went wrong. Please try again later.');
+      Alert('Error', 'Something went wrong. Please try again later.');
       navigation.goBack();
     }
   }, [currentUser, cost, distance, gasPrice, useSplitwise]);

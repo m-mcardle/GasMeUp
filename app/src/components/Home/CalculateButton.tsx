@@ -8,7 +8,7 @@ import Text from '../Text';
 import Button from '../Button';
 
 // Styles
-import { colors } from '../../styles/styles';
+import { boldFont, colors } from '../../styles/styles';
 import styles from '../../styles/HomeScreen.styles';
 
 interface Props {
@@ -24,7 +24,7 @@ export default function SaveTripButton({ onPress, disabled }: Props) {
       disabled={disabled}
     >
       <Ionicons name="ios-calculator" size={12} color={colors.secondary} />
-      <Text style={{ color: colors.secondary, textAlign: 'center' }}>Calculate</Text>
+      <Text style={{ color: colors.secondary, textAlign: 'center', fontFamily: boldFont }}>Calculate</Text>
     </Button>
   );
 }

@@ -4,7 +4,6 @@ import React, {
 } from 'react';
 import {
   View,
-  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -18,6 +17,7 @@ import Page from '../components/Page';
 import Table from '../components/Table';
 import Text from '../components/Text';
 import Button from '../components/Button';
+import Alert from '../components/Alert';
 
 // Styles
 import styles from '../styles/GasPriceScreen.styles';
@@ -134,7 +134,7 @@ export default function GasPriceScreen({ navigation }: any) {
         }));
       }
     } catch (err: any) {
-      Alert.alert(err.message);
+      Alert(err.message);
       setGasPrices([]);
     }
     setLoading(false);
@@ -157,7 +157,7 @@ export default function GasPriceScreen({ navigation }: any) {
 
   const useAsGasPrice = (price: number) => {
     changeSetting('Custom Gas Price', { price, enabled: 'true' }, updateGlobalState);
-    Alert.alert('Gas Price Updated', `Your gas price has been updated to ${convertGasPriceToString(price, 'CA', globalState.Locale)}`, [
+    Alert('Gas Price Updated', `Your gas price has been updated to ${convertGasPriceToString(price, 'CA', globalState.Locale)}`, [
       {
         text: 'OK',
         onPress: () => navigation.navigate('Calculate'),

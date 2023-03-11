@@ -4,7 +4,7 @@
 
 // React
 import React, { useCallback, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -20,6 +20,7 @@ import { db, auth } from '../../../firebase';
 import Input from '../Input';
 import Text from '../Text';
 import Button from '../Button';
+import Alert from '../Alert';
 
 // Helpers
 import { maybeValidEmail } from '../../helpers/emailHelper';
@@ -49,7 +50,7 @@ export default function AddFriendsTable({ close }: Props) {
   const closeModal = () => {
     setInputError(false);
     close();
-    Alert.alert('Friend Request Sent', `If a user exists with the email: "${friendEmail}", they will receive a friend request.`);
+    Alert('Friend Request Sent', `If a user exists with the email: "${friendEmail}", they will receive a friend request.`);
   };
 
   const sendFriendRequest = useCallback(async () => {
@@ -60,19 +61,19 @@ export default function AddFriendsTable({ close }: Props) {
     const existingFriend = userFriendRequests.find((friend) => friend.email === email);
 
     if (existingFriend?.accepted) {
-      Alert.alert('Error Sending Friend Request', 'Friend already added');
+      Alert('Error Sending Friend Request', 'Friend already added');
       setInputError(true);
       return;
     }
 
     if (existingFriend) {
-      Alert.alert('Error Sending Friend Request', 'Friend request already sent');
+      Alert('Error Sending Friend Request', 'Friend request already sent');
       setInputError(true);
       return;
     }
 
     if (email === currentUser.email) {
-      Alert.alert('Error Sending Friend Request', 'Cannot send friend request to yourself');
+      Alert('Error Sending Friend Request', 'Cannot send friend request to yourself');
       setInputError(true);
       return;
     }

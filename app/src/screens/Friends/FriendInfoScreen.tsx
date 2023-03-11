@@ -1,7 +1,7 @@
 // React
 import React, { useCallback, useState } from 'react';
 import {
-  Alert, Image, ScrollView, View, Platform,
+  Image, ScrollView, View, Platform,
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +22,7 @@ import Button from '../../components/Button';
 import MapModal from '../../components/MapModal';
 import Modal from '../../components/Modal';
 import Page from '../../components/Page';
+import Alert from '../../components/Alert';
 
 import TripDetailsModal from '../../components/Friends/TripDetailsModal';
 
@@ -111,7 +112,7 @@ export default function FriendInfoScreen({
     return transaction.amount * (userIsPayee ? 1 : -1);
   };
 
-  const showSettleConfirmationAlert = () => Alert.alert(
+  const showSettleConfirmationAlert = () => Alert(
     'Settle Up',
     `Are you sure you want to settle up with ${name} for ${formattedAmount}?`,
     [

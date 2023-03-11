@@ -1,5 +1,5 @@
 import * as AppleAuthentication from 'expo-apple-authentication';
-import { View, Alert } from 'react-native';
+import { View } from 'react-native';
 
 import md5 from 'md5';
 
@@ -8,6 +8,8 @@ import {
 } from 'firebase/auth';
 import { setDoc, getDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../../firebase';
+
+import Alert from '../Alert';
 
 import { DEV } from '../../helpers/env';
 
@@ -92,7 +94,7 @@ export default function AppleLogin({ onLogin, mode = 'login' }: Props) {
             }
           })
           .catch((exception) => {
-            Alert.alert('Error', exception.message);
+            Alert('Error', exception.message);
           });
       }
     } catch (e: any) {

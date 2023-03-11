@@ -198,7 +198,7 @@ export const globalStyles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     position: 'absolute',
-    top: 24,
+    top: 42,
     left: 0,
     width: '100%',
     zIndex: 1,
