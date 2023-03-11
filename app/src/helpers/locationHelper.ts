@@ -13,6 +13,8 @@ import {
 } from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 
+import Alert from '../components/Alert';
+
 export const provinceCodeLookup: Record<string, string> = {
   ON: 'Ontario',
   QC: 'Quebec',
@@ -98,12 +100,17 @@ export const lookupStateCode = (state: string) => {
 };
 
 export async function getFullLocationPermissions() {
-  const { status: foregroundStatus } = await requestForegroundPermissionsAsync();
-  if (foregroundStatus === 'granted') {
-    const { status: backgroundStatus } = await requestBackgroundPermissionsAsync();
-    if (backgroundStatus === 'granted') {
-      return true;
+  try {
+    const { status: foregroundStatus } = await requestForegroundPermissionsAsync();
+    if (foregroundStatus === 'granted') {
+      const { status: backgroundStatus } = await requestBackgroundPermissionsAsync();
+      if (backgroundStatus === 'granted') {
+        return true;
+      }
     }
+  } catch (ex) {
+    console.warn('Error getting location permissions', ex);
+    return false;
   }
 
   return false;
@@ -184,21 +191,29 @@ export async function startBackgroundLocationUpdates() {
   const granted = await getFullLocationPermissions();
 
   if (!granted) {
+    // This will occur on Expo Go because they do not set the plist value for background permissions
     console.log('Permission to access location was denied');
-    return undefined;
+    Alert('Unable to start trip', 'Permission to access location was denied. Please enable location services and try again.');
+    return false;
   }
 
-  await startLocationUpdatesAsync('background-location', {
-    accuracy: Accuracy.Balanced,
-    activityType: ActivityType.AutomotiveNavigation,
-    timeInterval: 5000,
-    distanceInterval: 15,
-    foregroundService: {
-      notificationTitle: 'Background location tracking',
-      notificationBody: 'We are tracking your location in the background',
-    },
-    showsBackgroundLocationIndicator: true,
-  });
+  try {
+    await startLocationUpdatesAsync('background-location', {
+      accuracy: Accuracy.Balanced,
+      activityType: ActivityType.AutomotiveNavigation,
+      timeInterval: 5000,
+      distanceInterval: 15,
+      foregroundService: {
+        notificationTitle: 'Background location tracking',
+        notificationBody: 'We are tracking your location in the background',
+      },
+      showsBackgroundLocationIndicator: true,
+    });
+  } catch (ex) {
+    console.log('Error starting background location updates', ex);
+    Alert('Unable to start trip', 'There was an error starting the trip. Please try again.');
+    return false;
+  }
 
   return true;
 }

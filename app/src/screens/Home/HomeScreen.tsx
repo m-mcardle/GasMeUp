@@ -318,7 +318,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     const success = await startBackgroundLocationUpdates();
 
     if (!success) {
-      Alert('Error', 'Unable to start trip tracking');
+      console.log('Failed to start background location updates');
       return;
     }
 

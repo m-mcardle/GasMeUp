@@ -49,10 +49,10 @@ export default function MapModal({
       )}
       {(!!startAddress || !!endAddress) && (
       <View style={{ marginVertical: 8 }}>
-        <Text style={globalStyles.h3}>
+        <Text style={globalStyles.h3} numberOfLines={1}>
           {`Start: ${startAddress || 'Not set'}`}
         </Text>
-        <Text style={globalStyles.h3}>
+        <Text style={globalStyles.h3} numberOfLines={1}>
           {`End: ${endAddress || 'Not set'}`}
         </Text>
       </View>
