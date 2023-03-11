@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 
 // External Components
-import { LocationSubscription } from 'expo-location';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { MapPressEvent, PoiClickEvent } from 'react-native-maps';
 import {
@@ -32,10 +31,11 @@ import { auth } from '../../../firebase';
 import { validateCurrentUser } from '../../helpers/authHelper';
 import { convertGasPrice } from '../../helpers/unitsHelper';
 import {
-  getUserLocation,
-  getLocationSubscription,
   calculatePathLength,
   convertLatLngToLocation,
+  createBackgroundLocationTask,
+  startBackgroundLocationUpdates,
+  stopBackgroundLocationUpdates,
 } from '../../helpers/locationHelper';
 
 // Global State Stuff
@@ -136,14 +136,21 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const [manualTripUsed, setManualTripUsed] = useState<boolean>(false);
   const [manualTripInProgress, setManualTripInProgress] = useState<boolean>(false);
-  const [locationSubscription, setLocationSubscription] = useState<LocationSubscription>();
   const [currentRoute, setCurrentRoute] = useState<Array<LatLng>>([]);
+
+  // TODO - This is inefficient because it's recalculating the entire distance every time
+  const routeDistance = manualTripUsed ? calculatePathLength(currentRoute) : distance;
 
   const GAS_MILEAGE = globalState['Gas Mileage'];
 
   const cost = (
-    ((distance * GAS_MILEAGE) / 100) // This get's the L of gas used
+    ((routeDistance * GAS_MILEAGE) / 100) // This get's the L of gas used
     * gasPrice // This gets the cost of the gas used (it should always be stored in $/L)
+  );
+
+  // Instantiate the background location task
+  createBackgroundLocationTask(
+    (latLng: LatLng) => setCurrentRoute((oldRoute) => [...oldRoute, latLng]),
   );
 
   const updateCustomGasPrice = (newPrice: number) => {
@@ -308,6 +315,13 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   ]);
 
   const startFollowingNewTrip = async () => {
+    const success = await startBackgroundLocationUpdates();
+
+    if (!success) {
+      Alert.alert('Error', 'Unable to start trip tracking');
+      return;
+    }
+
     setManualTripUsed(true);
     setManualTripInProgress(true);
     setCurrentRoute([]);
@@ -316,25 +330,20 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     setSuggestions([]);
 
     const tripGasPrice = await fetchGasPrice();
-
     setGasPrice(tripGasPrice);
-
-    const subscription = await getLocationSubscription(
-      (newPoint: LatLng) => setCurrentRoute((oldRoute) => [...oldRoute, newPoint]),
-    );
-
-    if (subscription) { setLocationSubscription(subscription); }
   };
 
   const stopFollowingNewTrip = async () => {
-    if (locationSubscription) {
-      locationSubscription.remove();
-      setLocationSubscription(undefined);
+    if (currentRoute.length < 2) {
+      Alert.alert('Trip too short', 'Please travel a bit further before stopping your trip');
+      return;
     }
+
+    await stopBackgroundLocationUpdates();
     setManualTripInProgress(false);
 
     setWaypoints(currentRoute.map(convertLatLngToLocation));
-    setDistance(calculatePathLength(currentRoute));
+    setDistance(routeDistance);
 
     const routeStart = currentRoute[0];
     const routeEnd = currentRoute[currentRoute.length - 1];
@@ -444,7 +453,6 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const useCurrentLocation = async (input: InputEnum) => {
     Keyboard.dismiss();
-    await getUserLocation(updateGlobalState);
 
     if (!globalState.userLocation.lat || !globalState.userLocation.lng) {
       Alert.alert('Location Unavailable', 'Please enable location services to use this feature');
@@ -649,7 +657,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           />
         </Modal>
       </Portal>
-      <View style={globalStyles.headerSection}>
+      <View style={{ ...globalStyles.headerSection, top: 24 }}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Ionicons name="settings" size={24} color="white" />
         </TouchableOpacity>
@@ -666,7 +674,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         />
         <StatsSection
           loading={loading}
-          distance={distance}
+          distance={manualTripUsed ? routeDistance : distance}
           gasPrice={gasPrice}
           useCustomGasPrice={useCustomGasPrice}
           cost={cost}

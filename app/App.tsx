@@ -12,6 +12,7 @@ import {
   Inter_900Black,
 } from '@expo-google-fonts/inter';
 import * as Notifications from 'expo-notifications';
+import { LocationSubscription } from 'expo-location';
 
 // React imports
 import React, {
@@ -36,7 +37,7 @@ import CarScreen from './src/screens/CarScreen';
 import { colors } from './src/styles/styles';
 
 // Helpers
-import { getUserLocation } from './src/helpers/locationHelper';
+import { getUserLocationSubscription } from './src/helpers/locationHelper';
 import { registerForPushNotificationsAsync } from './src/helpers/notificationHelper';
 import { getExchangeRate } from './src/helpers/unitsHelper';
 
@@ -97,6 +98,7 @@ const { auth } = firebase;
 
 export default function App() {
   const [globalState, setGlobalState] = useState(initialState);
+  const [locationSubscription, setLocationSubscription] = useState<LocationSubscription>();
 
   const updateGlobalState = (key: string, newValue: any) => {
     setGlobalState((oldState: any) => {
@@ -133,7 +135,16 @@ export default function App() {
 
   // Location initialization
   useEffect(() => {
-    getUserLocation(updateGlobalState);
+    const getSubscription = async () => {
+      const subscription = await getUserLocationSubscription(updateGlobalState);
+      setLocationSubscription(subscription);
+    };
+
+    getSubscription();
+
+    return () => {
+      locationSubscription?.remove();
+    };
   }, []);
 
   const [, setNotification] = useState<Notifications.Notification | undefined>();
