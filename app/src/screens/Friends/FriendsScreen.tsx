@@ -261,7 +261,7 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
             icon: SplitwiseLogo,
           },
         ]}
-        onValueChange={(value) => (value === 'Splitwise' ? navigation.replace('IndexSplitwise') : null)}
+        onValueChange={(value) => (value === 'Splitwise' ? navigation.replace('Splitwise') : null)}
         value="GasMeUp"
       />
     </Page>

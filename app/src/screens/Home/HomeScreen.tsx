@@ -466,13 +466,14 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const useCurrentLocation = async (input: InputEnum) => {
     Keyboard.dismiss();
+    const locationAvailable = !!globalState.userLocation.lat && !!globalState.userLocation.lng;
 
     logEvent('use_current_location', {
       input: input === InputEnum.Start ? 'start' : 'end',
-      available: globalState.userLocation.lat && globalState.userLocation.lng,
+      available: locationAvailable,
     });
 
-    if (!globalState.userLocation.lat || !globalState.userLocation.lng) {
+    if (!locationAvailable) {
       Alert('Location Unavailable', 'Please enable location services to use this feature');
       return;
     }

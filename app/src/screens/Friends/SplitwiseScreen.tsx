@@ -223,7 +223,7 @@ export default function SplitwiseScreen({ navigation } : Props) {
             icon: SplitwiseLogo,
           },
         ]}
-        onValueChange={(value) => (value === 'GasMeUp' ? navigation.replace('Index') : null)}
+        onValueChange={(value) => (value === 'GasMeUp' ? navigation.replace('Friends') : null)}
         value="Splitwise"
       />
     </Page>

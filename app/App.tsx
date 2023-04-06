@@ -67,12 +67,7 @@ function TabIcon({
         ? 'ios-calculator'
         : 'ios-calculator-outline';
       break;
-    case 'Settings':
-      iconName = focused
-        ? 'ios-settings'
-        : 'ios-settings-outline';
-      break;
-    case 'Friends':
+    case 'Friends/Login':
       iconName = focused
         ? 'ios-people'
         : 'ios-people-outline';
@@ -222,8 +217,8 @@ export default function App() {
             tabBarStyle: { backgroundColor: colors.primary },
           })}
         >
-          <Tab.Screen name="Friends" component={FriendsTab} />
-          <Tab.Screen name="Home" component={HomeTab} />
+          <Tab.Screen name="Friends/Login" component={FriendsTab} options={{ title: 'Friends' }} />
+          <Tab.Screen name="Home" component={HomeTab} options={{ title: 'Calculate' }} />
           <Tab.Screen name="Gas Prices" component={GasPriceScreen} />
           <Tab.Screen name="Car" component={CarScreen} />
         </Tab.Navigator>

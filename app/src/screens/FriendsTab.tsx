@@ -44,10 +44,10 @@ export default function FriendsTab() {
         headerTitleStyle: { color: colors.white },
         headerTintColor: colors.white,
       }}
-      initialRouteName="Index"
+      initialRouteName="Friends"
     >
       <RootStack.Screen
-        name="Index"
+        name="Friends"
         options={{
           headerShown: false,
           title: 'All Friends',
@@ -57,7 +57,7 @@ export default function FriendsTab() {
         {({ navigation }) => <FriendsScreen navigation={navigation} setFriend={setFriend} />}
       </RootStack.Screen>
       <RootStack.Screen
-        name="IndexSplitwise"
+        name="Splitwise"
         options={{
           headerShown: false,
           title: 'All Friends',
