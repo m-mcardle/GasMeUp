@@ -1,5 +1,4 @@
 apply plugin: "com.android.application"
-apply plugin: 'com.google.gms.google-services'
 
 import com.android.build.OutputFile
 
@@ -280,9 +279,6 @@ dependencies {
 
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
-
-    implementation platform('com.google.firebase:firebase-bom:31.3.0')
-    implementation 'com.google.firebase:firebase-analytics-ktx'
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";

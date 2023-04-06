@@ -10,11 +10,15 @@ install! 'cocoapods',
   :deterministic_uuids => false
 
 target 'GasMeUp' do
+  $static_framework = []
   use_expo_modules!
 # @generated begin react-native-maps - expo prebuild (DO NOT MODIFY) sync-e9cc66c360abe50bc66d89fffb3c55b034d7d369
   pod 'react-native-google-maps', path: File.dirname(`node --print "require.resolve('react-native-maps/package.json')"`)
 # @generated end react-native-maps
   config = use_native_modules!
+
+  pod 'GoogleMaps'
+  pod 'Google-Maps-iOS-Utils'
 
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
 
@@ -23,7 +27,7 @@ target 'GasMeUp' do
 
   use_react_native!(
     :path => config[:reactNativePath],
-    :hermes_enabled => podfile_properties['expo.jsEngine'] == 'hermes',
+    :hermes_enabled => true,
     :fabric_enabled => flags[:fabric_enabled],
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/..",
@@ -33,8 +37,32 @@ target 'GasMeUp' do
     # :flipper_configuration => !ENV['CI'] ? FlipperConfiguration.enabled : FlipperConfiguration.disabled,
   )
 
-  use_frameworks! :linkage => :static
-  $RNFirebaseAsStaticFramework = true
+  # This is the whole magic starts
+  # Hit build times and times and which library ever failing add here
+  $static_framework += [
+    'react-native-maps',
+    'react-native-google-maps',
+    'Google-Maps-iOS-Utils',
+    'GoogleMaps',
+    'RNPermissions',
+    'Permission-LocationWhenInUse',
+    'Permission-Notifications',
+    'react-native-paste-input',
+    'vision-camera-code-scanner',
+    'VisionCamera'
+  ]
+
+  # ****** THIS IS THE MAGIC ******
+  pre_install do |installer|
+    Pod::Installer::Xcode::TargetValidator.send(:define_method, :verify_no_static_framework_transitive_dependencies) {}
+        installer.pod_targets.each do |pod|
+            if $static_framework.include?(pod.name)
+                def pod.build_type;
+                Pod::BuildType.static_library # >= 1.9
+            end
+        end
+    end
+  end
 
   post_install do |installer|
     react_native_post_install(
