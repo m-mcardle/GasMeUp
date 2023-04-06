@@ -13,7 +13,6 @@ web-build/
 firebase-debug.log
 .ignore/
 
-ios
 .vscode/
 
 # macOS
