@@ -9,11 +9,11 @@ import {
   doc, updateDoc,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import analytics from '@react-native-firebase/analytics';
 import { db, auth } from '../../../firebase';
 
 // Helpers
 import { DEV, ENV } from '../../helpers/env';
+import { logLogin } from '../../helpers/analyticsHelper';
 
 // Components
 import Button from '../Button';
@@ -85,9 +85,7 @@ export default function SplitwiseLogin() {
           });
       }
 
-      analytics().logLogin({
-        method: 'splitwise',
-      });
+      logLogin('splitwise');
     }
   }, [result]);
 

@@ -19,6 +19,7 @@ import { auth, db } from '../../../firebase';
 
 // Helpers
 import { getIcon } from '../../helpers/iconHelper';
+import { logEvent } from '../../helpers/analyticsHelper';
 
 // Components
 import Page from '../../components/Page';
@@ -127,6 +128,8 @@ export default function SplitwiseScreen({ navigation } : Props) {
 
   const logout = () => {
     if (!secureUserDoc || !userDoc) { return; }
+
+    logEvent('splitwise_logout');
 
     updateDoc(secureUserDoc, {
       splitwiseToken: '',

@@ -8,7 +8,6 @@ import {
 // Firebase
 import { AuthCredential, EmailAuthProvider, signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import analytics from '@react-native-firebase/analytics';
 import { auth } from '../../../firebase';
 
 // Components
@@ -21,6 +20,7 @@ import AppleLogin from './AppleLogin';
 
 // Helpers
 import { maybeValidEmail } from '../../helpers/emailHelper';
+import { logLogin } from '../../helpers/analyticsHelper';
 
 // Styles
 import styles from '../../styles/LoginScreen.styles';
@@ -51,9 +51,7 @@ export default function LoginSection({ onLogin, mode = 'login' }: Props) {
           onLogin(cred);
         }
 
-        analytics().logLogin({
-          method: 'email',
-        });
+        logLogin('email');
       })
       .catch((exception) => {
         let errorMessage = 'An error occurred when trying to log you in. Please try again.';

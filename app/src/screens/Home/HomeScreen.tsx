@@ -24,7 +24,6 @@ import uuid from 'react-native-uuid';
 
 // Firebase
 import { useAuthState } from 'react-firebase-hooks/auth';
-import analytics from '@react-native-firebase/analytics';
 import { auth } from '../../../firebase';
 
 // Helpers
@@ -37,6 +36,7 @@ import {
   startBackgroundLocationUpdates,
   stopBackgroundLocationUpdates,
 } from '../../helpers/locationHelper';
+import { logEvent } from '../../helpers/analyticsHelper';
 
 // Global State Stuff
 import { useGlobalState, changeSetting } from '../../hooks/hooks';
@@ -159,6 +159,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   };
 
   const configureCustomGasPrice = (value: boolean) => {
+    logEvent('toggle_using_custom_gas_price', { value });
     changeSetting('Custom Gas Price', { price: customGasPrice, enabled: String(value) }, updateGlobalState);
   };
 
@@ -252,7 +253,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   }, [globalState.country, globalState.region, customGasPrice, useCustomGasPrice]);
 
   const submit = useCallback(async () => {
-    analytics().logEvent('calculate_trip', {
+    logEvent('calculate_trip', {
       start: startLocation,
       end: endLocation,
     });
@@ -436,7 +437,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   const setInputToPickedLocation = (item: string) => {
     Keyboard.dismiss();
 
-    analytics().logEvent('use_suggested_location', {
+    logEvent('use_suggested_location', {
       input: activeInput === InputEnum.Start ? 'start' : 'end',
       suggestion: item,
     });
@@ -466,7 +467,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   const useCurrentLocation = async (input: InputEnum) => {
     Keyboard.dismiss();
 
-    analytics().logEvent('use_current_location', {
+    logEvent('use_current_location', {
       input: input === InputEnum.Start ? 'start' : 'end',
       available: globalState.userLocation.lat && globalState.userLocation.lng,
     });
@@ -616,7 +617,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   );
 
   const handleSaveButtonPress = () => {
-    analytics().logEvent('save_trip', {
+    logEvent('open_save_trip', {
       distance,
       gas_price: gasPrice,
       logged_in: !!user,

@@ -25,6 +25,7 @@ import Alert from '../Alert';
 // Helpers
 import { maybeValidEmail } from '../../helpers/emailHelper';
 import { updateFriend } from '../../helpers/firestoreHelper';
+import { logEvent } from '../../helpers/analyticsHelper';
 
 // Styles
 import { colors, globalStyles } from '../../styles/styles';
@@ -48,6 +49,8 @@ export default function AddFriendsTable({ close }: Props) {
   const validEmail = maybeValidEmail(friendEmail);
 
   const closeModal = () => {
+    logEvent('sent_friend_request');
+
     setInputError(false);
     close();
     Alert('Friend Request Sent', `If a user exists with the email: "${friendEmail}", they will receive a friend request.`);

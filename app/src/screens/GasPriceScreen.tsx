@@ -34,6 +34,7 @@ import {
   convertGasPrice,
   convertGasPriceToString,
 } from '../helpers/unitsHelper';
+import { logEvent } from '../helpers/analyticsHelper';
 
 interface RequestLookup {
   [key: string]: Array<any>
@@ -91,6 +92,12 @@ export default function GasPriceScreen({ navigation }: any) {
 
   const fetchGasPrices = useCallback(async () => {
     setLoading(true);
+
+    logEvent('gas_price_screen_loaded', {
+      region_type: regionType,
+      region: selectedRegion || 'none',
+    });
+
     try {
       // Try and use the cache if possible to avoid unnecessary requests
       if (selectedCountry + selectedRegion in persistedGasPrices) {
@@ -156,6 +163,12 @@ export default function GasPriceScreen({ navigation }: any) {
   }
 
   const useAsGasPrice = (price: number) => {
+    logEvent('custom_gas_price_set', {
+      price: price.toString(),
+      region_type: regionType,
+      region: selectedRegion || 'none',
+    });
+
     changeSetting('Custom Gas Price', { price, enabled: 'true' }, updateGlobalState);
     Alert('Gas Price Updated', `Your gas price has been updated to ${convertGasPriceToString(price, 'CA', globalState.Locale)}`, [
       {

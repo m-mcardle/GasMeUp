@@ -9,8 +9,6 @@ import {
 
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
-import analytics from '@react-native-firebase/analytics';
-
 import { DataTable } from 'react-native-paper';
 
 // Global State Stuff
@@ -29,6 +27,7 @@ import { fetchData } from '../data/data';
 
 // Helpers
 import { convertFuelEfficiency, convertFuelEfficiencyToString } from '../helpers/unitsHelper';
+import { logEvent } from '../helpers/analyticsHelper';
 
 // Styles
 import styles from '../styles/CarScreen.styles';
@@ -136,7 +135,7 @@ export default function CarScreen({ navigation }: any) {
 
   useEffect(() => {
     async function fetchMakes() {
-      analytics().logEvent('car_selection', {
+      logEvent('car_selection', {
         stage: 'year',
       });
 
@@ -153,7 +152,7 @@ export default function CarScreen({ navigation }: any) {
 
   useEffect(() => {
     async function fetchModels() {
-      analytics().logEvent('car_selection', {
+      logEvent('car_selection', {
         stage: 'make',
       });
 
@@ -170,7 +169,7 @@ export default function CarScreen({ navigation }: any) {
 
   useEffect(() => {
     async function fetchTrims() {
-      analytics().logEvent('car_selection', {
+      logEvent('car_selection', {
         stage: 'model',
       });
 
@@ -187,7 +186,7 @@ export default function CarScreen({ navigation }: any) {
 
   useEffect(() => {
     async function fetchVehicle() {
-      analytics().logEvent('car_selection', {
+      logEvent('car_selection', {
         stage: 'done',
       });
 

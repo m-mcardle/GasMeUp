@@ -32,6 +32,7 @@ import { convertGasPrice, convertKMtoMiles, convertLtoGallons } from '../../help
 // Helpers
 import { createTransaction } from '../../helpers/firestoreHelper';
 import { getIcon } from '../../helpers/iconHelper';
+import { logEvent } from '../../helpers/analyticsHelper';
 
 // Styles
 import styles from '../../styles/HomeScreen.styles';
@@ -184,6 +185,14 @@ export default function SaveTripScreen({
     if (!currentUser?.uid) {
       return;
     }
+
+    logEvent('saved_trip', {
+      friends: friends.length,
+      is_driver: driver.uid === currentUser.uid,
+      split_type: splitType,
+      amount: cost,
+    });
+
     const isDriver = (user: any) => user.uid === driver.uid;
     const userIsDriver = driver.uid === currentUser.uid;
     const friendUIDs = friends.map((friend) => String(friend.uid));

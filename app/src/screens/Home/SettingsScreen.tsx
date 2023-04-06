@@ -32,6 +32,7 @@ import {
 
 // Helpers
 import { DEV } from '../../helpers/env';
+import { logEvent } from '../../helpers/analyticsHelper';
 
 // Styles
 import styles from '../../styles/SettingsScreen.styles';
@@ -50,6 +51,9 @@ export default function SettingsScreen() {
       console.log("Can't delete user, not signed in");
       return;
     }
+
+    logEvent('delete_account');
+
     setModalVisible(false);
 
     reauthenticateWithCredential(user, credential).then(() => {

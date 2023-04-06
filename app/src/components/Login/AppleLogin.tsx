@@ -7,12 +7,12 @@ import {
   AuthCredential, signInWithCredential, OAuthProvider, updateProfile,
 } from 'firebase/auth';
 import { setDoc, getDoc, doc } from 'firebase/firestore';
-import analytics from '@react-native-firebase/analytics';
 import { auth, db } from '../../../firebase';
 
 import Alert from '../Alert';
 
 import { DEV } from '../../helpers/env';
+import { logLogin } from '../../helpers/analyticsHelper';
 
 import { isDarkMode } from '../../styles/styles';
 
@@ -90,13 +90,9 @@ export default function AppleLogin({ onLogin, mode = 'login' }: Props) {
                   console.log('Created `SecureUsers` document');
                 });
 
-              analytics().logSignUp({
-                method: 'email',
-              });
+              logLogin('email');
             } else {
-              analytics().logLogin({
-                method: 'apple',
-              });
+              logLogin('apple');
             }
             if (onLogin) {
               onLogin(credential);

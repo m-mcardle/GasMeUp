@@ -30,6 +30,7 @@ import Alert from '../Alert';
 // Styles
 import styles from '../../styles/FriendsScreen.styles';
 import { colors } from '../../styles/styles';
+import { logEvent } from '../../helpers/analyticsHelper';
 
 interface Props {
   email: string,
@@ -46,6 +47,11 @@ export default function Row({
 }: Props) {
   const [user] = useAuthState(auth);
   const ref = useRef<Swipeable>(null);
+
+  const handleRemovedFriend = (friendUid: string) => {
+    logEvent('removed_friend');
+    removeFriend(uid, friendUid);
+  };
 
   const renderRightActions = (
     _progress: Animated.AnimatedInterpolation<number>,
@@ -78,7 +84,7 @@ export default function Row({
       [
         {
           text: 'Remove',
-          onPress: () => removeFriend(user?.uid, uid),
+          onPress: () => handleRemovedFriend(uid),
           style: 'destructive',
         },
         {

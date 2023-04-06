@@ -1,7 +1,6 @@
 // React
 import React, { useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-// import type { StackScreenProps } from '@react-navigation/stack';
 
 // Firebase
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -55,7 +54,6 @@ export default function FriendsTab() {
           gestureDirection: 'horizontal-inverted',
         }}
       >
-
         {({ navigation }) => <FriendsScreen navigation={navigation} setFriend={setFriend} />}
       </RootStack.Screen>
       <RootStack.Screen
