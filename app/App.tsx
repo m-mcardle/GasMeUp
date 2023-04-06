@@ -22,6 +22,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 // Firebase
+import analytics from '@react-native-firebase/analytics';
 import firebase from './firebase';
 
 // Global State
@@ -99,6 +100,9 @@ const { auth } = firebase;
 export default function App() {
   const [globalState, setGlobalState] = useState(initialState);
   const [locationSubscription, setLocationSubscription] = useState<LocationSubscription>();
+
+  const routeNameRef = React.useRef();
+  const navigationRef = React.useRef();
 
   const updateGlobalState = (key: string, newValue: any) => {
     setGlobalState((oldState: any) => {
@@ -185,7 +189,24 @@ export default function App() {
 
   return (
     <GlobalContext.Provider value={state}>
-      <NavigationContainer>
+      <NavigationContainer
+        ref={navigationRef}
+        onReady={() => {
+          routeNameRef.current = navigationRef.current.getCurrentRoute().name;
+        }}
+        onStateChange={async () => {
+          const previousRouteName = routeNameRef.current;
+          const currentRouteName = navigationRef.current.getCurrentRoute().name;
+
+          if (previousRouteName !== currentRouteName) {
+            await analytics().logScreenView({
+              screen_name: currentRouteName,
+              screen_class: currentRouteName,
+            });
+          }
+          routeNameRef.current = currentRouteName;
+        }}
+      >
         <Tab.Navigator
           initialRouteName="Calculate"
           screenOptions={({ route }: { route: any }) => ({

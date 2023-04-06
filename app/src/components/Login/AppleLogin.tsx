@@ -7,6 +7,7 @@ import {
   AuthCredential, signInWithCredential, OAuthProvider, updateProfile,
 } from 'firebase/auth';
 import { setDoc, getDoc, doc } from 'firebase/firestore';
+import analytics from '@react-native-firebase/analytics';
 import { auth, db } from '../../../firebase';
 
 import Alert from '../Alert';
@@ -88,6 +89,14 @@ export default function AppleLogin({ onLogin, mode = 'login' }: Props) {
                 .then(() => {
                   console.log('Created `SecureUsers` document');
                 });
+
+              analytics().logSignUp({
+                method: 'email',
+              });
+            } else {
+              analytics().logLogin({
+                method: 'apple',
+              });
             }
             if (onLogin) {
               onLogin(credential);

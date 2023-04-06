@@ -24,6 +24,7 @@ import uuid from 'react-native-uuid';
 
 // Firebase
 import { useAuthState } from 'react-firebase-hooks/auth';
+import analytics from '@react-native-firebase/analytics';
 import { auth } from '../../../firebase';
 
 // Helpers
@@ -251,6 +252,11 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   }, [globalState.country, globalState.region, customGasPrice, useCustomGasPrice]);
 
   const submit = useCallback(async () => {
+    analytics().logEvent('calculate_trip', {
+      start: startLocation,
+      end: endLocation,
+    });
+
     setSuggestions([]);
     const invalidStart = !startLocation && usingCurrentLocation !== InputEnum.Start;
     const invalidEnd = !endLocation && usingCurrentLocation !== InputEnum.End;
@@ -429,6 +435,12 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const setInputToPickedLocation = (item: string) => {
     Keyboard.dismiss();
+
+    analytics().logEvent('use_suggested_location', {
+      input: activeInput === InputEnum.Start ? 'start' : 'end',
+      suggestion: item,
+    });
+
     // Create new session token after selecting an autocomplete result
     setSessionToken(uuid.v4() as string);
 
@@ -453,6 +465,11 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const useCurrentLocation = async (input: InputEnum) => {
     Keyboard.dismiss();
+
+    analytics().logEvent('use_current_location', {
+      input: input === InputEnum.Start ? 'start' : 'end',
+      available: globalState.userLocation.lat && globalState.userLocation.lng,
+    });
 
     if (!globalState.userLocation.lat || !globalState.userLocation.lng) {
       Alert('Location Unavailable', 'Please enable location services to use this feature');
@@ -599,6 +616,15 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   );
 
   const handleSaveButtonPress = () => {
+    analytics().logEvent('save_trip', {
+      distance,
+      gas_price: gasPrice,
+      logged_in: !!user,
+      start_location: startPoint.address,
+      end_location: endPoint.address,
+      cost,
+    });
+
     if (!user) {
       showPleaseSignInAlert();
       return;

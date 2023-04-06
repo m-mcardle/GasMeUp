@@ -79,6 +79,9 @@ export default function SignUpScreen() {
           });
 
         console.log('All done!');
+        analytics().logSignUp({
+          method: 'email',
+        });
       })
       .catch((exception) => {
         let errorMessage = 'An error occurred when trying to log you in. Please try again.';

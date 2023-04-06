@@ -9,6 +9,8 @@ import {
 
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
+import analytics from '@react-native-firebase/analytics';
+
 import { DataTable } from 'react-native-paper';
 
 // Global State Stuff
@@ -134,6 +136,10 @@ export default function CarScreen({ navigation }: any) {
 
   useEffect(() => {
     async function fetchMakes() {
+      analytics().logEvent('car_selection', {
+        stage: 'year',
+      });
+
       setLoading(true);
       const data = await fetchData('/makes', { year: selectedYear });
       const { makes: validMakes } = await data.json();
@@ -147,6 +153,10 @@ export default function CarScreen({ navigation }: any) {
 
   useEffect(() => {
     async function fetchModels() {
+      analytics().logEvent('car_selection', {
+        stage: 'make',
+      });
+
       setLoading(true);
       const data = await fetchData('/models', { year: selectedYear, make: selectedMake });
       const { models: validModels } = await data.json();
@@ -160,6 +170,10 @@ export default function CarScreen({ navigation }: any) {
 
   useEffect(() => {
     async function fetchTrims() {
+      analytics().logEvent('car_selection', {
+        stage: 'model',
+      });
+
       setLoading(true);
       const data = await fetchData('/model-options', { year: selectedYear, make: selectedMake, model: selectedModel });
       const { modelOptions: validTrims } = await data.json();
@@ -173,6 +187,10 @@ export default function CarScreen({ navigation }: any) {
 
   useEffect(() => {
     async function fetchVehicle() {
+      analytics().logEvent('car_selection', {
+        stage: 'done',
+      });
+
       setLoading(true);
       const data = await fetchData(`/vehicle/${selectedTrim.value}`);
       const vehicleData: any = await data.json();

@@ -39,6 +39,7 @@ target 'GasMeUp' do
 
   # This is the whole magic starts
   # Hit build times and times and which library ever failing add here
+  # See https://github.com/react-native-maps/react-native-maps/issues/3597#issuecomment-1168582636 for more info
   $static_framework += [
     'react-native-maps',
     'react-native-google-maps',

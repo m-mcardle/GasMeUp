@@ -9,6 +9,7 @@ import {
   doc, updateDoc,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import analytics from '@react-native-firebase/analytics';
 import { db, auth } from '../../../firebase';
 
 // Helpers
@@ -83,6 +84,10 @@ export default function SplitwiseLogin() {
             });
           });
       }
+
+      analytics().logLogin({
+        method: 'splitwise',
+      });
     }
   }, [result]);
 

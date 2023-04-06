@@ -8,6 +8,7 @@ import {
 // Firebase
 import { AuthCredential, EmailAuthProvider, signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import analytics from '@react-native-firebase/analytics';
 import { auth } from '../../../firebase';
 
 // Components
@@ -49,6 +50,10 @@ export default function LoginSection({ onLogin, mode = 'login' }: Props) {
           const cred = EmailAuthProvider.credential(email, password);
           onLogin(cred);
         }
+
+        analytics().logLogin({
+          method: 'email',
+        });
       })
       .catch((exception) => {
         let errorMessage = 'An error occurred when trying to log you in. Please try again.';
