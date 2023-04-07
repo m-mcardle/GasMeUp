@@ -50,7 +50,7 @@ function Row({
       <DataTable.Cell style={{ maxWidth: 64, justifyContent: 'center' }} numeric>
         <Button
           style={{ paddingHorizontal: 8, padding: 2, margin: 0 }}
-          onPress={() => useAsFuelEfficiency(canadianFuelEfficiency)}
+          onPress={() => useAsFuelEfficiency(canadianFuelEfficiency, label)}
         >
           <Text>Use</Text>
         </Button>
@@ -287,8 +287,10 @@ export default function CarScreen({ navigation }: any) {
     ]
     : [];
 
-  const useAsFuelEfficiency = (value: number) => {
+  const useAsFuelEfficiency = (value: number, type: string) => {
     if (value) {
+      logEvent('use_as_fuel_efficiency', { type });
+
       changeSetting('Gas Mileage', value, updateGlobalState);
       Alert('Gas Mileage Updated', `Your gas milage has been updated to ${convertFuelEfficiencyToString(value, 'CA', globalState.Locale)}`, [
         {

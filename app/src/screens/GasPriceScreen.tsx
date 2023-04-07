@@ -94,7 +94,7 @@ export default function GasPriceScreen({ navigation }: any) {
     setLoading(true);
 
     logEvent('gas_price_screen_loaded', {
-      region_type: regionType,
+      country: selectedCountry,
       region: selectedRegion || 'none',
     });
 

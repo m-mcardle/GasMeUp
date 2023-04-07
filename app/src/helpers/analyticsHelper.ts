@@ -3,7 +3,7 @@ import analyticsModule from '@react-native-firebase/analytics';
 const analytics = analyticsModule();
 
 export const logEvent = (name: string, params?: any) => {
-  console.log('logEvent', name, params);
+  console.log('logEvent', name, params ?? '');
   analytics.logEvent(name, params);
 };
 

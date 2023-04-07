@@ -185,6 +185,8 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
     amount,
     uid,
     onPress: (friend: FriendObject) => {
+      logEvent('view_friend');
+
       setFriend(friend);
       navigation.navigate('Friend');
     },
