@@ -173,13 +173,13 @@ async function GetGasPrices(country, region) {
     if (region) {
       const { data } = await api(ProvincialGasPricesRequest(region));
       const { prices } = data;
-      return prices;
+      // TODO - remove this once new version of app is released to remove the `/ 100` from the client
+      return prices.map(el => ({ ...el, price: Number((el.price * 100).toFixed(3)) }));
     }
 
     const { data } = await api(CanadianGasPricesRequest());
     const { prices } = data;
-    // TODO - remove this once new version of app is released to remove the `/ 100` from the client
-    return prices.map(el => el / 100);
+    return prices;
   }
   if (region) {
     throw Error('Region is not supported for this country', { cause: 400 });

@@ -27,7 +27,8 @@
     "supertest": "^6.2.3"
   },
   "scripts": {
-    "start": "nodemon ./src/index.js",
+    "start": "node ./src/index.js",
+    "dev": "nodemon ./src/index.js",
     "tunnel": "lt --port 3001 --subdomain gas-me-up",
     "start-full": "NODE_OPTIONS='--experimental-specifier-resolution=node' nodemon ./src/index.js",
     "test": "jest",
