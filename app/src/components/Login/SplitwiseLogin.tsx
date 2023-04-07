@@ -13,6 +13,7 @@ import { db, auth } from '../../../firebase';
 
 // Helpers
 import { DEV, ENV } from '../../helpers/env';
+import { logLogin } from '../../helpers/analyticsHelper';
 
 // Components
 import Button from '../Button';
@@ -83,6 +84,8 @@ export default function SplitwiseLogin() {
             });
           });
       }
+
+      logLogin('splitwise');
     }
   }, [result]);
 

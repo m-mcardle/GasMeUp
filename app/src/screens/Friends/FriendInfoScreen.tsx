@@ -33,6 +33,7 @@ import { colors, boldFont } from '../../styles/styles';
 // Helpers
 import { createTransaction } from '../../helpers/firestoreHelper';
 import { getIcon } from '../../helpers/iconHelper';
+import { logEvent } from '../../helpers/analyticsHelper';
 
 const transactionsRef = collection(db, 'Transactions');
 
@@ -75,6 +76,11 @@ export default function FriendInfoScreen({
       console.log('User not logged in');
       return;
     }
+
+    logEvent('settled_up', {
+      amount,
+    });
+
     try {
       await createTransaction({
         amount: amount * -1,
@@ -110,6 +116,13 @@ export default function FriendInfoScreen({
   const getTransactionAmount = (transaction: DocumentData) => {
     const userIsPayee = transaction.payeeUID === currentUser?.uid;
     return transaction.amount * (userIsPayee ? 1 : -1);
+  };
+
+  const openTransactionViewMore = (transaction: DocumentData) => {
+    logEvent('viewed_transaction_details');
+
+    setSelectedTransaction(transaction);
+    setViewMoreVisible(true);
   };
 
   const showSettleConfirmationAlert = () => Alert(
@@ -189,10 +202,7 @@ export default function FriendInfoScreen({
           {transactionsSinceLastSettle?.map((transaction) => (
             <DataTable.Row
               key={transaction.payeeUID + transaction.amount + transaction.date}
-              onPress={() => {
-                setSelectedTransaction(transaction);
-                setViewMoreVisible(true);
-              }}
+              onPress={() => openTransactionViewMore(transaction)}
             >
               <DataTable.Cell
                 style={{ maxWidth: '10%' }}

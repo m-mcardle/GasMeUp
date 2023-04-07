@@ -24,6 +24,7 @@ import { useGlobalState } from '../../hooks/hooks';
 
 // Helpers
 import { validateCurrentUser } from '../../helpers/authHelper';
+import { logEvent } from '../../helpers/analyticsHelper';
 
 // Components
 import Page from '../../components/Page';
@@ -141,8 +142,18 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
       .sort((a, b) => a!.amount - b!.amount) as Array<object>
     : [] as Array<object>;
 
-  const [visible, setVisible] = useState(false);
+  const [addFriendVisible, setAddFriendVisible] = useState(false);
   const [friendRequestsVisible, setFriendRequestsVisible] = useState(false);
+
+  const openAddFriend = () => {
+    logEvent('view_add_friend');
+    setAddFriendVisible(true);
+  };
+
+  const openFriendRequests = () => {
+    logEvent('view_friend_requests');
+    setFriendRequestsVisible(true);
+  };
 
   // Set the user's notification token if possible
   useEffect(() => {
@@ -174,11 +185,13 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
     amount,
     uid,
     onPress: (friend: FriendObject) => {
+      logEvent('view_friend');
+
       setFriend(friend);
       navigation.navigate('Friend');
     },
   });
-  const Footer = () => FooterRow(() => validateCurrentUser(user) && setVisible(true));
+  const Footer = () => FooterRow(() => validateCurrentUser(user) && openAddFriend());
 
   const friendRequestUIDs = Object.keys(userDocument?.friends ?? {})
     .filter((uid: string) => userDocument?.friends[uid]?.status === 'incoming') ?? [];
@@ -188,11 +201,11 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
     <Page keyboardAvoiding={false}>
       <Portal>
         <Modal
-          visible={visible}
-          onDismiss={() => setVisible((state) => !state)}
+          visible={addFriendVisible}
+          onDismiss={() => setAddFriendVisible(false)}
         >
           <AddFriendsSection
-            close={() => setVisible(false)}
+            close={() => setAddFriendVisible(false)}
           />
         </Modal>
         <Modal
@@ -216,7 +229,7 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
         <TouchableOpacity
           style={{ flexDirection: 'row' }}
           onPress={
-            () => validateCurrentUser(user) && hasFriendRequests && setFriendRequestsVisible(true)
+            () => validateCurrentUser(user) && hasFriendRequests && openFriendRequests()
           }
         >
           <Text style={{ color: colors.white }}>{friendRequestUIDs.length}</Text>
@@ -250,7 +263,7 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
             icon: SplitwiseLogo,
           },
         ]}
-        onValueChange={(value) => (value === 'Splitwise' ? navigation.replace('IndexSplitwise') : null)}
+        onValueChange={(value) => (value === 'Splitwise' ? navigation.replace('Splitwise') : null)}
         value="GasMeUp"
       />
     </Page>

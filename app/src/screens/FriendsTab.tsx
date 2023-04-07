@@ -1,7 +1,6 @@
 // React
 import React, { useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-// import type { StackScreenProps } from '@react-navigation/stack';
 
 // Firebase
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -45,21 +44,20 @@ export default function FriendsTab() {
         headerTitleStyle: { color: colors.white },
         headerTintColor: colors.white,
       }}
-      initialRouteName="Index"
+      initialRouteName="Friends"
     >
       <RootStack.Screen
-        name="Index"
+        name="Friends"
         options={{
           headerShown: false,
           title: 'All Friends',
           gestureDirection: 'horizontal-inverted',
         }}
       >
-
         {({ navigation }) => <FriendsScreen navigation={navigation} setFriend={setFriend} />}
       </RootStack.Screen>
       <RootStack.Screen
-        name="IndexSplitwise"
+        name="Splitwise"
         options={{
           headerShown: false,
           title: 'All Friends',

@@ -24,6 +24,7 @@ import Alert from '../../components/Alert';
 
 // Helpers
 import { maybeValidEmail } from '../../helpers/emailHelper';
+import { logSignUp } from '../../helpers/analyticsHelper';
 
 // Styles
 import styles from '../../styles/SignUpScreen.styles';
@@ -79,6 +80,7 @@ export default function SignUpScreen() {
           });
 
         console.log('All done!');
+        logSignUp('email');
       })
       .catch((exception) => {
         let errorMessage = 'An error occurred when trying to log you in. Please try again.';

@@ -27,6 +27,7 @@ import { fetchData } from '../data/data';
 
 // Helpers
 import { convertFuelEfficiency, convertFuelEfficiencyToString } from '../helpers/unitsHelper';
+import { logEvent } from '../helpers/analyticsHelper';
 
 // Styles
 import styles from '../styles/CarScreen.styles';
@@ -49,7 +50,7 @@ function Row({
       <DataTable.Cell style={{ maxWidth: 64, justifyContent: 'center' }} numeric>
         <Button
           style={{ paddingHorizontal: 8, padding: 2, margin: 0 }}
-          onPress={() => useAsFuelEfficiency(canadianFuelEfficiency)}
+          onPress={() => useAsFuelEfficiency(canadianFuelEfficiency, label)}
         >
           <Text>Use</Text>
         </Button>
@@ -134,6 +135,10 @@ export default function CarScreen({ navigation }: any) {
 
   useEffect(() => {
     async function fetchMakes() {
+      logEvent('car_selection', {
+        stage: 'year',
+      });
+
       setLoading(true);
       const data = await fetchData('/makes', { year: selectedYear });
       const { makes: validMakes } = await data.json();
@@ -147,6 +152,10 @@ export default function CarScreen({ navigation }: any) {
 
   useEffect(() => {
     async function fetchModels() {
+      logEvent('car_selection', {
+        stage: 'make',
+      });
+
       setLoading(true);
       const data = await fetchData('/models', { year: selectedYear, make: selectedMake });
       const { models: validModels } = await data.json();
@@ -160,6 +169,10 @@ export default function CarScreen({ navigation }: any) {
 
   useEffect(() => {
     async function fetchTrims() {
+      logEvent('car_selection', {
+        stage: 'model',
+      });
+
       setLoading(true);
       const data = await fetchData('/model-options', { year: selectedYear, make: selectedMake, model: selectedModel });
       const { modelOptions: validTrims } = await data.json();
@@ -173,6 +186,10 @@ export default function CarScreen({ navigation }: any) {
 
   useEffect(() => {
     async function fetchVehicle() {
+      logEvent('car_selection', {
+        stage: 'done',
+      });
+
       setLoading(true);
       const data = await fetchData(`/vehicle/${selectedTrim.value}`);
       const vehicleData: any = await data.json();
@@ -270,8 +287,10 @@ export default function CarScreen({ navigation }: any) {
     ]
     : [];
 
-  const useAsFuelEfficiency = (value: number) => {
+  const useAsFuelEfficiency = (value: number, type: string) => {
     if (value) {
+      logEvent('use_as_fuel_efficiency', { type });
+
       changeSetting('Gas Mileage', value, updateGlobalState);
       Alert('Gas Mileage Updated', `Your gas milage has been updated to ${convertFuelEfficiencyToString(value, 'CA', globalState.Locale)}`, [
         {

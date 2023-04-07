@@ -41,10 +41,10 @@ export default function HomeTab() {
         headerTitleStyle: { color: colors.white },
         headerTintColor: colors.white,
       }}
-      initialRouteName="Index"
+      initialRouteName="Calculate"
     >
       <RootStack.Screen
-        name="Index"
+        name="Calculate"
         options={{
           headerShown: false,
           title: 'Home',

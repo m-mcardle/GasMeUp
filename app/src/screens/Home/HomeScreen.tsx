@@ -36,6 +36,7 @@ import {
   startBackgroundLocationUpdates,
   stopBackgroundLocationUpdates,
 } from '../../helpers/locationHelper';
+import { logEvent } from '../../helpers/analyticsHelper';
 
 // Global State Stuff
 import { useGlobalState, changeSetting } from '../../hooks/hooks';
@@ -158,6 +159,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   };
 
   const configureCustomGasPrice = (value: boolean) => {
+    logEvent('toggle_using_custom_gas_price', { value });
     changeSetting('Custom Gas Price', { price: customGasPrice, enabled: String(value) }, updateGlobalState);
   };
 
@@ -251,6 +253,11 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   }, [globalState.country, globalState.region, customGasPrice, useCustomGasPrice]);
 
   const submit = useCallback(async () => {
+    logEvent('calculate_trip', {
+      start: startLocation,
+      end: endLocation,
+    });
+
     setSuggestions([]);
     const invalidStart = !startLocation && usingCurrentLocation !== InputEnum.Start;
     const invalidEnd = !endLocation && usingCurrentLocation !== InputEnum.End;
@@ -429,6 +436,12 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const setInputToPickedLocation = (item: string) => {
     Keyboard.dismiss();
+
+    logEvent('use_suggested_location', {
+      input: activeInput === InputEnum.Start ? 'start' : 'end',
+      suggestion: item,
+    });
+
     // Create new session token after selecting an autocomplete result
     setSessionToken(uuid.v4() as string);
 
@@ -453,8 +466,14 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const useCurrentLocation = async (input: InputEnum) => {
     Keyboard.dismiss();
+    const locationAvailable = !!globalState.userLocation.lat && !!globalState.userLocation.lng;
 
-    if (!globalState.userLocation.lat || !globalState.userLocation.lng) {
+    logEvent('use_current_location', {
+      input: input === InputEnum.Start ? 'start' : 'end',
+      available: locationAvailable,
+    });
+
+    if (!locationAvailable) {
       Alert('Location Unavailable', 'Please enable location services to use this feature');
       return;
     }
@@ -599,6 +618,15 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   );
 
   const handleSaveButtonPress = () => {
+    logEvent('open_save_trip', {
+      distance,
+      gas_price: gasPrice,
+      logged_in: !!user,
+      start_location: startPoint.address,
+      end_location: endPoint.address,
+      cost,
+    });
+
     if (!user) {
       showPleaseSignInAlert();
       return;

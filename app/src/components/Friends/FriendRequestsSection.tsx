@@ -13,6 +13,7 @@ import { auth, db } from '../../../firebase';
 
 // Helpers
 import { updateFriend, removeFriend } from '../../helpers/firestoreHelper';
+import { logEvent } from '../../helpers/analyticsHelper';
 
 // Components
 import Text from '../Text';
@@ -61,6 +62,8 @@ export default function FriendRequestsSection({ friendRequestUIDs, closeModal } 
       return;
     }
 
+    logEvent('accepted_friend_request');
+
     try {
       await updateFriend(currentUser.uid, friend.uid, {
         status: 'accepted',
@@ -78,6 +81,8 @@ export default function FriendRequestsSection({ friendRequestUIDs, closeModal } 
     if (!currentUser) {
       return;
     }
+
+    logEvent('removed_friend_request');
 
     try {
       await removeFriend(currentUser.uid, friend.uid);

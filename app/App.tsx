@@ -18,7 +18,7 @@ import { LocationSubscription } from 'expo-location';
 import React, {
   useState, useMemo, useEffect, useRef,
 } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 // Firebase
@@ -40,6 +40,7 @@ import { colors } from './src/styles/styles';
 import { getUserLocationSubscription } from './src/helpers/locationHelper';
 import { registerForPushNotificationsAsync } from './src/helpers/notificationHelper';
 import { getExchangeRate } from './src/helpers/unitsHelper';
+import { logScreenView } from './src/helpers/analyticsHelper';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -61,17 +62,12 @@ function TabIcon({
   let iconName: React.ComponentProps<typeof Ionicons>['name'] = 'ios-square';
 
   switch (name) {
-    case 'Calculate':
+    case 'Home':
       iconName = focused
         ? 'ios-calculator'
         : 'ios-calculator-outline';
       break;
-    case 'Settings':
-      iconName = focused
-        ? 'ios-settings'
-        : 'ios-settings-outline';
-      break;
-    case 'Friends':
+    case 'Friends/Login':
       iconName = focused
         ? 'ios-people'
         : 'ios-people-outline';
@@ -99,6 +95,9 @@ const { auth } = firebase;
 export default function App() {
   const [globalState, setGlobalState] = useState(initialState);
   const [locationSubscription, setLocationSubscription] = useState<LocationSubscription>();
+
+  const routeNameRef = React.useRef<string | null>(null);
+  const navigationRef = React.useRef<NavigationContainerRef<any> | null>(null);
 
   const updateGlobalState = (key: string, newValue: any) => {
     setGlobalState((oldState: any) => {
@@ -185,9 +184,23 @@ export default function App() {
 
   return (
     <GlobalContext.Provider value={state}>
-      <NavigationContainer>
+      <NavigationContainer
+        ref={navigationRef}
+        onReady={() => {
+          routeNameRef.current = navigationRef?.current?.getCurrentRoute()?.name ?? 'Unknown';
+        }}
+        onStateChange={async () => {
+          const previousRouteName = routeNameRef.current;
+          const currentRouteName = navigationRef?.current?.getCurrentRoute()?.name ?? 'Unknown';
+
+          if (previousRouteName !== currentRouteName) {
+            logScreenView(currentRouteName);
+          }
+          routeNameRef.current = currentRouteName;
+        }}
+      >
         <Tab.Navigator
-          initialRouteName="Calculate"
+          initialRouteName="Home"
           screenOptions={({ route }: { route: any }) => ({
             headerShown: false,
             tabBarIcon: ({ focused, color, size }:
@@ -204,8 +217,8 @@ export default function App() {
             tabBarStyle: { backgroundColor: colors.primary },
           })}
         >
-          <Tab.Screen name="Friends" component={FriendsTab} />
-          <Tab.Screen name="Calculate" component={HomeTab} />
+          <Tab.Screen name="Friends/Login" component={FriendsTab} options={{ title: 'Friends' }} />
+          <Tab.Screen name="Home" component={HomeTab} options={{ title: 'Calculate' }} />
           <Tab.Screen name="Gas Prices" component={GasPriceScreen} />
           <Tab.Screen name="Car" component={CarScreen} />
         </Tab.Navigator>

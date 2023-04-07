@@ -12,6 +12,7 @@ import { auth, db } from '../../../firebase';
 import Alert from '../Alert';
 
 import { DEV } from '../../helpers/env';
+import { logLogin } from '../../helpers/analyticsHelper';
 
 import { isDarkMode } from '../../styles/styles';
 
@@ -88,6 +89,10 @@ export default function AppleLogin({ onLogin, mode = 'login' }: Props) {
                 .then(() => {
                   console.log('Created `SecureUsers` document');
                 });
+
+              logLogin('email');
+            } else {
+              logLogin('apple');
             }
             if (onLogin) {
               onLogin(credential);

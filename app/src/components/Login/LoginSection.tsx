@@ -20,6 +20,7 @@ import AppleLogin from './AppleLogin';
 
 // Helpers
 import { maybeValidEmail } from '../../helpers/emailHelper';
+import { logLogin } from '../../helpers/analyticsHelper';
 
 // Styles
 import styles from '../../styles/LoginScreen.styles';
@@ -49,6 +50,8 @@ export default function LoginSection({ onLogin, mode = 'login' }: Props) {
           const cred = EmailAuthProvider.credential(email, password);
           onLogin(cred);
         }
+
+        logLogin('email');
       })
       .catch((exception) => {
         let errorMessage = 'An error occurred when trying to log you in. Please try again.';
