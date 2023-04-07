@@ -145,8 +145,8 @@ android {
         applicationId 'com.Virintus.GasMeUp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 470010018
-        versionName "1.0.18"
+        versionCode 470010019
+        versionName "1.0.19"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
 
         if (isNewArchitectureEnabled()) {
