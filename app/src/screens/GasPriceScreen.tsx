@@ -121,7 +121,7 @@ export default function GasPriceScreen({ navigation }: any) {
           ...price,
           key: price.city,
           text: price.city,
-          price: price.price / 100,
+          price: price.price,
         }));
         setGasPrices(formattedGasPrices);
         setPersistedGasPrices((prev) => ({

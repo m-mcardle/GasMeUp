@@ -31,7 +31,8 @@
     "tunnel": "lt --port 3001 --subdomain gas-me-up",
     "start-full": "NODE_OPTIONS='--experimental-specifier-resolution=node' nodemon ./src/index.js",
     "test": "jest",
-    "deploy": "gcloud app deploy",
+    "deploy": "gcloud app deploy --project='northern-bot-301518'",
+    "deploy-dev": "gcloud app deploy --project='gasmeup-7ce5f'",
     "ngrok": "ngrok http 3001"
   },
   "keywords": [],
