@@ -11,8 +11,8 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "build": "eas build",
-    "build:dev": "eas build --profile development",
+    "build": "npm run setup-prod; eas build",
+    "build:dev": "npm run setup-dev; eas build --profile development",
     "bump": "standard-version",
     "publish": "eas submit --platform ios",
     "publish:expo": "eas update",
@@ -24,7 +24,9 @@
     "lint:fix": "npx eslint --fix './src/' 'App.tsx'",
     "lint-client": "npx eslint './src/' 'App.tsx'",
     "install-server": "cd ../server && npm install",
-    "test-server": "cd ../server && npm test"
+    "test-server": "cd ../server && npm test",
+    "setup-dev": "cp GoogleService-Info-Dev.plist GoogleService-Info.plist",
+    "setup-prod": "cp GoogleService-Info-Prod.plist GoogleService-Info.plist"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.2.2",
