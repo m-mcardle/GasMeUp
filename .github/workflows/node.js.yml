@@ -10,7 +10,10 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  test-app:
+    defaults:
+      run:
+        working-directory: ./app
 
     runs-on: ubuntu-latest
 
@@ -21,17 +24,38 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: create env file
-      run: |
-        touch ./server/.env
-        echo "${{ secrets.ENV_FILE }}" >> ./server/.env
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: app/package-lock.json
-    - run: cd app && npm install
-    - run: cd app && npm run install-server
-    - run: cd app && npm run lint
-    - run: cd app && npm run test-server
+        cache-dependency-path: ./app/package-lock.json
+    - run: npm install
+    - run: npm run lint
+
+  test-server:
+    defaults:
+      run:
+        working-directory: ./server
+
+    runs-on: ubuntu-latest
+    env:
+      ENV_FILE: ${{ secrets.ENV_FILE }}
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: create env file
+      run: echo "$ENV_FILE" >> .env
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: ./server/package-lock.json
+    - run: npm install
+    - run: npm run test
