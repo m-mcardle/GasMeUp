@@ -7,11 +7,11 @@ import CheckBox from 'expo-checkbox';
 
 import NumericInput from 'react-native-numeric-input';
 
-import Text from '../Text';
-import Button from '../Button';
+import Text from '../../../components/Text';
+import Button from '../../../components/Button';
 
-import styles from '../../styles/HomeScreen.styles';
-import { colors, globalStyles } from '../../styles/styles';
+import styles from '../../../styles/HomeScreen.styles';
+import { colors, globalStyles } from '../../../styles/styles';
 
 interface Props {
   setting: string,

@@ -50,11 +50,11 @@ import Modal from '../../components/Modal';
 import MapModal from '../../components/MapModal';
 import Alert from '../../components/Alert';
 
-import StatsSection from '../../components/Home/StatsSection';
-import SettingsModal from '../../components/Home/SettingsModal';
-import SaveTripButton from '../../components/Home/SaveTripButton';
-import CalculateButton from '../../components/Home/CalculateButton';
-import LocationInput from '../../components/Home/LocationInput';
+import StatsSection from './components/StatsSection';
+import SettingsModal from './components/SettingsModal';
+import SaveTripButton from './components/SaveTripButton';
+import CalculateButton from './components/CalculateButton';
+import LocationInput from './components/LocationInput';
 
 // Styles
 import { colors, globalStyles } from '../../styles/styles';

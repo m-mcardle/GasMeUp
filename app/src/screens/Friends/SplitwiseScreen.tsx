@@ -27,7 +27,7 @@ import Table from '../../components/Table';
 import Text from '../../components/Text';
 import Button from '../../components/Button';
 
-import SplitwiseLogin from '../../components/Login/SplitwiseLogin';
+import SplitwiseLogin from './components/SplitwiseLogin';
 
 // Styles
 import styles from '../../styles/FriendsScreen.styles';

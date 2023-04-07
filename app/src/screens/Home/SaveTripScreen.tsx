@@ -23,7 +23,7 @@ import Modal from '../../components/Modal';
 import Page from '../../components/Page';
 import Alert from '../../components/Alert';
 
-import TripSettingsModal from '../../components/Home/TripSettingsModal';
+import TripSettingsModal from './components/TripSettingsModal';
 
 // Global State
 import { useGlobalState, Locale } from '../../hooks/hooks';

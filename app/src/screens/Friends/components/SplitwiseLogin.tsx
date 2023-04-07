@@ -9,22 +9,22 @@ import {
   doc, updateDoc,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { db, auth } from '../../../firebase';
+import { db, auth } from '../../../../firebase';
 
 // Helpers
-import { DEV, ENV } from '../../helpers/env';
-import { logLogin } from '../../helpers/analyticsHelper';
+import { DEV, ENV } from '../../../helpers/env';
+import { logLogin } from '../../../helpers/analyticsHelper';
 
 // Components
-import Button from '../Button';
+import Button from '../../../components/Button';
 
 // Styles
 import {
   boldFont, colors, globalStyles,
-} from '../../styles/styles';
+} from '../../../styles/styles';
 
 // @ts-ignore
-import SplitwiseLogo from '../../../assets/splitwise-logo.png';
+import SplitwiseLogo from '../../../../assets/splitwise-logo.png';
 
 WebBrowser.maybeCompleteAuthSession();
 

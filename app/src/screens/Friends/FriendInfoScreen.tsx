@@ -24,7 +24,7 @@ import Modal from '../../components/Modal';
 import Page from '../../components/Page';
 import Alert from '../../components/Alert';
 
-import TripDetailsModal from '../../components/Friends/TripDetailsModal';
+import TripDetailsModal from './components/TripDetailsModal';
 
 // Styles
 import styles from '../../styles/FriendsScreen.styles';

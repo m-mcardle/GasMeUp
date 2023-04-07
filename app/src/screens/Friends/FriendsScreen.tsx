@@ -33,9 +33,9 @@ import Text from '../../components/Text';
 import Modal from '../../components/Modal';
 import Alert from '../../components/Alert';
 
-import AddFriendsSection from '../../components/Friends/AddFriendsSection';
-import FriendRequestsSection from '../../components/Friends/FriendRequestsSection';
-import Row from '../../components/Friends/FriendRow';
+import AddFriendsSection from './components/AddFriendsSection';
+import FriendRequestsSection from './components/FriendRequestsSection';
+import Row from './components/FriendRow';
 
 // Styles
 import styles from '../../styles/FriendsScreen.styles';

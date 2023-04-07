@@ -14,7 +14,7 @@ import SignUpScreen from './SignUpScreen';
 import Page from '../../components/Page';
 import Text from '../../components/Text';
 
-import LoginSection from '../../components/Login/LoginSection';
+import LoginSection from './components/LoginSection';
 
 // Styles
 import styles from '../../styles/LoginScreen.styles';

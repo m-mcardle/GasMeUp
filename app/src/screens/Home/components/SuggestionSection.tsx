@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import Text from '../Text';
+import Text from '../../../components/Text';
 
-import { colors, boldFont } from '../../styles/styles';
+import { colors, boldFont } from '../../../styles/styles';
 
 interface Props {
   items: Array<string>,

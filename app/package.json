@@ -13,6 +13,7 @@
     "eject": "expo eject",
     "build": "npm run setup-prod; eas build",
     "build:dev": "npm run setup-dev; eas build --profile development",
+    "build:sim": "npm run setup-dev; eas build --profile simulator --platform ios",
     "bump": "standard-version",
     "publish": "eas submit --platform ios",
     "publish:expo": "eas update",

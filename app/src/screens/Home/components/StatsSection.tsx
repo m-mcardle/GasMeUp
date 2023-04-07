@@ -11,15 +11,15 @@ import { ActivityIndicator } from 'react-native-paper';
 // Helpers
 import {
   convertLtoGallons, convertAllToString,
-} from '../../helpers/unitsHelper';
+} from '../../../helpers/unitsHelper';
 
 // Components
-import Text from '../Text';
-import AnimatedGradient from '../AnimatedGradient';
+import Text from '../../../components/Text';
+import AnimatedGradient from '../../../components/AnimatedGradient';
 
 // Styles
-import styles from '../../styles/HomeScreen.styles';
-import { colors } from '../../styles/styles';
+import styles from '../../../styles/HomeScreen.styles';
+import { colors } from '../../../styles/styles';
 
 interface Props {
   loading: boolean,

@@ -8,17 +8,17 @@ import {
 } from 'firebase/firestore';
 
 // Global State
-import { useGlobalState } from '../../hooks/hooks';
+import { useGlobalState } from '../../../hooks/hooks';
 
 // Components
-import Text from '../Text';
-import MapContainer from '../MapContainer';
+import Text from '../../../components/Text';
+import MapContainer from '../../../components/MapContainer';
 
 // Styles
-import styles from '../../styles/FriendsScreen.styles';
+import styles from '../../../styles/FriendsScreen.styles';
 
 // Helpers
-import { convertAllToString } from '../../helpers/unitsHelper';
+import { convertAllToString } from '../../../helpers/unitsHelper';
 
 interface Props {
   setMapVisible: () => void,

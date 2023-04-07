@@ -9,19 +9,19 @@ import {
   doc, DocumentData, getDoc,
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, db } from '../../../firebase';
+import { auth, db } from '../../../../firebase';
 
 // Helpers
-import { updateFriend, removeFriend } from '../../helpers/firestoreHelper';
-import { logEvent } from '../../helpers/analyticsHelper';
+import { updateFriend, removeFriend } from '../../../helpers/firestoreHelper';
+import { logEvent } from '../../../helpers/analyticsHelper';
 
 // Components
-import Text from '../Text';
-import Button from '../Button';
+import Text from '../../../components/Text';
+import Button from '../../../components/Button';
 
 // Styles
-import styles from '../../styles/FriendsScreen.styles';
-import { boldFont, colors, globalStyles } from '../../styles/styles';
+import styles from '../../../styles/FriendsScreen.styles';
+import { boldFont, colors, globalStyles } from '../../../styles/styles';
 
 interface Props {
   friendRequestUIDs: string[],

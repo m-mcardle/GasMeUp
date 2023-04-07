@@ -11,12 +11,12 @@ import {
 } from 'firebase/firestore';
 
 // Components
-import Text from '../Text';
-import Button from '../Button';
+import Text from '../../../components/Text';
+import Button from '../../../components/Button';
 
 // Styles
-import styles from '../../styles/HomeScreen.styles';
-import { colors, globalStyles } from '../../styles/styles';
+import styles from '../../../styles/HomeScreen.styles';
+import { colors, globalStyles } from '../../../styles/styles';
 
 interface User {
   uid: string | number,

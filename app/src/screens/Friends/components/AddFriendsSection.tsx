@@ -14,21 +14,21 @@ import uuid from 'react-native-uuid';
 import { doc } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
-import { db, auth } from '../../../firebase';
+import { db, auth } from '../../../../firebase';
 
 // Components
-import Input from '../Input';
-import Text from '../Text';
-import Button from '../Button';
-import Alert from '../Alert';
+import Input from '../../../components/Input';
+import Text from '../../../components/Text';
+import Button from '../../../components/Button';
+import Alert from '../../../components/Alert';
 
 // Helpers
-import { maybeValidEmail } from '../../helpers/emailHelper';
-import { updateFriend } from '../../helpers/firestoreHelper';
-import { logEvent } from '../../helpers/analyticsHelper';
+import { maybeValidEmail } from '../../../helpers/emailHelper';
+import { updateFriend } from '../../../helpers/firestoreHelper';
+import { logEvent } from '../../../helpers/analyticsHelper';
 
 // Styles
-import { colors, globalStyles } from '../../styles/styles';
+import { colors, globalStyles } from '../../../styles/styles';
 
 interface Props {
   close: () => void,

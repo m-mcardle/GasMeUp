@@ -8,12 +8,13 @@
       "distribution": "internal",
       "channel": "development",
       "ios": {
-        "resourceClass": "m1-medium"
+        "resourceClass": "medium"
       }
     },
-    "preview": {
+    "simulator": {
+      "developmentClient": true,
       "distribution": "internal",
-      "channel": "preview",
+      "channel": "simulator",
       "ios": {
         "simulator": true
       }
@@ -21,7 +22,7 @@
     "production": {
       "channel": "production",
       "ios": {
-        "resourceClass": "m1-medium"
+        "resourceClass": "medium"
       }
     }
   },

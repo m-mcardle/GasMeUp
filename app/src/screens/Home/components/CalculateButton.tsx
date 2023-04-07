@@ -4,12 +4,12 @@ import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 
 // Components
-import Text from '../Text';
-import Button from '../Button';
+import Text from '../../../components/Text';
+import Button from '../../../components/Button';
 
 // Styles
-import { boldFont, colors } from '../../styles/styles';
-import styles from '../../styles/HomeScreen.styles';
+import { boldFont, colors } from '../../../styles/styles';
+import styles from '../../../styles/HomeScreen.styles';
 
 interface Props {
   onPress: () => void,

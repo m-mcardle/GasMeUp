@@ -7,12 +7,12 @@ import {
 } from 'react-native';
 
 // Components
-import AutocompleteInput from '../AutocompleteInput';
+import AutocompleteInput from '../../../components/AutocompleteInput';
 
 import UseCurrentLocationButton from './UseCurrentLocationButton';
 
 // Styles
-import { colors } from '../../styles/styles';
+import { colors } from '../../../styles/styles';
 
 interface Props {
   z: number,

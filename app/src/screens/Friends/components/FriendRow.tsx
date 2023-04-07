@@ -16,21 +16,21 @@ import {
 
 // Firebase
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../../../firebase';
+import { auth } from '../../../../firebase';
 
 // Helpers
-import { validateCurrentUser } from '../../helpers/authHelper';
-import { getIcon } from '../../helpers/iconHelper';
-import { removeFriend } from '../../helpers/firestoreHelper';
+import { validateCurrentUser } from '../../../helpers/authHelper';
+import { getIcon } from '../../../helpers/iconHelper';
+import { removeFriend } from '../../../helpers/firestoreHelper';
 
 // Components
-import Text from '../Text';
-import Alert from '../Alert';
+import Text from '../../../components/Text';
+import Alert from '../../../components/Alert';
 
 // Styles
-import styles from '../../styles/FriendsScreen.styles';
-import { colors } from '../../styles/styles';
-import { logEvent } from '../../helpers/analyticsHelper';
+import styles from '../../../styles/FriendsScreen.styles';
+import { colors } from '../../../styles/styles';
+import { logEvent } from '../../../helpers/analyticsHelper';
 
 interface Props {
   email: string,

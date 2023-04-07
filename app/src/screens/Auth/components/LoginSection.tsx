@@ -8,22 +8,22 @@ import {
 // Firebase
 import { AuthCredential, EmailAuthProvider, signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../../../firebase';
+import { auth } from '../../../../firebase';
 
 // Components
-import Button from '../Button';
-import Input from '../Input';
-import Text from '../Text';
-import Alert from '../Alert';
+import Button from '../../../components/Button';
+import Input from '../../../components/Input';
+import Text from '../../../components/Text';
+import Alert from '../../../components/Alert';
 
 import AppleLogin from './AppleLogin';
 
 // Helpers
-import { maybeValidEmail } from '../../helpers/emailHelper';
-import { logLogin } from '../../helpers/analyticsHelper';
+import { maybeValidEmail } from '../../../helpers/emailHelper';
+import { logLogin } from '../../../helpers/analyticsHelper';
 
 // Styles
-import styles from '../../styles/LoginScreen.styles';
+import styles from '../../../styles/LoginScreen.styles';
 
 interface Props {
   onLogin?: (credential: AuthCredential, refreshToken?: string) => void,

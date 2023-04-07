@@ -23,7 +23,7 @@ import Button from '../../components/Button';
 import MyModal from '../../components/Modal';
 import Alert from '../../components/Alert';
 
-import LoginSection from '../../components/Login/LoginSection';
+import LoginSection from '../Auth/components/LoginSection';
 
 // Global state stuff
 import {
