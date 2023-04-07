@@ -8,12 +8,18 @@ jobs:
   build:
     name: Install and build
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./app
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
           cache: npm
+          cache-dependency-path: ./app/package-lock.json
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
         with:

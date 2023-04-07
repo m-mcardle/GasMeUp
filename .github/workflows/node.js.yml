@@ -11,6 +11,7 @@ on:
 
 jobs:
   test-app:
+    name: Test Frontend
     defaults:
       run:
         working-directory: ./app
@@ -34,6 +35,7 @@ jobs:
     - run: npm run lint
 
   test-server:
+    name: Test Backend
     defaults:
       run:
         working-directory: ./server
