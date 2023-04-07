@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.19](https://github.com/m-mcardle/GasMeUp/compare/v1.0.18...v1.0.19) (2023-04-07)
+
 ### [1.0.18](https://github.com/m-mcardle/GasMeUp/compare/v1.0.17...v1.0.18) (2023-03-09)
 
 * Fix callback for `/suggestions` so it works when user initially doesn't provide location
