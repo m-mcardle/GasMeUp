@@ -1,0 +1,5 @@
+# Path: .dockerignore
+# Write a .dockerignore file to ignore files and directories from the build context
+
+node_modules
+npm-debug.log

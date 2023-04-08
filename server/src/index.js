@@ -26,19 +26,12 @@ const {
   VehicleRequest
 } = require('./queries/fueleconomy');
 
-const { GasCostForDistance } = require('./calculations/fuel');
-
 const { Log, LogError } = require('./utils/console');
 const { validateAPIKey } = require('./utils/validation');
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3001;
-const env = process.env.NODE_ENV || 'development';
-
-Log('Google Enabled:', process.env.ENABLE_GOOGLE_QUERIES);
-
-const useGoogleAPI = (process.env.ENABLE_GOOGLE_QUERIES === 'true' || env === 'production');
 
 const { setupCache } = pkg;
 
@@ -57,67 +50,38 @@ const api = axios.create({
 });
 
 /*
-Axios Request Functions (to Google and CollectAPI)
+Axios Request Functions (to external APIs)
 */
-async function GetDistance(startLocation, endLocation) {
-  if (useGoogleAPI) {
-    const response = await api(Directions(startLocation, endLocation));
-
-    const { data } = response;
-    if (data.status !== 'OK') {
-      throw Error(`Invalid Request to Google (${data.status})`);
-    }
-    const distance = data.routes[0].legs[0].distance.value / 1000;
-    return distance;
-  }
-
-  return 10;
-}
-
 async function GetDistanceV2(startLocation, endLocation) {
-  if (useGoogleAPI) {
-    const response = await api(Directions(startLocation, endLocation));
+  const response = await api(Directions(startLocation, endLocation));
 
-    const { data } = response;
-    if (data.status !== 'OK') {
-      if (data.status === 'ZERO_RESULTS') {
-        throw Error(`Route not found (${startLocation} to ${endLocation})`, { cause: 404 });
-      } else if (data.status === 'NOT_FOUND') {
-        throw Error(`Location not found (${startLocation} or ${endLocation})`, { cause: 404 });
-      } else {
-        throw Error(`An unknown error occurred (${data.status})`, { cause: 500 });
-      }
+  const { data } = response;
+  if (data.status !== 'OK') {
+    if (data.status === 'ZERO_RESULTS') {
+      throw Error(`Route not found (${startLocation} to ${endLocation})`, { cause: 404 });
+    } else if (data.status === 'NOT_FOUND') {
+      throw Error(`Location not found (${startLocation} or ${endLocation})`, { cause: 404 });
+    } else {
+      throw Error(`An unknown error occurred (${data.status})`, { cause: 500 });
     }
-
-    const route = data.routes[0].legs[0];
-    const distance = route.distance.value / 1000;
-    const end = {
-      ...route.end_location,
-      address: route.end_address,
-    };
-    const start = {
-      ...route.start_location,
-      address: route.start_address,
-    };
-
-    return {
-      distance,
-      end,
-      start,
-      data,
-    };
   }
+
+  const route = data.routes[0].legs[0];
+  const distance = route.distance.value / 1000;
+  const end = {
+    ...route.end_location,
+    address: route.end_address,
+  };
+  const start = {
+    ...route.start_location,
+    address: route.start_address,
+  };
 
   return {
-    distance: 10,
-    end: {
-      lat: 43.6532,
-      lng: -79.3832,
-    },
-    start: {
-      lat: 43.6532,
-      lng: -79.3832,
-    },
+    distance,
+    end,
+    start,
+    data,
   };
 }
 
@@ -146,20 +110,16 @@ async function ReverseGeocode(latlng) {
 }
 
 async function GetSuggestions(input, sessionId, location) {
-  if (useGoogleAPI) {
-    const response = await api(LocationAutocomplete(input, sessionId, location));
+  const response = await api(LocationAutocomplete(input, sessionId, location));
 
-    const { data } = response;
-    if (data.status !== 'OK') {
-      throw Error(`Invalid Request to Google (${data.status})`);
-    }
-    const { predictions } = data;
-
-    const suggestions = predictions.map((el) => el.description);
-    return suggestions;
+  const { data } = response;
+  if (data.status !== 'OK') {
+    throw Error(`Invalid Request to Google (${data.status})`);
   }
+  const { predictions } = data;
 
-  return mockLocations.predictions.map((el) => el.description);
+  const suggestions = predictions.map((el) => el.description);
+  return suggestions;
 }
 
 async function GetGasPrice(country, region) {
@@ -173,8 +133,10 @@ async function GetGasPrices(country, region) {
     if (region) {
       const { data } = await api(ProvincialGasPricesRequest(region));
       const { prices } = data;
+      return prices;
       // TODO - remove this once new version of app is released to remove the `/ 100` from the client
-      return prices.map(el => ({ ...el, price: Number((el.price * 100).toFixed(3)) }));
+      // This is currently deployed on the server (northern-bot-301518) to fix the issue on v1.0 and v1.1 of the app
+      // return prices.map(el => ({ ...el, price: Number((el.price * 100).toFixed(3)) }));
     }
 
     const { data } = await api(CanadianGasPricesRequest());

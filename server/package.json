@@ -38,5 +38,8 @@
   },
   "keywords": [],
   "author": "Matthew McArdle",
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": "^16.0.0"
+  }
 }

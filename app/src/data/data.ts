@@ -2,7 +2,7 @@ import { ENV } from '../helpers/env';
 
 export const serverUrl = ENV.USE_DEV_API === 'true' && ENV.DEV_API_URL
   ? ENV.DEV_API_URL
-  : 'https://northern-bot-301518.uc.r.appspot.com';
+  : 'https://gasmeup-7ce5f.uc.r.appspot.com/';
 
 // Helper method to easily fetch API data
 // Example:
