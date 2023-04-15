@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.21](https://github.com/m-mcardle/GasMeUp/compare/v1.0.20...v1.0.21) (2023-04-15)
 
+* Use new production server URL
+
 ### [1.0.20](https://github.com/m-mcardle/GasMeUp/compare/v1.0.19...v1.0.20) (2023-04-07)
 
 ### [1.0.19](https://github.com/m-mcardle/GasMeUp/compare/v1.0.18...v1.0.19) (2023-04-07)
