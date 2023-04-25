@@ -187,7 +187,11 @@ export function createBackgroundLocationTask(updateRoute: Function) {
   });
 }
 
-export async function startBackgroundLocationUpdates() {
+export function removeBackgroundLocationTask() {
+  TaskManager.unregisterTaskAsync(taskName);
+}
+
+export async function startBackgroundLocationUpdates(updateRoute: Function) {
   const granted = await getFullLocationPermissions();
 
   if (!granted) {
@@ -197,8 +201,10 @@ export async function startBackgroundLocationUpdates() {
     return false;
   }
 
+  createBackgroundLocationTask(updateRoute);
+
   try {
-    await startLocationUpdatesAsync('background-location', {
+    await startLocationUpdatesAsync(taskName, {
       accuracy: Accuracy.Balanced,
       activityType: ActivityType.AutomotiveNavigation,
       timeInterval: 5000,
@@ -219,7 +225,8 @@ export async function startBackgroundLocationUpdates() {
 }
 
 export async function stopBackgroundLocationUpdates() {
-  await stopLocationUpdatesAsync('background-location');
+  await stopLocationUpdatesAsync(taskName);
+  removeBackgroundLocationTask();
 }
 
 function deg2rad(deg: number) {

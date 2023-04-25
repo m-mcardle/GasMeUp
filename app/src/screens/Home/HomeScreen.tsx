@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 
 // External Components
-import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { MapPressEvent, PoiClickEvent } from 'react-native-maps';
 import {
   Portal,
@@ -32,9 +32,6 @@ import { convertGasPrice } from '../../helpers/unitsHelper';
 import {
   calculatePathLength,
   convertLatLngToLocation,
-  createBackgroundLocationTask,
-  startBackgroundLocationUpdates,
-  stopBackgroundLocationUpdates,
 } from '../../helpers/locationHelper';
 import { logEvent } from '../../helpers/analyticsHelper';
 
@@ -55,6 +52,7 @@ import SettingsModal from './components/SettingsModal';
 import SaveTripButton from './components/SaveTripButton';
 import CalculateButton from './components/CalculateButton';
 import LocationInput from './components/LocationInput';
+import ManualTripTrackingSection from './components/ManualTripTrackingSection';
 
 // Styles
 import { colors, globalStyles } from '../../styles/styles';
@@ -62,6 +60,7 @@ import styles from '../../styles/HomeScreen.styles';
 
 // Mock Data
 import { fetchData } from '../../data/data';
+import { isFeatureEnabled } from '../../helpers/featureHelper';
 
 enum InputEnum {
   None,
@@ -147,11 +146,6 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   const cost = (
     ((routeDistance * GAS_MILEAGE) / 100) // This get's the L of gas used
     * gasPrice // This gets the cost of the gas used (it should always be stored in $/L)
-  );
-
-  // Instantiate the background location task
-  createBackgroundLocationTask(
-    (latLng: LatLng) => setCurrentRoute((oldRoute) => [...oldRoute, latLng]),
   );
 
   const updateCustomGasPrice = (newPrice: number) => {
@@ -320,53 +314,6 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     customGasPrice,
     gasPrice,
   ]);
-
-  const startFollowingNewTrip = async () => {
-    const success = await startBackgroundLocationUpdates();
-
-    if (!success) {
-      console.log('Failed to start background location updates');
-      return;
-    }
-
-    setManualTripUsed(true);
-    setManualTripInProgress(true);
-    setCurrentRoute([]);
-    clearCurrentTrip({ resetStart: true, resetEnd: true });
-    setLocations({ startLocation: '', endLocation: '' });
-    setSuggestions([]);
-
-    const tripGasPrice = await fetchGasPrice();
-    setGasPrice(tripGasPrice);
-  };
-
-  const stopFollowingNewTrip = async () => {
-    if (currentRoute.length < 2) {
-      Alert('Trip too short', 'Please travel a bit further before stopping your trip');
-      return;
-    }
-
-    await stopBackgroundLocationUpdates();
-    setManualTripInProgress(false);
-
-    setWaypoints(currentRoute.map(convertLatLngToLocation));
-    setDistance(routeDistance);
-
-    const routeStart = currentRoute[0];
-    const routeEnd = currentRoute[currentRoute.length - 1];
-
-    const startResponse = await fetchData('/geocode', { latlng: `${routeStart.lat},${routeStart.lng}` });
-    const startAddress = await startResponse.json();
-
-    const endResponse = await fetchData('/geocode', { latlng: `${routeEnd.lat},${routeEnd.lng}` });
-    const endAddress = await endResponse.json();
-
-    const tripStart = { lat: routeStart.lat, lng: routeStart.lng, address: startAddress };
-    const tripEnd = { lat: routeEnd.lat, lng: routeEnd.lng, address: endAddress };
-
-    setPoints(tripStart, tripEnd);
-    setLocations({ startLocation: tripStart.address, endLocation: tripEnd.address });
-  };
 
   const clearManualTrip = () => {
     setManualTripUsed(false);
@@ -583,40 +530,6 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     ],
   );
 
-  const showStartTrackingAlert = () => Alert(
-    'Start Trip',
-    'GasMeUp will start following your location and recording your trip. You can stop tracking at any time. Are you sure you want to start a new trip?',
-    [
-      {
-        text: 'Start',
-        onPress: () => startFollowingNewTrip(),
-        style: 'default',
-      },
-      {
-        text: 'Cancel',
-        onPress: () => {},
-        style: 'cancel',
-      },
-    ],
-  );
-
-  const showStopTrackingAlert = () => Alert(
-    'End Trip',
-    'Are you sure you want to stop tracking your location? This will finish your trip and you cannot undo this action.',
-    [
-      {
-        text: 'Finish',
-        onPress: () => stopFollowingNewTrip(),
-        style: 'default',
-      },
-      {
-        text: 'Cancel',
-        onPress: () => {},
-        style: 'cancel',
-      },
-    ],
-  );
-
   const handleSaveButtonPress = () => {
     logEvent('open_save_trip', {
       distance,
@@ -747,32 +660,24 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
             onUseCurrentLocationPress={() => useCurrentLocation(InputEnum.End)}
             returnKeyType="done"
           />
-          <View>
-            <Text style={{ marginTop: 8 }}>- OR -</Text>
-          </View>
+          {isFeatureEnabled('manual_trip_tracking') && (
+            <View>
+              <Text style={{ marginTop: 8 }}>- OR -</Text>
+            </View>
+          )}
         </>
         )}
-        {manualTripInProgress ? (
-          <Button
-            style={{ width: '60%', backgroundColor: colors.secondaryAction }}
-            onPress={() => showStopTrackingAlert()}
-          >
-            <View style={{ flexDirection: 'row' }}>
-              <FontAwesome5 name="stop-circle" size={16} color="red" />
-              <Text style={{ marginLeft: 4 }}>Stop Tracking</Text>
-            </View>
-          </Button>
-        ) : (
-          <Button
-            style={{ width: '60%', paddingHorizontal: 0, backgroundColor: colors.secondaryAction }}
-            onPress={() => showStartTrackingAlert()}
-          >
-            <View style={{ flexDirection: 'row' }}>
-              <FontAwesome5 name="route" size={16} color="white" />
-              <Text style={{ marginLeft: 4 }}>{`Start Tracking${currentRoute.length ? ' New Trip' : ''}`}</Text>
-            </View>
-          </Button>
-        )}
+        <ManualTripTrackingSection
+          distance={distance}
+          fetchGasPrice={fetchGasPrice}
+          clearCurrentTrip={clearCurrentTrip}
+          setDistance={setDistance}
+          setPoints={setPoints}
+          setGasPrice={setGasPrice}
+          setWaypoints={setWaypoints}
+          setSuggestions={setSuggestions}
+          setLocations={setLocations}
+        />
         <View style={styles.buttonSection}>
           {manualTripUsed ? (
             <Button

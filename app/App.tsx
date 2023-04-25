@@ -41,6 +41,7 @@ import { getUserLocationSubscription } from './src/helpers/locationHelper';
 import { registerForPushNotificationsAsync } from './src/helpers/notificationHelper';
 import { getExchangeRate } from './src/helpers/unitsHelper';
 import { logScreenView } from './src/helpers/analyticsHelper';
+import { initializeRemoteConfig } from './src/helpers/featureHelper';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -176,6 +177,11 @@ export default function App() {
     }
 
     fetchRate();
+  }, []);
+
+  // Feature Service initialization
+  useEffect(() => {
+    initializeRemoteConfig();
   }, []);
 
   if (!fontsLoaded) {
