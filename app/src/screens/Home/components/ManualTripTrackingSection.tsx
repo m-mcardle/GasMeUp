@@ -17,7 +17,6 @@ import {
   stopBackgroundLocationUpdates,
 } from '../../../helpers/locationHelper';
 import { logEvent } from '../../../helpers/analyticsHelper';
-import { isFeatureEnabled } from '../../../helpers/featureHelper';
 
 // Components
 import Text from '../../../components/Text';
@@ -32,6 +31,7 @@ import { fetchData } from '../../../data/data';
 
 interface Props {
   distance: number,
+  manualTripTrackingEnabled: boolean,
   fetchGasPrice: () => void,
   clearCurrentTrip: (any: any) => void,
   setDistance: (any: any) => void,
@@ -44,6 +44,7 @@ interface Props {
 
 export default function ManualTripTrackingSection({
   distance,
+  manualTripTrackingEnabled,
   fetchGasPrice,
   clearCurrentTrip,
   setDistance,
@@ -147,7 +148,7 @@ export default function ManualTripTrackingSection({
     ],
   );
 
-  if (!isFeatureEnabled('manual_trip_tracking')) {
+  if (!manualTripTrackingEnabled) {
     return (
       // eslint-disable-next-line react/jsx-no-useless-fragment
       <></>

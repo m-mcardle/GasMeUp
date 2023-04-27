@@ -138,6 +138,8 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   const [manualTripInProgress, setManualTripInProgress] = useState<boolean>(false);
   const [currentRoute, setCurrentRoute] = useState<Array<LatLng>>([]);
 
+  const [manualTripTrackingEnabled, setManualTripTrackingEnabled] = useState<boolean>(false);
+
   // TODO - This is inefficient because it's recalculating the entire distance every time
   const routeDistance = manualTripUsed ? calculatePathLength(currentRoute) : distance;
 
@@ -496,6 +498,11 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     }
   }, [useCustomGasPrice, customGasPrice]);
 
+  // Initialize user's features
+  useEffect(() => {
+    setManualTripTrackingEnabled(isFeatureEnabled('manual_trip_tracking'));
+  }, []);
+
   // Represents if the user has entered all the required data to save a trip's cost
   const canSaveTrip = (
     !!distance
@@ -660,7 +667,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
             onUseCurrentLocationPress={() => useCurrentLocation(InputEnum.End)}
             returnKeyType="done"
           />
-          {isFeatureEnabled('manual_trip_tracking') && (
+          {manualTripTrackingEnabled && (
             <View>
               <Text style={{ marginTop: 8 }}>- OR -</Text>
             </View>
@@ -669,6 +676,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         )}
         <ManualTripTrackingSection
           distance={distance}
+          manualTripTrackingEnabled={manualTripTrackingEnabled}
           fetchGasPrice={fetchGasPrice}
           clearCurrentTrip={clearCurrentTrip}
           setDistance={setDistance}

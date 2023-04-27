@@ -187,10 +187,6 @@ export function createBackgroundLocationTask(updateRoute: Function) {
   });
 }
 
-export function removeBackgroundLocationTask() {
-  TaskManager.unregisterTaskAsync(taskName);
-}
-
 export async function startBackgroundLocationUpdates(updateRoute: Function) {
   const granted = await getFullLocationPermissions();
 
@@ -226,7 +222,6 @@ export async function startBackgroundLocationUpdates(updateRoute: Function) {
 
 export async function stopBackgroundLocationUpdates() {
   await stopLocationUpdatesAsync(taskName);
-  removeBackgroundLocationTask();
 }
 
 function deg2rad(deg: number) {
