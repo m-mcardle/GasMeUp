@@ -21,6 +21,7 @@ import AppleLogin from './AppleLogin';
 // Helpers
 import { maybeValidEmail } from '../../../helpers/emailHelper';
 import { logLogin } from '../../../helpers/analyticsHelper';
+import { isFeatureEnabled } from '../../../helpers/featureHelper';
 
 // Styles
 import styles from '../../../styles/LoginScreen.styles';
@@ -109,7 +110,7 @@ export default function LoginSection({ onLogin, mode = 'login' }: Props) {
       >
         <Text style={styles.loginButtonText}>Login</Text>
       </Button>
-      {platform === 'ios' ? <AppleLogin onLogin={onLogin} mode={mode} /> : undefined}
+      {platform === 'ios' && isFeatureEnabled('apple_login') ? <AppleLogin onLogin={onLogin} mode={mode} /> : undefined}
     </>
   );
 }

@@ -1,10 +1,5 @@
 import remoteConfig from '@react-native-firebase/remote-config';
-
-const defaultValues = {
-  exchange_rate: 0.7,
-  fetch_exchange_rate: false,
-  manual_trip_tracking: false,
-};
+import defaultValues from '../data/remote_config_defaults.json';
 
 export const initializeRemoteConfig = async () => {
   await remoteConfig().setConfigSettings({

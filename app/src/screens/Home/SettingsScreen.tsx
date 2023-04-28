@@ -96,6 +96,8 @@ export default function SettingsScreen() {
       return;
     }
 
+    logEvent('request_email_verification');
+
     sendEmailVerification(user).then(() => {
       Alert('Email Verification Sent', 'A verification email has been sent to your email address.');
     }).catch((error) => {

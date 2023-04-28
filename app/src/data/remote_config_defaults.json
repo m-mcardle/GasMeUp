@@ -1,0 +1,13 @@
+{
+  "fetch_exchange_rate": "false",
+  "apple_login": "true",
+  "maintenance_mode": "false",
+  "exchange_rate": "0.7341",
+  "home_screen": "true",
+  "friends_screen": "true",
+  "gas_screen": "true",
+  "splitwise_screen": "true",
+  "server_url": "https://gasmeup-7ce5f.uc.r.appspot.com/",
+  "car_screen": "true",
+  "manual_trip_tracking": "false"
+}

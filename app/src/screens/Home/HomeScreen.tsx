@@ -41,7 +41,6 @@ import { useGlobalState, changeSetting } from '../../hooks/hooks';
 // Components
 import Page from '../../components/Page';
 import Text from '../../components/Text';
-import Button from '../../components/Button';
 import MapContainer from '../../components/MapContainer';
 import Modal from '../../components/Modal';
 import MapModal from '../../components/MapModal';
@@ -55,12 +54,13 @@ import LocationInput from './components/LocationInput';
 import ManualTripTrackingSection from './components/ManualTripTrackingSection';
 
 // Styles
-import { colors, globalStyles } from '../../styles/styles';
+import { globalStyles } from '../../styles/styles';
 import styles from '../../styles/HomeScreen.styles';
 
 // Mock Data
 import { fetchData } from '../../data/data';
 import { isFeatureEnabled } from '../../helpers/featureHelper';
+import ClearManualTripButton from './components/ClearManualTripButton';
 
 enum InputEnum {
   None,
@@ -195,12 +195,16 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   const fetchDistance = useCallback(async (start: string, end: string) => {
     const distanceResponse = await fetchData('/distance', { start, end });
 
-    if (!distanceResponse?.ok || !distanceResponse) {
+    if (!distanceResponse || !distanceResponse.ok) {
+      let error = 'Unknown error occurred';
       console.log(`Request for distance failed (${distanceResponse.status})`);
       setEndLocationError(true);
       setStartLocationError(true);
-      const { error } = await distanceResponse.json();
-      throw new Error(`Error: ${error} (${distanceResponse.status})`);
+
+      if (distanceResponse) {
+        error = (await distanceResponse.json())?.error;
+      }
+      throw new Error(`Error: ${error}`);
     }
 
     const {
@@ -247,6 +251,11 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     setFetchedGasPrice(tripGasPrice);
     return tripGasPrice;
   }, [globalState.country, globalState.region, customGasPrice, useCustomGasPrice]);
+
+  const fetchAndSetGasPrice = async () => {
+    const tripGasPrice = await fetchGasPrice();
+    setGasPrice(tripGasPrice);
+  };
 
   const submit = useCallback(async () => {
     logEvent('calculate_trip', {
@@ -474,6 +483,8 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     const response = await fetchData('/geocode', { latlng: `${latitude},${longitude}` });
     const address = await response.json();
 
+    logEvent('use_pressed_location', { poi: false });
+
     setLocationToPressedLocation(address, latitude, longitude);
   };
 
@@ -486,6 +497,9 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     const address = await response.json();
 
     const { latitude, longitude } = coordinate;
+
+    logEvent('use_pressed_location', { poi: true });
+
     setLocationToPressedLocation(address, latitude, longitude);
   };
 
@@ -526,7 +540,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     [
       {
         text: 'Sign In',
-        onPress: () => navigation.navigate('Friends'),
+        onPress: () => navigation.navigate('Friends/Login'),
         style: 'default',
       },
       {
@@ -675,27 +689,27 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         </>
         )}
         <ManualTripTrackingSection
-          distance={distance}
+          currentRoute={currentRoute}
+          userLocation={globalState.userLocation}
+          manualTripInProgress={manualTripInProgress}
           manualTripTrackingEnabled={manualTripTrackingEnabled}
-          fetchGasPrice={fetchGasPrice}
+          setCurrentRoute={setCurrentRoute}
           clearCurrentTrip={clearCurrentTrip}
-          setDistance={setDistance}
           setPoints={setPoints}
-          setGasPrice={setGasPrice}
+          fetchAndSetGasPrice={fetchAndSetGasPrice}
           setWaypoints={setWaypoints}
           setSuggestions={setSuggestions}
           setLocations={setLocations}
+          setManualTripUsed={setManualTripUsed}
+          setManualTripInProgress={setManualTripInProgress}
+          setDistanceToRouteDistance={() => setDistance(routeDistance)}
         />
         <View style={styles.buttonSection}>
           {manualTripUsed ? (
-            <Button
-              style={{ ...styles.calculateButton, backgroundColor: colors.red }}
+            <ClearManualTripButton
               onPress={clearManualTrip}
               disabled={manualTripInProgress}
-            >
-              <Ionicons name="ios-close" size={12} color="white" />
-              <Text>Clear Trip</Text>
-            </Button>
+            />
           ) : (
             <CalculateButton
               onPress={submit}

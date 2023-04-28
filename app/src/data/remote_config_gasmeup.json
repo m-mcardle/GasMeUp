@@ -1,0 +1,111 @@
+{
+  "conditions": [
+    {
+      "name": "All Users",
+      "expression": "true",
+      "tagColor": "CYAN"
+    },
+    {
+      "name": "50-50",
+      "expression": "percent('bjd8no51g4oz') between 0 and 50",
+      "tagColor": "PURPLE"
+    }
+  ],
+  "parameters": {
+    "fetch_exchange_rate": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "conditionalValues": {
+        "50-50": {
+          "value": "true"
+        }
+      },
+      "description": "Should user fetch exchange rate manually from external API?",
+      "valueType": "BOOLEAN"
+    },
+    "apple_login": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Can user login using Apple?",
+      "valueType": "BOOLEAN"
+    },
+    "maintenance_mode": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "Is the app undergoing maintenance? This will show a waiting screen.",
+      "valueType": "BOOLEAN"
+    },
+    "exchange_rate": {
+      "defaultValue": {
+        "value": "0.7341"
+      },
+      "description": "Current exchange rate between USD and CAD",
+      "valueType": "NUMBER"
+    },
+    "home_screen": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Is home screen viewable?",
+      "valueType": "BOOLEAN"
+    },
+    "friends_screen": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Is the friends screen viewable?",
+      "valueType": "BOOLEAN"
+    },
+    "gas_screen": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Is the gas price screen viewable?",
+      "valueType": "BOOLEAN"
+    },
+    "splitwise_screen": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Is the Splitwise friends screen viewable?",
+      "valueType": "BOOLEAN"
+    },
+    "server_url": {
+      "defaultValue": {
+        "value": "https://gasmeup-7ce5f.uc.r.appspot.com/"
+      },
+      "description": "URL for the Server API",
+      "valueType": "STRING"
+    },
+    "car_screen": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Is the car selection screen viewable?",
+      "valueType": "BOOLEAN"
+    },
+    "manual_trip_tracking": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "conditionalValues": {
+        "All Users": {
+          "value": "true"
+        }
+      },
+      "valueType": "BOOLEAN"
+    }
+  },
+  "version": {
+    "versionNumber": "10",
+    "updateTime": "2023-04-28T15:49:45.709459Z",
+    "updateUser": {
+      "email": "matthew.j.mcardle@gmail.com"
+    },
+    "updateOrigin": "CONSOLE",
+    "updateType": "INCREMENTAL_UPDATE"
+  }
+}

@@ -1,7 +1,5 @@
 // React imports
-import React, {
-  useState,
-} from 'react';
+import React from 'react';
 import {
   View,
 } from 'react-native';
@@ -11,7 +9,6 @@ import { FontAwesome5 } from '@expo/vector-icons';
 
 // Helpers
 import {
-  calculatePathLength,
   convertLatLngToLocation,
   startBackgroundLocationUpdates,
   stopBackgroundLocationUpdates,
@@ -30,40 +27,41 @@ import { colors } from '../../../styles/styles';
 import { fetchData } from '../../../data/data';
 
 interface Props {
-  distance: number,
   manualTripTrackingEnabled: boolean,
-  fetchGasPrice: () => void,
+  manualTripInProgress: boolean,
+  userLocation: any,
+  currentRoute: any,
+  setCurrentRoute: (any: any) => void,
   clearCurrentTrip: (any: any) => void,
-  setDistance: (any: any) => void,
   setPoints: (argv0: any, argv1: any) => void,
-  setGasPrice: (any: any) => void,
+  fetchAndSetGasPrice: () => void,
   setWaypoints: (any: any) => void,
   setSuggestions: (any: any) => void,
   setLocations: (any: any) => void,
+  setManualTripUsed: (any: any) => void,
+  setManualTripInProgress: (any: any) => void,
+  setDistanceToRouteDistance: () => void,
 }
 
 export default function ManualTripTrackingSection({
-  distance,
   manualTripTrackingEnabled,
-  fetchGasPrice,
+  manualTripInProgress,
+  userLocation,
+  currentRoute,
+  setCurrentRoute,
   clearCurrentTrip,
-  setDistance,
   setPoints,
-  setGasPrice,
+  fetchAndSetGasPrice,
   setWaypoints,
   setSuggestions,
   setLocations,
+  setManualTripUsed,
+  setManualTripInProgress,
+  setDistanceToRouteDistance,
 }: Props) {
-  const [manualTripUsed, setManualTripUsed] = useState<boolean>(false);
-  const [manualTripInProgress, setManualTripInProgress] = useState<boolean>(false);
-  const [currentRoute, setCurrentRoute] = useState<Array<LatLng>>([]);
-
-  // TODO - This is inefficient because it's recalculating the entire distance every time
-  const routeDistance = manualTripUsed ? calculatePathLength(currentRoute) : distance;
-
   const startFollowingNewTrip = async () => {
     const success = await startBackgroundLocationUpdates(
-      (latLng: LatLng) => setCurrentRoute((oldRoute) => [...oldRoute, latLng]),
+      (latLng: LatLng) => setCurrentRoute((oldRoute: Array<LatLng>) => [...oldRoute, latLng]),
     );
 
     if (!success) {
@@ -75,13 +73,18 @@ export default function ManualTripTrackingSection({
 
     setManualTripUsed(true);
     setManualTripInProgress(true);
-    setCurrentRoute([]);
+
+    // Initialize route with user's current location to set minimum route
+    setCurrentRoute([
+      userLocation,
+      userLocation,
+    ]);
+
     clearCurrentTrip({ resetStart: true, resetEnd: true });
     setLocations({ startLocation: '', endLocation: '' });
     setSuggestions([]);
 
-    const tripGasPrice = await fetchGasPrice();
-    setGasPrice(tripGasPrice);
+    fetchAndSetGasPrice();
   };
 
   const stopFollowingNewTrip = async () => {
@@ -96,7 +99,7 @@ export default function ManualTripTrackingSection({
     setManualTripInProgress(false);
 
     setWaypoints(currentRoute.map(convertLatLngToLocation));
-    setDistance(routeDistance);
+    setDistanceToRouteDistance();
 
     const routeStart = currentRoute[0];
     const routeEnd = currentRoute[currentRoute.length - 1];

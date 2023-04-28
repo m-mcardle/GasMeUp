@@ -31,6 +31,7 @@ import HomeTab from './src/screens/HomeTab';
 import FriendsTab from './src/screens/FriendsTab';
 import GasPriceScreen from './src/screens/GasPriceScreen';
 import CarScreen from './src/screens/CarScreen';
+import MaintenanceScreen from './src/screens/MaintenanceScreen';
 
 // Components
 import TabIcon from './src/components/TabIcon';
@@ -170,6 +171,12 @@ export default function App() {
     return null;
   }
 
+  if (isFeatureEnabled('maintenance_mode')) {
+    return (
+      <MaintenanceScreen />
+    );
+  }
+
   return (
     <GlobalContext.Provider value={state}>
       <NavigationContainer
@@ -205,10 +212,10 @@ export default function App() {
             tabBarStyle: { backgroundColor: colors.primary },
           })}
         >
-          <Tab.Screen name="Friends/Login" component={FriendsTab} options={{ title: 'Friends' }} />
-          <Tab.Screen name="Home" component={HomeTab} options={{ title: 'Calculate' }} />
-          <Tab.Screen name="Gas Prices" component={GasPriceScreen} />
-          <Tab.Screen name="Car" component={CarScreen} />
+          {isFeatureEnabled('friends_screen') && <Tab.Screen name="Friends/Login" component={FriendsTab} options={{ title: 'Friends' }} />}
+          {isFeatureEnabled('home_screen') && <Tab.Screen name="Home" component={HomeTab} options={{ title: 'Calculate' }} />}
+          {isFeatureEnabled('gas_screen') && <Tab.Screen name="Gas Prices" component={GasPriceScreen} />}
+          {isFeatureEnabled('car_screen') && <Tab.Screen name="Car" component={CarScreen} />}
         </Tab.Navigator>
       </NavigationContainer>
     </GlobalContext.Provider>
