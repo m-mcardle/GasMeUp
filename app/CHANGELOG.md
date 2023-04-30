@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.22](https://github.com/m-mcardle/GasMeUp/compare/v1.0.21...v1.0.22) (2023-04-30)
 
+* Remote Config added
+* More component cleanup
+* Manual trip improvements
+
 ### [1.0.21](https://github.com/m-mcardle/GasMeUp/compare/v1.0.20...v1.0.21) (2023-04-15)
 
 * Use new production server URL
