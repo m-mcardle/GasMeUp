@@ -47,8 +47,8 @@ export default function MapContainer({
   const hasStartAndEnd = !!start && !!end;
   const hasStartOrEnd = !!start || !!end;
 
-  const latDelta = hasStartAndEnd ? Math.abs(start.lat - end.lat) * 1.5 : 100;
-  const lngDelta = hasStartAndEnd ? Math.abs(start.lng - end.lng) * 1.5 : 100;
+  const latDelta = hasStartAndEnd ? Math.max(0.01, Math.abs(start.lat - end.lat) * 1.5) : 100;
+  const lngDelta = hasStartAndEnd ? Math.max(0.01, Math.abs(start.lng - end.lng) * 1.5) : 100;
 
   const middleLat = hasStartAndEnd ? (start.lat + end.lat) / 2 : 0;
   const middleLng = hasStartAndEnd ? (start.lng + end.lng) / 2 : 0;

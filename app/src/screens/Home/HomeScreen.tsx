@@ -253,8 +253,9 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   }, [globalState.country, globalState.region, customGasPrice, useCustomGasPrice]);
 
   const fetchAndSetGasPrice = async () => {
-    const tripGasPrice = await fetchGasPrice();
-    setGasPrice(tripGasPrice);
+    const latestGasPrice = await fetchGasPrice();
+    setFetchedGasPrice(latestGasPrice);
+    setGasPrice(latestGasPrice);
   };
 
   const submit = useCallback(async () => {
@@ -688,11 +689,11 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           )}
         </>
         )}
+        {manualTripTrackingEnabled && (
         <ManualTripTrackingSection
           currentRoute={currentRoute}
           userLocation={globalState.userLocation}
           manualTripInProgress={manualTripInProgress}
-          manualTripTrackingEnabled={manualTripTrackingEnabled}
           setCurrentRoute={setCurrentRoute}
           clearCurrentTrip={clearCurrentTrip}
           setPoints={setPoints}
@@ -704,6 +705,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           setManualTripInProgress={setManualTripInProgress}
           setDistanceToRouteDistance={() => setDistance(routeDistance)}
         />
+        )}
         <View style={styles.buttonSection}>
           {manualTripUsed ? (
             <ClearManualTripButton

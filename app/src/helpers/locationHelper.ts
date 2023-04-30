@@ -187,7 +187,7 @@ export function createBackgroundLocationTask(updateRoute: Function) {
   });
 }
 
-export async function startBackgroundLocationUpdates(updateRoute: Function) {
+export async function startBackgroundLocationUpdates() {
   const granted = await getFullLocationPermissions();
 
   if (!granted) {
@@ -196,8 +196,6 @@ export async function startBackgroundLocationUpdates(updateRoute: Function) {
     Alert('Unable to start trip', 'Permission to access location was denied. Please enable location services and try again.');
     return false;
   }
-
-  createBackgroundLocationTask(updateRoute);
 
   try {
     await startLocationUpdatesAsync(taskName, {

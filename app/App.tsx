@@ -116,17 +116,14 @@ export default function App() {
     registerForPushNotificationsAsync().then((token) => token && updateGlobalState('expoToken', token));
 
     notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
+      // Fired when a notification is received while the app is open
       setNotification(notification);
     });
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+      // Fired when a user taps on a notification
       console.log(response);
     });
-
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current);
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
   };
 
   const cleanupNotificationSubscriptions = () => {

@@ -10,6 +10,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 // Helpers
 import {
   convertLatLngToLocation,
+  createBackgroundLocationTask,
   startBackgroundLocationUpdates,
   stopBackgroundLocationUpdates,
 } from '../../../helpers/locationHelper';
@@ -27,7 +28,6 @@ import { colors } from '../../../styles/styles';
 import { fetchData } from '../../../data/data';
 
 interface Props {
-  manualTripTrackingEnabled: boolean,
   manualTripInProgress: boolean,
   userLocation: any,
   currentRoute: any,
@@ -44,7 +44,6 @@ interface Props {
 }
 
 export default function ManualTripTrackingSection({
-  manualTripTrackingEnabled,
   manualTripInProgress,
   userLocation,
   currentRoute,
@@ -59,10 +58,12 @@ export default function ManualTripTrackingSection({
   setManualTripInProgress,
   setDistanceToRouteDistance,
 }: Props) {
+  createBackgroundLocationTask(
+    (latLng: LatLng) => setCurrentRoute((oldRoute: Array<LatLng>) => [...oldRoute, latLng]),
+  );
+
   const startFollowingNewTrip = async () => {
-    const success = await startBackgroundLocationUpdates(
-      (latLng: LatLng) => setCurrentRoute((oldRoute: Array<LatLng>) => [...oldRoute, latLng]),
-    );
+    const success = await startBackgroundLocationUpdates();
 
     if (!success) {
       console.log('Failed to start background location updates');
@@ -150,13 +151,6 @@ export default function ManualTripTrackingSection({
       },
     ],
   );
-
-  if (!manualTripTrackingEnabled) {
-    return (
-      // eslint-disable-next-line react/jsx-no-useless-fragment
-      <></>
-    );
-  }
 
   if (manualTripInProgress) {
     return (
