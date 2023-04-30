@@ -25,6 +25,7 @@ import { useGlobalState } from '../../hooks/hooks';
 // Helpers
 import { validateCurrentUser } from '../../helpers/authHelper';
 import { logEvent } from '../../helpers/analyticsHelper';
+import { isFeatureEnabled } from '../../helpers/featureHelper';
 
 // Components
 import Page from '../../components/Page';
@@ -247,6 +248,7 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
         EmptyState={TableEmptyState}
         scrollable
       />
+      {isFeatureEnabled('splitwise_screen') && (
       <SegmentedButtons
         style={styles.toggleButton}
         buttons={[
@@ -266,6 +268,7 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
         onValueChange={(value) => (value === 'Splitwise' ? navigation.replace('Splitwise') : null)}
         value="GasMeUp"
       />
+      )}
     </Page>
   );
 }

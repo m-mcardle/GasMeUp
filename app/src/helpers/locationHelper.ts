@@ -198,7 +198,7 @@ export async function startBackgroundLocationUpdates() {
   }
 
   try {
-    await startLocationUpdatesAsync('background-location', {
+    await startLocationUpdatesAsync(taskName, {
       accuracy: Accuracy.Balanced,
       activityType: ActivityType.AutomotiveNavigation,
       timeInterval: 5000,
@@ -219,7 +219,7 @@ export async function startBackgroundLocationUpdates() {
 }
 
 export async function stopBackgroundLocationUpdates() {
-  await stopLocationUpdatesAsync('background-location');
+  await stopLocationUpdatesAsync(taskName);
 }
 
 function deg2rad(deg: number) {

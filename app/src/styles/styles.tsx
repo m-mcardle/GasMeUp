@@ -203,4 +203,10 @@ export const globalStyles = StyleSheet.create({
     width: '100%',
     zIndex: 1,
   },
+  mapOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    padding: 8,
+  },
 });

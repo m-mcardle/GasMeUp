@@ -1,6 +1,7 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 
+import { FontAwesome5 } from '@expo/vector-icons';
 import MapView, {
   PROVIDER_GOOGLE, Marker, Polyline, MapPressEvent, PoiClickEvent,
 } from 'react-native-maps';
@@ -17,19 +18,21 @@ interface Props {
   customEnd?: LatLng,
   showUserLocation: boolean;
   waypoints: Array<Location>,
+  showFullscreenButton?: boolean,
   style?: object,
-  onPress?: (event: MapPressEvent) => void,
-  onPoiClick?: (event: PoiClickEvent) => void,
+  onPress?: (event?: MapPressEvent) => void,
+  onPoiClick?: (event?: PoiClickEvent) => void,
 }
 
 export default function MapContainer({
   showUserLocation,
   waypoints,
   style,
+  showFullscreenButton = false,
   customStart = undefined,
   customEnd = undefined,
   onPress = (event) => console.log(event?.nativeEvent.coordinate),
-  onPoiClick = (event) => console.log(event.nativeEvent.name),
+  onPoiClick = (event) => console.log(event?.nativeEvent.name),
 }: Props) {
   const [globalState] = useGlobalState();
   const hasUserLocation = globalState.userLocation.lat && globalState.userLocation.lng;
@@ -47,8 +50,8 @@ export default function MapContainer({
   const hasStartAndEnd = !!start && !!end;
   const hasStartOrEnd = !!start || !!end;
 
-  const latDelta = hasStartAndEnd ? Math.abs(start.lat - end.lat) * 1.5 : 100;
-  const lngDelta = hasStartAndEnd ? Math.abs(start.lng - end.lng) * 1.5 : 100;
+  const latDelta = hasStartAndEnd ? Math.max(0.01, Math.abs(start.lat - end.lat) * 1.5) : 100;
+  const lngDelta = hasStartAndEnd ? Math.max(0.01, Math.abs(start.lng - end.lng) * 1.5) : 100;
 
   const middleLat = hasStartAndEnd ? (start.lat + end.lat) / 2 : 0;
   const middleLng = hasStartAndEnd ? (start.lng + end.lng) / 2 : 0;
@@ -127,6 +130,14 @@ export default function MapContainer({
           <Polyline coordinates={waypoints} strokeWidth={2} strokeColor={colors.action} />
         )}
       </MapView>
+      {showFullscreenButton && (
+      <TouchableOpacity
+        style={globalStyles.mapOverlay}
+        onPress={() => onPress()}
+      >
+        <FontAwesome5 name="expand" size={16} color="white" />
+      </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -137,4 +148,5 @@ MapContainer.defaultProps = {
   onPoiClick: undefined,
   customStart: undefined,
   customEnd: undefined,
+  showFullscreenButton: false,
 };

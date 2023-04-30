@@ -1,5 +1,4 @@
 // Expo imports
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import * as SplashScreen from 'expo-splash-screen';
 import {
   useFonts,
@@ -32,6 +31,10 @@ import HomeTab from './src/screens/HomeTab';
 import FriendsTab from './src/screens/FriendsTab';
 import GasPriceScreen from './src/screens/GasPriceScreen';
 import CarScreen from './src/screens/CarScreen';
+import MaintenanceScreen from './src/screens/MaintenanceScreen';
+
+// Components
+import TabIcon from './src/components/TabIcon';
 
 // Styles
 import { colors } from './src/styles/styles';
@@ -41,52 +44,11 @@ import { getUserLocationSubscription } from './src/helpers/locationHelper';
 import { registerForPushNotificationsAsync } from './src/helpers/notificationHelper';
 import { getExchangeRate } from './src/helpers/unitsHelper';
 import { logScreenView } from './src/helpers/analyticsHelper';
+import { getNumberConfig, initializeRemoteConfig, isFeatureEnabled } from './src/helpers/featureHelper';
 
 SplashScreen.preventAutoHideAsync();
 
 const Tab = createBottomTabNavigator();
-
-interface TabIconProps {
-  name: string,
-  focused: boolean,
-  color: string,
-  size: number
-}
-
-function TabIcon({
-  name,
-  focused,
-  color,
-  size,
-} : TabIconProps) {
-  let iconName: React.ComponentProps<typeof Ionicons>['name'] = 'ios-square';
-
-  switch (name) {
-    case 'Home':
-      iconName = focused
-        ? 'ios-calculator'
-        : 'ios-calculator-outline';
-      break;
-    case 'Friends/Login':
-      iconName = focused
-        ? 'ios-people'
-        : 'ios-people-outline';
-      break;
-    case 'Car':
-      iconName = focused
-        ? 'ios-car'
-        : 'ios-car-outline';
-      break;
-    case 'Gas Prices':
-      return <FontAwesome5 name="gas-pump" size={size} color={color} />;
-    default:
-      iconName = 'ios-square';
-  }
-
-  return (
-    <Ionicons name={iconName} size={size} color={color} />
-  );
-}
 
 // This is just to ensure that firebase is initialized on first rendering
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -150,36 +112,66 @@ export default function App() {
   const notificationListener = useRef<any>();
   const responseListener = useRef<any>();
 
-  // Notification initialization
-  useEffect(() => {
+  const initializeNotifications = () => {
     registerForPushNotificationsAsync().then((token) => token && updateGlobalState('expoToken', token));
 
     notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
+      // Fired when a notification is received while the app is open
       setNotification(notification);
     });
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+      // Fired when a user taps on a notification
       console.log(response);
     });
+  };
 
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current);
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, []);
+  const cleanupNotificationSubscriptions = () => {
+    Notifications.removeNotificationSubscription(notificationListener.current);
+    Notifications.removeNotificationSubscription(responseListener.current);
+  };
 
-  // Exchange Rate initialization
-  useEffect(() => {
+  const initializeExchangeRate = () => {
     async function fetchRate() {
       const exchangeRate = await getExchangeRate();
       updateGlobalState('exchangeRate', exchangeRate);
     }
 
-    fetchRate();
+    const shouldFetchRate = isFeatureEnabled('fetch_exchange_rate');
+    if (shouldFetchRate) {
+      console.log('Fetching exchange rate');
+      fetchRate();
+    } else {
+      const configRate = getNumberConfig('exchange_rate');
+      console.log('Using config rate', configRate);
+      updateGlobalState('exchangeRate', configRate);
+    }
+  };
+
+  // App initialization
+  useEffect(() => {
+    async function initialize() {
+      await initializeRemoteConfig();
+
+      initializeExchangeRate();
+      initializeNotifications();
+    }
+
+    initialize();
+
+    return () => {
+      cleanupNotificationSubscriptions();
+    };
   }, []);
 
   if (!fontsLoaded) {
     return null;
+  }
+
+  if (isFeatureEnabled('maintenance_mode')) {
+    return (
+      <MaintenanceScreen />
+    );
   }
 
   return (
@@ -217,10 +209,10 @@ export default function App() {
             tabBarStyle: { backgroundColor: colors.primary },
           })}
         >
-          <Tab.Screen name="Friends/Login" component={FriendsTab} options={{ title: 'Friends' }} />
-          <Tab.Screen name="Home" component={HomeTab} options={{ title: 'Calculate' }} />
-          <Tab.Screen name="Gas Prices" component={GasPriceScreen} />
-          <Tab.Screen name="Car" component={CarScreen} />
+          {isFeatureEnabled('friends_screen') && <Tab.Screen name="Friends/Login" component={FriendsTab} options={{ title: 'Friends' }} />}
+          {isFeatureEnabled('home_screen') && <Tab.Screen name="Home" component={HomeTab} options={{ title: 'Calculate' }} />}
+          {isFeatureEnabled('gas_screen') && <Tab.Screen name="Gas Prices" component={GasPriceScreen} />}
+          {isFeatureEnabled('car_screen') && <Tab.Screen name="Car" component={CarScreen} />}
         </Tab.Navigator>
       </NavigationContainer>
     </GlobalContext.Provider>
