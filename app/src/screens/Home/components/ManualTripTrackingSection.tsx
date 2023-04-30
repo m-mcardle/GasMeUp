@@ -34,7 +34,7 @@ interface Props {
   setCurrentRoute: (any: any) => void,
   clearCurrentTrip: (any: any) => void,
   setPoints: (argv0: any, argv1: any) => void,
-  fetchAndSetGasPrice: () => void,
+  fetchGasPrice: () => void,
   setWaypoints: (any: any) => void,
   setSuggestions: (any: any) => void,
   setLocations: (any: any) => void,
@@ -50,7 +50,7 @@ export default function ManualTripTrackingSection({
   setCurrentRoute,
   clearCurrentTrip,
   setPoints,
-  fetchAndSetGasPrice,
+  fetchGasPrice,
   setWaypoints,
   setSuggestions,
   setLocations,
@@ -85,7 +85,7 @@ export default function ManualTripTrackingSection({
     setLocations({ startLocation: '', endLocation: '' });
     setSuggestions([]);
 
-    fetchAndSetGasPrice();
+    fetchGasPrice();
   };
 
   const stopFollowingNewTrip = async () => {

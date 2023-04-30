@@ -235,8 +235,6 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   }, []);
 
   const fetchGasPrice = useCallback(async () => {
-    if (useCustomGasPrice) { return customGasPrice; }
-
     const gasPriceResponse = await fetchData('/gas', { country: globalState.country, region: globalState.region });
 
     if (!gasPriceResponse?.ok || !gasPriceResponse) {
@@ -250,12 +248,18 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     const tripGasPrice = convertGasPrice(price, globalState.country, 'CA');
     setFetchedGasPrice(tripGasPrice);
     return tripGasPrice;
-  }, [globalState.country, globalState.region, customGasPrice, useCustomGasPrice]);
+  }, [globalState.country, globalState.region]);
 
-  const fetchAndSetGasPrice = async () => {
-    const latestGasPrice = await fetchGasPrice();
-    setFetchedGasPrice(latestGasPrice);
-    setGasPrice(latestGasPrice);
+  const getTripGasPrice = async () => {
+    if (useCustomGasPrice) { return customGasPrice; }
+
+    try {
+      const price = await fetchGasPrice();
+      return price;
+    } catch (e) {
+      console.log('Error fetching gas price');
+      return 0;
+    }
   };
 
   const submit = useCallback(async () => {
@@ -293,7 +297,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         tripGasPrice,
       ] = await Promise.all([
         fetchDistance(parsedStartLocation, parsedEndLocation),
-        fetchGasPrice(),
+        getTripGasPrice(),
       ]);
 
       setStartLocationError(false);
@@ -697,7 +701,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           setCurrentRoute={setCurrentRoute}
           clearCurrentTrip={clearCurrentTrip}
           setPoints={setPoints}
-          fetchAndSetGasPrice={fetchAndSetGasPrice}
+          fetchGasPrice={fetchGasPrice}
           setWaypoints={setWaypoints}
           setSuggestions={setSuggestions}
           setLocations={setLocations}
