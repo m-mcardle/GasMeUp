@@ -392,8 +392,10 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     autocompleteSearch(input);
   };
 
-  const handleMapPress = () => {
+  const openMapModal = () => {
     Keyboard.dismiss();
+
+    logEvent('open_map_modal');
     if (!manualTripUsed) { setMapModalVisible(true); }
   };
 
@@ -634,10 +636,11 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           waypoints={manualTripInProgress ? currentRoute.map(convertLatLngToLocation) : waypoints}
           showUserLocation={!startPoint.address && !endPoint.address && !manualTripInProgress}
           style={{ ...styles.mapView, borderColor: manualTripInProgress ? 'red' : 'white' }}
-          onPress={handleMapPress}
-          onPoiClick={handleMapPress}
+          onPress={openMapModal}
+          onPoiClick={openMapModal}
           customStart={startPoint}
           customEnd={endPoint}
+          showFullscreenButton={!manualTripUsed}
         />
         <StatsSection
           loading={loading}
