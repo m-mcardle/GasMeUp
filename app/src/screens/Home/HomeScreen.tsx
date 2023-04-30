@@ -9,11 +9,9 @@ import {
   View,
   Keyboard,
   TextInput,
-  TouchableOpacity,
 } from 'react-native';
 
 // External Components
-import { Ionicons } from '@expo/vector-icons';
 import { MapPressEvent, PoiClickEvent } from 'react-native-maps';
 import {
   Portal,
@@ -54,13 +52,13 @@ import LocationInput from './components/LocationInput';
 import ManualTripTrackingSection from './components/ManualTripTrackingSection';
 
 // Styles
-import { globalStyles } from '../../styles/styles';
 import styles from '../../styles/HomeScreen.styles';
 
 // Mock Data
 import { fetchData } from '../../data/data';
 import { isFeatureEnabled } from '../../helpers/featureHelper';
 import ClearManualTripButton from './components/ClearManualTripButton';
+import SettingsIcon from './components/SettingsIcon';
 
 enum InputEnum {
   None,
@@ -157,6 +155,16 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
   const configureCustomGasPrice = (value: boolean) => {
     logEvent('toggle_using_custom_gas_price', { value });
     changeSetting('Custom Gas Price', { price: customGasPrice, enabled: String(value) }, updateGlobalState);
+  };
+
+  const openGasModal = () => {
+    logEvent('open_gas_modal');
+    setGasModalVisible(true);
+  };
+
+  const openFuelEfficiencyModal = () => {
+    logEvent('open_fuel_efficiency_modal');
+    setFuelModalVisible(true);
   };
 
   const clearCurrentTrip = ({ resetStart, resetEnd } = { resetStart: false, resetEnd: false }) => {
@@ -626,11 +634,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           />
         </Modal>
       </Portal>
-      <View style={{ ...globalStyles.headerSection, top: 24 }}>
-        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-          <Ionicons name="settings" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
+      <SettingsIcon onPress={() => navigation.navigate('Settings')} />
       <View style={styles.dataContainer}>
         <MapContainer
           waypoints={manualTripInProgress ? currentRoute.map(convertLatLngToLocation) : waypoints}
@@ -650,8 +654,8 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
           cost={cost}
           gasMileage={GAS_MILEAGE}
           locale={globalState.Locale}
-          openModal={() => setGasModalVisible(true)}
-          openFuelModal={() => setFuelModalVisible(true)}
+          openModal={openGasModal}
+          openFuelModal={openFuelEfficiencyModal}
         />
         {!manualTripUsed && (
         <>

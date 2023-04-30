@@ -53,6 +53,7 @@ export default function TripDetailsModal({
           waypoints={transactionWaypoints}
           style={{ height: '50%', width: '90%', backgroundColor: 'white' }}
           onPress={() => setMapVisible()}
+          showFullscreenButton
         />
         )}
         <View style={styles.tripDetailsLocationSection}>
