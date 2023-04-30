@@ -50,6 +50,8 @@ import SaveTripButton from './components/SaveTripButton';
 import CalculateButton from './components/CalculateButton';
 import LocationInput from './components/LocationInput';
 import ManualTripTrackingSection from './components/ManualTripTrackingSection';
+import ClearManualTripButton from './components/ClearManualTripButton';
+import SettingsIcon from './components/SettingsIcon';
 
 // Styles
 import styles from '../../styles/HomeScreen.styles';
@@ -57,8 +59,6 @@ import styles from '../../styles/HomeScreen.styles';
 // Mock Data
 import { fetchData } from '../../data/data';
 import { isFeatureEnabled } from '../../helpers/featureHelper';
-import ClearManualTripButton from './components/ClearManualTripButton';
-import SettingsIcon from './components/SettingsIcon';
 
 enum InputEnum {
   None,
