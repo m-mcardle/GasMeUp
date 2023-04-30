@@ -1,6 +1,6 @@
 {
   "name": "gas-me-up",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "scripts": {
     "start": "expo start --dev-client",
     "start:dev": "expo start --dev-client",
