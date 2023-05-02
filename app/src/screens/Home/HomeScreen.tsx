@@ -518,18 +518,22 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     setLocationToPressedLocation(address, latitude, longitude);
   };
 
-  // Reset to last server gas price each time the user changes custom gas price settings
+  // Update gas price each time the user changes custom gas price settings or fetched gas price
   useEffect(() => {
     if (!useCustomGasPrice) {
       setGasPrice(fetchedGasPrice);
     } else {
       setGasPrice(customGasPrice);
     }
-  }, [useCustomGasPrice, customGasPrice]);
+  }, [useCustomGasPrice, customGasPrice, fetchedGasPrice]);
 
-  // Initialize user's features
+  // Initialize
   useEffect(() => {
+    // Initialize user's features
     setManualTripTrackingEnabled(isFeatureEnabled('manual_trip_tracking'));
+
+    // Fetch gas price from server
+    fetchGasPrice();
   }, []);
 
   // Represents if the user has entered all the required data to save a trip's cost

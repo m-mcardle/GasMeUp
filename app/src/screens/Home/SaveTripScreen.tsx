@@ -183,6 +183,8 @@ export default function SaveTripScreen({
     splitType: 'split' | 'full',
   ) => {
     if (!currentUser?.uid) {
+      Alert('Error', 'You must be logged in to save a trip');
+      navigation.navigate('Friends/Login');
       return;
     }
 

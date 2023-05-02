@@ -366,6 +366,7 @@ export default function CarScreen({ navigation }: any) {
             />
            )}
         />
+        {selectedYear && (
         <AutocompleteInput
           myRef={makeRef}
           z={3}
@@ -404,6 +405,8 @@ export default function CarScreen({ navigation }: any) {
             />
            )}
         />
+        )}
+        {selectedYear && selectedMake && (
         <AutocompleteInput
           myRef={modelRef}
           z={2}
@@ -442,6 +445,8 @@ export default function CarScreen({ navigation }: any) {
             />
            )}
         />
+        )}
+        {selectedYear && selectedMake && selectedModel && (
         <AutocompleteInput
           myRef={trimRef}
           z={1}
@@ -486,19 +491,22 @@ export default function CarScreen({ navigation }: any) {
             />
            )}
         />
-        <Table
-          headers={headers}
-          data={tableData}
-          Row={MyRow}
-          EmptyState={EmptyState}
-          FooterRow={(vehicle.fuelType
-            ? () => FooterRow({ label: 'Fuel Type', text: vehicle.fuelType })
-            : undefined
-          )}
-          style={{ height: '30%', width: '90%', marginTop: 48 }}
-          loading={loading && selectedTrim.value}
-          scrollable
-        />
+        )}
+        {selectedYear && selectedMake && selectedModel && selectedTrim.value && (
+          <Table
+            headers={headers}
+            data={tableData}
+            Row={MyRow}
+            EmptyState={EmptyState}
+            FooterRow={(vehicle.fuelType
+              ? () => FooterRow({ label: 'Fuel Type', text: vehicle.fuelType })
+              : undefined
+            )}
+            style={{ height: '35%', width: '90%', marginTop: 48 }}
+            loading={loading && selectedTrim.value}
+            scrollable
+          />
+        )}
       </View>
     </Page>
   );

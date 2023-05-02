@@ -22,7 +22,7 @@ export default function HomeTab() {
     gasMileage,
     waypoints,
   }, setTrip] = useState({
-    start: 'string',
+    start: '',
     end: '',
     cost: 0,
     gasPrice: 0,

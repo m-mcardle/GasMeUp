@@ -86,9 +86,10 @@ const styles = StyleSheet.create({
   },
   tripDetailsStatsSection: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     width: '100%',
     marginTop: 12,
+    paddingHorizontal: 32,
   },
   toggleButton: {
     width: '70%',

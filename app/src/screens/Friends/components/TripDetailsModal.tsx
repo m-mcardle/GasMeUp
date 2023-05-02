@@ -6,6 +6,8 @@ import { View } from 'react-native';
 import {
   DocumentData,
 } from 'firebase/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../../../../firebase';
 
 // Global State
 import { useGlobalState } from '../../../hooks/hooks';
@@ -30,6 +32,7 @@ interface Props {
 export default function TripDetailsModal({
   transactionWaypoints, transaction, transactionAmount, setMapVisible,
 }: Props) {
+  const [user] = useAuthState(auth);
   const [globalState] = useGlobalState();
   const convertedStats = convertAllToString(
     transaction.distance,
@@ -38,7 +41,11 @@ export default function TripDetailsModal({
     globalState.Locale,
   );
 
-  const formattedAmountOwed = transactionAmount < 0 ? `-$${Math.abs(transactionAmount).toFixed(2)}` : `$${transactionAmount.toFixed(2)}`;
+  const riders = (transaction.payers?.length ?? 1) + 1;
+  const startLocation = transaction.startLocation ?? 'Unknown';
+  const endLocation = transaction.endLocation ?? 'Unknown';
+
+  const formattedAmountOwed = transactionAmount < 0 ? `You Owe: $${Math.abs(transactionAmount).toFixed(2)}` : `You Are Owed: $${transactionAmount.toFixed(2)}`;
   return (
     <View style={{ height: '100%', width: '100%' }}>
       <Text style={styles.friendInfoTitle}>Trip Details</Text>
@@ -57,19 +64,24 @@ export default function TripDetailsModal({
         />
         )}
         <View style={styles.tripDetailsLocationSection}>
-          <Text numberOfLines={1}>{`Start: ${transaction.startLocation}`}</Text>
-          <Text numberOfLines={1}>{`End: ${transaction.endLocation}`}</Text>
+          <Text numberOfLines={1} style={{ fontSize: 8, padding: 4 }}>{`Start: ${startLocation}`}</Text>
+          <Text numberOfLines={1} style={{ fontSize: 8, padding: 4 }}>{`End: ${endLocation}`}</Text>
         </View>
         <View style={styles.tripDetailsStatsSection}>
-          <Text>{`Total: $${transaction.cost.toFixed(2)}`}</Text>
-          <Text>{`Amount Owed: ${formattedAmountOwed}`}</Text>
+          <Text style={{ fontSize: 10 }}>{`Total: $${transaction.cost.toFixed(2)}`}</Text>
+          <Text style={{ fontSize: 10 }}>{formattedAmountOwed}</Text>
         </View>
         <View style={styles.tripDetailsStatsSection}>
-          <Text>{`Distance: ${convertedStats.distance}`}</Text>
-          <Text>{`Gas Price: ${convertedStats.gasPrice}`}</Text>
+          <Text style={{ fontSize: 10 }}>{`Distance: ${convertedStats.distance}`}</Text>
+          <Text style={{ fontSize: 10 }}>{`Date: ${transaction.date?.toDate().toLocaleDateString()}`}</Text>
         </View>
         <View style={styles.tripDetailsStatsSection}>
-          <Text>{`Date: ${transaction.date?.toDate().toLocaleDateString()}`}</Text>
+          <Text style={{ fontSize: 10 }}>{`Gas Mileage: ${convertedStats.fuelEfficiency}`}</Text>
+          <Text style={{ fontSize: 10 }}>{`Gas Price: ${convertedStats.gasPrice}`}</Text>
+        </View>
+        <View style={styles.tripDetailsStatsSection}>
+          <Text style={{ fontSize: 10 }}>{`Riders: ${riders}`}</Text>
+          <Text style={{ fontSize: 10 }}>{`Created By: ${transaction.creator === user?.uid ? 'You' : 'Them'}`}</Text>
         </View>
       </View>
     </View>

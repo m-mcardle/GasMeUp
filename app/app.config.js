@@ -30,9 +30,9 @@ module.exports = {
     },
     infoPlist: {
       UIBackgroundModes: ['location'],
-      NSLocationAlwaysUsageDescription: 'GasMeUp will access your location for functionality purposes only. Some examples of this would be to allow you to start tracking your location to record your trip manually while driving.',
+      NSLocationAlwaysUsageDescription: 'GasMeUp will access your location for functionality purposes only. One example of this would be to allow you to start tracking your location to record your trip manually in the background while driving.',
       NSLocationWhenInUseUsageDescription: "GasMeUp will access your location for functionality purposes only. Some examples of this would be to allow you to use your 'Current Location' as a start or end point or to determine which region's gas price to default to.",
-      NSLocationAlwaysAndWhenInUseUsageDescription: "GasMeUp will access your location for functionality purposes only. Some examples of this would be to allow you to use your 'Current Location' as a start or end point or to determine which region's gas price to default to.",
+      NSLocationAlwaysAndWhenInUseUsageDescription: 'GasMeUp will access your location for functionality purposes only. One example of this would be to allow you to start tracking your location to record your trip manually in the background while driving.',
     },
   },
   android: {

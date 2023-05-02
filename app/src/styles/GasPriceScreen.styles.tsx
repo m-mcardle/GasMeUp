@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
   selectionButtons: {
     marginTop: 'auto',
     marginBottom: 16,
-    width: '50%',
+    width: '70%',
   },
   gasPriceTable: {
     width: '100%',

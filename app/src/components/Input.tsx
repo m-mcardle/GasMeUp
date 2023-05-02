@@ -3,7 +3,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import React, { ReactComponentElement } from 'react';
 
 import {
-  TextInput, TouchableOpacity, View,
+  TextInput, TouchableOpacity, View, Keyboard,
 } from 'react-native';
 
 import Text from './Text';
@@ -58,6 +58,10 @@ export default function Input(props: Props) {
   } = props;
 
   const clearInput = () => {
+    if (value === '') {
+      Keyboard.dismiss();
+    }
+
     onChangeText('');
     if (onClear) {
       onClear();
