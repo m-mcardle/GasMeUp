@@ -10,7 +10,7 @@ To start the Expo development server run `npm run start`. This will provide a QR
 
 ## Build
 
-Before building you likely need to bump the versions. The versioning of our app is managed through `standard-version-expo`. To bump versions before creating a new build run `npm run bump`.
+Before building you likely need to bump the versions. The versioning of our app is managed through `standard-version`. To bump versions before creating a new build run `npm run bump`. This will not update the versions used in the `/ios` and `/android` directories so make sure to remember to bump [`Info.plist`](./ios/GasMeUp/Info.plist) and [`build.gradle`](./android/app/build.gradle) manually. Also make sure to update the [`app.config.js`](./app.config.js) because that is not updated automatically either.
 
 To build the application run `npm run build`. This will start a build on EAS which can then be submit to either the Google Play Store or the Apple App Store.
 

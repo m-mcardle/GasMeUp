@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.0.23](https://github.com/m-mcardle/GasMeUp/compare/v1.0.22...v1.0.23) (2023-05-02)
 
+* Autocomplete loading state added for CarScreen
+* Load gas price on mount and update each time the fetched price changes
+* Improve trip details layout
+* Only render usable car inputs on CarScreen
+
 ### [1.0.22](https://github.com/m-mcardle/GasMeUp/compare/v1.0.21...v1.0.22) (2023-04-30)
 
 * Remote Config added
