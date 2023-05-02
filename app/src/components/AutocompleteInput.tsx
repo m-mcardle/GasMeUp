@@ -10,6 +10,7 @@ import Autocomplete from 'react-native-autocomplete-input';
 
 import Text from './Text';
 import Input from './Input';
+import AnimatedGradient from './AnimatedGradient';
 
 import { colors, globalStyles } from '../styles/styles';
 
@@ -33,6 +34,7 @@ interface Props {
   showRedundantSuggestion?: boolean,
   editable?: boolean,
   myRef?: React.RefObject<TextInput>,
+  suggestionsLoading?: boolean,
   onClear?: () => void,
   onChangeText: (arg: string) => void,
   onPressIn?: () => void,
@@ -61,12 +63,33 @@ export default function AutocompleteInput(props: Props) {
     returnKeyType,
     z,
     myRef = undefined,
+    suggestionsLoading = false,
     blurOnSubmit = true,
     keyboardType = 'default',
     autoComplete = 'off',
     showRedundantSuggestion = false,
     editable = true,
   } = props;
+
+  const loadingGradientColors = [
+    colors.tertiary,
+    colors.darkestGray,
+    colors.tertiary,
+    colors.tertiary,
+    colors.darkestGray,
+    colors.tertiary,
+  ];
+
+  const overriddenSuggestions = suggestionsLoading ? ['Loading...'] : suggestions;
+
+  const internalSuggestions = ((
+    overriddenSuggestions.length === 1
+    && overriddenSuggestions[0] === value
+    && !showRedundantSuggestion
+  )
+    ? []
+    : overriddenSuggestions.map((s) => ({ title: s, id: s }))
+  );
 
   return (
     <View style={[globalStyles.autocompleteInputView, { zIndex: z }]}>
@@ -95,10 +118,7 @@ export default function AutocompleteInput(props: Props) {
               onClear={onClear}
             />
           )}
-          data={(suggestions.length === 1 && suggestions[0] === value && !showRedundantSuggestion
-            ? []
-            : suggestions.map((s) => ({ title: s, id: s }))
-          )}
+          data={internalSuggestions}
           value={value}
           onChangeText={onChangeText}
           onPressIn={onPressIn}
@@ -117,15 +137,29 @@ export default function AutocompleteInput(props: Props) {
             keyboardShouldPersistTaps: 'always',
             keyExtractor: ({ title }: any) => title,
             renderItem: ({ item: { title } } : any) => (
-              <TouchableOpacity
-                onPress={() => {
-                  if (onSuggestionPress) onSuggestionPress(title);
-                }}
-                style={[globalStyles.autocompleteListItem, (icon ? { paddingLeft: 52 } : {})]}
-              >
-                <Text style={{ fontSize: 12 }} numberOfLines={1}>{title}</Text>
-              </TouchableOpacity>
-            ),
+              suggestionsLoading
+                ? (
+                  <AnimatedGradient
+                    animate={suggestionsLoading}
+                    colors={loadingGradientColors}
+                    speed={1000}
+                    style={globalStyles.autocompleteListItem}
+                  >
+                    <Text style={{ padding: 8 }}>
+                      Loading...
+                    </Text>
+                  </AnimatedGradient>
+                )
+                : (
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (onSuggestionPress) onSuggestionPress(title);
+                    }}
+                    style={[globalStyles.autocompleteListItem, (icon ? { paddingLeft: 52 } : {})]}
+                  >
+                    <Text style={{ fontSize: 12 }} numberOfLines={1}>{title}</Text>
+                  </TouchableOpacity>
+                )),
           }}
         />
       </View>
@@ -156,4 +190,5 @@ AutocompleteInput.defaultProps = {
   editable: true,
   showRedundantSuggestion: false,
   onClear: undefined,
+  suggestionsLoading: false,
 };

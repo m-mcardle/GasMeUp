@@ -340,7 +340,7 @@ export default function CarScreen({ navigation }: any) {
             borderColor: (selectedYear ? colors.action : colors.white),
             borderWidth: 1,
             borderTopWidth: 0,
-            maxHeight: 200,
+            maxHeight: 300,
           }}
           onPressIn={() => setActiveInput(ActiveInput.Year)}
           suggestions={(
@@ -348,6 +348,7 @@ export default function CarScreen({ navigation }: any) {
               ? years.filter((year) => year.includes(yearInput))
               : []
           )}
+          suggestionsLoading={loading && activeInput === ActiveInput.Year}
           onSuggestionPress={(newYear) => { setSelectedYear(newYear); selectNextInput(); }}
           placeholder="Year"
           onChangeText={setYearInput}
@@ -379,7 +380,7 @@ export default function CarScreen({ navigation }: any) {
             borderColor: getBorderColor(!!selectedYear, !!selectedMake),
             borderWidth: 1,
             borderTopWidth: 0,
-            maxHeight: 200,
+            maxHeight: 300,
           }}
           onPressIn={() => setActiveInput(ActiveInput.Make)}
           suggestions={(
@@ -387,6 +388,7 @@ export default function CarScreen({ navigation }: any) {
               ? makes.filter((make) => make.toLowerCase().includes(makeInput.toLowerCase()))
               : []
           )}
+          suggestionsLoading={loading && activeInput === ActiveInput.Make}
           onSuggestionPress={(newMake) => { setSelectedMake(newMake); selectNextInput(); }}
           placeholder="Make"
           onChangeText={setMakeInput}
@@ -419,7 +421,7 @@ export default function CarScreen({ navigation }: any) {
             borderColor: getBorderColor(!!selectedMake, !!selectedModel),
             borderWidth: 1,
             borderTopWidth: 0,
-            maxHeight: 200,
+            maxHeight: 300,
           }}
           onPressIn={() => setActiveInput(ActiveInput.Model)}
           suggestions={(
@@ -427,6 +429,7 @@ export default function CarScreen({ navigation }: any) {
               ? models.filter((model) => model.toLowerCase().includes(modelInput.toLowerCase()))
               : []
           )}
+          suggestionsLoading={loading && activeInput === ActiveInput.Model}
           onSuggestionPress={(newModel) => { setSelectedModel(newModel); selectNextInput(); }}
           placeholder="Model"
           onChangeText={setModelInput}
@@ -459,7 +462,7 @@ export default function CarScreen({ navigation }: any) {
             borderColor: getBorderColor(!!selectedModel, !!selectedTrim.text),
             borderWidth: 1,
             borderTopWidth: 0,
-            maxHeight: 200,
+            maxHeight: 300,
           }}
           onPressIn={() => setActiveInput(ActiveInput.Trim)}
           suggestions={(
@@ -468,6 +471,7 @@ export default function CarScreen({ navigation }: any) {
                 .filter((trim) => trim.toLowerCase().includes(trimInput.toLowerCase()))
               : []
           )}
+          suggestionsLoading={loading && activeInput === ActiveInput.Trim}
           onSuggestionPress={(newTrim) => {
             setSelectedTrim(
               trims.find((trim) => trim.text === newTrim),
