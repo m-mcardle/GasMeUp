@@ -70,11 +70,10 @@ module.exports = {
     // Other
     exchangeRateAPIKey: process.env.EXCHANGE_RATE_API_KEY,
   },
-  runtimeVersion: {
-    policy: 'sdkVersion',
-  },
+  runtimeVersion: '1.69.0',
   plugins: [
     'expo-apple-authentication',
+    'expo-font',
     'expo-notifications',
     [
       'expo-build-properties',
