@@ -1,8 +1,8 @@
 // Needed to fix bundling issue when resolving @firebase module
 // https://stackoverflow.com/questions/72179070/react-native-bundling-failure-error-message-while-trying-to-resolve-module-i
-const { getDefaultConfig } = require('expo/metro-config');
+const { getDefaultConfig } = require('@expo/metro-config');
 
-const exclusionList = require('expo/metro-config/src/defaults/exclusionList');
+const exclusionList = require('metro-config/src/defaults/exclusionList');
 
 const defaultConfig = getDefaultConfig(__dirname);
 
