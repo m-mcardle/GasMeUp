@@ -1,36 +1,30 @@
-// React imports
-import React, {
-  RefObject,
-} from 'react';
+import React, { useState } from 'react';
 import {
-  TextInput,
+  TextInput, View, Text, TouchableOpacity,
 } from 'react-native';
-
-// Components
-import AutocompleteInput from '../../../components/AutocompleteInput';
-
+import Input from '../../../components/Input';
 import UseCurrentLocationButton from './UseCurrentLocationButton';
-
-// Styles
 import { colors } from '../../../styles/styles';
 
+import styles from '../../../styles/HomeScreen.styles';
+
 interface Props {
-  z: number,
-  myRef?: RefObject<TextInput>,
-  returnKeyType: 'done' | 'next',
-  error: boolean,
-  value: string,
-  suggestions: Array<string>,
-  placeholder: string,
-  blurOnSubmit?: boolean,
-  useCurrentLocationActive: boolean,
-  useCurrentLocationDisabled: boolean,
-  onChangeText: (text: string) => void,
-  onSubmitEditing: () => void,
-  onSuggestionPress: (suggestion: string) => void,
-  onPressIn: () => void,
-  onClear: () => void,
-  onUseCurrentLocationPress: () => void,
+  z: number;
+  returnKeyType: TextInput['props']['returnKeyType'];
+  suggestions: string[];
+  myRef?: React.RefObject<TextInput>;
+  error?: boolean;
+  value: string;
+  placeholder: string;
+  useCurrentLocationActive: boolean;
+  useCurrentLocationDisabled: boolean;
+  blurOnSubmit?: boolean;
+  onUseCurrentLocationPress: () => void;
+  onChangeText: (text: string) => void;
+  onSubmitEditing: () => void;
+  onSuggestionPress: (suggestion: string) => void;
+  onPressIn: () => void;
+  onClear: () => void;
 }
 
 export default function LocationInput({
@@ -51,31 +45,61 @@ export default function LocationInput({
   onPressIn,
   onClear,
 }: Props) {
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
+  const handleFocus = () => {
+    setDropdownVisible(true);
+    onPressIn();
+  };
+
+  const handleBlur = () => {
+    setDropdownVisible(false);
+  };
+
+  const handleSuggestionPress = (suggestion: string) => {
+    onSuggestionPress(suggestion);
+    setDropdownVisible(false);
+  };
+
   return (
-    <AutocompleteInput
-      myRef={myRef}
-      z={z}
-      style={{ backgroundColor: colors.darkestGray }}
-      suggestions={suggestions}
-      onSuggestionPress={onSuggestionPress}
-      placeholder={placeholder}
-      onChangeText={onChangeText}
-      onPressIn={onPressIn}
-      value={value}
-      icon={(
-        <UseCurrentLocationButton
-          color={(useCurrentLocationActive ? colors.action : colors.secondary)}
-          disabled={useCurrentLocationDisabled}
-          onPress={onUseCurrentLocationPress}
-        />
+    <View style={{ zIndex: z }}>
+      <Input
+        myRef={myRef}
+        style={{ backgroundColor: colors.darkestGray }}
+        viewStyle={styles.autocompleteInput}
+        placeholder={placeholder}
+        onChangeText={onChangeText}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        value={value}
+        icon={(
+          <UseCurrentLocationButton
+            color={(useCurrentLocationActive ? colors.action : colors.secondary)}
+            disabled={useCurrentLocationDisabled}
+            onPress={onUseCurrentLocationPress}
+          />
+        )}
+        clearButton
+        onClear={onClear}
+        error={error}
+        blurOnSubmit={blurOnSubmit}
+        autoComplete="street-address"
+        onSubmitEditing={onSubmitEditing}
+        returnKeyType={returnKeyType}
+      />
+      {dropdownVisible && suggestions.length > 0 && (
+        <View style={styles.dropdown}>
+          {suggestions.map((suggestion) => (
+            <TouchableOpacity
+              key={suggestion}
+              onPress={() => handleSuggestionPress(suggestion)}
+              style={styles.suggestion}
+            >
+              <Text>{suggestion}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       )}
-      clearButton
-      onClear={onClear}
-      error={error}
-      blurOnSubmit={blurOnSubmit}
-      autoComplete="street-address"
-      onSubmitEditing={onSubmitEditing}
-      returnKeyType={returnKeyType}
-    />
+    </View>
   );
 }

@@ -192,6 +192,26 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 1,
   },
+  dropdown: {
+    position: 'absolute',
+    top: 75, // Adjust this value based on the height of the dropdown
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    maxHeight: 150,
+    overflow: 'hidden',
+  },
+  suggestion: {
+    padding: 10,
+    borderBottomColor: 'gray',
+    borderBottomWidth: 1,
+  },
+  autocompleteInput: {
+    width: '100%', backgroundColor: colors.tertiary, marginTop: 8, padding: 4,
+  },
 });
 
 export default styles;
