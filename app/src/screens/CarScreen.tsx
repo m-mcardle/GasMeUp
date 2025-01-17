@@ -442,7 +442,7 @@ export default function CarScreen({ navigation }: any) {
           showRedundantSuggestion
           icon={(
             <Ionicons
-              name="ios-car"
+              name="car"
               size={30}
               color={colors.action}
             />

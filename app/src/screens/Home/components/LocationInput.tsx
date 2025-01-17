@@ -79,8 +79,3 @@ export default function LocationInput({
     />
   );
 }
-
-LocationInput.defaultProps = {
-  myRef: undefined,
-  blurOnSubmit: true,
-};

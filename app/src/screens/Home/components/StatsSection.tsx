@@ -212,7 +212,7 @@ export default function StatsSection(props: Props) {
             onTouchEnd={() => openModal()}
           >
             <View style={styles.statText}>
-              <Ionicons name="ios-pricetag" size={16} color={colors.gray} />
+              <Ionicons name="pricetag" size={16} color={colors.gray} />
               {loading
                 ? (
                   <View style={styles.statBoxText}>

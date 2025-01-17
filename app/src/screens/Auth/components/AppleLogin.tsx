@@ -125,8 +125,3 @@ export default function AppleLogin({ onLogin, mode = 'login' }: Props) {
     </View>
   );
 }
-
-AppleLogin.defaultProps = {
-  onLogin: undefined,
-  mode: 'login',
-};

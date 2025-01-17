@@ -62,6 +62,7 @@ async function GetDistanceV2(startLocation, endLocation) {
     } else if (data.status === 'NOT_FOUND') {
       throw Error(`Location not found (${startLocation} or ${endLocation})`, { cause: 404 });
     } else {
+      LogError(`An unknown error occurred (${data.status})`);
       throw Error(`An unknown error occurred (${data.status})`, { cause: 500 });
     }
   }

@@ -115,25 +115,3 @@ export default function Input(props: Props) {
     </View>
   );
 }
-
-Input.defaultProps = {
-  value: undefined,
-  placeholder: undefined,
-  style: undefined,
-  viewStyle: undefined,
-  labelStyle: undefined,
-  containerStyle: undefined,
-  onPressIn: undefined,
-  password: false,
-  autoComplete: 'off',
-  clearButton: false,
-  icon: undefined,
-  error: false,
-  returnKeyType: undefined,
-  blurOnSubmit: true,
-  keyboardType: 'default',
-  myRef: undefined,
-  onSubmitEditing: undefined,
-  editable: true,
-  onClear: undefined,
-};

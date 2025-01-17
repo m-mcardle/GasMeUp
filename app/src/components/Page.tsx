@@ -53,7 +53,3 @@ export default function Page({
     </Provider>
   );
 }
-
-Page.defaultProps = {
-  keyboardAvoiding: true,
-};

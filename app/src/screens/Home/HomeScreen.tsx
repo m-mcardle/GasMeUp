@@ -320,6 +320,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         endPoint: tripEnd,
       }));
     } catch (err: any) {
+      console.warn(err);
       Alert(err.message);
       setCostRequest((oldState) => ({
         ...oldState,
@@ -369,7 +370,8 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       })
       .then((data) => setSuggestions(data.suggestions ?? []))
       .catch((err) => {
-        Alert(err);
+        console.warn(err);
+        Alert(err.message);
       });
   }, [location]);
 

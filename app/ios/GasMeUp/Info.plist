@@ -36,6 +36,12 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
+          <string>com.googleusercontent.apps.888451573881-k5n25lno66hcesavohm94bicgl1b2l5a</string>
+        </array>
+      </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
           <string>exp+gas-me-up</string>
         </array>
       </dict>

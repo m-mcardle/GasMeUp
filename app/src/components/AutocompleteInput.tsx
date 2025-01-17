@@ -91,6 +91,31 @@ export default function AutocompleteInput(props: Props) {
     : overriddenSuggestions.map((s) => ({ title: s, id: s }))
   );
 
+  // this is a hack but it doesn't really work
+  // const renderTextInput = useCallback(() => (
+  //   <Input
+  //   onChangeText={onChangeText}
+  //   onPressIn={onPressIn}
+  //   onSubmitEditing={onSubmitEditing}
+  //   placeholder={placeholder}
+  //   style={[style, { borderWidth: 0 }]}
+  //   labelStyle={labelStyle}
+  //   containerStyle={{ ...containerStyle, width: '100%', paddingHorizontal: 8 }}
+  //   value={value}
+  //   password={password}
+  //   clearButton={clearButton}
+  //   icon={icon}
+  //   error={error}
+  //   returnKeyType={returnKeyType}
+  //   myRef={myRef}
+  //   blurOnSubmit={blurOnSubmit}
+  //   keyboardType={keyboardType}
+  //   autoComplete={autoComplete}
+  //   editable={editable}
+  //   onClear={onClear}
+  // />
+  // ), []);
+
   return (
     <View style={[globalStyles.autocompleteInputView, { zIndex: z }]}>
       <View style={[globalStyles.autocompleteContainer, { zIndex: z }]}>
@@ -134,6 +159,7 @@ export default function AutocompleteInput(props: Props) {
           listContainerStyle={[globalStyles.autocompleteListContainer, listContainerStyle]}
           containerStyle={[globalStyles.autocompleteNestedContainer, { zIndex: z }]}
           flatListProps={{
+            style: { backgroundColor: colors.tertiary },
             keyboardShouldPersistTaps: 'always',
             keyExtractor: ({ title }: any) => title,
             renderItem: ({ item: { title } } : any) => (
@@ -166,29 +192,3 @@ export default function AutocompleteInput(props: Props) {
     </View>
   );
 }
-
-AutocompleteInput.defaultProps = {
-  z: undefined,
-  value: undefined,
-  placeholder: undefined,
-  listContainerStyle: undefined,
-  style: undefined,
-  labelStyle: undefined,
-  containerStyle: undefined,
-  onPressIn: undefined,
-  password: false,
-  autoComplete: 'off',
-  clearButton: false,
-  icon: undefined,
-  error: false,
-  returnKeyType: undefined,
-  blurOnSubmit: true,
-  keyboardType: 'default',
-  myRef: undefined,
-  onSubmitEditing: undefined,
-  onSuggestionPress: undefined,
-  editable: true,
-  showRedundantSuggestion: false,
-  onClear: undefined,
-  suggestionsLoading: false,
-};

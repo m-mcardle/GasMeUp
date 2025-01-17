@@ -142,13 +142,3 @@ export default function Table({
     </View>
   );
 }
-
-Table.defaultProps = {
-  title: '',
-  itemsPerPage: 10,
-  FooterRow: undefined,
-  EmptyState: undefined,
-  loading: false,
-  style: undefined,
-  scrollable: false,
-};

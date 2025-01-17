@@ -23,7 +23,7 @@ export default function SaveTripButton({ onPress, disabled }: Props) {
       onPress={onPress}
       disabled={disabled}
     >
-      <Ionicons name="ios-calculator" size={12} color={colors.secondary} />
+      <Ionicons name="calculator" size={12} color={colors.secondary} />
       <Text style={{ color: colors.secondary, textAlign: 'center', fontFamily: boldFont }}>Calculate</Text>
     </Button>
   );

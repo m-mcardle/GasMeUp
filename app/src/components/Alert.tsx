@@ -11,5 +11,5 @@ export default function MyAlert(
     ...customOptions,
   };
 
-  Alert.alert(title, message, buttons, options);
+  Alert.alert(title ?? 'Unknown Error Has Occurred', message, buttons, options);
 }

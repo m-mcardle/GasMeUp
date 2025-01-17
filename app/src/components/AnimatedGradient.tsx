@@ -115,11 +115,3 @@ export default function AnimatedGradient(props: Props) {
     </AnimatedLinearGradient>
   );
 }
-
-AnimatedGradient.defaultProps = {
-  colors: customColors,
-  style: undefined,
-  x: 0,
-  y: 0.2,
-  onTouchEnd: () => {},
-};

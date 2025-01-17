@@ -141,12 +141,3 @@ export default function MapContainer({
     </View>
   );
 }
-
-MapContainer.defaultProps = {
-  style: undefined,
-  onPress: undefined,
-  onPoiClick: undefined,
-  customStart: undefined,
-  customEnd: undefined,
-  showFullscreenButton: false,
-};

@@ -1,6 +1,382 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Workspace
    version = "1.0">
+   <Group
+      location = "group:../node_modules/react-native-maps/ios/AirMaps"
+      name = "AirMaps">
+      <FileRef
+         location = "group:AIRMapLocalTileManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCallout.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRWeakTimerReference.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapLocalTileOverlay.h">
+      </FileRef>
+      <FileRef
+         location = "group:RCTComponentData+Maps.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCalloutManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMap.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapPolygon.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapPolygonManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapMarker.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCircleManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRWeakMapReference.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapUrlTileCachedOverlay.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapPolyline.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapLocalTile.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapWMSTileManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapUrlTileManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapMarkerManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCalloutSubviewManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapUrlTile.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapPolylineRenderer.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapOverlayManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapWMSTile.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCircle.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCoordinate.m">
+      </FileRef>
+      <FileRef
+         location = "group:RCTConvert+AirMap.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCalloutSubview.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapOverlay.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapOverlayRenderer.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapPolylineManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCalloutManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:RCTComponentData+Maps.h">
+      </FileRef>
+      <Group
+         location = "group:Callout"
+         name = "Callout">
+         <FileRef
+            location = "group:SMCalloutView.m">
+         </FileRef>
+         <FileRef
+            location = "group:SMCalloutView.h">
+         </FileRef>
+      </Group>
+      <FileRef
+         location = "group:AIRMapLocalTileOverlay.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRWeakTimerReference.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCallout.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapLocalTileManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapPolyline.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapSnapshot.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRWeakMapReference.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapUrlTileCachedOverlay.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCircleManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapMarker.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapPolygonManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapPolygon.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMap.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCoordinate.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCircle.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapOverlayManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapWMSTile.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapPolylineRenderer.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapUrlTile.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCalloutSubviewManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapUrlTileManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapMarkerManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapWMSTileManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapLocalTile.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapPolylineManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapOverlay.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapOverlayRenderer.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRMapCalloutSubview.h">
+      </FileRef>
+      <FileRef
+         location = "group:RCTConvert+AirMap.m">
+      </FileRef>
+   </Group>
+   <Group
+      location = "group:../node_modules/react-native-maps/ios/AirGoogleMaps"
+      name = "AirGoogleMaps">
+      <FileRef
+         location = "group:AIRDummyView.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapWMSTile.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapPolyline.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapHeatmapManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapUrlTile.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapMarkerManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapCalloutManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapPolygonManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:RCTConvert+GMSMapViewType.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapMarker.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGMSPolyline.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapPolylineManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapOverlay.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGMSPolygon.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapURLTileManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapWMSTileManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapCircle.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMap.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapHeatmap.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapOverlayManager.h">
+      </FileRef>
+      <Group
+         location = "group:Resources"
+         name = "Resources">
+         <FileRef
+            location = "group:GoogleMapsPrivacy.bundle">
+         </FileRef>
+      </Group>
+      <FileRef
+         location = "group:AIRGoogleMapCallout.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapCalloutSubviewManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapCalloutSubview.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGMSMarker.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapCircleManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapPolygon.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapCalloutManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapMarkerManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapUrlTile.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapPolyline.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapHeatmapManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapWMSTile.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRDummyView.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGMSPolygon.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapOverlay.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGMSPolyline.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapPolylineManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapMarker.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapPolygonManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:RCTConvert+GMSMapViewType.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapCalloutSubviewManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapCallout.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapOverlayManager.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapHeatmap.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMap.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapCircle.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapWMSTileManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapUrlTileManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapCircleManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapPolygon.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGMSMarker.m">
+      </FileRef>
+      <FileRef
+         location = "group:AIRGoogleMapCalloutSubview.m">
+      </FileRef>
+   </Group>
    <FileRef
       location = "group:GasMeUp.xcodeproj">
    </FileRef>

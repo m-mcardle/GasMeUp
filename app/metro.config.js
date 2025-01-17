@@ -6,7 +6,7 @@ const exclusionList = require('metro-config/src/defaults/exclusionList');
 
 const defaultConfig = getDefaultConfig(__dirname);
 
-defaultConfig.resolver.assetExts.push('cjs');
+// defaultConfig.resolver.assetExts.push('cjs');
 defaultConfig.resolver.blockList = exclusionList([/firebase-admin\/.*/, /functions\/.*/, /server\/.*/]);
 
 module.exports = defaultConfig;

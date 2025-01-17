@@ -43,7 +43,7 @@ async function checkDevAPI() {
       throw new Error('Dev API is not running. Please start the API and try again.');
     }
   } catch (exception) {
-    console.error('Dev API is not running. Please start the API and try again.');
+    console.warn('Dev API is not running. Please start the API and try again.');
   }
 }
 

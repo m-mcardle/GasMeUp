@@ -36,7 +36,3 @@ export default function MyModal({
     </Modal>
   );
 }
-
-MyModal.defaultProps = {
-  style: undefined,
-};
