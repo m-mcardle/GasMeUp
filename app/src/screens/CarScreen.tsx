@@ -333,14 +333,13 @@ export default function CarScreen({ navigation }: any) {
           z={4}
           labelStyle={{ paddingLeft: 0 }}
           containerStyle={{
-            borderColor: (selectedYear ? colors.action : colors.white),
-            borderWidth: 1,
+            width: '100%',
           }}
-          listContainerStyle={{
+          viewStyle={{
             borderColor: (selectedYear ? colors.action : colors.white),
             borderWidth: 1,
-            borderTopWidth: 0,
             maxHeight: 300,
+            marginBottom: 16,
           }}
           onPressIn={() => setActiveInput(ActiveInput.Year)}
           suggestions={(
@@ -373,14 +372,13 @@ export default function CarScreen({ navigation }: any) {
           z={3}
           labelStyle={{ paddingLeft: 0 }}
           containerStyle={{
-            borderColor: getBorderColor(!!selectedYear, !!selectedMake),
-            borderWidth: 1,
+            width: '100%',
           }}
-          listContainerStyle={{
+          viewStyle={{
             borderColor: getBorderColor(!!selectedYear, !!selectedMake),
             borderWidth: 1,
-            borderTopWidth: 0,
             maxHeight: 300,
+            marginBottom: 16,
           }}
           onPressIn={() => setActiveInput(ActiveInput.Make)}
           suggestions={(
@@ -414,14 +412,13 @@ export default function CarScreen({ navigation }: any) {
           z={2}
           labelStyle={{ paddingLeft: 0 }}
           containerStyle={{
-            borderColor: getBorderColor(!!selectedMake, !!selectedModel),
-            borderWidth: 1,
+            width: '100%',
           }}
-          listContainerStyle={{
+          viewStyle={{
             borderColor: getBorderColor(!!selectedMake, !!selectedModel),
             borderWidth: 1,
-            borderTopWidth: 0,
             maxHeight: 300,
+            marginBottom: 16,
           }}
           onPressIn={() => setActiveInput(ActiveInput.Model)}
           suggestions={(
@@ -455,14 +452,13 @@ export default function CarScreen({ navigation }: any) {
           z={1}
           labelStyle={{ paddingLeft: 0 }}
           containerStyle={{
-            borderColor: getBorderColor(!!selectedModel, !!selectedTrim.text),
-            borderWidth: 1,
+            width: '100%',
           }}
-          listContainerStyle={{
+          viewStyle={{
             borderColor: getBorderColor(!!selectedModel, !!selectedTrim.text),
             borderWidth: 1,
-            borderTopWidth: 0,
             maxHeight: 300,
+            marginBottom: 16,
           }}
           onPressIn={() => setActiveInput(ActiveInput.Trim)}
           suggestions={(

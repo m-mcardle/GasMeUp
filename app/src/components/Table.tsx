@@ -89,10 +89,11 @@ export default function Table({
                   </DataTable.Cell>
                 </DataTable.Row>
               )
-              : pageData.map((rowData) => (
+              : pageData.map((rowData) => {
+                const { key, ...rowDataWithoutKey } = rowData;
                 // eslint-disable-next-line react/jsx-props-no-spreading
-                <Row key={rowData.key} {...rowData} />
-              ))
+                return <Row key={rowData.key} {...rowDataWithoutKey} />;
+              })
           }
           </ScrollView>
         )

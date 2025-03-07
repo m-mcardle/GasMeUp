@@ -1,6 +1,7 @@
 // React
 import React, { useEffect, useState } from 'react';
 import {
+  Image,
   TouchableOpacity, View,
 } from 'react-native';
 
@@ -98,6 +99,14 @@ interface Props {
     replace: (str: string) => {},
     goBack: () => {}
   },
+}
+
+function GasMeUpIconComponent({ size }: { size: number }) {
+  return <Image source={GasMeUpLogo} style={{ width: size, height: size }} />;
+}
+
+function SplitwiseIconComponent({ size }: { size: number }) {
+  return <Image source={SplitwiseLogo} style={{ width: size, height: size }} />;
 }
 
 export default function FriendsScreen({ navigation, setFriend }: Props) {
@@ -255,14 +264,14 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
           {
             value: 'GasMeUp',
             label: 'GasMeUp',
+            icon: GasMeUpIconComponent,
             style: { backgroundColor: colors.action },
-            icon: GasMeUpLogo,
           },
           {
             value: 'Splitwise',
             label: 'Splitwise',
             style: { backgroundColor: colors.primary },
-            icon: SplitwiseLogo,
+            icon: SplitwiseIconComponent,
           },
         ]}
         onValueChange={(value) => (value === 'Splitwise' ? navigation.replace('Splitwise') : null)}

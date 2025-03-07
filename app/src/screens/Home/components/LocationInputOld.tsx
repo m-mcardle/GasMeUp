@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  TextInput, View,
+  TextInput, View, TouchableOpacity,
 } from 'react-native';
+import Input from '../../../components/Input';
+import Text from '../../../components/Text';
 import UseCurrentLocationButton from './UseCurrentLocationButton';
-import { colors } from '../../../styles/styles';
+import { colors, globalStyles } from '../../../styles/styles';
 
-import AutocompleteInput from '../../../components/AutocompleteInput';
+import styles from '../../../styles/HomeScreen.styles';
 
 interface Props {
   z: number;
@@ -26,7 +28,7 @@ interface Props {
   onClear: () => void;
 }
 
-export default function LocationInput({
+export default function LocationInputOld({
   z,
   returnKeyType,
   suggestions,
@@ -44,17 +46,32 @@ export default function LocationInput({
   onPressIn,
   onClear,
 }: Props) {
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
+  const handleFocus = () => {
+    setDropdownVisible(true);
+    onPressIn();
+  };
+
+  const handleBlur = () => {
+    setDropdownVisible(false);
+  };
+
+  const handleSuggestionPress = (suggestion: string) => {
+    onSuggestionPress(suggestion);
+    setDropdownVisible(false);
+  };
+
   return (
     <View style={{ zIndex: z }}>
-      <AutocompleteInput
+      <Input
         myRef={myRef}
-        suggestions={suggestions}
         style={{ backgroundColor: colors.darkestGray }}
-        containerStyle={{ width: '75%' }}
+        viewStyle={globalStyles.autocompleteInput}
         placeholder={placeholder}
         onChangeText={onChangeText}
-        onSuggestionPress={onSuggestionPress}
-        onPressIn={onPressIn}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         value={value}
         icon={(
           <UseCurrentLocationButton
@@ -71,6 +88,19 @@ export default function LocationInput({
         onSubmitEditing={onSubmitEditing}
         returnKeyType={returnKeyType}
       />
+      {dropdownVisible && suggestions.length > 0 && (
+        <View style={globalStyles.dropdown}>
+          {suggestions.map((suggestion) => (
+            <TouchableOpacity
+              key={suggestion}
+              onPress={() => handleSuggestionPress(suggestion)}
+              style={styles.suggestion}
+            >
+              <Text>{suggestion}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
     </View>
   );
 }

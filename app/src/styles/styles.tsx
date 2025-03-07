@@ -79,12 +79,33 @@ export const globalStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  dropdown: {
+    position: 'absolute',
+    top: 85, // Adjust this value based on the height of the dropdown
+    left: 0,
+    right: 0,
+    backgroundColor: colors.tertiary,
+    color: colors.secondary,
+    borderColor: colors.gray,
+    borderWidth: 1,
+    borderRadius: 5,
+    maxHeight: 150,
+    overflow: 'hidden',
+  },
+  autocompleteInput: {
+    width: '100%', backgroundColor: colors.tertiary, marginTop: 8, padding: 4,
+  },
   autocompleteInputView: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     height: 75,
+  },
+  suggestion: {
+    padding: 10,
+    borderBottomColor: 'gray',
+    borderBottomWidth: 1,
   },
   autocompleteListContainer: {
     backgroundColor: colors.tertiary,

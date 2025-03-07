@@ -48,7 +48,9 @@ import StatsSection from './components/StatsSection';
 import SettingsModal from './components/SettingsModal';
 import SaveTripButton from './components/SaveTripButton';
 import CalculateButton from './components/CalculateButton';
-import LocationInput from './components/LocationInput';
+// TODO: Fix this to use the new LocationInput
+import LocationInputV1 from './components/LocationInputOld';
+// import LocationInput from './components/LocationInput';
 import ManualTripTrackingSection from './components/ManualTripTrackingSection';
 import ClearManualTripButton from './components/ClearManualTripButton';
 import SettingsIcon from './components/SettingsIcon';
@@ -665,7 +667,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         />
         {!manualTripUsed && (
         <>
-          <LocationInput
+          <LocationInputV1
             z={2}
             placeholder="Start Location"
             suggestions={activeInput === InputEnum.Start ? suggestions : []}
@@ -682,7 +684,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
             blurOnSubmit={false}
             returnKeyType="next"
           />
-          <LocationInput
+          <LocationInputV1
             myRef={endLocationRef}
             z={1}
             suggestions={activeInput === InputEnum.End ? suggestions : []}

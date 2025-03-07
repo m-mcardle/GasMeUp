@@ -104,6 +104,14 @@ function FooterRow() {
   );
 }
 
+function GasMeUpIconComponent({ size }: { size: number }) {
+  return <Image source={GasMeUpLogo} style={{ width: size, height: size }} />;
+}
+
+function SplitwiseIconComponent({ size }: { size: number }) {
+  return <Image source={SplitwiseLogo} style={{ width: size, height: size }} />;
+}
+
 interface Props {
   navigation: {
     navigate: (str: string) => {},
@@ -214,13 +222,13 @@ export default function SplitwiseScreen({ navigation } : Props) {
             value: 'GasMeUp',
             label: 'GasMeUp',
             style: { backgroundColor: colors.primary },
-            icon: GasMeUpLogo,
+            icon: GasMeUpIconComponent,
           },
           {
             value: 'Splitwise',
             label: 'Splitwise',
             style: { backgroundColor: colors.splitwiseGreen },
-            icon: SplitwiseLogo,
+            icon: SplitwiseIconComponent,
           },
         ]}
         onValueChange={(value) => (value === 'GasMeUp' ? navigation.replace('Friends') : null)}

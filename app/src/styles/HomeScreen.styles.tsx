@@ -32,13 +32,6 @@ const styles = StyleSheet.create({
     width: '100%',
     minHeight: 100,
     justifyContent: 'center',
-    shadowOffset: {
-      width: 3,
-      height: 3,
-    },
-    shadowColor: colors.secondary,
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
   },
   costText: {
     fontSize: 64,
@@ -192,25 +185,11 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 1,
   },
-  dropdown: {
-    position: 'absolute',
-    top: 75, // Adjust this value based on the height of the dropdown
-    left: 0,
-    right: 0,
-    backgroundColor: 'white',
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    maxHeight: 150,
-    overflow: 'hidden',
-  },
   suggestion: {
     padding: 10,
     borderBottomColor: 'gray',
     borderBottomWidth: 1,
-  },
-  autocompleteInput: {
-    width: '100%', backgroundColor: colors.tertiary, marginTop: 8, padding: 4,
+    color: colors.gray,
   },
 });
 
