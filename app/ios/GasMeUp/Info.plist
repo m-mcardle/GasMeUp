@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
   <dict>
+    <key>CADisableMinimumFrameDurationOnPhone</key>
+    <true/>
     <key>CFBundleAllowMixedLocalizations</key>
     <true/>
     <key>CFBundleDevelopmentRegion</key>
@@ -34,35 +36,35 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
+          <string>com.googleusercontent.apps.888451573881-k5n25lno66hcesavohm94bicgl1b2l5a</string>
+        </array>
+      </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
           <string>exp+gas-me-up</string>
         </array>
       </dict>
     </array>
     <key>CFBundleVersion</key>
     <string>1.0.23</string>
-    <key>GMSApiKey</key>
-    <string>AIzaSyB1JNdanwF6CavSHC5S2nS6mwefil7BcKc</string>
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
+    <key>LSMinimumSystemVersion</key>
+    <string>12.0</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
+      <false/>
+      <key>NSAllowsLocalNetworking</key>
       <true/>
-      <key>NSExceptionDomains</key>
-      <dict>
-        <key>localhost</key>
-        <dict>
-          <key>NSExceptionAllowsInsecureHTTPLoads</key>
-          <true/>
-        </dict>
-      </dict>
     </dict>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>GasMeUp will access your location for functionality purposes only. Some examples of this would be to allow you to use your 'Current Location' as a start or end point or to determine which region's gas price to default to.</string>
+    <string>GasMeUp will access your location for functionality purposes only. One example of this would be to allow you to start tracking your location to record your trip manually in the background while driving.</string>
     <key>NSLocationAlwaysUsageDescription</key>
-    <string>GasMeUp will access your location for functionality purposes only. Some examples of this would be to allow you to start tracking your location to record your trip manually while driving.</string>
+    <string>GasMeUp will access your location for functionality purposes only. One example of this would be to allow you to start tracking your location to record your trip manually in the background while driving.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>GasMeUp will access your location for functionality purposes only. Some examples of this would be to allow you to use your 'Current Location' as a start or end point or to determine which region's gas price to default to.</string>
     <key>UIBackgroundModes</key>
@@ -74,7 +76,7 @@
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>
     <array>
-      <string>armv7</string>
+      <string>arm64</string>
     </array>
     <key>UIRequiresFullScreen</key>
     <false/>

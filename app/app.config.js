@@ -28,6 +28,7 @@ module.exports = {
       googleMapsApiKey: process.env.GOOGLE_IOS_SDK_KEY,
       usesNonExemptEncryption: false,
     },
+    googleServicesFile: './GoogleService-Info.plist',
     infoPlist: {
       UIBackgroundModes: ['location'],
       NSLocationAlwaysUsageDescription: 'GasMeUp will access your location for functionality purposes only. One example of this would be to allow you to start tracking your location to record your trip manually in the background while driving.',
@@ -41,6 +42,7 @@ module.exports = {
       backgroundColor: '#FFFFFF',
     },
     package: 'com.Virintus.GasMeUp',
+    googleServicesFile: './google-services.json',
     versionCode: 470010022,
   },
   web: {
@@ -70,12 +72,13 @@ module.exports = {
     // Other
     exchangeRateAPIKey: process.env.EXCHANGE_RATE_API_KEY,
   },
-  runtimeVersion: {
-    policy: 'sdkVersion',
-  },
+  runtimeVersion: '1.69.0',
   plugins: [
     'expo-apple-authentication',
+    'expo-font',
     'expo-notifications',
+    '@react-native-firebase/app',
+    '@react-native-firebase/auth',
     [
       'expo-build-properties',
       {

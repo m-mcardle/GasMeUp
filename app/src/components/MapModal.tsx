@@ -69,15 +69,3 @@ export default function MapModal({
     </View>
   );
 }
-
-MapModal.defaultProps = {
-  showTitle: true,
-  style: undefined,
-  handleMapPress: undefined,
-  handlePoiPress: undefined,
-  customStart: undefined,
-  customEnd: undefined,
-  startAddress: undefined,
-  endAddress: undefined,
-  description: undefined,
-};

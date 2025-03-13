@@ -40,6 +40,6 @@
   "author": "Matthew McArdle",
   "license": "ISC",
   "engines": {
-    "node": "^16.0.0"
+    "node": "^20.0.0"
   }
 }

@@ -94,10 +94,3 @@ export default function SettingModal(props: Props) {
     </Modal>
   );
 }
-
-SettingModal.defaultProps = {
-  useCustomValue: false,
-  setUseCustomValue: undefined,
-  inputStep: 0.01,
-  maxValue: undefined,
-};

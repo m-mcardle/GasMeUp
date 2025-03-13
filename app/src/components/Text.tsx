@@ -40,10 +40,3 @@ AppText.propTypes = {
   // @ts-ignore
   style: PropTypes.shape(TextStyle),
 };
-
-AppText.defaultProps = {
-  onPress: undefined,
-  children: undefined,
-  style: undefined,
-  numberOfLines: undefined,
-};

@@ -1,12 +1,10 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-import React, { ReactComponentElement } from 'react';
+import React, { ReactComponentElement, useState } from 'react';
 
 import {
-  TextInput, TouchableOpacity, View,
+  TextInput, TouchableOpacity, View, ScrollView,
 } from 'react-native';
-
-import Autocomplete from 'react-native-autocomplete-input';
 
 import Text from './Text';
 import Input from './Input';
@@ -18,7 +16,7 @@ interface Props {
   z?: number,
   value?: string,
   placeholder?: string,
-  listContainerStyle?: object,
+  viewStyle?: object,
   containerStyle?: object,
   style?: object,
   labelStyle?: object,
@@ -45,12 +43,12 @@ interface Props {
 export default function AutocompleteInput(props: Props) {
   const {
     onChangeText,
-    onPressIn,
+    onPressIn = () => {},
     onSubmitEditing,
-    onSuggestionPress,
+    onSuggestionPress = () => {},
     onClear,
     placeholder,
-    listContainerStyle,
+    viewStyle,
     labelStyle,
     containerStyle,
     style,
@@ -70,6 +68,22 @@ export default function AutocompleteInput(props: Props) {
     showRedundantSuggestion = false,
     editable = true,
   } = props;
+
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
+  const handleFocus = () => {
+    setDropdownVisible(true);
+    onPressIn();
+  };
+
+  const handleBlur = () => {
+    setDropdownVisible(false);
+  };
+
+  const handleSuggestionPress = (suggestion: string) => {
+    onSuggestionPress(suggestion);
+    setDropdownVisible(false);
+  };
 
   const loadingGradientColors = [
     colors.tertiary,
@@ -94,101 +108,59 @@ export default function AutocompleteInput(props: Props) {
   return (
     <View style={[globalStyles.autocompleteInputView, { zIndex: z }]}>
       <View style={[globalStyles.autocompleteContainer, { zIndex: z }]}>
-        <Autocomplete
-          renderTextInput={() => (
-            <Input
-              onChangeText={onChangeText}
-              onPressIn={onPressIn}
-              onSubmitEditing={onSubmitEditing}
-              placeholder={placeholder}
-              style={[style, { borderWidth: 0 }]}
-              labelStyle={labelStyle}
-              containerStyle={{ ...containerStyle, width: '100%', paddingHorizontal: 8 }}
-              value={value}
-              password={password}
-              clearButton={clearButton}
-              icon={icon}
-              error={error}
-              returnKeyType={returnKeyType}
-              myRef={myRef}
-              blurOnSubmit={blurOnSubmit}
-              keyboardType={keyboardType}
-              autoComplete={autoComplete}
-              editable={editable}
-              onClear={onClear}
-            />
-          )}
-          data={internalSuggestions}
-          value={value}
-          onChangeText={onChangeText}
-          onPressIn={onPressIn}
-          onSubmitEditing={onSubmitEditing}
-          keyboardType={keyboardType}
-          returnKeyType={returnKeyType}
+        <Input
+          myRef={myRef}
+          style={{ backgroundColor: colors.darkestGray, ...style }}
+          viewStyle={[globalStyles.autocompleteInput, viewStyle]}
+          labelStyle={labelStyle}
+          containerStyle={containerStyle}
           placeholder={placeholder}
-          placeholderTextColor={colors.secondary}
-          inputContainerStyle={[
-            { backgroundColor: colors.tertiary },
-            error ? { borderColor: colors.red } : { borderWidth: 0 },
-          ]}
-          listContainerStyle={[globalStyles.autocompleteListContainer, listContainerStyle]}
-          containerStyle={[globalStyles.autocompleteNestedContainer, { zIndex: z }]}
-          flatListProps={{
-            keyboardShouldPersistTaps: 'always',
-            keyExtractor: ({ title }: any) => title,
-            renderItem: ({ item: { title } } : any) => (
-              suggestionsLoading
-                ? (
-                  <AnimatedGradient
-                    animate={suggestionsLoading}
-                    colors={loadingGradientColors}
-                    speed={1000}
-                    style={globalStyles.autocompleteListItem}
-                  >
-                    <Text style={{ padding: 8 }}>
-                      Loading...
-                    </Text>
-                  </AnimatedGradient>
-                )
-                : (
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (onSuggestionPress) onSuggestionPress(title);
-                    }}
-                    style={[globalStyles.autocompleteListItem, (icon ? { paddingLeft: 52 } : {})]}
-                  >
-                    <Text style={{ fontSize: 12 }} numberOfLines={1}>{title}</Text>
-                  </TouchableOpacity>
-                )),
-          }}
+          onChangeText={onChangeText}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          value={value}
+          icon={icon}
+          clearButton={clearButton}
+          onClear={onClear}
+          error={error}
+          blurOnSubmit={blurOnSubmit}
+          autoComplete={autoComplete}
+          onSubmitEditing={onSubmitEditing}
+          returnKeyType={returnKeyType}
+          keyboardType={keyboardType}
+          editable={editable}
+          password={password}
         />
+        {dropdownVisible && internalSuggestions.length > 0 && (
+          <ScrollView
+            style={globalStyles.dropdown}
+            keyboardShouldPersistTaps="always"
+          >
+            {overriddenSuggestions.map((suggestion) => (suggestionsLoading
+              ? (
+                <AnimatedGradient
+                  animate={suggestionsLoading}
+                  colors={loadingGradientColors}
+                  speed={1000}
+                  style={globalStyles.autocompleteListItem}
+                >
+                  <Text style={{ padding: 8 }}>
+                    Loading...
+                  </Text>
+                </AnimatedGradient>
+              )
+              : (
+                <TouchableOpacity
+                  key={suggestion}
+                  onPress={() => handleSuggestionPress(suggestion)}
+                  style={globalStyles.suggestion}
+                >
+                  <Text style={{ color: colors.gray }}>{suggestion}</Text>
+                </TouchableOpacity>
+              )))}
+          </ScrollView>
+        )}
       </View>
     </View>
   );
 }
-
-AutocompleteInput.defaultProps = {
-  z: undefined,
-  value: undefined,
-  placeholder: undefined,
-  listContainerStyle: undefined,
-  style: undefined,
-  labelStyle: undefined,
-  containerStyle: undefined,
-  onPressIn: undefined,
-  password: false,
-  autoComplete: 'off',
-  clearButton: false,
-  icon: undefined,
-  error: false,
-  returnKeyType: undefined,
-  blurOnSubmit: true,
-  keyboardType: 'default',
-  myRef: undefined,
-  onSubmitEditing: undefined,
-  onSuggestionPress: undefined,
-  editable: true,
-  showRedundantSuggestion: false,
-  onClear: undefined,
-  suggestionsLoading: false,
-};

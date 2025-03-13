@@ -45,9 +45,3 @@ Button.propTypes = {
     PropTypes.array,
   ]),
 };
-
-Button.defaultProps = {
-  children: undefined,
-  style: undefined,
-  disabled: false,
-};

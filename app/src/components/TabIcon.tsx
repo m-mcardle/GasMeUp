@@ -14,28 +14,28 @@ export default function TabIcon({
   color,
   size,
 } : TabIconProps) {
-  let iconName: React.ComponentProps<typeof Ionicons>['name'] = 'ios-square';
+  let iconName: React.ComponentProps<typeof Ionicons>['name'] = 'square';
 
   switch (name) {
     case 'Home':
       iconName = focused
-        ? 'ios-calculator'
-        : 'ios-calculator-outline';
+        ? 'calculator'
+        : 'calculator-outline';
       break;
     case 'Friends/Login':
       iconName = focused
-        ? 'ios-people'
-        : 'ios-people-outline';
+        ? 'people'
+        : 'people-outline';
       break;
     case 'Car':
       iconName = focused
-        ? 'ios-car'
-        : 'ios-car-outline';
+        ? 'car'
+        : 'car-outline';
       break;
     case 'Gas Prices':
       return <FontAwesome5 name="gas-pump" size={size} color={color} />;
     default:
-      iconName = 'ios-square';
+      iconName = 'square';
   }
 
   return (

@@ -114,8 +114,3 @@ export default function LoginSection({ onLogin, mode = 'login' }: Props) {
     </>
   );
 }
-
-LoginSection.defaultProps = {
-  onLogin: undefined,
-  mode: 'login',
-};

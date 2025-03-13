@@ -1,9 +1,8 @@
 import Constants from 'expo-constants';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import { initializeApp } from 'firebase/app';
-import { getReactNativePersistence, initializeAuth } from 'firebase/auth/react-native';
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 import { getFirestore } from 'firebase/firestore';
 
@@ -35,7 +34,7 @@ export const app = initializeApp(firebaseConfig);
 
 // Needed to fix `AsyncStorage has been extracted from react-native core` warning
 export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
 
 export const db = getFirestore();

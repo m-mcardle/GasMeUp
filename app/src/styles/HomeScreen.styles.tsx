@@ -32,13 +32,6 @@ const styles = StyleSheet.create({
     width: '100%',
     minHeight: 100,
     justifyContent: 'center',
-    shadowOffset: {
-      width: 3,
-      height: 3,
-    },
-    shadowColor: colors.secondary,
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
   },
   costText: {
     fontSize: 64,
@@ -191,6 +184,12 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     zIndex: 1,
+  },
+  suggestion: {
+    padding: 10,
+    borderBottomColor: 'gray',
+    borderBottomWidth: 1,
+    color: colors.gray,
   },
 });
 

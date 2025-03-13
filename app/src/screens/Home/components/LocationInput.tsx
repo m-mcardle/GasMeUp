@@ -1,36 +1,29 @@
-// React imports
-import React, {
-  RefObject,
-} from 'react';
+import React from 'react';
 import {
-  TextInput,
+  TextInput, View,
 } from 'react-native';
-
-// Components
-import AutocompleteInput from '../../../components/AutocompleteInput';
-
 import UseCurrentLocationButton from './UseCurrentLocationButton';
-
-// Styles
 import { colors } from '../../../styles/styles';
 
+import AutocompleteInput from '../../../components/AutocompleteInput';
+
 interface Props {
-  z: number,
-  myRef?: RefObject<TextInput>,
-  returnKeyType: 'done' | 'next',
-  error: boolean,
-  value: string,
-  suggestions: Array<string>,
-  placeholder: string,
-  blurOnSubmit?: boolean,
-  useCurrentLocationActive: boolean,
-  useCurrentLocationDisabled: boolean,
-  onChangeText: (text: string) => void,
-  onSubmitEditing: () => void,
-  onSuggestionPress: (suggestion: string) => void,
-  onPressIn: () => void,
-  onClear: () => void,
-  onUseCurrentLocationPress: () => void,
+  z: number;
+  returnKeyType: TextInput['props']['returnKeyType'];
+  suggestions: string[];
+  myRef?: React.RefObject<TextInput>;
+  error?: boolean;
+  value: string;
+  placeholder: string;
+  useCurrentLocationActive: boolean;
+  useCurrentLocationDisabled: boolean;
+  blurOnSubmit?: boolean;
+  onUseCurrentLocationPress: () => void;
+  onChangeText: (text: string) => void;
+  onSubmitEditing: () => void;
+  onSuggestionPress: (suggestion: string) => void;
+  onPressIn: () => void;
+  onClear: () => void;
 }
 
 export default function LocationInput({
@@ -52,35 +45,32 @@ export default function LocationInput({
   onClear,
 }: Props) {
   return (
-    <AutocompleteInput
-      myRef={myRef}
-      z={z}
-      style={{ backgroundColor: colors.darkestGray }}
-      suggestions={suggestions}
-      onSuggestionPress={onSuggestionPress}
-      placeholder={placeholder}
-      onChangeText={onChangeText}
-      onPressIn={onPressIn}
-      value={value}
-      icon={(
-        <UseCurrentLocationButton
-          color={(useCurrentLocationActive ? colors.action : colors.secondary)}
-          disabled={useCurrentLocationDisabled}
-          onPress={onUseCurrentLocationPress}
-        />
-      )}
-      clearButton
-      onClear={onClear}
-      error={error}
-      blurOnSubmit={blurOnSubmit}
-      autoComplete="street-address"
-      onSubmitEditing={onSubmitEditing}
-      returnKeyType={returnKeyType}
-    />
+    <View style={{ zIndex: z }}>
+      <AutocompleteInput
+        myRef={myRef}
+        suggestions={suggestions}
+        style={{ backgroundColor: colors.darkestGray }}
+        containerStyle={{ width: '75%' }}
+        placeholder={placeholder}
+        onChangeText={onChangeText}
+        onSuggestionPress={onSuggestionPress}
+        onPressIn={onPressIn}
+        value={value}
+        icon={(
+          <UseCurrentLocationButton
+            color={(useCurrentLocationActive ? colors.action : colors.secondary)}
+            disabled={useCurrentLocationDisabled}
+            onPress={onUseCurrentLocationPress}
+          />
+        )}
+        clearButton
+        onClear={onClear}
+        error={error}
+        blurOnSubmit={blurOnSubmit}
+        autoComplete="street-address"
+        onSubmitEditing={onSubmitEditing}
+        returnKeyType={returnKeyType}
+      />
+    </View>
   );
 }
-
-LocationInput.defaultProps = {
-  myRef: undefined,
-  blurOnSubmit: true,
-};

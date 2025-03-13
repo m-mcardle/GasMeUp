@@ -28,6 +28,8 @@ interface Props {
   myRef?: React.RefObject<TextInput>,
   editable?: boolean,
   onClear?: () => void,
+  onBlur?: () => void,
+  onFocus?: () => void,
   onChangeText: (arg: string) => void,
   onPressIn?: () => void,
   onSubmitEditing?: () => void,
@@ -39,6 +41,8 @@ export default function Input(props: Props) {
     onPressIn,
     onSubmitEditing,
     onClear,
+    onBlur,
+    onFocus,
     placeholder,
     labelStyle,
     viewStyle,
@@ -98,6 +102,8 @@ export default function Input(props: Props) {
           onChangeText={onChangeText}
           onPressIn={onPressIn}
           onSubmitEditing={onSubmitEditing}
+          onFocus={onFocus}
+          onBlur={onBlur}
           secureTextEntry={password}
           autoComplete={autoComplete}
           editable={editable}
@@ -115,25 +121,3 @@ export default function Input(props: Props) {
     </View>
   );
 }
-
-Input.defaultProps = {
-  value: undefined,
-  placeholder: undefined,
-  style: undefined,
-  viewStyle: undefined,
-  labelStyle: undefined,
-  containerStyle: undefined,
-  onPressIn: undefined,
-  password: false,
-  autoComplete: 'off',
-  clearButton: false,
-  icon: undefined,
-  error: false,
-  returnKeyType: undefined,
-  blurOnSubmit: true,
-  keyboardType: 'default',
-  myRef: undefined,
-  onSubmitEditing: undefined,
-  editable: true,
-  onClear: undefined,
-};
