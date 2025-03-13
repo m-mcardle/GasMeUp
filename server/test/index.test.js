@@ -81,12 +81,10 @@ describe('Gas prices requests', () => {
 
   const endpoint = '/gas-prices';
   const country = 'CA';
-  const region = 'Ontario';
   it('should handle request', async () => {
     const response = await get(endpoint)
       .query({
         country,
-        region,
       });
 
     expect(response.statusCode).toBe(200);

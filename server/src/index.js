@@ -16,7 +16,6 @@ const {
   AmericanGasPriceRequest,
   CanadianGasPricesRequest,
   AmericanGasPricesRequest,
-  ProvincialGasPricesRequest,
 } = require('./queries/gasprice');
 const {
   YearRequest,
@@ -131,14 +130,7 @@ async function GetGasPrice(country, region) {
 
 async function GetGasPrices(country, region) {
   if (country === 'CA') {
-    if (region) {
-      const { data } = await api(ProvincialGasPricesRequest(region));
-      const { prices } = data;
-      return prices;
-      // TODO - remove this once new version of app is released to remove the `/ 100` from the client
-      // This is currently deployed on the server (northern-bot-301518) to fix the issue on v1.0 and v1.1 of the app
-      // return prices.map(el => ({ ...el, price: Number((el.price * 100).toFixed(3)) }));
-    }
+    // No longer support region for Canadian gas prices
 
     const { data } = await api(CanadianGasPricesRequest());
     const { prices } = data;

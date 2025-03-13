@@ -5,7 +5,6 @@ import React, {
 import {
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 import { DataTable, SegmentedButtons } from 'react-native-paper';
 
@@ -27,7 +26,6 @@ import { colors } from '../styles/styles';
 import { fetchData } from '../data/data';
 
 // Helpers
-import { provinces, states } from '../helpers/locationHelper';
 import {
   convertDollarsPerGalToDollarsPerL,
   convertDollarsPerLToDollarsPerGal,
@@ -41,21 +39,16 @@ interface RequestLookup {
 }
 
 function Row({
-  text, price, setSelectedRegion, useAsGasPrice, locale,
+  text, price, useAsGasPrice, locale,
 }: any) {
-  const isProvince = provinces.includes(text);
-  const isState = !isProvince && states.includes(text);
   const roundedPrice = price.toFixed(2);
   const roundedCanadianPrice = Number(convertGasPrice(price, locale, 'CA').toFixed(2));
   return (
     <DataTable.Row
       key={text}
-      onPress={() => (isProvince ? setSelectedRegion(text) : setSelectedRegion(''))}
     >
       <DataTable.Cell style={{ minWidth: 150 }}>
-        {!isProvince && !isState && <Ionicons name="chevron-back" size={12} color={colors.secondary} />}
         {text}
-        {isProvince && <Ionicons name="chevron-forward" size={12} color={colors.secondary} />}
       </DataTable.Cell>
       <DataTable.Cell numeric>
         $
@@ -79,10 +72,7 @@ function Row({
 
 export default function GasPriceScreen({ navigation }: any) {
   const [globalState, updateGlobalState] = useGlobalState();
-  const [{ selectedCountry, selectedRegion }, setSelected] = useState({ selectedCountry: 'CA', selectedRegion: '' });
-  const setSelectedRegion = (region: string) => setSelected((prev) => (
-    { ...prev, selectedRegion: region }
-  ));
+  const [selectedCountry, setSelected] = useState('CA');
 
   const [loading, setLoading] = useState(false);
   const [gasPrices, setGasPrices] = useState<Array<any>>([]);
@@ -95,18 +85,17 @@ export default function GasPriceScreen({ navigation }: any) {
 
     logEvent('gas_price_screen_loaded', {
       country: selectedCountry,
-      region: selectedRegion || 'none',
     });
 
     try {
       // Try and use the cache if possible to avoid unnecessary requests
-      if (selectedCountry + selectedRegion in persistedGasPrices) {
-        setGasPrices(persistedGasPrices[selectedCountry + selectedRegion]);
+      if (selectedCountry in persistedGasPrices) {
+        setGasPrices(persistedGasPrices[selectedCountry]);
         setLoading(false);
         return;
       }
 
-      const gasPricesResponse = await fetchData('/gas-prices', { country: selectedCountry, region: selectedRegion });
+      const gasPricesResponse = await fetchData('/gas-prices', { country: selectedCountry });
 
       if (!gasPricesResponse?.ok || !gasPricesResponse) {
         console.log(`Request for gas prices failed (${gasPricesResponse.status})`);
@@ -116,40 +105,26 @@ export default function GasPriceScreen({ navigation }: any) {
 
       const { prices } = (await gasPricesResponse.json());
 
-      if (selectedRegion) {
-        const formattedGasPrices = prices.map((price: any) => ({
-          ...price,
-          key: price.city,
-          text: price.city,
-          price: price.price,
-        }));
-        setGasPrices(formattedGasPrices);
-        setPersistedGasPrices((prev) => ({
-          ...prev,
-          [selectedCountry + selectedRegion]: formattedGasPrices,
-        }));
-      } else {
-        const formattedGasPrices = prices.map((price: any) => ({
-          ...price,
-          key: price[regionType],
-          text: price[regionType],
-        }));
-        setGasPrices(formattedGasPrices);
-        setPersistedGasPrices((prev) => ({
-          ...prev,
-          [selectedCountry + selectedRegion]: formattedGasPrices,
-        }));
-      }
+      const formattedGasPrices = prices.map((price: any) => ({
+        ...price,
+        key: price[regionType],
+        text: price[regionType],
+      }));
+      setGasPrices(formattedGasPrices);
+      setPersistedGasPrices((prev) => ({
+        ...prev,
+        [selectedCountry]: formattedGasPrices,
+      }));
     } catch (err: any) {
       Alert(err.message);
       setGasPrices([]);
     }
     setLoading(false);
-  }, [selectedRegion, selectedCountry]);
+  }, [selectedCountry]);
 
   useEffect(() => {
     fetchGasPrices();
-  }, [selectedRegion, selectedCountry]);
+  }, [selectedCountry]);
 
   let gasPriceConversion = (gasPrice: number) => gasPrice;
   if (globalState.Locale === 'CA' && selectedCountry === 'USA') {
@@ -166,7 +141,6 @@ export default function GasPriceScreen({ navigation }: any) {
     logEvent('custom_gas_price_set', {
       price: price.toString(),
       region_type: regionType,
-      region: selectedRegion || 'none',
     });
 
     changeSetting('Custom Gas Price', { price, enabled: 'true' }, updateGlobalState);
@@ -197,7 +171,6 @@ export default function GasPriceScreen({ navigation }: any) {
           ]}
           Row={(values) => Row({
             ...values,
-            setSelectedRegion,
             useAsGasPrice,
             locale: globalState.Locale,
           })}
@@ -218,7 +191,7 @@ export default function GasPriceScreen({ navigation }: any) {
               style: { backgroundColor: selectedCountry === 'USA' ? colors.action : colors.primary },
             },
           ]}
-          onValueChange={(value) => setSelected({ selectedCountry: value, selectedRegion: '' })}
+          onValueChange={(value) => setSelected(value)}
           value={selectedCountry}
         />
       </View>
