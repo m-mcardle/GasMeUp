@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   TextInput, View, TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import Input from '../../../components/Input';
 import Text from '../../../components/Text';
@@ -89,7 +90,10 @@ export default function LocationInputOld({
         returnKeyType={returnKeyType}
       />
       {dropdownVisible && suggestions.length > 0 && (
-        <View style={globalStyles.dropdown}>
+        <ScrollView
+          style={{ ...globalStyles.dropdown, maxHeight: 125 }}
+          keyboardShouldPersistTaps="always"
+        >
           {suggestions.map((suggestion) => (
             <TouchableOpacity
               key={suggestion}
@@ -99,7 +103,7 @@ export default function LocationInputOld({
               <Text>{suggestion}</Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
       )}
     </View>
   );

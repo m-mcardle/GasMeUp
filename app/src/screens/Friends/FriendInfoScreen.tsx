@@ -213,7 +213,7 @@ export default function FriendInfoScreen({
                 disabled={!(transaction?.waypoints?.length > 0)}
               >
                 {transaction?.waypoints?.length > 0 && (
-                <View style={{ justifyContent: 'center', minWidth: '100%', alignItems: 'center' }}>
+                <View style={{ justifyContent: 'center', minWidth: 20, alignItems: 'center' }}>
                   <Ionicons name="map" size={18} color={colors.action} />
                 </View>
                 )}
