@@ -91,8 +91,8 @@ android {
         applicationId 'com.Virintus.GasMeUp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 470010100
-        versionName "1.1.0"
+        versionCode 470010101
+        versionName "1.1.1"
     }
     signingConfigs {
         debug {

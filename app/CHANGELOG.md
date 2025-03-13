@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.1.1](https://github.com/m-mcardle/GasMeUp/compare/v1.1.0...v1.1.1) (2025-03-13)
 
+* Fix minor layout bug on FriendInfoScreen table
+* Make location suggestions scrollable
+
 ## [1.1.0](https://github.com/m-mcardle/GasMeUp/compare/v1.0.23...v1.1.0) (2025-03-13)
 
 * Bump Expo to 52
