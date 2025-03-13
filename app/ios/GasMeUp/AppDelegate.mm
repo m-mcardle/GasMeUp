@@ -10,9 +10,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+// Swap iOS Maps SDK Key based on environment (development or production)
 // @generated begin react-native-maps-init - expo prebuild (DO NOT MODIFY) sync-b75f1b1a921934c8df6426da0a01d450150b11ca
 #if __has_include(<GoogleMaps/GoogleMaps.h>)
-  [GMSServices provideAPIKey:@"AIzaSyD9qH7R3OgoxWjD-8l5uaUFyfZzAnLrlCY"];
+  [GMSServices provideAPIKey:@"AIzaSyB71op_J2zYTLJ0fRi7ncjX5ump3VjjDyA"];
 #endif
 // @generated end react-native-maps-init
 
