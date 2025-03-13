@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/m-mcardle/GasMeUp/compare/v1.0.23...v1.1.0) (2025-03-13)
+
 ### [1.0.23](https://github.com/m-mcardle/GasMeUp/compare/v1.0.22...v1.0.23) (2023-05-02)
 
 * Autocomplete loading state added for CarScreen

@@ -1,6 +1,6 @@
 {
   "name": "gas-me-up",
-  "version": "1.0.23",
+  "version": "1.1.0",
   "scripts": {
     "start": "expo start --dev-client",
     "start:dev": "expo start --dev-client",
@@ -16,6 +16,8 @@
     "build:devlocal": "npm run setup-dev; eas build --profile development --platform ios --local",
     "build:sim": "npm run setup-dev; eas build --profile simulator --platform ios",
     "bump": "standard-version",
+    "bump-minor": "standard-version --release-as minor",
+    "bump-major": "standard-version --release-as major",
     "publish": "eas submit --platform ios",
     "publish:expo": "eas update",
     "publish:android": "eas submit --platform android",
