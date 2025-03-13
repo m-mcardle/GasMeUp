@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [1.1.0](https://github.com/m-mcardle/GasMeUp/compare/v1.0.23...v1.1.0) (2025-03-13)
 
+* Bump Expo to 52
+* Bump React and RN
+* Bump Firebase
+* Bump Node version
+* Remove AutocompleteDropdown and build custom
+* Remove City gas prices
+
 ### [1.0.23](https://github.com/m-mcardle/GasMeUp/compare/v1.0.22...v1.0.23) (2023-05-02)
 
 * Autocomplete loading state added for CarScreen
