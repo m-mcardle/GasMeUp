@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "888451573881",
+    "project_id": "northern-bot-301518",
+    "storage_bucket": "northern-bot-301518.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:888451573881:android:9a3fec6029200324b78ca8",
+        "android_client_info": {
+          "package_name": "com.Virintus.GasMeUp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "888451573881-sq49st4t3vv6fc6drva37suspkceslvj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrd6T11gWPiKo0X-uhOOI-Yc8w0xpR9_c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "888451573881-sq49st4t3vv6fc6drva37suspkceslvj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
