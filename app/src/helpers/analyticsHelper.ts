@@ -1,6 +1,6 @@
-import analyticsModule from '@react-native-firebase/analytics';
+import { getAnalytics } from '@react-native-firebase/analytics';
 
-const analytics = analyticsModule();
+const analytics = getAnalytics();
 
 export const logEvent = (name: string, params?: any) => {
   console.log('logEvent', name, params ?? '');

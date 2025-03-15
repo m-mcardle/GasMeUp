@@ -1,33 +1,37 @@
-import remoteConfig from '@react-native-firebase/remote-config';
+import { getRemoteConfig } from '@react-native-firebase/remote-config';
+
 import defaultValues from '../data/remote_config_defaults.json';
 
+const remoteConfig = getRemoteConfig();
+
 export const initializeRemoteConfig = async () => {
-  await remoteConfig().setConfigSettings({
-    minimumFetchIntervalMillis: 3000,
+  await remoteConfig.activate();
+  await remoteConfig.setConfigSettings({
+    minimumFetchIntervalMillis: 3600000, // 1 hour
   });
-  await remoteConfig().setDefaults(defaultValues);
-  const response = await remoteConfig().fetchAndActivate();
-  console.log('Remote config initialized: ', response);
+  await remoteConfig.setDefaults(defaultValues);
+  const response = await remoteConfig.fetchAndActivate();
+  console.log('Remote config initialized:', response);
   return response;
 };
 
 export const isFeatureEnabled = (feature: string) => {
-  const enabled = remoteConfig().getValue(feature);
+  const enabled = remoteConfig.getValue(feature);
   return enabled.asBoolean();
 };
 
 export const getConfig = (feature: string) => {
-  const config = remoteConfig().getValue(feature);
+  const config = remoteConfig.getValue(feature);
   return config.asString();
 };
 
 export const getNumberConfig = (feature: string) => {
-  const config = remoteConfig().getValue(feature);
+  const config = remoteConfig.getValue(feature);
   return config.asNumber();
 };
 
 export const getAllFeatures = () => {
-  const features = remoteConfig().getAll();
+  const features = remoteConfig.getAll();
   return features;
 };
 
