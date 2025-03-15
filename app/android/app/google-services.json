@@ -1,34 +1,42 @@
 {
   "project_info": {
-    "project_number": "888451573881",
-    "project_id": "northern-bot-301518",
-    "storage_bucket": "northern-bot-301518.appspot.com"
+    "project_number": "75759268664",
+    "project_id": "gasmeup-7ce5f",
+    "storage_bucket": "gasmeup-7ce5f.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:888451573881:android:9a3fec6029200324b78ca8",
+        "mobilesdk_app_id": "1:75759268664:android:c5f7f088b5a4469b7dc7cd",
         "android_client_info": {
           "package_name": "com.Virintus.GasMeUp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "888451573881-sq49st4t3vv6fc6drva37suspkceslvj.apps.googleusercontent.com",
+          "client_id": "75759268664-01uscbrgf3nid6qpkgeohhgn92s5kd5u.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCrd6T11gWPiKo0X-uhOOI-Yc8w0xpR9_c"
+          "current_key": "AIzaSyDzxTYXOmg7ze_0YaqgiA6WUFqeA-vDffU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "888451573881-sq49st4t3vv6fc6drva37suspkceslvj.apps.googleusercontent.com",
+              "client_id": "75759268664-01uscbrgf3nid6qpkgeohhgn92s5kd5u.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "75759268664-0jerb8vgqaao05oa3vo8tinojf5ibc4r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Virintus.GasMeUp",
+                "app_store_id": "1662998670"
+              }
             }
           ]
         }

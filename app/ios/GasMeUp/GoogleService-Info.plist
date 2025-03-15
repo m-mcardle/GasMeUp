@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>888451573881-k5n25lno66hcesavohm94bicgl1b2l5a.apps.googleusercontent.com</string>
+	<string>75759268664-0jerb8vgqaao05oa3vo8tinojf5ibc4r.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.888451573881-k5n25lno66hcesavohm94bicgl1b2l5a</string>
+	<string>com.googleusercontent.apps.75759268664-0jerb8vgqaao05oa3vo8tinojf5ibc4r</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDrWtLhJ1ekGgHGSkbfjMCbJtmEIsL7R8s</string>
 	<key>GCM_SENDER_ID</key>
-	<string>888451573881</string>
+	<string>75759268664</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.Virintus.GasMeUp</string>
 	<key>PROJECT_ID</key>
-	<string>northern-bot-301518</string>
+	<string>gasmeup-7ce5f</string>
 	<key>STORAGE_BUCKET</key>
-	<string>northern-bot-301518.appspot.com</string>
+	<string>gasmeup-7ce5f.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false/>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true/>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:888451573881:ios:30d997b1e00dfe89b78ca8</string>
+	<string>1:75759268664:ios:b008ac36d751ec297dc7cd</string>
 </dict>
 </plist>
