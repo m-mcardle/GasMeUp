@@ -69,6 +69,9 @@ module.exports = {
     splitwiseDevClientID: process.env.DEV_SPLITWISE_CLIENT_ID,
     splitwiseDevConsumerSecret: process.env.DEV_SPLITWISE_CONSUMER_SECRET,
 
+    // Sentry
+    sentryAuthToken: process.env.SENTRY_AUTH_TOKEN,
+
     // Other
     exchangeRateAPIKey: process.env.EXCHANGE_RATE_API_KEY,
   },
@@ -79,6 +82,14 @@ module.exports = {
     'expo-notifications',
     '@react-native-firebase/app',
     '@react-native-firebase/auth',
+    [
+      '@sentry/react-native/expo',
+      {
+        url: 'https://sentry.io/',
+        project: 'react-native',
+        organization: 'mcmatt-inc',
+      },
+    ],
     [
       'expo-build-properties',
       {

@@ -13,6 +13,9 @@ import {
 import * as Notifications from 'expo-notifications';
 import { LocationSubscription } from 'expo-location';
 
+// Sentry
+import * as Sentry from '@sentry/react-native';
+
 // React imports
 import React, {
   useState, useMemo, useEffect, useRef,
@@ -46,6 +49,12 @@ import { getExchangeRate } from './src/helpers/unitsHelper';
 import { logScreenView } from './src/helpers/analyticsHelper';
 import { getNumberConfig, initializeRemoteConfig, isFeatureEnabled } from './src/helpers/featureHelper';
 
+Sentry.init({
+  dsn: 'https://b385eda3b86e83abcd85a93b6b64e8a6@o4508982712664064.ingest.us.sentry.io/4508982713843712',
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
+
 SplashScreen.preventAutoHideAsync();
 
 const Tab = createBottomTabNavigator();
@@ -54,7 +63,7 @@ const Tab = createBottomTabNavigator();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { auth } = firebase;
 
-export default function App() {
+export default Sentry.wrap(() => {
   const [globalState, setGlobalState] = useState(initialState);
   const [locationSubscription, setLocationSubscription] = useState<LocationSubscription>();
 
@@ -217,4 +226,4 @@ export default function App() {
       </NavigationContainer>
     </GlobalContext.Provider>
   );
-}
+});

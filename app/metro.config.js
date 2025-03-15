@@ -4,7 +4,11 @@ const { getDefaultConfig } = require('@expo/metro-config');
 
 const exclusionList = require('metro-config/src/defaults/exclusionList');
 
-const defaultConfig = getDefaultConfig(__dirname);
+const {
+  getSentryExpoConfig,
+} = require('@sentry/react-native/metro');
+
+const defaultConfig = getSentryExpoConfig(__dirname);
 
 // defaultConfig.resolver.assetExts.push('cjs');
 defaultConfig.resolver.blockList = exclusionList([/firebase-admin\/.*/, /functions\/.*/, /server\/.*/]);
