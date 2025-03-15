@@ -29,8 +29,8 @@
     "lint-client": "npx eslint './src/' 'App.tsx'",
     "install-server": "cd ../server && npm install",
     "test-server": "cd ../server && npm test",
-    "setup-dev": "cp GoogleService-Info-Dev.plist GoogleService-Info.plist",
-    "setup-prod": "cp GoogleService-Info-Prod.plist GoogleService-Info.plist"
+    "setup-dev": "cp GoogleService-Info-Dev.plist GoogleService-Info.plist; cp GoogleService-Info-Dev.plist ios/GasMeUp/GoogleService-Info.plist",
+    "setup-prod": "cp GoogleService-Info-Prod.plist GoogleService-Info.plist; cp GoogleService-Info-Prod.plist ios/GasMeUp/GoogleService-Info.plist"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.2.2",
