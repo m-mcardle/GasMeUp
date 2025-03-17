@@ -15,6 +15,11 @@ import * as TaskManager from 'expo-task-manager';
 
 import Alert from '../components/Alert';
 
+export interface CurrentRouteState {
+  route: Array<LatLng>,
+  distance: number,
+}
+
 export const provinceCodeLookup: Record<string, string> = {
   ON: 'Ontario',
   QC: 'Quebec',
@@ -166,8 +171,8 @@ export async function getUserLocationSubscription(updateGlobalState: Function) {
 }
 
 const taskName = 'background-location';
-export function createBackgroundLocationTask(updateRoute: Function) {
-  TaskManager.defineTask(taskName, ({ data: { locations }, error }: any) => {
+export function createBackgroundLocationTask(updateRoute: (latLng: LatLng) => void) {
+  TaskManager.defineTask(taskName, async ({ data: { locations }, error }: any) => {
     if (error) {
       console.warn('Error getting background location', error);
       return;
@@ -249,6 +254,15 @@ export function calculatePathLength(path: Array<LatLng>) {
     total += getDistanceFromLatLngInKm(pos1, pos2);
   }
   return total;
+}
+
+export function calculatePathLengthWithNewPoint(path: CurrentRouteState, newPoint: LatLng) {
+  if (path.route.length === 0) {
+    return 0;
+  }
+
+  const lastPoint = path.route[path.route.length - 1];
+  return path.distance + getDistanceFromLatLngInKm(lastPoint, newPoint);
 }
 
 export const convertLatLngToLocation = (latLng: LatLng) => ({

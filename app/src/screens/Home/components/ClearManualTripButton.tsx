@@ -23,7 +23,7 @@ export default function ClearManualTripButton({ onPress, disabled }: Props) {
       onPress={onPress}
       disabled={disabled}
     >
-      <Ionicons name="ios-close" size={12} color="white" />
+      <Ionicons name="close" size={12} color="white" />
       <Text>Clear Trip</Text>
     </Button>
   );

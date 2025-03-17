@@ -11,8 +11,10 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import {
   convertLatLngToLocation,
   createBackgroundLocationTask,
+  CurrentRouteState,
   startBackgroundLocationUpdates,
   stopBackgroundLocationUpdates,
+  calculatePathLengthWithNewPoint,
 } from '../../../helpers/locationHelper';
 import { logEvent } from '../../../helpers/analyticsHelper';
 
@@ -30,7 +32,7 @@ import { fetchData } from '../../../data/data';
 interface Props {
   manualTripInProgress: boolean,
   userLocation: any,
-  currentRoute: any,
+  currentRoute: CurrentRouteState,
   setCurrentRoute: (any: any) => void,
   clearCurrentTrip: (any: any) => void,
   setPoints: (argv0: any, argv1: any) => void,
@@ -59,7 +61,13 @@ export default function ManualTripTrackingSection({
   setDistanceToRouteDistance,
 }: Props) {
   createBackgroundLocationTask(
-    (latLng: LatLng) => setCurrentRoute((oldRoute: Array<LatLng>) => [...oldRoute, latLng]),
+    (latLng: LatLng) => setCurrentRoute((oldRoute: CurrentRouteState) => {
+      console.log('(please work) Adding new point to route', latLng);
+      return {
+        route: [...oldRoute.route, latLng],
+        distance: calculatePathLengthWithNewPoint(oldRoute, latLng),
+      };
+    }),
   );
 
   const startFollowingNewTrip = async () => {
@@ -76,10 +84,13 @@ export default function ManualTripTrackingSection({
     setManualTripInProgress(true);
 
     // Initialize route with user's current location to set minimum route
-    setCurrentRoute([
-      userLocation,
-      userLocation,
-    ]);
+    setCurrentRoute({
+      distance: 0,
+      route: [
+        userLocation,
+        userLocation,
+      ],
+    });
 
     clearCurrentTrip({ resetStart: true, resetEnd: true });
     setLocations({ startLocation: '', endLocation: '' });
@@ -89,7 +100,7 @@ export default function ManualTripTrackingSection({
   };
 
   const stopFollowingNewTrip = async () => {
-    if (currentRoute.length < 2) {
+    if (currentRoute.route.length < 2) {
       Alert('Trip too short', 'Please travel a bit further before stopping your trip');
       return;
     }
@@ -99,11 +110,11 @@ export default function ManualTripTrackingSection({
     await stopBackgroundLocationUpdates();
     setManualTripInProgress(false);
 
-    setWaypoints(currentRoute.map(convertLatLngToLocation));
+    setWaypoints(currentRoute.route.map(convertLatLngToLocation));
     setDistanceToRouteDistance();
 
-    const routeStart = currentRoute[0];
-    const routeEnd = currentRoute[currentRoute.length - 1];
+    const routeStart = currentRoute.route[0];
+    const routeEnd = currentRoute.route[currentRoute.route.length - 1];
 
     const startResponse = await fetchData('/geocode', { latlng: `${routeStart.lat},${routeStart.lng}` });
     const startAddress = await startResponse.json();
@@ -173,7 +184,7 @@ export default function ManualTripTrackingSection({
     >
       <View style={{ flexDirection: 'row' }}>
         <FontAwesome5 name="route" size={16} color="white" />
-        <Text style={{ marginLeft: 4 }}>{`Start Tracking${currentRoute.length ? ' New Trip' : ''}`}</Text>
+        <Text style={{ marginLeft: 4 }}>{`Start Tracking${currentRoute.route.length ? ' New Trip' : ''}`}</Text>
       </View>
     </Button>
   );

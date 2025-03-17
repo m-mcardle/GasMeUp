@@ -28,8 +28,8 @@ import { auth } from '../../../firebase';
 import { validateCurrentUser } from '../../helpers/authHelper';
 import { convertGasPrice } from '../../helpers/unitsHelper';
 import {
-  calculatePathLength,
   convertLatLngToLocation,
+  CurrentRouteState,
 } from '../../helpers/locationHelper';
 import { logEvent } from '../../helpers/analyticsHelper';
 
@@ -136,12 +136,14 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const [manualTripUsed, setManualTripUsed] = useState<boolean>(false);
   const [manualTripInProgress, setManualTripInProgress] = useState<boolean>(false);
-  const [currentRoute, setCurrentRoute] = useState<Array<LatLng>>([]);
+  const [currentCustomRoute, setCurrentCustomRoute] = useState<CurrentRouteState>({
+    route: [],
+    distance: 0,
+  });
 
   const [manualTripTrackingEnabled, setManualTripTrackingEnabled] = useState<boolean>(false);
 
-  // TODO - This is inefficient because it's recalculating the entire distance every time
-  const routeDistance = manualTripUsed ? calculatePathLength(currentRoute) : distance;
+  const routeDistance = manualTripUsed ? currentCustomRoute.distance : distance;
 
   const GAS_MILEAGE = globalState['Gas Mileage'];
 
@@ -348,7 +350,10 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     clearCurrentTrip({ resetStart: true, resetEnd: true });
     setLocations({ startLocation: '', endLocation: '' });
     setSuggestions([]);
-    setCurrentRoute([]);
+    setCurrentCustomRoute({
+      route: [],
+      distance: 0,
+    });
   };
 
   const location = (globalState.userLocation.lat && globalState.userLocation.lng
@@ -645,7 +650,11 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       <SettingsIcon onPress={() => navigation.navigate('Settings')} />
       <View style={styles.dataContainer}>
         <MapContainer
-          waypoints={manualTripInProgress ? currentRoute.map(convertLatLngToLocation) : waypoints}
+          waypoints={
+            manualTripInProgress
+              ? currentCustomRoute.route.map(convertLatLngToLocation)
+              : waypoints
+          }
           showUserLocation={!startPoint.address && !endPoint.address && !manualTripInProgress}
           style={{ ...styles.mapView, borderColor: manualTripInProgress ? 'red' : 'white' }}
           onPress={openMapModal}
@@ -710,10 +719,10 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         )}
         {manualTripTrackingEnabled && (
         <ManualTripTrackingSection
-          currentRoute={currentRoute}
+          currentRoute={currentCustomRoute}
           userLocation={globalState.userLocation}
           manualTripInProgress={manualTripInProgress}
-          setCurrentRoute={setCurrentRoute}
+          setCurrentRoute={setCurrentCustomRoute}
           clearCurrentTrip={clearCurrentTrip}
           setPoints={setPoints}
           fetchGasPrice={fetchGasPrice}
