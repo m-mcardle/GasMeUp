@@ -12,7 +12,7 @@
     "web": "expo start --web",
     "eject": "expo eject",
     "build": "npm run setup-prod; eas build",
-    "build:dev": "npm run setup-dev; eas build --profile development",
+    "build:dev": "npm run setup-dev; eas build --profile development --platform ios",
     "build:devlocal": "npm run setup-dev; eas build --profile development --platform ios --local",
     "build:sim": "npm run setup-dev; eas build --profile simulator --platform ios",
     "bump": "standard-version",
