@@ -13,6 +13,9 @@ import {
 import * as Notifications from 'expo-notifications';
 import { LocationSubscription } from 'expo-location';
 
+// RevenueCat
+import Purchases from 'react-native-purchases';
+
 // React imports
 import React, {
   useState, useMemo, useEffect, useRef,
@@ -148,10 +151,19 @@ export default function App() {
     }
   };
 
+  const initializeBilling = async () => {
+    await Purchases.configure({
+      apiKey: 'appl_uhkJTefIGjgwdmMkGVyYfQCbnUG',
+    });
+
+    Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
+  };
+
   // App initialization
   useEffect(() => {
     async function initialize() {
       await initializeRemoteConfig();
+      await initializeBilling();
 
       initializeExchangeRate();
       initializeNotifications();
