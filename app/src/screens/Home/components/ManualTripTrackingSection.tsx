@@ -62,7 +62,7 @@ export default function ManualTripTrackingSection({
 }: Props) {
   createBackgroundLocationTask(
     (latLng: LatLng) => setCurrentRoute((oldRoute: CurrentRouteState) => {
-      console.log('(please work) Adding new point to route', latLng);
+      console.log('(Manual tracking) Adding new point to route', latLng);
       return {
         route: [...oldRoute.route, latLng],
         distance: calculatePathLengthWithNewPoint(oldRoute, latLng),

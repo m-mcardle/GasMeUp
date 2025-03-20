@@ -15,7 +15,7 @@ export const colors = {
   darkGray: '#888888',
   gray: '#bcbcbc',
   lightGray: '#EEEEEE',
-  teal: '#29A8AB',
+  teal: '#36dfdd',
   green: '#118C4F',
   darkGreen: '#1f584e',
   red: '#af4154',

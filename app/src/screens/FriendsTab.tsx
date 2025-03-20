@@ -11,6 +11,7 @@ import FriendsScreen from './Friends/FriendsScreen';
 import SplitwiseScreen from './Friends/SplitwiseScreen';
 import LoginScreen from './Auth/LoginScreen';
 import FriendInfoScreen from './Friends/FriendInfoScreen';
+import PaywallScreen from './PaywallScreen';
 
 // Styles
 import { colors } from '../styles/styles';
@@ -78,6 +79,12 @@ export default function FriendsTab() {
             amount={amount}
           />
         )}
+      </RootStack.Screen>
+      <RootStack.Screen
+        name="Paywall"
+        options={{ headerShown: false }}
+      >
+        {({ navigation }) => <PaywallScreen navigation={navigation} />}
       </RootStack.Screen>
     </RootStack.Navigator>
   );

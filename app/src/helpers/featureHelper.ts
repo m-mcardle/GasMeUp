@@ -2,12 +2,14 @@ import { getRemoteConfig } from '@react-native-firebase/remote-config';
 
 import defaultValues from '../data/remote_config_defaults.json';
 
+import { DEV } from './env';
+
 const remoteConfig = getRemoteConfig();
 
 export const initializeRemoteConfig = async () => {
   await remoteConfig.activate();
   await remoteConfig.setConfigSettings({
-    minimumFetchIntervalMillis: 3600000, // 1 hour
+    minimumFetchIntervalMillis: (DEV ? 60000 : 3600000), // 1h if production, 1m if development
   });
   await remoteConfig.setDefaults(defaultValues);
   const response = await remoteConfig.fetchAndActivate();

@@ -6,11 +6,21 @@ import { User } from 'firebase/auth';
 
 export const offeringNames = [
   '$rc_annual',
+  '$rc_monthly',
 ];
 
 export const entitlementIdentifiers = [
   'pro',
 ];
+
+type SubscriptionPeriodMap = {
+  [key: string]: string;
+};
+
+export const subscriptionPeriodMap: SubscriptionPeriodMap = {
+  P1M: 'Monthly',
+  P1Y: 'Annual',
+};
 
 export const loginBillingUser = async (firebaseUser: User) => {
   await Purchases.logIn(firebaseUser.uid);
@@ -29,12 +39,14 @@ export const checkEntitlementStatus = async (entitlementIdentifier: string): Pro
   return typeof customerInfo.entitlements.active[entitlementIdentifier] !== 'undefined';
 };
 
+export const checkIfProUser = async (): Promise<boolean> => checkEntitlementStatus('pro');
+
+export const getOffering = async () => (await Purchases.getOfferings()).current;
+
 export async function promptPurchase(
-  offeringsName: string,
-  offeringIdentifier: string,
+  packageIdentifier: string,
 ): Promise<boolean> {
-  const offerings = await Purchases.getOfferings();
-  const offering = offerings.all[offeringsName];
+  const offering = await getOffering();
 
   if (!offering) {
     console.error('Offering not found');
@@ -42,7 +54,7 @@ export async function promptPurchase(
   }
 
   const productToBuy = offering.availablePackages.find(
-    (p) => p.identifier === offeringIdentifier,
+    (p) => p.identifier === packageIdentifier,
   )?.product;
 
   if (!productToBuy) {
@@ -72,7 +84,10 @@ export async function promptPurchase(
 export default {
   offeringNames,
   entitlementIdentifiers,
+  subscriptionPeriodMap,
   loginBillingUser,
   checkEntitlementStatus,
+  checkIfProUser,
+  getOffering,
   promptPurchase,
 };

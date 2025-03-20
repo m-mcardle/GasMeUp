@@ -69,6 +69,9 @@ module.exports = {
     splitwiseDevClientID: process.env.DEV_SPLITWISE_CLIENT_ID,
     splitwiseDevConsumerSecret: process.env.DEV_SPLITWISE_CONSUMER_SECRET,
 
+    // RevenueCat
+    revenueCatAPIKey: process.env.REVENUE_CAT_API_KEY,
+
     // Other
     exchangeRateAPIKey: process.env.EXCHANGE_RATE_API_KEY,
   },

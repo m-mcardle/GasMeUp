@@ -20,6 +20,7 @@ import { auth, db } from '../../../firebase';
 // Helpers
 import { getIcon } from '../../helpers/iconHelper';
 import { logEvent } from '../../helpers/analyticsHelper';
+import { checkIfProUser } from '../../helpers/billingHelper';
 
 // Components
 import Page from '../../components/Page';
@@ -122,6 +123,7 @@ interface Props {
 
 export default function SplitwiseScreen({ navigation } : Props) {
   const [friendsData, setFriendsData] = useState<Array<any>>([]);
+  const [isProUser, setIsProUser] = useState(false);
 
   const [user] = useAuthState(auth);
 
@@ -188,6 +190,24 @@ export default function SplitwiseScreen({ navigation } : Props) {
     { text: 'Friend', numeric: false },
     { text: 'Amount Owed', numeric: true },
   ];
+
+  // Send to paywall if they are not subscribed
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      const fetchedProUserStatus = await checkIfProUser();
+      setIsProUser(fetchedProUserStatus);
+      if (!fetchedProUserStatus) {
+        navigation.navigate('Paywall');
+      }
+    };
+
+    checkUserStatus();
+  }, [user]);
+
+  if (!isProUser) {
+    // Show paywall
+    return <Page><View /></Page>;
+  }
 
   return (
     <Page keyboardAvoiding={false}>

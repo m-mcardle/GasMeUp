@@ -20,6 +20,7 @@ export const ENV = expoConstants
       : expoConstants.splitwiseConsumerSecret,
     SPLITWISE_AUTHORIZE_URL: expoConstants.splitwiseAuthorizeURL,
     SPLITWISE_TOKEN_URL: expoConstants.splitwiseTokenURL,
+    REVENUE_CAT_API_KEY: expoConstants.revenueCatAPIKey,
   }
   : {
     FIREBASE_API_KEY: '',
@@ -32,6 +33,7 @@ export const ENV = expoConstants
     SPLITWISE_CONSUMER_SECRET: '',
     SPLITWISE_AUTHORIZE_URL: '',
     SPLITWISE_TOKEN_URL: '',
+    REVENUE_CAT_API_KEY: '',
   };
 
 async function checkDevAPI() {
