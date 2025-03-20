@@ -86,16 +86,7 @@ export default function App() {
     Inter_800ExtraBold,
     Inter_900Black,
   });
-
-  useEffect(() => {
-    async function hideSplashScreen() {
-      await SplashScreen.hideAsync();
-    }
-
-    if (fontsLoaded) {
-      hideSplashScreen();
-    }
-  }, [fontsLoaded]);
+  const [billingLoaded, setBillingLoaded] = useState(false);
 
   // Location initialization
   useEffect(() => {
@@ -134,7 +125,7 @@ export default function App() {
     Notifications.removeNotificationSubscription(responseListener.current);
   };
 
-  const initializeExchangeRate = () => {
+  const initializeExchangeRate = async () => {
     async function fetchRate() {
       const exchangeRate = await getExchangeRate();
       updateGlobalState('exchangeRate', exchangeRate);
@@ -157,16 +148,21 @@ export default function App() {
     });
 
     Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
+
+    const customerInfo = await Purchases.getCustomerInfo();
+    updateGlobalState('customerInfo', customerInfo);
+    setBillingLoaded(true);
   };
 
   // App initialization
   useEffect(() => {
     async function initialize() {
-      await initializeRemoteConfig();
-      await initializeBilling();
-
-      initializeExchangeRate();
       initializeNotifications();
+      await Promise.allSettled([
+        initializeRemoteConfig(),
+        initializeBilling(),
+        initializeExchangeRate(),
+      ]);
     }
 
     initialize();
@@ -175,6 +171,19 @@ export default function App() {
       cleanupNotificationSubscriptions();
     };
   }, []);
+
+  // Hiding splash screen, logic for all prerequisites to be ready
+  useEffect(() => {
+    const appIsReady = fontsLoaded && billingLoaded;
+
+    async function hideSplashScreen() {
+      await SplashScreen.hideAsync();
+    }
+
+    if (appIsReady) {
+      hideSplashScreen();
+    }
+  }, [fontsLoaded, billingLoaded]);
 
   if (!fontsLoaded) {
     return null;

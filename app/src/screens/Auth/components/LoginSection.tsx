@@ -22,6 +22,7 @@ import AppleLogin from './AppleLogin';
 import { maybeValidEmail } from '../../../helpers/emailHelper';
 import { logLogin } from '../../../helpers/analyticsHelper';
 import { isFeatureEnabled } from '../../../helpers/featureHelper';
+import { loginBillingUser } from '../../../helpers/billingHelper';
 
 // Styles
 import styles from '../../../styles/LoginScreen.styles';
@@ -43,7 +44,7 @@ export default function LoginSection({ onLogin, mode = 'login' }: Props) {
 
   const login = () => {
     signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
+      .then((userCredential) => {
         console.log('signed in!');
         setEmailError(false);
         setPasswordError(false);
@@ -53,6 +54,8 @@ export default function LoginSection({ onLogin, mode = 'login' }: Props) {
         }
 
         logLogin('email');
+
+        loginBillingUser(userCredential.user);
       })
       .catch((exception) => {
         let errorMessage = 'An error occurred when trying to log you in. Please try again.';
