@@ -37,7 +37,7 @@ const { setupCache } = pkg;
 const app = express();
 
 const cache = setupCache({
-  maxAge: 24 * 60 * 60 * 1000,
+  maxAge: 5 * 60 * 1000, // 5 minutes
   exclude: {
     // Store responses from requests with query parameters in cache
     query: false,
