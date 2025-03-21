@@ -4,6 +4,8 @@ import { Platform } from 'react-native';
 
 import { User } from 'firebase/auth';
 
+import { ENV } from './env';
+
 export const offeringNames = [
   '$rc_annual',
   '$rc_monthly',
@@ -21,6 +23,19 @@ export const subscriptionPeriodMap: SubscriptionPeriodMap = {
   P1M: 'Monthly',
   P1Y: 'Annual',
 };
+
+export async function initializeRevenueCat() {
+  await Purchases.configure({
+    apiKey: ENV.REVENUE_CAT_API_KEY,
+  });
+
+  Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
+}
+
+export async function fetchBillingUser() {
+  const customerInfo = await Purchases.getCustomerInfo();
+  return customerInfo;
+}
 
 export const loginBillingUser = async (firebaseUser: User) => {
   await Purchases.logIn(firebaseUser.uid);

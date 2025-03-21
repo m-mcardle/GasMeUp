@@ -78,11 +78,15 @@ export default function PaywallScreen({ navigation }: any) {
         </Text>
         <Text style={styles.featureItem}>
           <Text style={{ color: colors.teal }}>▶ </Text>
-          Car fuel efficiency lookup
+          Access to our car gas milage database
         </Text>
         <Text style={styles.featureItem}>
           <Text style={{ color: colors.teal }}>▶ </Text>
-          Save and split trips
+          Unlimited trip saving
+        </Text>
+        <Text style={styles.featureItem}>
+          <Text style={{ color: colors.teal }}>▶ </Text>
+          Splitwise integration
         </Text>
       </View>
 
@@ -111,12 +115,6 @@ export default function PaywallScreen({ navigation }: any) {
       <TouchableOpacity style={styles.continueButton} onPress={makePurchase}>
         <Text style={styles.continueText}>Continue</Text>
       </TouchableOpacity>
-
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Restore</Text>
-        <Text style={styles.footerText}>Terms</Text>
-        <Text style={styles.footerText}>Privacy</Text>
-      </View>
     </LinearGradient>
   );
 }

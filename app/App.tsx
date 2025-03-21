@@ -13,9 +13,6 @@ import {
 import * as Notifications from 'expo-notifications';
 import { LocationSubscription } from 'expo-location';
 
-// RevenueCat
-import Purchases from 'react-native-purchases';
-
 // React imports
 import React, {
   useState, useMemo, useEffect, useRef,
@@ -48,6 +45,7 @@ import { registerForPushNotificationsAsync } from './src/helpers/notificationHel
 import { getExchangeRate } from './src/helpers/unitsHelper';
 import { logScreenView } from './src/helpers/analyticsHelper';
 import { getNumberConfig, initializeRemoteConfig, isFeatureEnabled } from './src/helpers/featureHelper';
+import { fetchBillingUser, initializeRevenueCat } from './src/helpers/billingHelper';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -143,13 +141,9 @@ export default function App() {
   };
 
   const initializeBilling = async () => {
-    await Purchases.configure({
-      apiKey: 'appl_uhkJTefIGjgwdmMkGVyYfQCbnUG',
-    });
+    await initializeRevenueCat();
 
-    Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
-
-    const customerInfo = await Purchases.getCustomerInfo();
+    const customerInfo = await fetchBillingUser();
     updateGlobalState('customerInfo', customerInfo);
     setBillingLoaded(true);
   };
@@ -157,9 +151,9 @@ export default function App() {
   // App initialization
   useEffect(() => {
     async function initialize() {
+      await initializeRemoteConfig(); // Remote config must be initialized first
       initializeNotifications();
       await Promise.allSettled([
-        initializeRemoteConfig(),
         initializeBilling(),
         initializeExchangeRate(),
       ]);
