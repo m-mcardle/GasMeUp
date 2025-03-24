@@ -91,7 +91,7 @@ export const initialState = {
     lat: undefined,
     lng: undefined,
   },
-  exchangeRate: 1,
+  exchangeRate: 0.70,
   expoToken: '',
 };
 

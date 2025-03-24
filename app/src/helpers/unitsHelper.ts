@@ -36,9 +36,6 @@ export const convertFuelEfficiencyToString = (fuel: number, inputCountry: 'CA' |
   return `${convertedFuel} ${units}`;
 };
 
-export const convertDollarsPerGalToDollarsPerL = (dollar: number) => dollar * 4.54609;
-export const convertDollarsPerLToDollarsPerGal = (dollar: number) => dollar / 4.54609;
-
 export const convertGasPrice = (price: number, inputCountry: 'CA' | 'US', outputCountry: 'CA' | 'US') => {
   if (inputCountry === outputCountry) {
     return price;
@@ -110,7 +107,5 @@ export default {
   convertLtoGallons,
   convertGallonsToL,
   convertFuelEfficiency,
-  convertDollarsPerGalToDollarsPerL,
-  convertDollarsPerLToDollarsPerGal,
   convertGasPrice,
 };

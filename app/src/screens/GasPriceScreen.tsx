@@ -28,8 +28,8 @@ import { fetchData } from '../data/data';
 
 // Helpers
 import {
-  convertDollarsPerGalToDollarsPerL,
-  convertDollarsPerLToDollarsPerGal,
+  convertGallonsToL,
+  convertLtoGallons,
   convertGasPrice,
   convertGasPriceToString,
 } from '../helpers/unitsHelper';
@@ -163,12 +163,14 @@ export default function GasPriceScreen({ navigation }: any) {
 
   let gasPriceConversion = (gasPrice: number) => gasPrice;
   if (globalState.Locale === 'CA' && selectedCountry === 'USA') {
+    // Convert $USD / Gal to $CAD / L
     gasPriceConversion = (gasPrice: number) => (
-      convertDollarsPerLToDollarsPerGal(gasPrice) / globalState.exchangeRate
+      convertLtoGallons(gasPrice) / globalState.exchangeRate
     );
   } else if (globalState.Locale === 'US' && (selectedCountry === 'CA' || selectedCountry === 'WORLD')) {
+    // Convert $CAD / L to $USD / Gal
     gasPriceConversion = (gasPrice: number) => (
-      convertDollarsPerGalToDollarsPerL(gasPrice) * globalState.exchangeRate
+      convertGallonsToL(gasPrice) * globalState.exchangeRate
     );
   }
 
@@ -215,6 +217,12 @@ export default function GasPriceScreen({ navigation }: any) {
           style={styles.gasPriceTable}
           scrollable
         />
+        <View style={{ paddingTop: 4 }}>
+          <Text style={{ color: colors.gray }}>
+            Gas prices are in
+            {globalState.Locale === 'CA' ? ' $CAD' : ' $USD'}
+          </Text>
+        </View>
         <SegmentedButtons
           style={styles.selectionButtons}
           buttons={[
