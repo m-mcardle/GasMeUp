@@ -122,7 +122,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const customGasPrice = globalState['Custom Gas Price'].price;
   const useCustomGasPrice = globalState['Custom Gas Price'].enabled === 'true';
-  const [fetchedGasPrice, setFetchedGasPrice] = useState<number>(0);
+  const [fetchedGasPrice, setFetchedGasPrice] = useState<number>(1.5);
 
   const [suggestions, setSuggestions] = useState<Array<string>>([]);
   const [{ startLocation, endLocation }, setLocations] = useState<Locations>({ startLocation: '', endLocation: '' });

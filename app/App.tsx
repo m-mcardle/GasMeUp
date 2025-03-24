@@ -45,6 +45,7 @@ import { registerForPushNotificationsAsync } from './src/helpers/notificationHel
 import { getExchangeRate } from './src/helpers/unitsHelper';
 import { logScreenView } from './src/helpers/analyticsHelper';
 import { getNumberConfig, initializeRemoteConfig, isFeatureEnabled } from './src/helpers/featureHelper';
+import { fetchBillingUser, initializeRevenueCat } from './src/helpers/billingHelper';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -83,16 +84,7 @@ export default function App() {
     Inter_800ExtraBold,
     Inter_900Black,
   });
-
-  useEffect(() => {
-    async function hideSplashScreen() {
-      await SplashScreen.hideAsync();
-    }
-
-    if (fontsLoaded) {
-      hideSplashScreen();
-    }
-  }, [fontsLoaded]);
+  const [billingLoaded, setBillingLoaded] = useState(false);
 
   // Location initialization
   useEffect(() => {
@@ -131,7 +123,7 @@ export default function App() {
     Notifications.removeNotificationSubscription(responseListener.current);
   };
 
-  const initializeExchangeRate = () => {
+  const initializeExchangeRate = async () => {
     async function fetchRate() {
       const exchangeRate = await getExchangeRate();
       updateGlobalState('exchangeRate', exchangeRate);
@@ -148,13 +140,23 @@ export default function App() {
     }
   };
 
+  const initializeBilling = async () => {
+    await initializeRevenueCat();
+
+    const customerInfo = await fetchBillingUser();
+    updateGlobalState('customerInfo', customerInfo);
+    setBillingLoaded(true);
+  };
+
   // App initialization
   useEffect(() => {
     async function initialize() {
-      await initializeRemoteConfig();
-
-      initializeExchangeRate();
+      await initializeRemoteConfig(); // Remote config must be initialized first
       initializeNotifications();
+      await Promise.allSettled([
+        initializeBilling(),
+        initializeExchangeRate(),
+      ]);
     }
 
     initialize();
@@ -163,6 +165,19 @@ export default function App() {
       cleanupNotificationSubscriptions();
     };
   }, []);
+
+  // Hiding splash screen, logic for all prerequisites to be ready
+  useEffect(() => {
+    const appIsReady = fontsLoaded && billingLoaded;
+
+    async function hideSplashScreen() {
+      await SplashScreen.hideAsync();
+    }
+
+    if (appIsReady) {
+      hideSplashScreen();
+    }
+  }, [fontsLoaded, billingLoaded]);
 
   if (!fontsLoaded) {
     return null;

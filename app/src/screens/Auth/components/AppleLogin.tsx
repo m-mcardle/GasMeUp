@@ -12,7 +12,8 @@ import { auth, db } from '../../../../firebase';
 import Alert from '../../../components/Alert';
 
 import { DEV } from '../../../helpers/env';
-import { logLogin } from '../../../helpers/analyticsHelper';
+import { logLogin, logSignUp } from '../../../helpers/analyticsHelper';
+import { loginBillingUser } from '../../../helpers/billingHelper';
 
 import { isDarkMode } from '../../../styles/styles';
 
@@ -90,10 +91,13 @@ export default function AppleLogin({ onLogin, mode = 'login' }: Props) {
                   console.log('Created `SecureUsers` document');
                 });
 
-              logLogin('email');
+              logSignUp('apple');
             } else {
               logLogin('apple');
             }
+
+            loginBillingUser(user);
+
             if (onLogin) {
               onLogin(credential);
             }
