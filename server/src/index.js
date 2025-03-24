@@ -14,6 +14,7 @@ const {
 const {
   CanadianGasPriceRequest,
   AmericanGasPriceRequest,
+  ProvincialGasPricesRequest,
   CanadianGasPricesRequest,
   AmericanGasPricesRequest,
   WorldGasPricesRequest,
