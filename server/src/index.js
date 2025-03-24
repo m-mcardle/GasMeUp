@@ -138,7 +138,7 @@ async function GetGasPrices(country, region) {
 
   if (country === 'CA') {
     if (region) {
-      const { data } = await api(CanadianGasPriceRequest(region));
+      const { data } = await api(ProvincialGasPricesRequest(region));
       const { prices } = data;
       return prices;
     }
