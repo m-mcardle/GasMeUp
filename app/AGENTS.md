@@ -1,0 +1,101 @@
+# App Agent Guide
+
+This directory contains the Expo + React Native mobile client for GasMeUp.
+
+## Stack
+
+- Expo SDK 52
+- React Native 0.76
+- React 18
+- TypeScript
+- React Navigation
+- Firebase Auth, Firestore, Analytics, Remote Config
+- Expo Notifications, Location, and Updates
+
+## Entry Points And Structure
+
+- App root: `App.tsx`
+- Firebase client setup: `firebase.js`
+- Global app state: `src/hooks/hooks.tsx`
+- Shared UI components: `src/components/`
+- Screens:
+  - `src/screens/Home/`
+  - `src/screens/Friends/`
+  - `src/screens/Auth/`
+- Shared helpers: `src/helpers/`
+- Shared global types: `types.d.ts`
+
+Navigation is split into:
+
+- bottom tabs in `App.tsx`
+- stack navigators in `src/screens/HomeTab.tsx` and `src/screens/FriendsTab.tsx`
+
+## Commands
+
+Run from this directory:
+
+- `npm install`
+- `npm run start`
+- `npm run ios`
+- `npm run android`
+- `npm run web`
+- `npm run lint`
+- `npm run check-types`
+
+Build and release scripts live in `package.json` and EAS config lives in `eas.json`.
+
+## Environment Model
+
+Do not read `process.env` directly from feature code. Runtime values are passed through:
+
+1. `app.config.js`
+2. Expo `extra`
+3. `src/helpers/env.ts`
+
+If a new env var is needed:
+
+1. add it to `app.config.js`
+2. expose it from `src/helpers/env.ts`
+3. use it from there
+
+## High-Signal Architectural Notes
+
+- Feature flags come from Firebase Remote Config.
+- Tab visibility is conditional. A screen can exist but be hidden by config.
+- API requests should go through `src/data/data.ts`.
+- Server selection is dynamic:
+  - local/dev API when `USE_DEV_API === 'true'`
+  - otherwise Remote Config `server_url`
+- Firebase project selection is based on `process.env.NODE_ENV` inside `firebase.js`.
+
+## Editing Guidance
+
+- Prefer keeping screen logic close to the relevant screen folder. Helpers belong in `src/helpers/` only when reused.
+- Preserve existing response expectations from the Express API. Search `fetchData(` callers before changing server contracts.
+- Keep `types.d.ts` up to date when changing trip, friend, or location payloads.
+- Do not hardcode backend URLs in screens or helpers. Use `fetchData`.
+- Be careful with `useGlobalState()` updates. Settings persistence is partly tied to `react-native` `Settings`, with platform-specific behavior in `src/hooks/hooks.tsx`.
+- Remote Config defaults live in `src/data/remote_config_defaults.json`. Add new keys there when introducing new flags.
+
+## Sensitive Areas
+
+- `src/helpers/locationHelper.ts`: foreground/background location permissions and manual trip tracking.
+- `src/helpers/notificationHelper.ts`: push token registration and platform-specific notification setup.
+- `src/helpers/analyticsHelper.ts`: analytics logging used across screens.
+- `src/screens/Friends/`: tightly coupled to Firestore schema and Cloud Functions friend-sync behavior.
+- `src/screens/Home/HomeScreen.tsx`: large stateful screen with trip calculation, route fetching, and manual tracking.
+
+## Testing And Validation
+
+Fast checks:
+
+- `npm run lint`
+- `npm run check-types`
+
+There are no checked-in app unit tests. When changing UI behavior, validate in Expo/dev client on the relevant platform if possible.
+
+## Known Constraints
+
+- Push notifications generally require a physical device.
+- Background location requires native permissions and is not fully testable in Expo Go.
+- `HomeScreen` still uses `LocationInputOld`, so avoid assuming the newer location input flow is active.
