@@ -2,7 +2,6 @@ const dotenv = require('dotenv');
 const express = require('express');
 
 const axios = require('axios');
-const pkg = require('axios-cache-adapter');
 
 const {
   LocationAutocomplete,
@@ -34,21 +33,8 @@ dotenv.config();
 
 const PORT = process.env.PORT || 3001;
 
-const { setupCache } = pkg;
-
 const app = express();
-
-const cache = setupCache({
-  maxAge: 1, // 5 * 60 * 1000, // 5 minutes
-  exclude: {
-    // Store responses from requests with query parameters in cache
-    query: false,
-  },
-});
-
-const api = axios.create({
-  adapter: cache.adapter,
-});
+const api = axios.create();
 
 /*
 Axios Request Functions (to external APIs)
