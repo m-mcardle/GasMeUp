@@ -1,0 +1,139 @@
+{
+  "geocoded_waypoints": [
+    {
+      "geocoder_status": "OK",
+      "place_id": "ChIJpTvG15DL1IkRd8S0KlBVNTI",
+      "types": [
+        "locality",
+        "political"
+      ]
+    },
+    {
+      "geocoder_status": "OK",
+      "place_id": "ChIJDbdkHFQayUwR7-8fITgxTmU",
+      "types": [
+        "locality",
+        "political"
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "bounds": {
+        "northeast": {
+          "lat": 45.5026721,
+          "lng": -73.56546089999999
+        },
+        "southwest": {
+          "lat": 43.6548139,
+          "lng": -79.3884466
+        }
+      },
+      "copyrights": "Powered by Google, ©2026 Google",
+      "legs": [
+        {
+          "distance": {
+            "text": "541 km",
+            "value": 541247
+          },
+          "duration": {
+            "text": "5 hours 26 mins",
+            "value": 19582
+          },
+          "end_address": "Montreal, QC, Canada",
+          "end_location": {
+            "lat": 45.5018695,
+            "lng": -73.56742249999999
+          },
+          "start_address": "Toronto, ON, Canada",
+          "start_location": {
+            "lat": 43.6548139,
+            "lng": -79.3884466
+          },
+          "steps": [
+            {
+              "distance": {
+                "text": "2.9 km",
+                "value": 2886
+              },
+              "duration": {
+                "text": "12 mins",
+                "value": 743
+              },
+              "end_location": {
+                "lat": 43.6618515,
+                "lng": -79.3545244
+              },
+              "html_instructions": "Head <b>east</b> on <b>Dundas St W</b> toward <b>University Ave</b><div style=\"font-size:0.9em\">Parts of this road may be closed at certain times or days</div>",
+              "polyline": {
+                "points": "qimiGxppcNAk@?Q?WAE?C?EAE?EAICUS"
+              },
+              "start_location": {
+                "lat": 43.6548139,
+                "lng": -79.3884466
+              },
+              "travel_mode": "DRIVING"
+            },
+            {
+              "distance": {
+                "text": "0.2 km",
+                "value": 222
+              },
+              "duration": {
+                "text": "1 min",
+                "value": 22
+              },
+              "end_location": {
+                "lat": 43.66368809999999,
+                "lng": -79.35551310000001
+              },
+              "html_instructions": "Turn <b>left</b> onto the <b>Don Valley Pkwy. North</b> ramp",
+              "maneuver": "ramp-left",
+              "polyline": {
+                "points": "quniGv|icN]NC@MDCB_Br@SJ]NC@s@ZW"
+              },
+              "start_location": {
+                "lat": 43.6618515,
+                "lng": -79.3545244
+              },
+              "travel_mode": "DRIVING"
+            },
+            {
+              "distance": {
+                "text": "12.9 km",
+                "value": 12915
+              },
+              "duration": {
+                "text": "11 mins",
+                "value": 661
+              },
+              "end_location": {
+                "lat": 43.7630039,
+                "lng": -79.3367647
+              },
+              "html_instructions": "Merge onto <b>Don Valley Pkwy N</b>",
+              "maneuver": "merge",
+              "polyline": {
+                "points": "aaoiG|bjcNQDk@JIBc@HMDc@HgATQBa@"
+              },
+              "start_location": {
+                "lat": 43.66368809999999,
+                "lng": -79.35551310000001
+              },
+              "travel_mode": "DRIVING"
+            }
+          ],
+          "traffic_speed_entry": [],
+          "via_waypoint": []
+        }
+      ],
+      "overview_polyline": {
+        "points": "qimiGxppcN{TalB{R}vAoLmHim@dQen@bWgw@yGij@c_@}Ri^hAid@qTss@ig@o^"
+      },
+      "summary": "ON-401 E",
+      "warnings": [],
+      "waypoint_order": []
+    }
+  ],
+  "status": "OK"
+}

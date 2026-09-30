@@ -1,0 +1,40 @@
+{
+  "prices": [
+    {
+      "province": "Ontario",
+      "price": 1.77,
+      "asOf": "2026-09-30T17:30:37.847Z",
+      "source": "caa"
+    },
+    {
+      "province": "Quebec",
+      "price": 1.77,
+      "asOf": "2026-09-30T17:30:37.847Z",
+      "source": "caa"
+    },
+    {
+      "province": "Alberta",
+      "price": 1.77,
+      "asOf": "2026-09-30T17:30:37.847Z",
+      "source": "caa"
+    },
+    {
+      "province": "British Columbia",
+      "price": 1.77,
+      "asOf": "2026-09-30T17:30:37.847Z",
+      "source": "caa"
+    },
+    {
+      "province": "Manitoba",
+      "price": 1.77,
+      "asOf": "2026-09-30T17:30:37.847Z",
+      "source": "caa"
+    },
+    {
+      "province": "New Brunswick",
+      "price": 1.77,
+      "asOf": "2026-09-30T17:30:37.847Z",
+      "source": "caa"
+    }
+  ]
+}

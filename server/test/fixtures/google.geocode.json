@@ -1,0 +1,210 @@
+{
+  "plus_code": {
+    "compound_code": "MJ38+7P Toronto, ON, Canada",
+    "global_code": "87M2MJ38+7P"
+  },
+  "results": [
+    {
+      "address_components": [
+        {
+          "long_name": "123",
+          "short_name": "123",
+          "types": [
+            "street_number"
+          ]
+        },
+        {
+          "long_name": "Maple Street",
+          "short_name": "Maple Street",
+          "types": [
+            "route"
+          ]
+        },
+        {
+          "long_name": "Old Toronto",
+          "short_name": "Old Toronto",
+          "types": [
+            "political",
+            "sublocality",
+            "sublocality_level_1"
+          ]
+        },
+        {
+          "long_name": "Toronto",
+          "short_name": "Toronto",
+          "types": [
+            "locality",
+            "political"
+          ]
+        },
+        {
+          "long_name": "Toronto",
+          "short_name": "Toronto",
+          "types": [
+            "administrative_area_level_3",
+            "political"
+          ]
+        },
+        {
+          "long_name": "Toronto",
+          "short_name": "Toronto",
+          "types": [
+            "administrative_area_level_2",
+            "political"
+          ]
+        },
+        {
+          "long_name": "Ontario",
+          "short_name": "ON",
+          "types": [
+            "administrative_area_level_1",
+            "political"
+          ]
+        },
+        {
+          "long_name": "Canada",
+          "short_name": "CA",
+          "types": [
+            "country",
+            "political"
+          ]
+        },
+        {
+          "long_name": "K0G 0A0",
+          "short_name": "K0G 0A0",
+          "types": [
+            "postal_code"
+          ]
+        }
+      ],
+      "formatted_address": "123 Maple Street, Toronto, ON K0G 0A0, Canada",
+      "geometry": {
+        "location": {
+          "lat": 43.6532258,
+          "lng": -79.3831843
+        },
+        "location_type": "ROOFTOP",
+        "viewport": {
+          "northeast": {
+            "lat": 43.6547941302915,
+            "lng": -79.3817684197085
+          },
+          "southwest": {
+            "lat": 43.6520961697085,
+            "lng": -79.3844663802915
+          }
+        }
+      },
+      "place_id": "ChIJvxl6Ysw0K4gRojQaqSMpSm4",
+      "types": [
+        "street_address",
+        "subpremise"
+      ]
+    },
+    {
+      "address_components": [
+        {
+          "long_name": "100",
+          "short_name": "100",
+          "types": [
+            "street_number"
+          ]
+        },
+        {
+          "long_name": "Queen Street West",
+          "short_name": "Queen St W",
+          "types": [
+            "route"
+          ]
+        },
+        {
+          "long_name": "Old Toronto",
+          "short_name": "Old Toronto",
+          "types": [
+            "political",
+            "sublocality",
+            "sublocality_level_1"
+          ]
+        },
+        {
+          "long_name": "Toronto",
+          "short_name": "Toronto",
+          "types": [
+            "locality",
+            "political"
+          ]
+        },
+        {
+          "long_name": "Toronto",
+          "short_name": "Toronto",
+          "types": [
+            "administrative_area_level_3",
+            "political"
+          ]
+        },
+        {
+          "long_name": "Toronto",
+          "short_name": "Toronto",
+          "types": [
+            "administrative_area_level_2",
+            "political"
+          ]
+        },
+        {
+          "long_name": "Ontario",
+          "short_name": "ON",
+          "types": [
+            "administrative_area_level_1",
+            "political"
+          ]
+        },
+        {
+          "long_name": "Canada",
+          "short_name": "CA",
+          "types": [
+            "country",
+            "political"
+          ]
+        },
+        {
+          "long_name": "M5H 2N1",
+          "short_name": "M5H 2N1",
+          "types": [
+            "postal_code"
+          ]
+        }
+      ],
+      "formatted_address": "100 Queen St W, Toronto, ON M5H 2N1, Canada",
+      "geometry": {
+        "location": {
+          "lat": 43.6534399,
+          "lng": -79.3840901
+        },
+        "location_type": "ROOFTOP",
+        "viewport": {
+          "northeast": {
+            "lat": 43.6550642802915,
+            "lng": -79.38326171970849
+          },
+          "southwest": {
+            "lat": 43.6523663197085,
+            "lng": -79.38595968029149
+          }
+        }
+      },
+      "place_id": "ChIJ81rnZsw0K4gR4CIzkYYawjE",
+      "plus_code": {
+        "compound_code": "MJ38+99 Toronto, ON, Canada",
+        "global_code": "87M2MJ38+99"
+      },
+      "types": [
+        "city_hall",
+        "establishment",
+        "local_government_office",
+        "point_of_interest",
+        "tourist_attraction"
+      ]
+    }
+  ],
+  "status": "OK"
+}

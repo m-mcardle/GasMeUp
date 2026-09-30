@@ -1,0 +1,233 @@
+{
+  "predictions": [
+    {
+      "description": "Toronto, ON, Canada",
+      "matched_substrings": [
+        {
+          "length": 7,
+          "offset": 0
+        }
+      ],
+      "place_id": "ChIJpTvG15DL1IkRd8S0KlBVNTI",
+      "reference": "ChIJpTvG15DL1IkRd8S0KlBVNTI",
+      "structured_formatting": {
+        "main_text": "Toronto",
+        "main_text_matched_substrings": [
+          {
+            "length": 7,
+            "offset": 0
+          }
+        ],
+        "secondary_text": "ON, Canada"
+      },
+      "terms": [
+        {
+          "offset": 0,
+          "value": "Toronto"
+        },
+        {
+          "offset": 9,
+          "value": "ON"
+        },
+        {
+          "offset": 13,
+          "value": "Canada"
+        }
+      ],
+      "types": [
+        "geocode",
+        "locality",
+        "political"
+      ]
+    },
+    {
+      "description": "Toronto Pearson International Airport (YYZ), Silver Dart Drive, Mississauga, ON, Canada",
+      "matched_substrings": [
+        {
+          "length": 7,
+          "offset": 0
+        }
+      ],
+      "place_id": "ChIJkdQtwEo5K4gRxQ4DxOldHbQ",
+      "reference": "ChIJkdQtwEo5K4gRxQ4DxOldHbQ",
+      "structured_formatting": {
+        "main_text": "Toronto Pearson International Airport (YYZ)",
+        "main_text_matched_substrings": [
+          {
+            "length": 7,
+            "offset": 0
+          }
+        ],
+        "secondary_text": "Silver Dart Drive, Mississauga, ON, Canada"
+      },
+      "terms": [
+        {
+          "offset": 0,
+          "value": "Toronto Pearson International Airport (YYZ)"
+        },
+        {
+          "offset": 45,
+          "value": "Silver Dart Drive"
+        },
+        {
+          "offset": 64,
+          "value": "Mississauga"
+        },
+        {
+          "offset": 77,
+          "value": "ON"
+        },
+        {
+          "offset": 81,
+          "value": "Canada"
+        }
+      ],
+      "types": [
+        "airport",
+        "establishment",
+        "point_of_interest"
+      ]
+    },
+    {
+      "description": "Toronto Premium Outlets, Steeles Avenue, Halton Hills, ON, Canada",
+      "matched_substrings": [
+        {
+          "length": 7,
+          "offset": 0
+        }
+      ],
+      "place_id": "ChIJL2_93bGqUEARl3O9v9NFlvk",
+      "reference": "ChIJL2_93bGqUEARl3O9v9NFlvk",
+      "structured_formatting": {
+        "main_text": "Toronto Premium Outlets",
+        "main_text_matched_substrings": [
+          {
+            "length": 7,
+            "offset": 0
+          }
+        ],
+        "secondary_text": "Steeles Avenue, Halton Hills, ON, Canada"
+      },
+      "terms": [
+        {
+          "offset": 0,
+          "value": "Toronto Premium Outlets"
+        },
+        {
+          "offset": 25,
+          "value": "Steeles Avenue"
+        },
+        {
+          "offset": 41,
+          "value": "Halton Hills"
+        },
+        {
+          "offset": 55,
+          "value": "ON"
+        },
+        {
+          "offset": 59,
+          "value": "Canada"
+        }
+      ],
+      "types": [
+        "establishment",
+        "point_of_interest",
+        "shopping_mall"
+      ]
+    },
+    {
+      "description": "Toronto Zoo, Meadowvale Road, Scarborough, ON, Canada",
+      "matched_substrings": [
+        {
+          "length": 7,
+          "offset": 0
+        }
+      ],
+      "place_id": "ChIJzdqWrfHZ1IkR2LWLAmB6GZ4",
+      "reference": "ChIJzdqWrfHZ1IkR2LWLAmB6GZ4",
+      "structured_formatting": {
+        "main_text": "Toronto Zoo",
+        "main_text_matched_substrings": [
+          {
+            "length": 7,
+            "offset": 0
+          }
+        ],
+        "secondary_text": "Meadowvale Road, Scarborough, ON, Canada"
+      },
+      "terms": [
+        {
+          "offset": 0,
+          "value": "Toronto Zoo"
+        },
+        {
+          "offset": 13,
+          "value": "Meadowvale Road"
+        },
+        {
+          "offset": 30,
+          "value": "Scarborough"
+        },
+        {
+          "offset": 43,
+          "value": "ON"
+        },
+        {
+          "offset": 47,
+          "value": "Canada"
+        }
+      ],
+      "types": [
+        "establishment",
+        "point_of_interest",
+        "tourist_attraction",
+        "zoo"
+      ]
+    },
+    {
+      "description": "Toronto Islands, St Lawrence-East Bayfront-The Islands, ON, Canada",
+      "matched_substrings": [
+        {
+          "length": 7,
+          "offset": 0
+        }
+      ],
+      "place_id": "ChIJVYdeYbfK1IkRYKGgz-OTyRc",
+      "reference": "ChIJVYdeYbfK1IkRYKGgz-OTyRc",
+      "structured_formatting": {
+        "main_text": "Toronto Islands",
+        "main_text_matched_substrings": [
+          {
+            "length": 7,
+            "offset": 0
+          }
+        ],
+        "secondary_text": "St Lawrence-East Bayfront-The Islands, ON, Canada"
+      },
+      "terms": [
+        {
+          "offset": 0,
+          "value": "Toronto Islands"
+        },
+        {
+          "offset": 17,
+          "value": "St Lawrence-East Bayfront-The Islands"
+        },
+        {
+          "offset": 56,
+          "value": "ON"
+        },
+        {
+          "offset": 60,
+          "value": "Canada"
+        }
+      ],
+      "types": [
+        "establishment",
+        "natural_feature"
+      ]
+    }
+  ],
+  "status": "OK"
+}

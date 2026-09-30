@@ -1,0 +1,29 @@
+{
+  "html_attributions": [],
+  "result": {
+    "formatted_address": "Toronto, ON, Canada",
+    "geometry": {
+      "location": {
+        "lat": 43.6548253,
+        "lng": -79.388447
+      },
+      "viewport": {
+        "northeast": {
+          "lat": 43.85545793597914,
+          "lng": -79.11610013619145
+        },
+        "southwest": {
+          "lat": 43.58421288494134,
+          "lng": -79.63921092581104
+        }
+      }
+    },
+    "name": "Toronto",
+    "place_id": "ChIJpTvG15DL1IkRd8S0KlBVNTI",
+    "types": [
+      "locality",
+      "political"
+    ]
+  },
+  "status": "OK"
+}

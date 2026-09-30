@@ -1,0 +1,24 @@
+{
+  "prices": [
+    {
+      "state": "Alaska",
+      "price": 5.0459
+    },
+    {
+      "state": "Alabama",
+      "price": 4.049
+    },
+    {
+      "state": "Arkansas",
+      "price": 4.016
+    },
+    {
+      "state": "Arizona",
+      "price": 4.788
+    },
+    {
+      "state": "California",
+      "price": 6.3905
+    }
+  ]
+}

@@ -1,11 +1,15 @@
-// TODO - These tests don't actually fetch from Google API
-// * Need to set `ENABLE_GOOGLE_QUERIES` to `true` in `.env`
+// Live smoke tests: these hit the real Google Maps, RapidAPI gas-price and
+// fueleconomy.gov APIs using the keys in server/.env. Run with `npm run test:live`.
+// The default `npm test` runs the hermetic suite in test/hermetic instead.
 const dotenv = require('dotenv');
 
-const supertest = require('supertest');
-const app = require('../src/index');
+dotenv.config({ quiet: true });
 
-dotenv.config();
+const supertest = require('supertest');
+const app = require('../../src/index');
+
+// Upstreams (notably the gas-price service) can cold-start slowly.
+jest.setTimeout(30000);
 
 const api = supertest(app);
 
@@ -77,8 +81,6 @@ describe('Distance requests', () => {
 });
 
 describe('Gas prices requests', () => {
-  jest.setTimeout(10000);
-
   const endpoint = '/gas-prices';
   const country = 'CA';
   it('should handle request', async () => {
@@ -94,8 +96,6 @@ describe('Gas prices requests', () => {
 });
 
 describe('Gas price requests', () => {
-  jest.setTimeout(10000);
-
   const endpoint = '/gas';
   const country = 'CA';
   const region = 'Ontario';

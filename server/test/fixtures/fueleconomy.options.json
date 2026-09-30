@@ -1,0 +1,20 @@
+{
+  "menuItem": [
+    {
+      "text": "Auto (AV-S7), 4 cyl, 1.5 L, Turbo",
+      "value": "41749"
+    },
+    {
+      "text": "Auto (variable gear ratios), 4 cyl, 1.5 L, Turbo",
+      "value": "41748"
+    },
+    {
+      "text": "Man 6-spd, 4 cyl, 1.5 L, Turbo",
+      "value": "41747"
+    },
+    {
+      "text": "Man 6-spd, 4 cyl, 2.0 L, Turbo",
+      "value": "42501"
+    }
+  ]
+}

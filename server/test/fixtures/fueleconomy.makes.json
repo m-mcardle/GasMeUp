@@ -1,0 +1,204 @@
+{
+  "menuItem": [
+    {
+      "text": "Acura",
+      "value": "Acura"
+    },
+    {
+      "text": "Alfa Romeo",
+      "value": "Alfa Romeo"
+    },
+    {
+      "text": "Aston Martin",
+      "value": "Aston Martin"
+    },
+    {
+      "text": "Audi",
+      "value": "Audi"
+    },
+    {
+      "text": "Bentley",
+      "value": "Bentley"
+    },
+    {
+      "text": "BMW",
+      "value": "BMW"
+    },
+    {
+      "text": "Bugatti",
+      "value": "Bugatti"
+    },
+    {
+      "text": "Buick",
+      "value": "Buick"
+    },
+    {
+      "text": "BYD",
+      "value": "BYD"
+    },
+    {
+      "text": "Cadillac",
+      "value": "Cadillac"
+    },
+    {
+      "text": "Chevrolet",
+      "value": "Chevrolet"
+    },
+    {
+      "text": "Chrysler",
+      "value": "Chrysler"
+    },
+    {
+      "text": "Dodge",
+      "value": "Dodge"
+    },
+    {
+      "text": "Ferrari",
+      "value": "Ferrari"
+    },
+    {
+      "text": "Fiat",
+      "value": "Fiat"
+    },
+    {
+      "text": "Ford",
+      "value": "Ford"
+    },
+    {
+      "text": "Genesis",
+      "value": "Genesis"
+    },
+    {
+      "text": "GMC",
+      "value": "GMC"
+    },
+    {
+      "text": "Honda",
+      "value": "Honda"
+    },
+    {
+      "text": "Hyundai",
+      "value": "Hyundai"
+    },
+    {
+      "text": "Infiniti",
+      "value": "Infiniti"
+    },
+    {
+      "text": "Jaguar",
+      "value": "Jaguar"
+    },
+    {
+      "text": "Jeep",
+      "value": "Jeep"
+    },
+    {
+      "text": "Karma",
+      "value": "Karma"
+    },
+    {
+      "text": "Kia",
+      "value": "Kia"
+    },
+    {
+      "text": "Koenigsegg",
+      "value": "Koenigsegg"
+    },
+    {
+      "text": "Lamborghini",
+      "value": "Lamborghini"
+    },
+    {
+      "text": "Land Rover",
+      "value": "Land Rover"
+    },
+    {
+      "text": "Lexus",
+      "value": "Lexus"
+    },
+    {
+      "text": "Lincoln",
+      "value": "Lincoln"
+    },
+    {
+      "text": "Lotus",
+      "value": "Lotus"
+    },
+    {
+      "text": "Maserati",
+      "value": "Maserati"
+    },
+    {
+      "text": "Mazda",
+      "value": "Mazda"
+    },
+    {
+      "text": "McLaren Automotive",
+      "value": "McLaren Automotive"
+    },
+    {
+      "text": "Mercedes-Benz",
+      "value": "Mercedes-Benz"
+    },
+    {
+      "text": "MINI",
+      "value": "MINI"
+    },
+    {
+      "text": "Mitsubishi",
+      "value": "Mitsubishi"
+    },
+    {
+      "text": "Nissan",
+      "value": "Nissan"
+    },
+    {
+      "text": "Pagani",
+      "value": "Pagani"
+    },
+    {
+      "text": "Polestar",
+      "value": "Polestar"
+    },
+    {
+      "text": "Porsche",
+      "value": "Porsche"
+    },
+    {
+      "text": "Ram",
+      "value": "Ram"
+    },
+    {
+      "text": "Rolls-Royce",
+      "value": "Rolls-Royce"
+    },
+    {
+      "text": "Roush Performance",
+      "value": "Roush Performance"
+    },
+    {
+      "text": "RUF Automobile",
+      "value": "RUF Automobile"
+    },
+    {
+      "text": "Subaru",
+      "value": "Subaru"
+    },
+    {
+      "text": "Tesla",
+      "value": "Tesla"
+    },
+    {
+      "text": "Toyota",
+      "value": "Toyota"
+    },
+    {
+      "text": "Volkswagen",
+      "value": "Volkswagen"
+    },
+    {
+      "text": "Volvo",
+      "value": "Volvo"
+    }
+  ]
+}
