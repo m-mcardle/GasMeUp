@@ -4,7 +4,7 @@ build:
 
 # Run the containers
 run:
-	docker run -d -p 3001:3001 --name gasmeup-server gasmeup-server
+	docker run -d -p 3001:3001 -v "$(CURDIR)/.env:/usr/app/.env:ro" --name gasmeup-server gasmeup-server
 
 # Run the containers in the background
 dev:
