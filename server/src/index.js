@@ -29,12 +29,28 @@ const {
 const { Log, LogError } = require('./utils/console');
 const { validateAPIKey } = require('./utils/validation');
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const PORT = process.env.PORT || 3001;
 
 const app = express();
 const api = axios.create();
+
+/*
+Error helpers
+*/
+// Express 5 throws on non-integer / out-of-range status codes, and axios errors
+// can carry a non-numeric `cause`, so only trust integer HTTP status causes.
+function errorStatus(err) {
+  const status = err?.cause;
+  return Number.isInteger(status) && status >= 400 && status <= 599 ? status : 500;
+}
+
+// Never serialize the raw Error: AxiosError#toJSON includes the request config,
+// which contains upstream API keys (e.g. X-RapidAPI-Key).
+function errorMessage(err) {
+  return err?.message ?? 'An error occurred';
+}
 
 /*
 Axios Request Functions (to external APIs)
@@ -289,7 +305,7 @@ app.get('/distance', async (req, res) => {
     });
   } catch (exception) {
     LogError(exception);
-    res.status(exception.cause ?? 500).send({ error: exception.message });
+    res.status(errorStatus(exception)).send({ error: exception.message });
   }
 });
 
@@ -310,7 +326,7 @@ app.get('/gas-prices', async (req, res) => {
     res.json({ prices: gasPrices });
   } catch (exception) {
     LogError(exception);
-    res.status(exception.cause ?? 500).send({ error: exception.message });
+    res.status(errorStatus(exception)).send({ error: exception.message });
   }
 });
 
@@ -330,7 +346,7 @@ app.get('/gas', async (req, res) => {
     res.json({ price: gasPrice });
   } catch (exception) {
     LogError(exception);
-    res.status(500).send({ error: exception });
+    res.status(500).send({ error: errorMessage(exception) });
   }
 });
 
@@ -347,7 +363,7 @@ app.get('/years', async (req, res) => {
     res.json({ years });
   } catch (exception) {
     LogError(exception);
-    res.status(500).send({ error: exception });
+    res.status(500).send({ error: errorMessage(exception) });
   }
 });
 
@@ -366,7 +382,7 @@ app.get('/makes', async (req, res) => {
     res.json({ makes });
   } catch (exception) {
     LogError(exception);
-    res.status(500).send({ error: exception });
+    res.status(500).send({ error: errorMessage(exception) });
   }
 });
 
@@ -386,7 +402,7 @@ app.get('/models', async (req, res) => {
     res.json({ models });
   } catch (exception) {
     LogError(exception);
-    res.status(500).send({ error: exception });
+    res.status(500).send({ error: errorMessage(exception) });
   }
 });
 
@@ -407,7 +423,7 @@ app.get('/model-options', async (req, res) => {
     res.json({ modelOptions });
   } catch (exception) {
     LogError(exception);
-    res.status(500).send({ error: exception });
+    res.status(500).send({ error: errorMessage(exception) });
   }
 });
 
@@ -422,11 +438,11 @@ app.get('/vehicle/:vehicleId', async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   try {
     const { comb08, city08, highway08, fuelType } = await GetVehicle(id);
-    Log(`[vehicle] Vehicle: ${comb08, city08, highway08, fuelType}`);
+    Log(`[vehicle] Vehicle: ${JSON.stringify({ comb08, city08, highway08, fuelType })}`);
     res.json({ mpg: Number(comb08), city: Number(city08), highway: Number(highway08), fuelType });
   } catch (exception) {
     LogError(exception);
-    res.status(500).send({ error: exception });
+    res.status(500).send({ error: errorMessage(exception) });
   }
 });
 
@@ -434,8 +450,17 @@ app.get('/', (req, res) => {
   res.send('GasMeUp API');
 });
 
+// Express 5 forwards rejected async handlers here; respond with JSON, not HTML.
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  LogError(err);
+  res.status(errorStatus(err)).send({ error: 'An error occurred' });
+});
+
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
+  // Express 5 passes listen errors (e.g. EADDRINUSE) to this callback.
+  app.listen(PORT, (err) => {
+    if (err) throw err;
     Log(`Server listening on ${PORT}`);
   });
 }
