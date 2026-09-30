@@ -20,3 +20,6 @@ firebase-debug.log
 
 # Builds
 *.ipa
+
+# Local simulator audit screenshots
+.audit-screens/
