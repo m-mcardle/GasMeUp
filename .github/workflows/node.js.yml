@@ -1,63 +1,148 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and then lint the code across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# CI for every package in the repo. There is no root package.json, so each
+# job installs and runs from its own package directory.
 
 name: Node.js CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      run-live-tests:
+        description: Run server tests against live (paid) third-party APIs
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test-app:
-    name: Test Frontend
+  app:
+    name: App (lint, typecheck, expo-doctor)
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./app
-
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        node-version: [20.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
+        node-version: [24.x]
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: ./app/package-lock.json
-    - run: npm install
-    - run: npm run lint
+      - uses: actions/checkout@v7
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npx expo-doctor
+      - name: npm audit (high+)
+        # Non-blocking for now: existing advisories would otherwise fail CI.
+        continue-on-error: true
+        run: npm audit --audit-level=high
 
-  test-server:
-    name: Test Backend
+  server:
+    name: Server (hermetic tests)
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./server
-
-    runs-on: ubuntu-latest
-    env:
-      ENV_FILE: ${{ secrets.ENV_FILE }}
-
     strategy:
       matrix:
-        node-version: [20.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
+        node-version: [24.x]
     steps:
-    - uses: actions/checkout@v3
-    - name: create env file
-      run: echo "$ENV_FILE" >> .env
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: ./server/package-lock.json
-    - run: npm ci
-    - run: npm run test
+      - uses: actions/checkout@v7
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - name: npm audit (high+)
+        continue-on-error: true
+        run: npm audit --audit-level=high
+
+  server-live:
+    name: Server (live API tests)
+    # Hits real, paid third-party APIs. Only runs when manually requested.
+    if: github.event_name == 'workflow_dispatch' && inputs.run-live-tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+    env:
+      ENV_FILE: ${{ secrets.ENV_FILE }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.x
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - name: Create env file
+        run: |
+          if [ -z "$ENV_FILE" ]; then
+            echo "::error::ENV_FILE secret is not set"
+            exit 1
+          fi
+          printf '%s\n' "$ENV_FILE" > .env
+      - run: npm ci
+      - run: npm run test:live
+
+  functions:
+    name: Functions (lint, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./functions
+    strategy:
+      matrix:
+        node-version: [24.x]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - name: npm audit (high+)
+        continue-on-error: true
+        run: npm audit --audit-level=high
+
+  firebase-admin:
+    name: Firebase Admin (build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./firebase-admin
+    strategy:
+      matrix:
+        node-version: [24.x]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: firebase-admin/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - name: npm audit (high+)
+        continue-on-error: true
+        run: npm audit --audit-level=high
