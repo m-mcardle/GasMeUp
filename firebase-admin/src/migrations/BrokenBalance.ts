@@ -1,4 +1,4 @@
-import admin from 'firebase-admin';
+import type { Firestore } from 'firebase-admin/firestore';
 
 interface Friend {
   balance: number,
@@ -8,7 +8,7 @@ interface Friend {
 }
 
 // Migrate to new version
-export const unbreakBalances = async (db: admin.firestore.Firestore) => {
+export const unbreakBalances = async (db: Firestore) => {
   const usersCollection = db.collection('Users');
 
   const users = await usersCollection.get();

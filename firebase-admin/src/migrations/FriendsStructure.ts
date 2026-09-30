@@ -1,4 +1,4 @@
-import admin from 'firebase-admin';
+import type { Firestore } from 'firebase-admin/firestore';
 
 interface Friend {
   balance: number,
@@ -8,7 +8,7 @@ interface Friend {
 }
 
 // Migrate to new version
-export const migrateFriendsListsUp = async (db: admin.firestore.Firestore) => {
+export const migrateFriendsListsUp = async (db: Firestore) => {
   const usersCollection = db.collection('Users');
 
   const users = await usersCollection.get();
@@ -40,7 +40,7 @@ export const migrateFriendsListsUp = async (db: admin.firestore.Firestore) => {
 };
 
 // Migrate back
-export const migrateFriendsListsDown = async (db: admin.firestore.Firestore) => {
+export const migrateFriendsListsDown = async (db: Firestore) => {
   const usersCollection = db.collection('Users');
 
   const users = await usersCollection.get();
