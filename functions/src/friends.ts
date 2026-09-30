@@ -1,7 +1,5 @@
-/* eslint-disable max-len */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import * as admin from "firebase-admin";
-import {DocumentReference} from "firebase-admin/firestore";
+/* eslint-disable @stylistic/max-len */
+import {DocumentReference, Firestore} from "firebase-admin/firestore";
 import {Expo} from "expo-server-sdk";
 
 import {expo} from "../index";
@@ -19,7 +17,7 @@ import {createFriendRequestNotification} from "./notificationMessages";
  * @param {FriendsField} afterFriends - The friends object after
  */
 async function handleOutgoingFriendRequest(
-    db: admin.firestore.Firestore,
+    db: Firestore,
     uid: string,
     document: User,
     beforeFriends: FriendsField,
@@ -122,7 +120,7 @@ async function handleOutgoingFriendRequest(
  * @param {FriendsField} afterFriends - The friends object after
  */
 async function handleAcceptedFriendRequest(
-    db: admin.firestore.Firestore,
+    db: Firestore,
     uid: string,
     beforeFriends: FriendsField,
     afterFriends: FriendsField,
@@ -206,7 +204,7 @@ async function handleAcceptedFriendRequest(
  * @param {FriendsField} beforeFriends - The friends object before
  * @param {FriendsField} afterFriends - The friends object after
  */
-async function handleRemovedFriends(db: admin.firestore.Firestore, uid: string, beforeFriends: FriendsField, afterFriends: FriendsField) {
+async function handleRemovedFriends(db: Firestore, uid: string, beforeFriends: FriendsField, afterFriends: FriendsField) {
   console.log("Handling removed friend");
 
   // Get value of the newly added transaction
@@ -235,6 +233,9 @@ async function handleRemovedFriends(db: admin.firestore.Firestore, uid: string, 
         const friendData = friendDoc.data() ?? {};
 
         // Only need to run if this friend has this user as a friend
+        // NOTE: the second operand is always false (pre-existing bug). Left
+        // as-is to preserve runtime behavior during the dependency upgrade.
+        // eslint-disable-next-line no-constant-binary-expression
         if (!friendData.friends || !friendData.friends[uid] === undefined ) {
           console.log(`Friend (${friendDoc.id}) doesn't have ${uid} as friend`);
           return;

@@ -1,12 +1,12 @@
-/* eslint-disable max-len */
-import * as functions from "firebase-functions";
+/* eslint-disable @stylistic/max-len */
+import * as functions from "firebase-functions/v1";
 import {Expo, ExpoPushMessage} from "expo-server-sdk";
 
-import * as admin from "firebase-admin";
-import {DocumentSnapshot, QueryDocumentSnapshot} from "firebase-admin/firestore";
+import {initializeApp} from "firebase-admin/app";
+import {getFirestore, DocumentReference, DocumentSnapshot, QueryDocumentSnapshot, Transaction} from "firebase-admin/firestore";
 
 import jwt from "jsonwebtoken";
-import fs from "fs";
+import fs from "node:fs";
 import axios from "axios";
 import qs from "qs";
 
@@ -15,13 +15,10 @@ import {Friend, User} from "./global";
 import friends from "./src/friends";
 import {createTripNotification, createSettleNotification} from "./src/notificationMessages";
 
-admin.initializeApp();
+initializeApp();
 
-const db = admin.firestore();
+const db = getFirestore();
 export const expo = new Expo();
-
-type Transaction = admin.firestore.Transaction;
-type DocumentReference = admin.firestore.DocumentReference;
 
 export const sendTransactionNotifications = functions.firestore
     .document("Transactions/{transactionUID}")
