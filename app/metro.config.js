@@ -1,24 +1,15 @@
-// Needed to fix bundling issue when resolving @firebase module
-// https://stackoverflow.com/questions/72179070/react-native-bundling-failure-error-message-while-trying-to-resolve-module-i
 const path = require('path');
-const { getDefaultConfig } = require('@expo/metro-config');
+const { getDefaultConfig } = require('expo/metro-config');
 
-const exclusionList = require('metro-config/src/defaults/exclusionList');
+const config = getDefaultConfig(__dirname);
 
-const defaultConfig = getDefaultConfig(__dirname);
-const fontfaceobserverPath = path.resolve(__dirname, 'src/shims/fontfaceobserver.js');
+// Never bundle the sibling backend packages of this repo (they are not app code).
+// Anchored to the repo root so unrelated node_modules paths such as
+// `.../functions/...` or `.../server/...` are not blocked.
+const repoRoot = path.resolve(__dirname, '..');
+const escapeRegExp = (value) => value.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+config.resolver.blockList = ['firebase-admin', 'functions', 'server'].map(
+  (dir) => new RegExp(`^${escapeRegExp(path.join(repoRoot, dir))}\\/.*$`),
+);
 
-// defaultConfig.resolver.assetExts.push('cjs');
-defaultConfig.resolver.blockList = exclusionList([/firebase-admin\/.*/, /functions\/.*/, /server\/.*/]);
-defaultConfig.resolver.resolveRequest = (context, moduleName, platform) => {
-  if (moduleName === 'fontfaceobserver') {
-    return {
-      filePath: fontfaceobserverPath,
-      type: 'sourceFile',
-    };
-  }
-
-  return context.resolveRequest(context, moduleName, platform);
-};
-
-module.exports = defaultConfig;
+module.exports = config;

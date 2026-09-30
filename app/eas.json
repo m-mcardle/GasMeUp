@@ -9,6 +9,9 @@
       "channel": "development",
       "ios": {
         "resourceClass": "medium"
+      },
+      "env": {
+        "FIREBASE_ENV": "dev"
       }
     },
     "simulator": {
@@ -17,12 +20,18 @@
       "channel": "simulator",
       "ios": {
         "simulator": true
+      },
+      "env": {
+        "FIREBASE_ENV": "dev"
       }
     },
     "production": {
       "channel": "production",
       "ios": {
         "resourceClass": "medium"
+      },
+      "env": {
+        "FIREBASE_ENV": "prod"
       }
     }
   },
