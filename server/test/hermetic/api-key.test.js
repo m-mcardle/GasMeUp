@@ -11,16 +11,19 @@ jest.mock('axios', () => ({
   create: () => require('../helpers/upstream').api,
 }));
 
-const supertest = require('supertest');
+const { startServer, isolateEnv } = require('../helpers/server');
 const app = require('../../src/index');
-const { api: upstream } = require('../helpers/upstream');
+const {
+  api: upstream, resetUpstream,
+} = require('../helpers/upstream');
 const { validateAPIKey } = require('../../src/utils/validation');
 
-const request = supertest(app);
+const request = startServer(app);
+isolateEnv();
 
 let logSpy;
 beforeEach(() => {
-  upstream.mockClear();
+  resetUpstream();
   logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 });
 afterEach(() => logSpy.mockRestore());
@@ -71,9 +74,7 @@ describe('x-api-key header', () => {
 });
 
 describe('validateAPIKey', () => {
-  const saved = process.env.CLIENT_API_KEY;
-  afterEach(() => { process.env.CLIENT_API_KEY = saved; });
-
+  // isolateEnv() restores CLIENT_API_KEY after each test.
   it('rejects everything when CLIENT_API_KEY is not configured', () => {
     delete process.env.CLIENT_API_KEY;
     expect(validateAPIKey(undefined)).toBe(false);

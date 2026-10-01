@@ -84,6 +84,16 @@ function resolve(config) {
 }
 
 // Mimics the axios instance returned by axios.create(): callable with a config.
-const api = jest.fn(async (config) => ({ status: 200, data: resolve(config), config }));
+const defaultImplementation = async (config) => ({ status: 200, data: resolve(config), config });
+const api = jest.fn(defaultImplementation);
 
-module.exports = { api, httpError, fixture };
+// Clears recorded calls AND any queued mock*Once overrides a previous test left
+// unconsumed (otherwise they would answer the next test's upstream call).
+function resetUpstream() {
+  api.mockReset();
+  api.mockImplementation(defaultImplementation);
+}
+
+module.exports = {
+  api, httpError, fixture, resetUpstream,
+};

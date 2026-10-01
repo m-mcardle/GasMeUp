@@ -543,6 +543,8 @@ app.get('/vehicle/:vehicleId', async (req, res) => {
 // rates change once a day, so cache each pair in memory for an hour.
 const EXCHANGE_RATE_TTL_MS = 60 * 60 * 1000;
 const exchangeRateCache = new Map();
+// Lets tests start each case with an empty cache.
+app.locals.clearCaches = () => exchangeRateCache.clear();
 
 async function GetExchangeRate(from, to) {
   const cacheKey = `${from}/${to}`;

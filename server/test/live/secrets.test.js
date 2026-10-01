@@ -5,12 +5,12 @@ const dotenv = require('dotenv');
 
 dotenv.config({ quiet: true });
 
-const supertest = require('supertest');
+const { startServer } = require('../helpers/server');
 const app = require('../../src/index');
 
 jest.setTimeout(30000);
 
-const api = supertest(app);
+const api = startServer(app);
 
 const describeIf = (condition) => (condition ? describe : describe.skip);
 

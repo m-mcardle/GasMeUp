@@ -5,13 +5,13 @@ const dotenv = require('dotenv');
 
 dotenv.config({ quiet: true });
 
-const supertest = require('supertest');
+const { startServer } = require('../helpers/server');
 const app = require('../../src/index');
 
 // Upstreams (notably the gas-price service) can cold-start slowly.
 jest.setTimeout(30000);
 
-const api = supertest(app);
+const api = startServer(app);
 
 const get = (endpoint) => api
   .get(endpoint)

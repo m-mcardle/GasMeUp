@@ -16,12 +16,15 @@ jest.mock('axios', () => ({
   create: () => require('../helpers/upstream').api,
 }));
 
-const supertest = require('supertest');
+const { startServer, isolateEnv } = require('../helpers/server');
 const app = require('../../src/index');
-const { api: upstream, httpError } = require('../helpers/upstream');
+const {
+  api: upstream, httpError, resetUpstream,
+} = require('../helpers/upstream');
 const { SPLITWISE_TOKEN_URL } = require('../../src/queries/splitwise');
 
-const request = supertest(app);
+const request = startServer(app);
+isolateEnv();
 
 const VALID_BODY = {
   code: 'auth-code-123',
@@ -52,7 +55,7 @@ beforeEach(() => {
   process.env.SPLITWISE_CONSUMER_SECRET = PROD_SECRET;
   process.env.DEV_SPLITWISE_CLIENT_ID = DEV_ID;
   process.env.DEV_SPLITWISE_CONSUMER_SECRET = DEV_SECRET;
-  upstream.mockClear();
+  resetUpstream();
   logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
   errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 });

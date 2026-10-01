@@ -14,18 +14,21 @@ jest.mock('axios', () => ({
   create: () => require('../helpers/upstream').api,
 }));
 
-const supertest = require('supertest');
+const { startServer, isolateEnv } = require('../helpers/server');
 const app = require('../../src/index');
-const { api: upstream, fixture } = require('../helpers/upstream');
+const {
+  api: upstream, fixture, resetUpstream,
+} = require('../helpers/upstream');
 
-const request = supertest(app);
+const request = startServer(app);
+isolateEnv();
 const get = (endpoint, query = {}) => request.get(endpoint).query({ api_key: 'test-client-key', ...query });
 const keys = (obj) => Object.keys(obj).sort();
 const lastUpstreamUrl = () => new URL(upstream.mock.calls.at(-1)[0].url);
 
 let logSpy;
 beforeEach(() => {
-  upstream.mockClear();
+  resetUpstream();
   logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 });
 afterEach(() => logSpy.mockRestore());

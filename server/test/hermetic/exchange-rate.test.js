@@ -1,5 +1,5 @@
 // GET /exchange-rate: server-side proxy so the ExchangeRate-API key leaves the app.
-// The route caches per currency pair, so each test uses its own pair.
+// The route caches per currency pair; the cache is cleared before every test.
 
 process.env.NODE_ENV = 'test';
 process.env.CLIENT_API_KEY = 'test-client-key';
@@ -10,17 +10,21 @@ jest.mock('axios', () => ({
   create: () => require('../helpers/upstream').api,
 }));
 
-const supertest = require('supertest');
+const { startServer, isolateEnv } = require('../helpers/server');
 const app = require('../../src/index');
-const { api: upstream, fixture } = require('../helpers/upstream');
+const {
+  api: upstream, fixture, resetUpstream,
+} = require('../helpers/upstream');
 
-const request = supertest(app);
+const request = startServer(app);
+isolateEnv();
 const get = (query = {}) => request.get('/exchange-rate').set('x-api-key', 'test-client-key').query(query);
 
 let logSpy;
 beforeEach(() => {
   process.env.EXCHANGE_RATE_API_KEY = 'test-exchange-key-SECRET';
-  upstream.mockClear();
+  resetUpstream();
+  app.locals.clearCaches();
   logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 });
 afterEach(() => {

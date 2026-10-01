@@ -17,12 +17,15 @@ jest.mock('axios', () => ({
   create: () => require('../helpers/upstream').api,
 }));
 
-const supertest = require('supertest');
+const { startServer, isolateEnv } = require('../helpers/server');
 const app = require('../../src/index');
-const { api: upstream, httpError, fixture } = require('../helpers/upstream');
+const {
+  api: upstream, httpError, fixture, resetUpstream,
+} = require('../helpers/upstream');
 const { ROUTES_FIELD_MASK } = require('../../src/queries/google');
 
-const request = supertest(app);
+const request = startServer(app);
+isolateEnv();
 const get = (endpoint, query = {}) => request.get(endpoint).query({ api_key: 'test-client-key', ...query });
 const keys = (obj) => Object.keys(obj).sort();
 const calls = () => upstream.mock.calls.map(([config]) => config);
@@ -31,7 +34,7 @@ const callTo = (substr) => calls().find((c) => c.url.includes(substr));
 let logSpy;
 beforeEach(() => {
   process.env.GOOGLE_MAPS_API = 'new';
-  upstream.mockClear();
+  resetUpstream();
   logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 });
 afterEach(() => logSpy.mockRestore());
