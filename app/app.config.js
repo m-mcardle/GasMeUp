@@ -43,7 +43,6 @@ module.exports = {
     buildNumber: '1.1.2',
     appleTeamId: '2Q4CXG64VY',
     config: {
-      googleMapsApiKey: GOOGLE_IOS_SDK_KEY,
       usesNonExemptEncryption: false,
     },
     googleServicesFile: `./GoogleService-Info-${firebaseFileSuffix}.plist`,
@@ -122,7 +121,10 @@ module.exports = {
     // static frameworks (`useFrameworks: 'static'`) that react-native-firebase requires.
     ['@react-native-firebase/app', { ios: { disableSPM: true } }],
     '@react-native-firebase/auth',
-    './plugins/withFmtCxx17',
+    // Google Maps provider on iOS (react-native-maps >= 1.22 ships its own plugin;
+    // it replaces the legacy `ios.config.googleMapsApiKey` field).
+    ['react-native-maps', { iosGoogleMapsApiKey: GOOGLE_IOS_SDK_KEY }],
+    './plugins/withPodBuildFixes',
     [
       'expo-build-properties',
       {
