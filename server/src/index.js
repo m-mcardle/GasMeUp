@@ -33,7 +33,7 @@ const {
 } = require('./queries/fueleconomy');
 
 const { Log, LogError } = require('./utils/console');
-const { validateAPIKey } = require('./utils/validation');
+const { validateRequest, API_KEY_HEADER } = require('./utils/validation');
 
 dotenv.config({ quiet: true });
 
@@ -41,6 +41,22 @@ const PORT = process.env.PORT || 3001;
 
 const app = express();
 const api = axios.create();
+
+// CORS preflight (web builds): allow the API key header and JSON bodies.
+// Native iOS/Android clients never send preflights.
+app.use((req, res, next) => {
+  if (req.method !== 'OPTIONS') {
+    next();
+    return;
+  }
+  res.set({
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': `${API_KEY_HEADER}, content-type`,
+    'Access-Control-Max-Age': '600',
+  });
+  res.sendStatus(204);
+});
 
 /*
 Error helpers
@@ -282,7 +298,7 @@ Express API Endpoints
 
 // Handle autocomplete suggestions for locations
 app.get('/suggestions', async (req, res) => {
-  if (!validateAPIKey(req.query?.api_key)) {
+  if (!validateRequest(req)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
@@ -310,7 +326,7 @@ app.get('/suggestions', async (req, res) => {
 
 // Handle request for place details
 app.get('/place', async (req, res) => {
-  if (!validateAPIKey(req.query?.api_key)) {
+  if (!validateRequest(req)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
@@ -334,7 +350,7 @@ app.get('/place', async (req, res) => {
 });
 
 app.get('/geocode', async (req, res) => {
-  if (!validateAPIKey(req.query?.api_key)) {
+  if (!validateRequest(req)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
@@ -359,7 +375,7 @@ app.get('/geocode', async (req, res) => {
 
 // Handle request for distances
 app.get('/distance', async (req, res) => {
-  if (!validateAPIKey(req.query?.api_key)) {
+  if (!validateRequest(req)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
@@ -387,7 +403,7 @@ app.get('/distance', async (req, res) => {
 // Handle GET requests to /gas-price route
 // provides list of gas prices of all provinces in Canada or all cities in a province
 app.get('/gas-prices', async (req, res) => {
-  if (!validateAPIKey(req.query?.api_key)) {
+  if (!validateRequest(req)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
@@ -406,7 +422,7 @@ app.get('/gas-prices', async (req, res) => {
 });
 
 app.get('/gas', async (req, res) => {
-  if (!validateAPIKey(req.query?.api_key)) {
+  if (!validateRequest(req)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
@@ -426,7 +442,7 @@ app.get('/gas', async (req, res) => {
 });
 
 app.get('/years', async (req, res) => {
-  if (!validateAPIKey(req.query?.api_key)) {
+  if (!validateRequest(req)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
@@ -443,7 +459,7 @@ app.get('/years', async (req, res) => {
 });
 
 app.get('/makes', async (req, res) => {
-  if (!validateAPIKey(req.query?.api_key)) {
+  if (!validateRequest(req)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
@@ -462,7 +478,7 @@ app.get('/makes', async (req, res) => {
 });
 
 app.get('/models', async (req, res) => {
-  if (!validateAPIKey(req.query?.api_key)) {
+  if (!validateRequest(req)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
@@ -482,7 +498,7 @@ app.get('/models', async (req, res) => {
 });
 
 app.get('/model-options', async (req, res) => {
-  if (!validateAPIKey(req.query?.api_key)) {
+  if (!validateRequest(req)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
@@ -503,7 +519,7 @@ app.get('/model-options', async (req, res) => {
 });
 
 app.get('/vehicle/:vehicleId', async (req, res) => {
-  if (!validateAPIKey(req.query?.api_key)) {
+  if (!validateRequest(req)) {
     res.status(401).send({ error: 'Invalid API Key' });
     return;
   }
