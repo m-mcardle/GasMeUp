@@ -94,7 +94,8 @@ export default function LocationInputOld({
           style={{ ...globalStyles.dropdown, maxHeight: 125 }}
           keyboardShouldPersistTaps="always"
         >
-          {suggestions.map((suggestion) => (
+          {/* Google can return several predictions with identical text; show each once. */}
+          {Array.from(new Set(suggestions)).map((suggestion) => (
             <TouchableOpacity
               key={suggestion}
               onPress={() => handleSuggestionPress(suggestion)}

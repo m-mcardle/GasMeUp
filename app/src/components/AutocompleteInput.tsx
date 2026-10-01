@@ -94,7 +94,9 @@ export default function AutocompleteInput(props: Props) {
     colors.tertiary,
   ];
 
-  const overriddenSuggestions = suggestionsLoading ? ['Loading...'] : suggestions;
+  // Google can return several predictions with identical text; showing them twice adds nothing
+  // and would give two rows the same React key.
+  const overriddenSuggestions = suggestionsLoading ? ['Loading...'] : Array.from(new Set(suggestions));
 
   const internalSuggestions = ((
     overriddenSuggestions.length === 1
@@ -139,6 +141,7 @@ export default function AutocompleteInput(props: Props) {
             {overriddenSuggestions.map((suggestion) => (suggestionsLoading
               ? (
                 <AnimatedGradient
+                  key="loading"
                   animate={suggestionsLoading}
                   colors={loadingGradientColors}
                   speed={1000}
