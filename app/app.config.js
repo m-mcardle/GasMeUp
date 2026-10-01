@@ -110,13 +110,19 @@ module.exports = {
     // Other
     exchangeRateAPIKey: process.env.EXCHANGE_RATE_API_KEY,
   },
-  runtimeVersion: '1.69.0',
+  // Runtime (EAS Update compatibility) follows the app `version`. Bump `version` whenever
+  // native code changes so OTA updates never target an incompatible binary.
+  // (Previously a fixed '1.69.0'; the SDK 53+ binaries are not compatible with it.)
+  runtimeVersion: { policy: 'appVersion' },
   plugins: [
     'expo-apple-authentication',
     'expo-font',
     'expo-notifications',
-    '@react-native-firebase/app',
+    // Firebase via CocoaPods: RNFB's default SPM resolution is incompatible with the
+    // static frameworks (`useFrameworks: 'static'`) that react-native-firebase requires.
+    ['@react-native-firebase/app', { ios: { disableSPM: true } }],
     '@react-native-firebase/auth',
+    './plugins/withFmtCxx17',
     [
       'expo-build-properties',
       {

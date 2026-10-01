@@ -295,7 +295,7 @@ export default function CarScreen({ navigation }: any) {
       Alert('Gas Mileage Updated', `Your gas milage has been updated to ${convertFuelEfficiencyToString(value, 'CA', globalState.Locale)}`, [
         {
           text: 'OK',
-          onPress: () => navigation.navigate('Calculate'),
+          onPress: () => navigation.navigate('Home', { screen: 'Calculate', pop: true }),
         },
       ]);
     }

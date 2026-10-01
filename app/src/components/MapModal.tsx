@@ -62,8 +62,8 @@ export default function MapModal({
         customStart={customStart}
         customEnd={customEnd}
         waypoints={waypoints}
-        onPress={handleMapPress}
-        onPoiClick={handlePoiPress}
+        onPress={(event) => event && handleMapPress?.(event)}
+        onPoiClick={(event) => event && handlePoiPress?.(event)}
         style={style}
       />
     </View>

@@ -12,7 +12,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { db, auth } from '../../../../firebase';
 
 // Helpers
-import { DEV, ENV } from '../../../helpers/env';
+import { ENV } from '../../../helpers/env';
 import { logLogin } from '../../../helpers/analyticsHelper';
 
 // Components
@@ -34,9 +34,10 @@ export default function SplitwiseLogin() {
   const userDoc = currentUser?.uid ? doc(db, 'Users', currentUser.uid) : undefined;
   const secureUserDoc = currentUser?.uid ? doc(db, 'SecureUsers', currentUser.uid) : undefined;
 
-  const useProxy = DEV;
+  // The auth.expo.io proxy (`useProxy`) was removed from expo-auth-session.
+  // Always redirect back through the app scheme: gas-me-up://redirect
   const redirectUri = AuthSession.makeRedirectUri({
-    useProxy,
+    scheme: 'gas-me-up',
     path: 'redirect',
   });
 
@@ -44,7 +45,6 @@ export default function SplitwiseLogin() {
     authorizationEndpoint: 'https://secure.splitwise.com/oauth/authorize',
     tokenEndpoint: 'https://secure.splitwise.com/oauth/token',
     revocationEndpoint: 'https://secure.splitwise.com/oauth/revoke',
-    useProxy,
   };
 
   // Create and load an auth request
@@ -95,7 +95,7 @@ export default function SplitwiseLogin() {
       <Text style={{ ...globalStyles.h3, color: 'white' }}>Sign in to your Splitwise account to view your friends here</Text>
       <Button
         disabled={!request}
-        onPress={() => promptAsync({ useProxy })}
+        onPress={() => promptAsync()}
         style={{
           backgroundColor: colors.splitwiseGreen,
           flexDirection: 'row',

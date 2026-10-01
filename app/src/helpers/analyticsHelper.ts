@@ -1,15 +1,21 @@
-import { getAnalytics } from '@react-native-firebase/analytics';
+import {
+  getAnalytics,
+  logEvent as firebaseLogEvent,
+  logLogin as firebaseLogLogin,
+  logScreenView as firebaseLogScreenView,
+  logSignUp as firebaseLogSignUp,
+} from '@react-native-firebase/analytics';
 
 const analytics = getAnalytics();
 
 export const logEvent = (name: string, params?: any) => {
   console.log('logEvent', name, params ?? '');
-  analytics.logEvent(name, params);
+  firebaseLogEvent(analytics, name, params);
 };
 
 export const logScreenView = (screenName: string) => {
   console.log('logScreenView', screenName);
-  analytics.logScreenView({
+  firebaseLogScreenView(analytics, {
     screen_name: screenName,
     screen_class: screenName,
   });
@@ -17,14 +23,14 @@ export const logScreenView = (screenName: string) => {
 
 export const logSignUp = (method: string) => {
   console.log('logSignUp', method);
-  analytics.logSignUp({
+  firebaseLogSignUp(analytics, {
     method,
   });
 };
 
 export const logLogin = (method: string) => {
   console.log('logLogin', method);
-  analytics.logLogin({
+  firebaseLogLogin(analytics, {
     method,
   });
 };

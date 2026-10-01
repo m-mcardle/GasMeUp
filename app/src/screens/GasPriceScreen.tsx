@@ -185,7 +185,7 @@ export default function GasPriceScreen({ navigation }: any) {
     Alert('Gas Price Updated', `Your gas price has been updated to ${convertGasPriceToString(price, 'CA', globalState.Locale)}`, [
       {
         text: 'OK',
-        onPress: () => navigation.navigate('Calculate'),
+        onPress: () => navigation.navigate('Home', { screen: 'Calculate', pop: true }),
       },
     ]);
   };

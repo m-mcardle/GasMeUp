@@ -25,7 +25,7 @@ interface Props {
   icon?: ReactComponentElement<typeof MaterialIcons>,
   error?: boolean,
   blurOnSubmit?: boolean,
-  myRef?: React.RefObject<TextInput>,
+  myRef?: React.RefObject<TextInput | null>,
   editable?: boolean,
   onClear?: () => void,
   onBlur?: () => void,

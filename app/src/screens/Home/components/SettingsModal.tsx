@@ -1,11 +1,11 @@
 import {
   View,
   Modal,
-  ViewStyle,
+  TextStyle,
 } from 'react-native';
 import CheckBox from 'expo-checkbox';
 
-import NumericInput from 'react-native-numeric-input';
+import NumericInput from '../../../components/NumericInput';
 
 import Text from '../../../components/Text';
 import Button from '../../../components/Button';
@@ -61,7 +61,7 @@ export default function SettingModal(props: Props) {
             totalHeight={25}
             totalWidth={150}
             containerStyle={{ backgroundColor: 'white' }}
-            inputStyle={globalStyles.numericInput as ViewStyle}
+            inputStyle={globalStyles.numericInput as TextStyle}
             valueType="real"
             minValue={0.01}
             maxValue={maxValue}

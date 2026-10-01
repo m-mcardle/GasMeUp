@@ -31,7 +31,7 @@ interface Props {
   blurOnSubmit?: boolean,
   showRedundantSuggestion?: boolean,
   editable?: boolean,
-  myRef?: React.RefObject<TextInput>,
+  myRef?: React.RefObject<TextInput | null>,
   suggestionsLoading?: boolean,
   onClear?: () => void,
   onChangeText: (arg: string) => void,

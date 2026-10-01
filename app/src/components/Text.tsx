@@ -1,9 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 
 import React, { ReactNode } from 'react';
-import { Text, TextStyle } from 'react-native';
-
-import PropTypes from 'prop-types';
+import { Text } from 'react-native';
 
 import { globalStyles } from '../styles/styles';
 
@@ -33,10 +31,3 @@ export default function AppText(props: Props) {
     </Text>
   );
 }
-
-AppText.propTypes = {
-  onPress: PropTypes.func,
-  children: PropTypes.node,
-  // @ts-ignore
-  style: PropTypes.shape(TextStyle),
-};

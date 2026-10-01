@@ -14,7 +14,7 @@ interface Props {
   z: number;
   returnKeyType: TextInput['props']['returnKeyType'];
   suggestions: string[];
-  myRef?: React.RefObject<TextInput>;
+  myRef?: React.RefObject<TextInput | null>;
   error?: boolean;
   value: string;
   placeholder: string;

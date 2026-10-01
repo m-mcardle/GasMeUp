@@ -1,8 +1,6 @@
 import React, { ReactNode } from 'react';
 import { TouchableOpacity, Keyboard } from 'react-native';
 
-import PropTypes from 'prop-types';
-
 import { globalStyles } from '../styles/styles';
 
 interface Props {
@@ -36,12 +34,3 @@ export default function Button(props: Props) {
     </TouchableOpacity>
   );
 }
-
-Button.propTypes = {
-  onPress: PropTypes.func.isRequired,
-  children: PropTypes.node,
-  style: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.array,
-  ]),
-};

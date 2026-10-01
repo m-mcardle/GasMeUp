@@ -1,8 +1,6 @@
 // React
 import React, { useState, useRef } from 'react';
 import { View, TextInput } from 'react-native';
-import PropTypes from 'prop-types';
-
 import md5 from 'md5';
 
 // Firebase
@@ -161,9 +159,3 @@ export default function SignUpScreen() {
     </Page>
   );
 }
-
-SignUpScreen.propTypes = {
-  navigation: PropTypes.shape({
-    goBack: PropTypes.func.isRequired,
-  }).isRequired,
-};

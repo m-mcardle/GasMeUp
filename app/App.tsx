@@ -50,6 +50,8 @@ SplashScreen.preventAutoHideAsync();
 
 const Tab = createBottomTabNavigator();
 
+type NotificationSubscription = ReturnType<typeof Notifications.addNotificationReceivedListener>;
+
 // This is just to ensure that firebase is initialized on first rendering
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { auth } = firebase;
@@ -109,8 +111,8 @@ export default function App() {
   }, []);
 
   const [, setNotification] = useState<Notifications.Notification | undefined>();
-  const notificationListener = useRef<any>();
-  const responseListener = useRef<any>();
+  const notificationListener = useRef<NotificationSubscription | null>(null);
+  const responseListener = useRef<NotificationSubscription | null>(null);
 
   const initializeNotifications = () => {
     registerForPushNotificationsAsync().then((token) => token && updateGlobalState('expoToken', token));
@@ -127,8 +129,8 @@ export default function App() {
   };
 
   const cleanupNotificationSubscriptions = () => {
-    Notifications.removeNotificationSubscription(notificationListener.current);
-    Notifications.removeNotificationSubscription(responseListener.current);
+    notificationListener.current?.remove();
+    responseListener.current?.remove();
   };
 
   const initializeExchangeRate = () => {

@@ -5,8 +5,6 @@ import {
   View,
 } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-import PropTypes from 'prop-types';
-
 // Screen
 import SignUpScreen from './SignUpScreen';
 
@@ -44,13 +42,6 @@ function LoginPage({ navigation }: Props) {
     </Page>
   );
 }
-
-LoginPage.propTypes = {
-  navigation: PropTypes.shape({
-    navigate: PropTypes.func.isRequired,
-    goBack: PropTypes.func.isRequired,
-  }).isRequired,
-};
 
 const RootStack = createStackNavigator();
 
