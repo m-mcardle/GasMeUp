@@ -31,6 +31,7 @@ const {
   ModelOptionRequest,
   VehicleRequest
 } = require('./queries/fueleconomy');
+const { splitwiseClients, SplitwiseTokenRequest } = require('./queries/splitwise');
 
 const { Log, LogError } = require('./utils/console');
 const { validateRequest, API_KEY_HEADER } = require('./utils/validation');
@@ -537,6 +538,67 @@ app.get('/vehicle/:vehicleId', async (req, res) => {
   }
 });
 
+// Splitwise OAuth: exchange an authorization code for an access token. The
+// consumer secret stays on the server; the app only ever sees the user's token.
+// Body (JSON): { code, redirect_uri, client_id, code_verifier? }
+// 200: { access_token, token_type }  (+ refresh_token / expires_in if Splitwise sends them)
+app.post('/splitwise/token', express.json({ limit: '4kb' }), async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  if (!validateRequest(req)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
+  const {
+    code, redirect_uri: redirectUri, client_id: clientId, code_verifier: codeVerifier,
+  } = req.body ?? {};
+  const isString = (v) => typeof v === 'string' && v.length > 0 && v.length <= 2048;
+  if (!isString(code) || !isString(redirectUri) || !isString(clientId)
+    || (codeVerifier !== undefined && !isString(codeVerifier))) {
+    res.status(400).send({ error: 'Missing or invalid code, redirect_uri or client_id' });
+    return;
+  }
+
+  const clients = splitwiseClients();
+  if (!Object.keys(clients).length) {
+    LogError('[splitwise/token] Splitwise credentials are not configured');
+    res.status(503).send({ error: 'Splitwise is not configured' });
+    return;
+  }
+  const clientSecret = Object.hasOwn(clients, clientId) ? clients[clientId] : undefined;
+  if (!clientSecret) {
+    res.status(400).send({ error: 'Unknown client_id' });
+    return;
+  }
+
+  try {
+    const { data } = await api(SplitwiseTokenRequest({
+      clientId, clientSecret, code, redirectUri, codeVerifier,
+    }));
+    if (typeof data?.access_token !== 'string' || !data.access_token) {
+      throw Error('Splitwise token response had no access_token');
+    }
+    const body = { access_token: data.access_token, token_type: data.token_type ?? 'bearer' };
+    if (typeof data.refresh_token === 'string') body.refresh_token = data.refresh_token;
+    if (Number.isFinite(data.expires_in)) body.expires_in = data.expires_in;
+    Log('[splitwise/token] Exchanged an authorization code');
+    res.json(body);
+  } catch (err) {
+    const status = err?.response?.status;
+    // OAuth errors (invalid_grant, invalid_client, ...) are client-correctable:
+    // surface only the standard error code, never the upstream body.
+    const oauthError = err?.response?.data?.error;
+    if (status >= 400 && status < 500) {
+      LogError(`[splitwise/token] Splitwise rejected the exchange (${status}${typeof oauthError === 'string' ? `, ${oauthError}` : ''})`);
+      const errorCode = typeof oauthError === 'string' && /^[a-z_]{1,64}$/.test(oauthError) ? oauthError : 'invalid_request';
+      res.status(400).send({ error: errorCode });
+      return;
+    }
+    LogError('[splitwise/token] Token exchange failed:', err);
+    res.status(502).send({ error: 'Splitwise token exchange failed' });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('GasMeUp API');
 });
@@ -544,6 +606,11 @@ app.get('/', (req, res) => {
 // Express 5 forwards rejected async handlers here; respond with JSON, not HTML.
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
+  // Body-parser errors (malformed JSON, oversized body) are the client's fault.
+  if (err?.expose && Number.isInteger(err.status) && err.status >= 400 && err.status < 500) {
+    res.status(err.status).send({ error: 'Invalid request body' });
+    return;
+  }
   LogError(err);
   res.status(errorStatus(err)).send({ error: 'An error occurred' });
 });
