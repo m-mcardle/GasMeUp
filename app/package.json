@@ -76,28 +76,18 @@
     "@types/md5": "^2.3.2",
     "@types/react": "~19.2.10",
     "@types/throttle-debounce": "^5.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.23.0",
-    "@typescript-eslint/parser": "^5.23.0",
     "dotenv": "^16.6.1",
-    "eslint": "^8.15.0",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-import-resolver-typescript": "^2.7.1",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jsx-a11y": "^6.5.1",
-    "eslint-plugin-react": "^7.29.4",
-    "eslint-plugin-react-hooks": "^4.5.0",
-    "eslint-plugin-react-native": "^4.0.0",
+    "eslint": "^9.39.5",
+    "eslint-config-airbnb-extended": "^3.2.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-native": "^5.0.0",
+    "globals": "^17.12.0",
     "standard-version": "^9.5.0",
     "typescript": "~6.0.3"
   },
-  "overrides": {
-    "@xmldom/xmldom": "0.8.13",
-    "postcss": "8.5.10",
-    "expo-dev-launcher": {
-      "ajv": "8.20.0"
-    }
-  },
   "private": true,
-  "proxy": "http://localhost:3001"
+  "proxy": "http://localhost:3001",
+  "overrides": {
+    "@grpc/grpc-js": "^1.14.5"
+  }
 }

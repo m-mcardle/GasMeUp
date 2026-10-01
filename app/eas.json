@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": ">= 3.1.1"
+    "version": ">= 18.11.0",
+    "appVersionSource": "local"
   },
   "build": {
     "development": {
@@ -8,7 +9,8 @@
       "distribution": "internal",
       "channel": "development",
       "ios": {
-        "resourceClass": "medium"
+        "resourceClass": "medium",
+        "image": "macos-tahoe-26.5-xcode-26.6"
       },
       "env": {
         "FIREBASE_ENV": "dev"
@@ -19,7 +21,8 @@
       "distribution": "internal",
       "channel": "simulator",
       "ios": {
-        "simulator": true
+        "simulator": true,
+        "image": "macos-tahoe-26.5-xcode-26.6"
       },
       "env": {
         "FIREBASE_ENV": "dev"
@@ -28,7 +31,8 @@
     "production": {
       "channel": "production",
       "ios": {
-        "resourceClass": "medium"
+        "resourceClass": "medium",
+        "image": "macos-tahoe-26.5-xcode-26.6"
       },
       "env": {
         "FIREBASE_ENV": "prod"

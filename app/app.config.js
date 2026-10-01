@@ -104,10 +104,12 @@ module.exports = {
     // Other
     exchangeRateAPIKey: process.env.EXCHANGE_RATE_API_KEY,
   },
-  // Runtime (EAS Update compatibility) follows the app `version`. Bump `version` whenever
-  // native code changes so OTA updates never target an incompatible binary.
-  // (Previously a fixed '1.69.0'; the SDK 53+ binaries are not compatible with it.)
-  runtimeVersion: { policy: 'appVersion' },
+  // Runtime (EAS Update compatibility). The `fingerprint` policy hashes the native
+  // project (SDK, native deps, config plugins, native config), so the runtime changes
+  // automatically whenever native code changes and OTA updates can never reach an
+  // incompatible binary, without relying on a manual `version` bump.
+  // (Previously a fixed '1.69.0'; SDK 57 binaries must not receive updates built for it.)
+  runtimeVersion: { policy: 'fingerprint' },
   plugins: [
     'expo-apple-authentication',
     'expo-asset',
@@ -132,7 +134,6 @@ module.exports = {
     // Google Maps provider on iOS (react-native-maps >= 1.22 ships its own plugin;
     // it replaces the legacy `ios.config.googleMapsApiKey` field).
     ['react-native-maps', { iosGoogleMapsApiKey: GOOGLE_IOS_SDK_KEY }],
-    './plugins/withPodBuildFixes',
     [
       'expo-build-properties',
       {
