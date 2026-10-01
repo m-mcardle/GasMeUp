@@ -1,0 +1,144 @@
+{
+  "routes": [
+    {
+      "legs": [
+        {
+          "distanceMeters": 541247,
+          "duration": "19582s",
+          "startLocation": {
+            "latLng": {
+              "latitude": 43.6548139,
+              "longitude": -79.3884466
+            }
+          },
+          "endLocation": {
+            "latLng": {
+              "latitude": 45.5018695,
+              "longitude": -73.56742249999999
+            }
+          },
+          "steps": [
+            {
+              "distanceMeters": 2886,
+              "staticDuration": "743s",
+              "polyline": {
+                "encodedPolyline": "qimiGxppcNAk@?Q?WAE?C?EAE?EAICUS"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": 43.6548139,
+                  "longitude": -79.3884466
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": 43.6618515,
+                  "longitude": -79.3545244
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head east on Dundas St W toward University Ave\nParts of this road may be closed at certain times or days"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "2.9 km"
+                },
+                "staticDuration": {
+                  "text": "12 mins"
+                }
+              }
+            },
+            {
+              "distanceMeters": 222,
+              "staticDuration": "22s",
+              "polyline": {
+                "encodedPolyline": "quniGv|icN]NC@MDCB_Br@SJ]NC@s@ZW"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": 43.6618515,
+                  "longitude": -79.3545244
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": 43.66368809999999,
+                  "longitude": -79.35551310000001
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "RAMP_LEFT",
+                "instructions": "Turn left onto the Don Valley Pkwy. North ramp"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.2 km"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              }
+            },
+            {
+              "distanceMeters": 12915,
+              "staticDuration": "661s",
+              "polyline": {
+                "encodedPolyline": "aaoiG|bjcNQDk@JIBc@HMDc@HgATQBa@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": 43.66368809999999,
+                  "longitude": -79.35551310000001
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": 43.7630039,
+                  "longitude": -79.3367647
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "MERGE",
+                "instructions": "Merge onto Don Valley Pkwy N"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "12.9 km"
+                },
+                "staticDuration": {
+                  "text": "11 mins"
+                }
+              }
+            }
+          ],
+          "localizedValues": {
+            "distance": {
+              "text": "541 km"
+            },
+            "duration": {
+              "text": "5 hours 26 mins"
+            },
+            "staticDuration": {
+              "text": "5 hours 26 mins"
+            }
+          }
+        }
+      ],
+      "polyline": {
+        "encodedPolyline": "qimiGxppcN{TalB{R}vAoLmHim@dQen@bWgw@yGij@c_@}Ri^hAid@qTss@ig@o^"
+      },
+      "description": "ON-401 E",
+      "viewport": {
+        "low": {
+          "latitude": 43.6548139,
+          "longitude": -79.3884466
+        },
+        "high": {
+          "latitude": 45.5026721,
+          "longitude": -73.56546089999999
+        }
+      }
+    }
+  ]
+}

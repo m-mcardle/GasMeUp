@@ -10,6 +10,15 @@ function httpError(config, status, data) {
   return new AxiosError(`Request failed with status code ${status}`, AxiosError.ERR_BAD_REQUEST, config, {}, response);
 }
 
+// Forward-geocode fixtures by `address` param; anything else is ZERO_RESULTS.
+const FORWARD_GEOCODES = {
+  Toronto: 'toronto',
+  Montreal: 'montreal',
+  'London, UK': 'london_uk',
+  Ottawa: 'ottawa',
+};
+const LONDON_UK_PLACE_ID = 'ChIJdd4hrwug2EcRmSrV3Vo6llI';
+
 function resolve(config) {
   const url = new URL(config.url);
   const q = url.searchParams;
@@ -18,12 +27,29 @@ function resolve(config) {
   if (host === 'maps.googleapis.com') {
     if (pathname.endsWith('/place/autocomplete/json')) return fixture('google.autocomplete');
     if (pathname.endsWith('/place/details/json')) return fixture('google.place');
-    if (pathname.endsWith('/geocode/json')) return fixture('google.geocode');
+    if (pathname.endsWith('/geocode/json')) {
+      const address = config.params?.address;
+      if (address === undefined) return fixture('google.geocode');
+      const name = FORWARD_GEOCODES[address] ?? 'zero_results';
+      return fixture(`google.geocode.forward.${name}`);
+    }
     if (pathname.endsWith('/directions/json')) {
       return q.get('destination') === 'London, UK'
         ? fixture('google.directions.zero_results')
         : fixture('google.directions');
     }
+  }
+
+  // GOOGLE_MAPS_API=new: Places API (New) and Routes API.
+  if (host === 'places.googleapis.com') {
+    if (pathname === '/v1/places:autocomplete') return fixture('google.places_new.autocomplete');
+    if (pathname.startsWith('/v1/places/')) return fixture('google.places_new.place');
+  }
+
+  if (host === 'routes.googleapis.com' && pathname === '/directions/v2:computeRoutes') {
+    return config.data?.destination?.placeId === LONDON_UK_PLACE_ID
+      ? fixture('google.routes.zero_results')
+      : fixture('google.routes');
   }
 
   if (host === 'canadian-gas-prices.p.rapidapi.com') {

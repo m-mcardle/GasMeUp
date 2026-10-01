@@ -6,6 +6,7 @@ module.exports = {
       displayName: 'hermetic',
       testEnvironment: 'node',
       testMatch: ['<rootDir>/test/hermetic/**/*.test.js'],
+      setupFiles: ['<rootDir>/test/helpers/hermetic-env.js'],
     },
     {
       displayName: 'live',

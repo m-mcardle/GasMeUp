@@ -1,0 +1,39 @@
+{
+  "suggestions": [
+    {
+      "placePrediction": {
+        "text": {
+          "text": "Toronto, ON, Canada"
+        }
+      }
+    },
+    {
+      "placePrediction": {
+        "text": {
+          "text": "Toronto Pearson International Airport (YYZ), Silver Dart Drive, Mississauga, ON, Canada"
+        }
+      }
+    },
+    {
+      "placePrediction": {
+        "text": {
+          "text": "Toronto Premium Outlets, Steeles Avenue, Halton Hills, ON, Canada"
+        }
+      }
+    },
+    {
+      "placePrediction": {
+        "text": {
+          "text": "Toronto Zoo, Meadowvale Road, Scarborough, ON, Canada"
+        }
+      }
+    },
+    {
+      "placePrediction": {
+        "text": {
+          "text": "Toronto Islands, St Lawrence-East Bayfront-The Islands, ON, Canada"
+        }
+      }
+    }
+  ]
+}

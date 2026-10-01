@@ -1,0 +1,40 @@
+{
+  "results": [
+    {
+      "formatted_address": "Ottawa, ON, Canada",
+      "geometry": {
+        "bounds": {
+          "northeast": {
+            "lat": 45.5337989,
+            "lng": -75.2465979
+          },
+          "southwest": {
+            "lat": 44.962733,
+            "lng": -76.35391589999999
+          }
+        },
+        "location": {
+          "lat": 45.4200572,
+          "lng": -75.7003397
+        },
+        "location_type": "APPROXIMATE",
+        "viewport": {
+          "northeast": {
+            "lat": 45.5337989,
+            "lng": -75.2465979
+          },
+          "southwest": {
+            "lat": 44.962733,
+            "lng": -76.35391589999999
+          }
+        }
+      },
+      "place_id": "ChIJrxNRX7IFzkwR7RXdMeFRaoo",
+      "types": [
+        "locality",
+        "political"
+      ]
+    }
+  ],
+  "status": "OK"
+}

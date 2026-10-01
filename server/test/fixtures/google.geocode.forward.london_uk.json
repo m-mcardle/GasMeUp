@@ -1,0 +1,40 @@
+{
+  "results": [
+    {
+      "formatted_address": "London, UK",
+      "geometry": {
+        "bounds": {
+          "northeast": {
+            "lat": 51.6723432,
+            "lng": 0.148271
+          },
+          "southwest": {
+            "lat": 51.38494009999999,
+            "lng": -0.3514683
+          }
+        },
+        "location": {
+          "lat": 51.5072178,
+          "lng": -0.1275862
+        },
+        "location_type": "APPROXIMATE",
+        "viewport": {
+          "northeast": {
+            "lat": 51.6723432,
+            "lng": 0.148271
+          },
+          "southwest": {
+            "lat": 51.38494009999999,
+            "lng": -0.3514683
+          }
+        }
+      },
+      "place_id": "ChIJdd4hrwug2EcRmSrV3Vo6llI",
+      "types": [
+        "locality",
+        "political"
+      ]
+    }
+  ],
+  "status": "OK"
+}

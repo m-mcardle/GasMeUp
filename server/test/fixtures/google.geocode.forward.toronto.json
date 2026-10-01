@@ -1,0 +1,40 @@
+{
+  "results": [
+    {
+      "formatted_address": "Toronto, ON, Canada",
+      "geometry": {
+        "bounds": {
+          "northeast": {
+            "lat": 43.8554579,
+            "lng": -79.1161001
+          },
+          "southwest": {
+            "lat": 43.5842129,
+            "lng": -79.6392109
+          }
+        },
+        "location": {
+          "lat": 43.6548253,
+          "lng": -79.388447
+        },
+        "location_type": "APPROXIMATE",
+        "viewport": {
+          "northeast": {
+            "lat": 43.8554579,
+            "lng": -79.1161001
+          },
+          "southwest": {
+            "lat": 43.5842129,
+            "lng": -79.6392109
+          }
+        }
+      },
+      "place_id": "ChIJpTvG15DL1IkRd8S0KlBVNTI",
+      "types": [
+        "locality",
+        "political"
+      ]
+    }
+  ],
+  "status": "OK"
+}

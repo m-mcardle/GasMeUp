@@ -1,0 +1,40 @@
+{
+  "results": [
+    {
+      "formatted_address": "Montreal, QC, Canada",
+      "geometry": {
+        "bounds": {
+          "northeast": {
+            "lat": 45.7037777,
+            "lng": -73.47620359999999
+          },
+          "southwest": {
+            "lat": 45.4145877,
+            "lng": -73.94754309999999
+          }
+        },
+        "location": {
+          "lat": 45.5018869,
+          "lng": -73.56739189999999
+        },
+        "location_type": "APPROXIMATE",
+        "viewport": {
+          "northeast": {
+            "lat": 45.7037777,
+            "lng": -73.47620359999999
+          },
+          "southwest": {
+            "lat": 45.4145877,
+            "lng": -73.94754309999999
+          }
+        }
+      },
+      "place_id": "ChIJDbdkHFQayUwR7-8fITgxTmU",
+      "types": [
+        "locality",
+        "political"
+      ]
+    }
+  ],
+  "status": "OK"
+}
