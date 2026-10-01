@@ -76,6 +76,10 @@ function resolve(config) {
     if (/\/vehicle\/\d+$/.test(pathname)) return fixture('fueleconomy.vehicle');
   }
 
+  if (host === 'v6.exchangerate-api.com' && pathname.startsWith('/v6/pair/')) {
+    return fixture('exchangerate.pair');
+  }
+
   throw new Error(`Hermetic test made an unexpected outbound request: ${config.method} ${config.url}`);
 }
 

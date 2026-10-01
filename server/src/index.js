@@ -32,6 +32,7 @@ const {
   VehicleRequest
 } = require('./queries/fueleconomy');
 const { splitwiseClients, SplitwiseTokenRequest } = require('./queries/splitwise');
+const { ExchangeRatePairRequest } = require('./queries/exchangerate');
 
 const { Log, LogError } = require('./utils/console');
 const { validateRequest, API_KEY_HEADER } = require('./utils/validation');
@@ -535,6 +536,55 @@ app.get('/vehicle/:vehicleId', async (req, res) => {
   } catch (exception) {
     LogError(exception);
     res.status(500).send({ error: errorMessage(exception) });
+  }
+});
+
+// Currency exchange rate (the app converts CAD gas prices to USD). Upstream
+// rates change once a day, so cache each pair in memory for an hour.
+const EXCHANGE_RATE_TTL_MS = 60 * 60 * 1000;
+const exchangeRateCache = new Map();
+
+async function GetExchangeRate(from, to) {
+  const cacheKey = `${from}/${to}`;
+  const cached = exchangeRateCache.get(cacheKey);
+  if (cached && cached.expires > Date.now()) return cached.rate;
+
+  const { data } = await api(ExchangeRatePairRequest(from, to));
+  if (data?.result !== 'success' || !Number.isFinite(data.conversion_rate)) {
+    throw Error(`Exchange rate lookup failed (${data?.['error-type'] ?? 'unknown'})`, { cause: 502 });
+  }
+  exchangeRateCache.set(cacheKey, { rate: data.conversion_rate, expires: Date.now() + EXCHANGE_RATE_TTL_MS });
+  return data.conversion_rate;
+}
+
+// 200: { rate } where 1 <from> = rate <to>
+app.get('/exchange-rate', async (req, res) => {
+  if (!validateRequest(req)) {
+    res.status(401).send({ error: 'Invalid API Key' });
+    return;
+  }
+
+  const from = req.query?.from ?? 'CAD';
+  const to = req.query?.to ?? 'USD';
+  const isCurrency = (v) => typeof v === 'string' && /^[A-Z]{3}$/.test(v);
+  if (!isCurrency(from) || !isCurrency(to)) {
+    res.status(400).send({ error: 'from and to must be 3-letter currency codes' });
+    return;
+  }
+
+  res.set('Access-Control-Allow-Origin', '*');
+  if (!process.env.EXCHANGE_RATE_API_KEY) {
+    LogError('[exchange-rate] EXCHANGE_RATE_API_KEY is not configured');
+    res.status(503).send({ error: 'Exchange rates are not configured' });
+    return;
+  }
+  try {
+    const rate = await GetExchangeRate(from, to);
+    Log(`[exchange-rate] ${from}/${to}: ${rate}`);
+    res.json({ rate });
+  } catch (exception) {
+    LogError(exception);
+    res.status(502).send({ error: 'Exchange rate lookup failed' });
   }
 });
 

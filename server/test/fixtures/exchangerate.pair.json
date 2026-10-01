@@ -1,0 +1,12 @@
+{
+  "result": "success",
+  "documentation": "https://www.exchangerate-api.com/docs",
+  "terms_of_use": "https://www.exchangerate-api.com/terms",
+  "time_last_update_unix": 1790812801,
+  "time_last_update_utc": "Thu, 01 Oct 2026 00:00:01 +0000",
+  "time_next_update_unix": 1790899201,
+  "time_next_update_utc": "Fri, 02 Oct 2026 00:00:01 +0000",
+  "base_code": "CAD",
+  "target_code": "USD",
+  "conversion_rate": 0.704
+}
