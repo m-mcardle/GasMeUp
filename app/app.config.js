@@ -11,11 +11,25 @@ require('dotenv').config();
 const FIREBASE_ENV = process.env.FIREBASE_ENV === 'dev' ? 'dev' : 'prod';
 const firebaseFileSuffix = FIREBASE_ENV === 'dev' ? 'Dev' : 'Prod';
 
-// Google Maps SDK for iOS key (react-native-maps uses PROVIDER_GOOGLE).
-// Prefer the GOOGLE_IOS_SDK_KEY env var (EAS env / local .env). The fallback is the
-// key that was hard-coded in the previously checked-in ios/GasMeUp/AppDelegate.mm,
-// kept so builds do not silently lose Google Maps when the env var is missing.
-const GOOGLE_IOS_SDK_KEY = process.env.GOOGLE_IOS_SDK_KEY || 'AIzaSyB71op_J2zYTLJ0fRi7ncjX5ump3VjjDyA';
+// Google Maps SDK for iOS key (react-native-maps uses PROVIDER_GOOGLE). Set
+// GOOGLE_IOS_SDK_KEY in the local .env and in the EAS environment. It is compiled
+// into the iOS binary (unavoidable for the Maps SDK), so restrict it in GCP to the
+// iOS bundle id com.Virintus.GasMeUp and the Maps SDK for iOS.
+// Missing key: warn for local work; fail every EAS build, which would
+// otherwise ship with blank Google maps.
+const GOOGLE_IOS_SDK_KEY = process.env.GOOGLE_IOS_SDK_KEY;
+if (!GOOGLE_IOS_SDK_KEY) {
+  const message = 'GOOGLE_IOS_SDK_KEY is not set: Google Maps will not render on iOS. Add it to app/.env (local) or the EAS environment.';
+  if (process.env.EAS_BUILD === 'true') {
+    throw new Error(message);
+  }
+  // eslint-disable-next-line no-console
+  console.warn(`\u26a0\ufe0f  ${message}`);
+}
+
+// Splitwise dev client id: DEV_SPLITWISE_CLIENT_ID (documented name) or
+// SPLITWISE_DEV_CLIENT_ID (the name used in existing .env files).
+const DEV_SPLITWISE_CLIENT_ID = process.env.DEV_SPLITWISE_CLIENT_ID || process.env.SPLITWISE_DEV_CLIENT_ID;
 
 module.exports = {
   name: 'GasMeUp',
@@ -93,16 +107,12 @@ module.exports = {
     useDevAPI: process.env.USE_DEV_API,
     devAPIURL: process.env.DEV_API_URL,
 
-    // Splitwise
-    splitwiseTokenURL: process.env.SPLITWISE_TOKEN_URL,
-    splitwiseAuthorizeURL: process.env.SPLITWISE_AUTHORIZE_URL,
+    // Splitwise (public OAuth client ids only; the consumer secret lives on the
+    // server, which performs the code -> token exchange at POST /splitwise/token)
     splitwiseClientID: process.env.SPLITWISE_CLIENT_ID,
-    splitwiseConsumerSecret: process.env.SPLITWISE_CONSUMER_SECRET,
-    splitwiseDevClientID: process.env.DEV_SPLITWISE_CLIENT_ID,
-    splitwiseDevConsumerSecret: process.env.DEV_SPLITWISE_CONSUMER_SECRET,
+    splitwiseDevClientID: DEV_SPLITWISE_CLIENT_ID,
 
-    // Other
-    exchangeRateAPIKey: process.env.EXCHANGE_RATE_API_KEY,
+    // Nothing secret may go in `extra`: it is readable from the app bundle.
   },
   // Runtime (EAS Update compatibility). The `fingerprint` policy hashes the native
   // project (SDK, native deps, config plugins, native config), so the runtime changes
@@ -133,7 +143,7 @@ module.exports = {
     '@react-native-firebase/auth',
     // Google Maps provider on iOS (react-native-maps >= 1.22 ships its own plugin;
     // it replaces the legacy `ios.config.googleMapsApiKey` field).
-    ['react-native-maps', { iosGoogleMapsApiKey: GOOGLE_IOS_SDK_KEY }],
+    ['react-native-maps', GOOGLE_IOS_SDK_KEY ? { iosGoogleMapsApiKey: GOOGLE_IOS_SDK_KEY } : {}],
     [
       'expo-build-properties',
       {
