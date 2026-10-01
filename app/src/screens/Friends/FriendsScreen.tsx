@@ -117,8 +117,11 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
   const [userDocument, , errorUserDB] = useDocumentData(userDoc);
 
   const userFriends = userDocument ? userDocument.friends : undefined;
+  // Only read the user docs of ACCEPTED friends (mirrors SaveTripScreen). Pending
+  // (incoming/outgoing) requests are not friends yet; FriendRequestsSection loads
+  // incoming requesters itself and falls back to the email stored in this map.
   const friendsUIDs = userFriends
-    ? Object.keys(userFriends).filter((uid) => !uid.includes('TEMP_'))
+    ? Object.keys(userFriends).filter((uid) => !uid.includes('TEMP_') && userFriends[uid]?.accepted)
     : undefined;
 
   const friendsQuery = friendsUIDs?.length ? query(usersRef, where('__name__', 'in', friendsUIDs)) : undefined;
@@ -136,7 +139,7 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
       }
 
       // If the current friend hasn't been accepted yet, then don't show them
-      if (!userFriends[currentFriend.uid].accepted) {
+      if (!userFriends[currentFriend.uid]?.accepted) {
         return null;
       }
 
@@ -224,6 +227,9 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
         >
           <FriendRequestsSection
             friendRequestUIDs={friendRequestUIDs}
+            friendEmails={Object.fromEntries(friendRequestUIDs.map(
+              (uid: string) => [uid, userDocument?.friends[uid]?.email],
+            ))}
             closeModal={() => setFriendRequestsVisible(false)}
           />
         </Modal>

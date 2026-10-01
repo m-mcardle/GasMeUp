@@ -25,6 +25,9 @@ import { boldFont, colors, globalStyles } from '../../../styles/styles';
 
 interface Props {
   friendRequestUIDs: string[],
+  // Email stored on each request in the current user's `friends` map; shown when
+  // the requester's user doc cannot be read (e.g. denied by security rules).
+  friendEmails?: Record<string, string | undefined>,
   closeModal: () => void,
 }
 
@@ -34,20 +37,31 @@ interface FriendObject {
   uid: string,
 }
 
-export default function FriendRequestsSection({ friendRequestUIDs, closeModal } : Props) {
+export default function FriendRequestsSection({
+  friendRequestUIDs, friendEmails = {}, closeModal,
+} : Props) {
   const [currentUser] = useAuthState(auth);
   const [friendRequests, setFriendRequests] = useState<FriendObject[]>([]);
 
   useEffect(() => {
     async function fetchUsers() {
-      const requests = (await Promise.all(friendRequestUIDs.map((request: string) => {
-        const docRef = doc(db, 'Users', request);
-        return getDoc(docRef);
-      })))
-        .map((document: DocumentData) => {
+      const requests = await Promise.all(friendRequestUIDs.map(async (uid: string) => {
+        const fallbackEmail = friendEmails[uid] ?? '';
+        try {
+          const document: DocumentData = await getDoc(doc(db, 'Users', uid));
           const data = document.data();
-          return { fullName: `${data.firstName} ${data.lastName}`, email: data.email, uid: document.id };
-        });
+          if (data) {
+            return {
+              fullName: `${data.firstName} ${data.lastName}`,
+              email: data.email ?? fallbackEmail,
+              uid,
+            };
+          }
+        } catch (exception) {
+          console.log(exception);
+        }
+        return { fullName: fallbackEmail, email: fallbackEmail, uid };
+      }));
 
       setFriendRequests(requests);
     }
