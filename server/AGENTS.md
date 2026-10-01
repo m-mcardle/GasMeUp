@@ -54,7 +54,10 @@ Deploy:
 
 - `GOOGLE_API_KEY`
 - `RAPID_API_KEY`
-- `CLIENT_API_KEY`
+- `CLIENT_API_KEY` (clients send it as the `x-api-key` header; the `api_key` query param is still accepted for shipped app builds)
+- `SPLITWISE_CLIENT_ID`, `SPLITWISE_CONSUMER_SECRET`, `DEV_SPLITWISE_CLIENT_ID`, `DEV_SPLITWISE_CONSUMER_SECRET` (for `POST /splitwise/token`, the server-side OAuth code exchange)
+- `EXCHANGE_RATE_API_KEY` (for `GET /exchange-rate`)
+- `GOOGLE_MAPS_API` (`legacy` default, or `new`)
 - `PORT` (optional)
 
 `server/.env.sample` is complete. App Engine receives env by uploading `server/.env` with the deploy, so deploy from a checkout that has it. The Maps key belongs to the dev project `northern-bot-301518` and is used by prod too.
