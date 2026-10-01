@@ -33,6 +33,7 @@ import { convertGasPrice, convertKMtoMiles, convertLtoGallons } from '../../help
 import { createTransaction } from '../../helpers/firestoreHelper';
 import { getIcon } from '../../helpers/iconHelper';
 import { logEvent } from '../../helpers/analyticsHelper';
+import { isFeatureEnabled } from '../../helpers/featureHelper';
 
 // Styles
 import styles from '../../styles/HomeScreen.styles';
@@ -148,6 +149,8 @@ export default function SaveTripScreen({
   const [secureUserDocument] = useDocumentData(secureUserDoc);
 
   const splitwiseToken = secureUserDocument?.splitwiseToken ?? '';
+  // Splitwise's API needs a paid Pro subscription, so the integration is off unless the flag is on.
+  const splitwiseEnabled = isFeatureEnabled('splitwise_screen');
 
   const userFriends = userDocument?.friends ?? {};
   const friendsUIDs = userFriends
@@ -226,7 +229,7 @@ export default function SaveTripScreen({
         type: 'trip',
       });
 
-      if (useSplitwise && userDocument?.splitwiseUID && splitwiseToken) {
+      if (splitwiseEnabled && useSplitwise && userDocument?.splitwiseUID && splitwiseToken) {
         const splitAmount = splitType === 'full'
           ? (cost / friendUIDs.length).toFixed(2)
           : (cost / (friendUIDs.length + 1)).toFixed(2);
@@ -288,7 +291,7 @@ export default function SaveTripScreen({
       Alert('Error', 'Something went wrong. Please try again later.');
       navigation.goBack();
     }
-  }, [currentUser, cost, distance, gasPrice, useSplitwise]);
+  }, [currentUser, cost, distance, gasPrice, useSplitwise, splitwiseEnabled]);
 
   if (errorUsersDB) {
     console.log(errorUsersDB);
@@ -395,7 +398,7 @@ export default function SaveTripScreen({
         EmptyState={TableEmptyState}
         scrollable
       />
-      {splitwiseToken && userDocument?.splitwiseUID && (
+      {splitwiseEnabled && splitwiseToken && userDocument?.splitwiseUID && (
       <View style={styles.checkBoxSection}>
         <Image source={SplitwiseLogo} style={{ width: 16, height: 16 }} />
         <Text style={{ color: colors.secondary, fontSize: 14 }}>Save on Splitwise:</Text>

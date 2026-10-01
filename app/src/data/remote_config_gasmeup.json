@@ -68,7 +68,7 @@
     },
     "splitwise_screen": {
       "defaultValue": {
-        "value": "true"
+        "value": "false"
       },
       "description": "Is the Splitwise friends screen viewable?",
       "valueType": "BOOLEAN"
