@@ -68,7 +68,7 @@ async function handleOutgoingFriendRequest(
   // Update aggregations in a transaction
   await db.runTransaction(async (transaction) => {
     // Only need to run if this friend doesn't have this user as a friend
-    if (friendData.friends[uid]) {
+    if (friendData.friends?.[uid]) {
       console.log(`Friend (${friendUID}) already has ${uid} as friend`);
       return;
     }
@@ -168,6 +168,15 @@ async function handleAcceptedFriendRequest(
         return;
       }
 
+      // Only the recipient of a friend request can accept it: the other user
+      // must have an outgoing request to this user. Otherwise anyone could
+      // mark a stranger as "accepted" on their own doc and have it mirrored,
+      // gaining read access to the stranger's document.
+      if (friendData.friends?.[uid]?.status !== "outgoing") {
+        console.warn(`Friend (${friendUID}) has no outgoing request to ${uid} - not mirroring acceptance`);
+        return;
+      }
+
       const friendsFriendsList = friendData.friends;
       console.log("Friend's friends list:", friendsFriendsList);
 
@@ -232,13 +241,11 @@ async function handleRemovedFriends(db: Firestore, uid: string, beforeFriends: F
       for (const friendDoc of friendDocs) {
         const friendData = friendDoc.data() ?? {};
 
-        // Only need to run if this friend has this user as a friend
-        // NOTE: the second operand is always false (pre-existing bug). Left
-        // as-is to preserve runtime behavior during the dependency upgrade.
-        // eslint-disable-next-line no-constant-binary-expression
-        if (!friendData.friends || !friendData.friends[uid] === undefined ) {
+        // Only need to run if this friend has this user as a friend. Skip
+        // (don't abort) so the remaining friends are still cleaned up.
+        if (friendData.friends?.[uid] === undefined) {
           console.log(`Friend (${friendDoc.id}) doesn't have ${uid} as friend`);
-          return;
+          continue;
         }
 
         const friendsFriendsList = friendData.friends;

@@ -14,6 +14,7 @@ import {Friend, User} from "./global";
 
 import friends from "./src/friends";
 import {createTripNotification, createSettleNotification} from "./src/notificationMessages";
+import {areMutualFriends} from "./src/friendship";
 
 initializeApp();
 
@@ -45,6 +46,13 @@ export const sendTransactionNotifications = functions.firestore
       await Promise.all(usersToNotify.map(async (uid) => {
         const doc = await db.collection("Users").doc(uid).get();
         const data = await doc.data() ?? {};
+
+        // Only notify people who are actually friends with the creator, so a
+        // forged transaction can't be used to push-spam arbitrary users.
+        if (!areMutualFriends(creatorUID, creatorData, uid, data)) {
+          console.warn(`Not notifying ${uid}: not an accepted friend of creator ${creatorUID}`);
+          return;
+        }
 
         const expoPushToken = data.notificationToken;
         if (Expo.isExpoPushToken(expoPushToken)) {
@@ -84,50 +92,109 @@ export const aggregateBalances = functions.firestore
       if (costPerRider !== amount) {
         console.warn(`costPerRider !== amount (${costPerRider} vs ${amount})`);
       }
+      const creatorUID: string = newData.creator;
+
       // Get a reference to the payee
       const payeeRef = db.collection("Users").doc(payeeUID);
 
       // Get a reference to the payer
       const payerRefs = payerUIDs.map((uid: string) => db.collection("Users").doc(uid));
 
-      const newPayeeObjects: Record<string, Friend> = {};
-
       // Update aggregations in a transaction
       await db.runTransaction(async (transaction: Transaction) => {
         const payeeDoc = await transaction.get(payeeRef);
         const payerDocs = await Promise.all(payerRefs.map(async (ref: DocumentReference) => transaction.get(ref)));
 
-        const payeeData = payeeDoc.data() ?? {};
+        const payeeData = payeeDoc.data();
         const payersData = payerDocs.map((doc) => doc.data());
+
+        if (!payeeData) {
+          console.warn(`Payee (${payeeUID}) not found - skipping transaction ${snapshot.id}`);
+          return;
+        }
+
+        // Idempotency: onCreate can be delivered more than once.
+        if ((payeeData.transactions ?? []).includes(snapshot.id)) {
+          console.log(`Transaction ${snapshot.id} already aggregated`);
+          return;
+        }
+
+        // The creator must be a party to the transaction (the app always
+        // creates trips/settle-ups it is part of).
+        const partyData = (uid: string) => uid === payeeUID ? payeeData : payersData[payerUIDs.indexOf(uid)];
+        if (creatorUID !== payeeUID && !payerUIDs.includes(creatorUID)) {
+          console.warn(`Creator (${creatorUID}) is not a party to ${snapshot.id} - skipping`);
+          return;
+        }
+        const creatorData = partyData(creatorUID);
+
+        // Only people who are accepted friends of the creator can be pulled
+        // into a transaction. The app only offers accepted friends.
+        const trustedByCreator = (uid: string) => uid === creatorUID ||
+          areMutualFriends(creatorUID, creatorData, uid, partyData(uid));
+
+        if (!trustedByCreator(payeeUID)) {
+          console.warn(`Payee (${payeeUID}) is not an accepted friend of creator (${creatorUID}) - skipping ${snapshot.id}`);
+          return;
+        }
+
+        const newPayeeObjects: Record<string, Friend> = {};
+        const seenPayers = new Set<string>();
 
         // Compute new balances
         payersData.forEach((payerData, i) => {
-          const oldPayeeObject = payeeData.friends[payerData.uid] ?? {};
+          const payerUID: string = payerUIDs[i];
+          if (seenPayers.has(payerUID) || payerUID === payeeUID) {
+            console.warn(`Skipping duplicate payer/payee (${payerUID}) in ${snapshot.id}`);
+            return;
+          }
+          seenPayers.add(payerUID);
+
+          if (!payerData) {
+            console.warn(`Payer (${payerUID}) not found - skipping`);
+            return;
+          }
+          if (!trustedByCreator(payerUID)) {
+            console.warn(`Payer (${payerUID}) is not an accepted friend of creator (${creatorUID}) - skipping`);
+            return;
+          }
+
+          const payerTransactions = [...(payerData.transactions ?? []), snapshot.id];
+
+          // Balances only exist between accepted friends. A co-rider who
+          // isn't friends with the driver still gets the trip in their
+          // history, but no (invisible) balance entry is created.
+          if (!areMutualFriends(payeeUID, payeeData, payerUID, payerData)) {
+            console.warn(`Payer (${payerUID}) and payee (${payeeUID}) are not accepted friends - not updating balance`);
+            transaction.update(payerRefs[i], {
+              transactions: payerTransactions,
+            });
+            return;
+          }
+
+          const oldPayeeObject = payeeData.friends[payerUID];
           const oldPayeeBalance = oldPayeeObject.balance ?? 0;
           const newPayeeBalance = oldPayeeBalance + costPerRider;
 
-          const oldPayerObject = payerData.friends[payeeDoc.id] ?? {};
+          const oldPayerObject = payerData.friends[payeeUID];
           const oldPayerBalance = oldPayerObject.balance ?? 0;
           const newPayerBalance = oldPayerBalance - costPerRider;
-
-          const payerTransactions = payerData.transactions;
-          payerTransactions.push(snapshot.id);
 
           const oldPayerFriends = payerData.friends;
 
           // Update payee balances
-          newPayeeObjects[payerData.uid] = {
+          newPayeeObjects[payerUID] = {
             ...oldPayeeObject,
             balance: newPayeeBalance,
           };
 
-          console.log(`Updating payer's (${payerUIDs[i]}) balance with: ${newPayerBalance}`);
+          console.log(`Updating payer's (${payerUID}) balance with: ${newPayerBalance}`);
           // Update payer info
           transaction.update(payerRefs[i], {
-            transactions: [...payerTransactions],
+            transactions: payerTransactions,
             friends: {
               ...oldPayerFriends,
-              [payeeDoc.id]: {
+              [payeeUID]: {
                 ...oldPayerObject,
                 balance: newPayerBalance,
               },
@@ -136,12 +203,11 @@ export const aggregateBalances = functions.firestore
         });
 
         console.log("Updating payee's balances with: ", newPayeeObjects);
-        const oldPayeeFriends = payeeData.friends;
-        const payeeTransactions = payeeData.transactions;
-        payeeTransactions.push(snapshot.id);
+        const oldPayeeFriends = payeeData.friends ?? {};
+        const payeeTransactions = [...(payeeData.transactions ?? []), snapshot.id];
         // Update payee info
         transaction.update(payeeRef, {
-          transactions: [...payeeTransactions],
+          transactions: payeeTransactions,
           friends: {
             ...oldPayeeFriends,
             ...newPayeeObjects,
