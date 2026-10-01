@@ -115,6 +115,8 @@ module.exports = {
   runtimeVersion: { policy: 'appVersion' },
   plugins: [
     'expo-apple-authentication',
+    'expo-asset',
+    'expo-web-browser',
     'expo-font',
     'expo-notifications',
     // Firebase via CocoaPods: RNFB's default SPM resolution is incompatible with the
