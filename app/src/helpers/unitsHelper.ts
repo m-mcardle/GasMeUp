@@ -1,13 +1,14 @@
-import { ENV } from './env';
+import { fetchData } from '../data/data';
 
+// CAD -> USD rate, via the server (which holds the ExchangeRate-API key).
 export async function getExchangeRate() {
   try {
-    const response = await fetch(`https://v6.exchangerate-api.com/v6/${ENV.EXCHANGE_RATE_API_KEY}/pair/CAD/USD`);
+    const response = await fetchData('/exchange-rate', { from: 'CAD', to: 'USD' });
     const json = await response.json();
-    if (json.result !== 'success') {
+    if (!response.ok || typeof json?.rate !== 'number') {
       throw new Error('Failed to get exchange rate');
     }
-    return json.conversion_rate ?? 1;
+    return json.rate;
   } catch (ex) {
     console.error(ex);
     return 1;
