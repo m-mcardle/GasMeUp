@@ -19,7 +19,8 @@ Main responsibilities:
 - TypeScript
 - Firebase Admin SDK
 - Expo Server SDK
-- Node.js 16 runtime
+- Node.js 22 runtime (1st-gen functions; `firebase-functions/v1` API)
+- Sign in with Apple key read from Secret Manager secret `APPLE_SIGN_IN_KEY` (local `B34ZDLHVDF.p8` is only an emulator fallback, gitignored)
 
 ## Entry Points
 
@@ -76,7 +77,8 @@ If you change any of these rules, check the app flows in `app/src/screens/Friend
 
 - Keep the friend-sync logic symmetric. One-sided updates usually create data drift.
 - Preserve idempotency where possible. These handlers can be triggered more than once.
-- Avoid Node 18/20-only APIs unless you also upgrade the functions runtime and deploy settings.
+- Node 22 APIs are fine. Node 24 would need a gen2 migration (functions are deleted and recreated).
+- Rules and trigger behaviour are covered by `../rules-tests/` (Firestore emulator); keep it passing.
 - If you change transaction payload shape, update:
   - `functions/global.d.ts`
   - app-side type declarations

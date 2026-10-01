@@ -51,7 +51,7 @@ Cloud Functions react to Firestore writes to:
 - Gas price request builders: `server/src/queries/gasprice.js`
 - Fuel economy request builders: `server/src/queries/fueleconomy.js`
 - API key validation: `server/src/utils/validation.js`
-- Tests: `server/test/index.test.js`
+- Tests: `server/test/` (hermetic suite run by `npm test`; live-API suite in `test/live` run by `npm run test:live`)
 - Deployment target: Google App Engine via `server/app.yaml`
 
 ### `functions/`
@@ -154,7 +154,7 @@ App-related env vars used in code:
 
 ### Server env surface
 
-`server/.env.sample` documents only part of the required config. Based on the code, the server also expects:
+`server/.env.sample` lists every variable the server reads. Key ones:
 
 - `GOOGLE_API_KEY`
 - `RAPID_API_KEY`
@@ -229,10 +229,10 @@ Be careful with direct writes to `Users.friends`; one-sided edits are often only
 ## Editing Guardrails
 
 - Keep server response shapes stable. The mobile client parses exact field names like `price`, `prices`, `distance`, `start`, `end`, `modelOptions`, and `mpg`.
-- If you change API params or response shapes in `server/src/index.js`, update the app consumer and `server/test/index.test.js`.
+- If you change API params or response shapes in `server/src/index.js`, update the app consumer and the contract tests in `server/test/`.
 - The app uses both TypeScript and global `.d.ts` types. Keep `app/types.d.ts` and `functions/global.d.ts` aligned when changing Firestore payloads.
-- `functions/` targets Node 16. Avoid introducing syntax or dependencies that require a newer runtime there unless you also update deployment/runtime config.
-- `server/` runs on Node 20 and uses CommonJS.
+- `functions/` targets Node 22 (the maximum for 1st-gen functions) with firebase-functions 7 imported as `firebase-functions/v1`. Moving to Node 24 requires a gen2 migration (delete + recreate of every function).
+- `server/` runs on Node 24 (App Engine `nodejs24`) with Express 5 and uses CommonJS.
 - Some repo docs are stale. Prefer package manifests and code over README instructions when they disagree.
 - Several features depend on native capabilities:
   - push notifications generally require a physical device.
@@ -244,7 +244,8 @@ Be careful with direct writes to `Users.friends`; one-sided edits are often only
 ## Testing Expectations
 
 - App: linting and type-checking are the main fast checks.
-- Server: Jest + Supertest integration tests exist and expect valid env secrets.
+- Server: `npm test` is hermetic (mocked upstreams, contract assertions on every route, both `GOOGLE_MAPS_API` modes); `npm run test:live` hits real APIs and needs `server/.env`.
+- Firestore rules + functions: `rules-tests/` runs an emulator suite (`PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH npm test`, needs Java 21). Run it after any change to `firestore.rules` or `functions/`.
 - Functions: lint/build are available, but there are no meaningful automated tests checked in.
 - Firebase Admin: no tests; review scripts carefully before running them against real data.
 
@@ -252,7 +253,6 @@ Be careful with direct writes to `Users.friends`; one-sided edits are often only
 
 - `app/src/screens/Home/HomeScreen.tsx` still uses `LocationInputOld`.
 - Server tests are not pure unit tests; they depend on real external API configuration.
-- `server/.env.sample` is incomplete for actual execution because `CLIENT_API_KEY` is also required.
 - The root README describes commands conceptually, but this repo does not have a root `package.json`.
 
 ## Package-Local Guides

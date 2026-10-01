@@ -14,11 +14,12 @@ The mobile client depends on these routes for trip calculation and vehicle data.
 
 ## Stack
 
-- Node.js 20
+- Node.js 24 (App Engine `nodejs24`)
+- Express 5
 - Express
 - CommonJS modules
-- Axios with `axios-cache-adapter`
-- Jest + Supertest for tests
+- Axios (no response cache)
+- Jest 30 + Supertest: hermetic `npm test`, live `npm run test:live`
 
 ## Entry Points
 
@@ -30,7 +31,8 @@ The mobile client depends on these routes for trip calculation and vehicle data.
 - Helpers:
   - `src/utils/validation.js`
   - `src/utils/console.js`
-- Tests: `test/index.test.js`
+- Tests: `test/hermetic/` (fixtures in `test/fixtures`, re-record with `node test/fixtures/record.js`), `test/live/`
+- Google adapters for the new Places/Routes APIs: `src/adapters/google.js` (selected by `GOOGLE_MAPS_API=new|legacy`, default `legacy`)
 
 ## Commands
 
@@ -55,7 +57,7 @@ Deploy:
 - `CLIENT_API_KEY`
 - `PORT` (optional)
 
-`server/.env.sample` is not complete for local execution because it does not mention `CLIENT_API_KEY`.
+`server/.env.sample` is complete. App Engine receives env by uploading `server/.env` with the deploy, so deploy from a checkout that has it. The Maps key belongs to the dev project `northern-bot-301518` and is used by prod too.
 
 ## API Contract
 
