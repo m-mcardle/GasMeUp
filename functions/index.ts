@@ -287,8 +287,9 @@ export const updateFriendsListDeletion = functions.firestore
  * @return {string} JWT token
  */
 function makeJWT() {
-  // Path to download key file from developer.apple.com/account/resources/authkeys/list
-  const privateKey = fs.readFileSync("B34ZDLHVDF.p8");
+  // Sign in with Apple key (developer.apple.com/account/resources/authkeys/list), stored in
+  // Secret Manager as APPLE_SIGN_IN_KEY. The local .p8 file is only a fallback for the emulator.
+  const privateKey = process.env[APPLE_SIGN_IN_KEY] || fs.readFileSync("B34ZDLHVDF.p8");
 
   // Sign with your team ID and key ID information.
   const token = jwt.sign({
@@ -305,12 +306,27 @@ function makeJWT() {
       kid: "B34ZDLHVDF",
     }});
 
-  console.log(token);
   return token;
 }
 
+const APPLE_SIGN_IN_KEY = "APPLE_SIGN_IN_KEY";
+const appleFunctions = functions.runWith({secrets: [APPLE_SIGN_IN_KEY]});
+
+/**
+ * Logs an Apple token endpoint failure without the request config, which holds the client secret.
+ * @param {string} context Which endpoint failed
+ * @param {unknown} err The error thrown by axios
+ */
+function logAppleError(context: string, err: unknown) {
+  if (axios.isAxiosError(err)) {
+    console.error(`${context} failed: ${err.response?.status ?? "no response"} ${JSON.stringify(err.response?.data ?? err.message)}`);
+  } else {
+    console.error(`${context} failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
 // https://github.com/jooyoungho/apple-token-revoke-in-firebase
-export const getRefreshToken = functions.https.onRequest(async (request, response) => {
+export const getRefreshToken = appleFunctions.https.onRequest(async (request, response) => {
   const code = request.query.code;
   const clientSecret = makeJWT();
 
@@ -331,12 +347,13 @@ export const getRefreshToken = functions.https.onRequest(async (request, respons
         response.send(refreshToken);
       })
       .catch((err) => {
-        console.log(err);
+        logAppleError("getRefreshToken", err);
+        response.status(500).send("Failed to get refresh token");
       });
 });
 
 
-export const revokeToken = functions.https.onRequest(async (request, response) => {
+export const revokeToken = appleFunctions.https.onRequest(async (request, response) => {
   const refreshToken = request.query.refresh_token;
   const clientSecret = makeJWT();
 
@@ -347,19 +364,17 @@ export const revokeToken = functions.https.onRequest(async (request, response) =
     "token_type_hint": "refresh_token",
   };
 
-  console.log(qs.stringify(data));
-
   return axios.post("https://appleid.apple.com/auth/revoke", qs.stringify(data), {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
   })
-      .then(async (res) => {
-        console.log(res.data);
+      .then(async () => {
         response.send("Complete");
       })
       .catch((err) => {
-        console.log(err);
+        logAppleError("revokeToken", err);
+        response.status(500).send("Failed to revoke token");
       });
 });
 
