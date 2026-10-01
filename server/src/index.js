@@ -8,8 +8,14 @@ const {
   Directions,
   Place,
   Geocode,
-  mockLocations,
+  mapsApiMode,
+  parseLatLng,
+  PlacesAutocompleteNew,
+  PlaceDetailsNew,
+  ForwardGeocode,
+  ComputeRoutes,
 } = require('./queries/google');
+const { toLegacyDirections, toLegacySuggestions } = require('./adapters/google');
 const {
   CanadianGasPriceRequest,
   AmericanGasPriceRequest,
@@ -55,20 +61,72 @@ function errorMessage(err) {
 /*
 Axios Request Functions (to external APIs)
 */
-async function GetDistanceV2(startLocation, endLocation) {
-  const response = await api(Directions(startLocation, endLocation));
+const routeNotFound = (start, end) => Error(`Route not found (${start} to ${end})`, { cause: 404 });
+const locationNotFound = (start, end) => Error(`Location not found (${start} or ${end})`, { cause: 404 });
+function unknownGoogleError(status) {
+  LogError(`An unknown error occurred (${status})`);
+  return Error(`An unknown error occurred (${status})`, { cause: 500 });
+}
 
-  const { data } = response;
-  if (data.status !== 'OK') {
-    if (data.status === 'ZERO_RESULTS') {
-      throw Error(`Route not found (${startLocation} to ${endLocation})`, { cause: 404 });
-    } else if (data.status === 'NOT_FOUND') {
-      throw Error(`Location not found (${startLocation} or ${endLocation})`, { cause: 404 });
-    } else {
-      LogError(`An unknown error occurred (${data.status})`);
-      throw Error(`An unknown error occurred (${data.status})`, { cause: 500 });
-    }
+// New-API HTTP errors (403 PERMISSION_DENIED, 429 RESOURCE_EXHAUSTED, ...) are
+// reported like the legacy APIs' non-OK `status` values; network errors pass through.
+async function callNewApi(config) {
+  try {
+    return await api(config);
+  } catch (err) {
+    const status = err?.response?.data?.error?.status ?? err?.response?.data?.[0]?.error?.status;
+    if (status) throw unknownGoogleError(status);
+    throw err;
   }
+}
+
+async function GetDirectionsLegacy(startLocation, endLocation) {
+  const { data } = await api(Directions(startLocation, endLocation));
+  if (data.status !== 'OK') {
+    if (data.status === 'ZERO_RESULTS') throw routeNotFound(startLocation, endLocation);
+    if (data.status === 'NOT_FOUND') throw locationNotFound(startLocation, endLocation);
+    throw unknownGoogleError(data.status);
+  }
+  return data;
+}
+
+// Resolves free text (or "lat,lng") to { address, placeId, types, waypoint } the
+// way legacy Directions geocoded its origin/destination. null = not found.
+async function ResolveWaypoint(text) {
+  const latLng = parseLatLng(text);
+  const { data } = await api(latLng ? Geocode(text) : ForwardGeocode(text));
+  if (data.status === 'ZERO_RESULTS' || data.status === 'NOT_FOUND') return null;
+  if (data.status !== 'OK' || !data.results?.length) throw unknownGoogleError(data.status);
+
+  const [result] = data.results;
+  return {
+    address: result.formatted_address,
+    placeId: result.place_id,
+    types: result.types,
+    waypoint: latLng ? { location: { latLng } } : { placeId: result.place_id },
+  };
+}
+
+// Routes API path: geocode both ends, computeRoutes, then rebuild the legacy
+// Directions payload so /distance returns byte-for-byte the same shape.
+async function GetDirectionsNew(startLocation, endLocation) {
+  const [origin, destination] = await Promise.all([
+    ResolveWaypoint(startLocation),
+    ResolveWaypoint(endLocation),
+  ]);
+  if (!origin || !destination) throw locationNotFound(startLocation, endLocation);
+
+  const { data: routesData } = await callNewApi(ComputeRoutes(origin.waypoint, destination.waypoint));
+  // computeRoutes answers an unroutable pair with an empty object.
+  if (!routesData?.routes?.length) throw routeNotFound(startLocation, endLocation);
+
+  return toLegacyDirections(routesData, origin, destination);
+}
+
+async function GetDistanceV2(startLocation, endLocation) {
+  const data = mapsApiMode() === 'new'
+    ? await GetDirectionsNew(startLocation, endLocation)
+    : await GetDirectionsLegacy(startLocation, endLocation);
 
   const route = data.routes[0].legs[0];
   const distance = route.distance.value / 1000;
@@ -90,6 +148,14 @@ async function GetDistanceV2(startLocation, endLocation) {
 }
 
 async function GetPlace(placeId) {
+  if (mapsApiMode() === 'new') {
+    const { data } = await callNewApi(PlaceDetailsNew(placeId));
+    if (typeof data?.formattedAddress !== 'string') {
+      throw Error('Invalid Request to Google (missing formattedAddress)');
+    }
+    return data.formattedAddress;
+  }
+
   const response = await api(Place(placeId));
 
   const { data } = response;
@@ -114,6 +180,15 @@ async function ReverseGeocode(latlng) {
 }
 
 async function GetSuggestions(input, sessionId, location) {
+  if (mapsApiMode() === 'new') {
+    const { data } = await callNewApi(PlacesAutocompleteNew(input, sessionId, location));
+    const suggestions = toLegacySuggestions(data);
+    // Legacy answers "no matches" with status ZERO_RESULTS, which this route has
+    // always surfaced as a 500; keep that status code for the shipped app.
+    if (!suggestions.length) throw Error('Invalid Request to Google (ZERO_RESULTS)');
+    return suggestions;
+  }
+
   const response = await api(LocationAutocomplete(input, sessionId, location));
 
   const { data } = response;
