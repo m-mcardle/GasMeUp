@@ -1,6 +1,6 @@
 // Firestore security rules: every read/write the shipped app performs must be
 // allowed, and every known attack must be denied.
-import {afterAll, beforeAll, beforeEach, describe, it} from "vitest";
+import {afterAll, beforeAll, beforeEach, describe, expect, it} from "vitest";
 import {
   assertFails,
   assertSucceeds,
@@ -185,6 +185,19 @@ describe("legitimate app patterns (must be allowed)", () => {
         tripPayload({creator: A, driver: A, friends: [B], cost: 0})));
   });
 
+  it("SaveTripScreen: solo trip, no friends (split)", async () => {
+    await assertSucceeds(addDoc(collection(as(A), "Transactions"),
+        tripPayload({creator: A, driver: A, friends: []})));
+  });
+
+  it("SaveTripScreen: solo trip, no friends (full -> amount Infinity)",
+      async () => {
+        const trip = tripPayload({creator: A, driver: A, friends: [],
+          splitType: "full"});
+        expect(trip.amount).toBe(Infinity);
+        await assertSucceeds(addDoc(collection(as(A), "Transactions"), trip));
+      });
+
   it("FriendInfoScreen: settle up when the friend owes me (negative cost)",
       async () => {
         await assertSucceeds(addDoc(collection(as(A), "Transactions"),
@@ -288,6 +301,20 @@ describe("finding 2: forged / malformed transactions", () => {
 
   it("unknown type", async () => {
     await assertFails(create(E, {...base(), type: "gift"}));
+  });
+
+  it("empty payers but another user named (fake solo trip)", async () => {
+    await assertFails(create(E, {...base(), payers: [], users: [E, A]}));
+  });
+
+  it("empty payers paying someone else", async () => {
+    await assertFails(create(E,
+        {...base(), payers: [], users: [E], payeeUID: A}));
+  });
+
+  it("solo trip with an absurd cost", async () => {
+    await assertFails(create(E, {...tripPayload({creator: E, driver: E,
+      friends: []}), cost: 1e9}));
   });
 
   it("settle-up with a non-friend", async () => {

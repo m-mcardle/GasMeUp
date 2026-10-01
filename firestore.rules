@@ -46,7 +46,7 @@ service cloud.firestore {
         // type-checked so older app builds keep working.
         // Every party is listed in `users` (what reads are keyed on),
         // payers are unique and the payee is not also a payer.
-        && t.payers.size() >= 1
+        && (t.payers.size() >= 1 || isSoloTrip(t))
         && t.payers.size() == t.payers.toSet().size()
         && t.users.hasAll(t.payers)
         && t.users.hasAll([t.payeeUID, t.creator])
@@ -55,10 +55,21 @@ service cloud.firestore {
         && (t.creator == t.payeeUID || t.creator in t.payers);
     }
 
+    // A trip logged with no friends: the creator drove alone, is the only
+    // party, and pays themselves. No balance can move, so `amount` is not
+    // constrained (the app computes cost / 0 = Infinity for a "full" split).
+    function isSoloTrip(t) {
+      return t.type == 'trip'
+        && t.payers.size() == 0
+        && t.users.size() == 1
+        && t.users[0] == t.creator
+        && t.payeeUID == t.creator;
+    }
+
     function validTrip(t) {
       return t.type == 'trip'
         && t.cost >= 0 && t.cost <= 100000
-        && t.amount >= 0 && t.amount <= t.cost;
+        && (isSoloTrip(t) || (t.amount >= 0 && t.amount <= t.cost));
     }
 
     // Settle-up: the creator is the payee, there is exactly one payer, and the

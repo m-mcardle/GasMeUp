@@ -228,6 +228,17 @@ describe("legitimate flows", () => {
     }]);
   });
 
+  it("solo trip (no friends) is recorded; no balances, no pushes",
+      async () => {
+        const aliceBefore = await user(A);
+        const id = await clientCreateTransaction(tripPayload({creator: A,
+          driver: A, friends: [], cost: 30, splitType: "full"}));
+        const alice = await user(A);
+        expect(alice.transactions).toEqual([id]);
+        expect(alice.friends).toEqual(aliceBefore.friends);
+        expect(sentMessages()).toEqual([]);
+      });
+
   it("settle-up clears the balance on both sides", async () => {
     const id = await clientCreateTransaction(
         settlePayload({creator: A, friend: B, amount: 12.5}));
