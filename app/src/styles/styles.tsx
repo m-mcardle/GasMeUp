@@ -212,7 +212,7 @@ export const globalStyles = StyleSheet.create({
     alignItems: 'center',
   },
   map: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   headerSection: {
     paddingHorizontal: 16,

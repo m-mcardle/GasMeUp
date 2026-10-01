@@ -25,11 +25,6 @@ module.exports = {
   version: '1.1.2',
   orientation: 'portrait',
   icon: './assets/car.png',
-  splash: {
-    image: './assets/splash-screen.png',
-    resizeMode: 'contain',
-    backgroundColor: '#6F61FE',
-  },
   updates: {
     fallbackToCacheTimeout: 0,
     url: 'https://u.expo.dev/ca421c93-c21f-4e6b-a62c-52b626a5bbac',
@@ -117,6 +112,17 @@ module.exports = {
     'expo-apple-authentication',
     'expo-asset',
     'expo-web-browser',
+    // Replaces the legacy top-level `splash` field (same image/colour; the full-screen
+    // image mode keeps the previous iOS storyboard layout).
+    [
+      'expo-splash-screen',
+      {
+        image: './assets/splash-screen.png',
+        resizeMode: 'contain',
+        backgroundColor: '#6F61FE',
+        enableFullScreenImage_legacy: true,
+      },
+    ],
     'expo-font',
     'expo-notifications',
     // Firebase via CocoaPods: RNFB's default SPM resolution is incompatible with the
