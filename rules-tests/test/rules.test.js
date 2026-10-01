@@ -185,18 +185,7 @@ describe("legitimate app patterns (must be allowed)", () => {
         tripPayload({creator: A, driver: A, friends: [B], cost: 0})));
   });
 
-  it("SaveTripScreen: solo trip, no friends (split)", async () => {
-    await assertSucceeds(addDoc(collection(as(A), "Transactions"),
-        tripPayload({creator: A, driver: A, friends: []})));
-  });
 
-  it("SaveTripScreen: solo trip, no friends (full -> amount Infinity)",
-      async () => {
-        const trip = tripPayload({creator: A, driver: A, friends: [],
-          splitType: "full"});
-        expect(trip.amount).toBe(Infinity);
-        await assertSucceeds(addDoc(collection(as(A), "Transactions"), trip));
-      });
 
   it("FriendInfoScreen: settle up when the friend owes me (negative cost)",
       async () => {
@@ -312,10 +301,19 @@ describe("finding 2: forged / malformed transactions", () => {
         {...base(), payers: [], users: [E], payeeUID: A}));
   });
 
-  it("solo trip with an absurd cost", async () => {
-    await assertFails(create(E, {...tripPayload({creator: E, driver: E,
-      friends: []}), cost: 1e9}));
-  });
+  it("trip with no riders (trips are only saved to split costs)",
+      async () => {
+        await assertFails(create(E,
+            tripPayload({creator: E, driver: E, friends: []})));
+      });
+
+  it("trip with no riders and a 'full' split (amount Infinity)",
+      async () => {
+        const trip = tripPayload({creator: E, driver: E, friends: [],
+          splitType: "full"});
+        expect(trip.amount).toBe(Infinity);
+        await assertFails(create(E, trip));
+      });
 
   it("settle-up with a non-friend", async () => {
     await assertFails(create(E,

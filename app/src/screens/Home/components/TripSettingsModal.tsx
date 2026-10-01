@@ -47,8 +47,10 @@ export default function TripSettingsModal({
     email: '',
   });
 
-  const evenSplitCost = cost / (selectedFriends.length + 1);
-  const ridersCost = cost / selectedFriends.length;
+  // Everyone except the driver is a rider. With no riders, "only riders pay" would divide by zero.
+  const riderCount = selectedFriends.length;
+  const evenSplitCost = cost / (riderCount + 1);
+  const ridersCost = riderCount > 0 ? cost / riderCount : null;
   const isDriver = (friend: DocumentData) => friend.uid === driver.uid;
   return (
     <View style={{ height: '100%', width: '100%', padding: 12 }}>
@@ -102,7 +104,7 @@ export default function TripSettingsModal({
         </View>
         <View>
           <Button
-            disabled={!driver.uid}
+            disabled={!driver.uid || ridersCost === null}
             style={styles.addToFriendButton}
             onPress={() => {
               saveTrip(selectedFriends, driver, 'full');
@@ -114,7 +116,7 @@ export default function TripSettingsModal({
             </Text>
           </Button>
           <Text style={{ ...globalStyles.smallText, textAlign: 'center' }}>
-            {`$${ridersCost.toFixed(2)} per rider`}
+            {ridersCost === null ? '—' : `$${ridersCost.toFixed(2)} per rider`}
           </Text>
         </View>
       </View>

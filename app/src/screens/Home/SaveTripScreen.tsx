@@ -206,6 +206,13 @@ export default function SaveTripScreen({
       ? friendUIDs
       : [currentUser.uid, ...friendUIDs.filter((friend) => friend !== driver.uid)];
 
+    // Trips are only saved to split the cost, so there must be at least one rider
+    // (Firestore rules reject a trip with no payers).
+    if (payers.length === 0) {
+      Alert('Error', 'Select at least one friend who was on this trip');
+      return;
+    }
+
     const amount = splitType === 'full'
       ? Number((cost / payers.length).toFixed(2))
       : Number((cost / (payers.length + 1)).toFixed(2));

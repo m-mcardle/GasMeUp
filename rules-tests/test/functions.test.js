@@ -228,7 +228,7 @@ describe("legitimate flows", () => {
     }]);
   });
 
-  it("solo trip (no friends) is recorded; no balances, no pushes",
+  it("empty-payer trip (rules reject these; e.g. old data) is harmless",
       async () => {
         const aliceBefore = await user(A);
         const id = await clientCreateTransaction(tripPayload({creator: A,
