@@ -1,21 +1,214 @@
 rules_version = '2';
+
+// GasMeUp Firestore rules.
+//
+// These rules must allow every read/write the shipped iOS app performs
+// directly against Firestore (see rules-tests/ for the full inventory, encoded
+// as emulator tests). Cross-user state (mirrored friend requests, balances,
+// `Users.transactions`) is only ever written by Cloud Functions, which use the
+// Admin SDK and bypass these rules.
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /Transactions/{transactionID}/{documents=**} {
-    	allow read: if request.auth != null
-      allow create: if request.auth != null && (request.auth.uid == request.resource.data.payeeUID || request.auth.uid == request.resource.data.payerUID || request.auth.uid in request.resource.data.payers)
+
+    function signedIn() {
+      return request.auth != null;
     }
 
-    match /Users/{uid}/{documents=**} {
-    	allow read: if request.auth != null && (
-      	uid == request.auth.uid ||
-        request.auth.uid in resource.data.friends
-      )
-      allow create, update, delete: if request.auth != null && uid == request.auth.uid
+    function isNumber(v) {
+      return v is int || v is float;
     }
 
-		match /SecureUsers/{uid}/{documents=**} {
-      allow read, write, delete: if request.auth != null && uid == request.auth.uid
+    // ---------------------------------------------------------------- Transactions
+
+    // Fields the app writes on a Transaction (trip or settle-up).
+    function transactionKeys() {
+      return ['amount', 'cost', 'payeeUID', 'payers', 'splitType', 'date',
+              'distance', 'gasPrice', 'startLocation', 'endLocation',
+              'gasMileage', 'creator', 'type', 'users', 'waypoints',
+              'country'];
+    }
+
+    function validTransactionShape(t) {
+      return t.keys().hasOnly(transactionKeys())
+        && t.keys().hasAll(['amount', 'cost', 'payeeUID', 'payers', 'date',
+                            'creator', 'type', 'users'])
+        && isNumber(t.amount)
+        && isNumber(t.cost)
+        && t.payeeUID is string
+        && t.payers is list
+        && t.users is list
+        && t.creator is string
+        && t.date is timestamp
+        && t.type in ['trip', 'settle']
+        && (!('splitType' in t) || t.splitType in ['split', 'full'])
+        // distance/gasPrice/gasMileage/locations/waypoints/country are
+        // display-only (no function reads them) and are deliberately not
+        // type-checked so older app builds keep working.
+        // Every party is listed in `users` (what reads are keyed on),
+        // payers are unique and the payee is not also a payer.
+        && t.payers.size() >= 1
+        && t.payers.size() == t.payers.toSet().size()
+        && t.users.hasAll(t.payers)
+        && t.users.hasAll([t.payeeUID, t.creator])
+        && !(t.payeeUID in t.payers)
+        // The creator must be a party to the money movement.
+        && (t.creator == t.payeeUID || t.creator in t.payers);
+    }
+
+    function validTrip(t) {
+      return t.type == 'trip'
+        && t.cost >= 0 && t.cost <= 100000
+        && t.amount >= 0 && t.amount <= t.cost;
+    }
+
+    // Settle-up: the creator is the payee, there is exactly one payer, and the
+    // payer must be an accepted friend of the creator. The amount is the
+    // (negated) current balance, so it may be negative.
+    function validSettle(t) {
+      return t.type == 'settle'
+        && t.payeeUID == request.auth.uid
+        && t.payers.size() == 1
+        && t.users.size() == 2
+        && t.cost > -1000000 && t.cost < 1000000
+        && get(/databases/$(database)/documents/Users/$(request.auth.uid))
+             .data.friends[t.payers[0]].status == 'accepted';
+    }
+
+    match /Transactions/{transactionID} {
+      // Only parties to a transaction may read it. The app queries
+      // `where('users', 'array-contains', uid)`, which satisfies this.
+      allow read: if signedIn() && request.auth.uid in resource.data.users;
+
+      allow create: if signedIn()
+        && request.resource.data.creator == request.auth.uid
+        && validTransactionShape(request.resource.data)
+        && (validTrip(request.resource.data)
+            || validSettle(request.resource.data));
+
+      // Transactions are immutable from the client.
+      allow update, delete: if false;
+    }
+
+    // ----------------------------------------------------------------------- Users
+
+    function friendsOf(data) {
+      return data.get('friends', {});
+    }
+
+    // Friend relationship that grants the requester read access to `data`.
+    //  - 'accepted': mutual friends.
+    //  - 'outgoing': `data`'s owner sent the requester a friend request
+    //    (FriendRequestsSection reads the requester's name/email).
+    //  - 'incoming': the requester sent `data`'s owner a request.
+    //    KNOWN GAP (audit finding 4): the shipped FriendsScreen queries
+    //    `__name__ in <all non-TEMP friend keys>`, including pending outgoing
+    //    requests, and the whole query fails if any doc is denied. Drop
+    //    'incoming' once the app filters that query to accepted friends and
+    //    old builds have aged out.
+    //  - no status: legacy "ghost" entries ({balance} only) that older
+    //    versions of aggregateBalances created between non-friends. Kept so
+    //    existing users' friend queries keep working; functions no longer
+    //    create them. Drop after a cleanup migration.
+    function canReadAsFriend(data) {
+      let entry = friendsOf(data).get(request.auth.uid, null);
+      return entry != null && (
+        !(entry is map)
+        || !('status' in entry)
+        || entry.status in ['accepted', 'outgoing', 'incoming']
+      );
+    }
+
+    function validNewUser(uid, d) {
+      return d.keys().hasOnly(['uid', 'email', 'firstName', 'lastName',
+                               'transactions', 'friends',
+                               'notificationToken', 'appleUser'])
+        && d.keys().hasAll(['uid', 'email', 'firstName', 'lastName'])
+        && d.uid == uid
+        && d.email is string
+        && d.firstName is string
+        && d.lastName is string
+        && d.get('transactions', []) == []
+        && d.get('friends', {}) == {}
+        && (!('notificationToken' in d) || d.notificationToken is string)
+        && (!('appleUser' in d) || d.appleUser is bool);
+    }
+
+    // A new outgoing friend request as written by AddFriendsSection.
+    function validOutgoing(f) {
+      return f is map
+        && f.keys().hasOnly(['status', 'accepted', 'balance', 'email'])
+        && f.status == 'outgoing'
+        && f.accepted == false
+        && f.balance == 0
+        && f.email is string;
+    }
+
+    // Accepting an incoming request (FriendRequestsSection). Only an entry
+    // that a Cloud Function mirrored in as 'incoming' can become 'accepted'.
+    function validAccept(oldF, newF) {
+      return oldF is map
+        && oldF.get('status', '') == 'incoming'
+        && newF is map
+        && newF.keys().hasOnly(['status', 'accepted', 'balance', 'email'])
+        && newF.status == 'accepted'
+        && newF.accepted == true
+        && (newF.balance == 0 || newF.balance == oldF.get('balance', 0))
+        && (!('email' in newF) || newF.email is string);
+    }
+
+    // The app always rewrites the whole `friends` map, changing exactly one
+    // entry: add an outgoing request, accept an incoming one, or remove
+    // entries. Balances and other entries must be untouched.
+    function validFriendsChange(oldFriends, newFriends) {
+      let d = newFriends.diff(oldFriends);
+      let added = d.addedKeys();
+      let changed = d.changedKeys();
+      let removed = d.removedKeys();
+      return (added.size() == 0 && changed.size() == 0)
+        || (added.size() == 1 && changed.size() == 0 && removed.size() == 0
+            && validOutgoing(
+                 newFriends[newFriends.keys().removeAll(oldFriends.keys())[0]]))
+        || (added.size() == 0 && changed.size() == 1 && removed.size() == 0
+            && oldFriends.values().removeAll(newFriends.values()).size() == 1
+            && newFriends.values().removeAll(oldFriends.values()).size() == 1
+            && validAccept(
+                 oldFriends.values().removeAll(newFriends.values())[0],
+                 newFriends.values().removeAll(oldFriends.values())[0]));
+    }
+
+    function validUserUpdate() {
+      let newD = request.resource.data;
+      let changed = newD.diff(resource.data).affectedKeys();
+      return changed.hasOnly(['friends', 'notificationToken', 'splitwiseUID'])
+        && (!('friends' in changed)
+            || (newD.friends is map
+                && validFriendsChange(friendsOf(resource.data), newD.friends)))
+        && (!('notificationToken' in changed)
+            || newD.notificationToken is string)
+        && (!('splitwiseUID' in changed)
+            || newD.splitwiseUID == null
+            || newD.splitwiseUID is int
+            || newD.splitwiseUID is string);
+    }
+
+    match /Users/{uid} {
+      allow read: if signedIn()
+        && (uid == request.auth.uid || canReadAsFriend(resource.data));
+
+      allow create: if signedIn() && uid == request.auth.uid
+        && validNewUser(uid, request.resource.data);
+
+      allow update: if signedIn() && uid == request.auth.uid
+        && validUserUpdate();
+
+      // Account deletion (SettingsScreen).
+      allow delete: if signedIn() && uid == request.auth.uid;
+    }
+
+    // ----------------------------------------------------------------- SecureUsers
+
+    match /SecureUsers/{uid}/{documents=**} {
+      allow read, write, delete: if signedIn() && uid == request.auth.uid;
     }
 
     match /{document=**} {
