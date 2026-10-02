@@ -36,7 +36,7 @@ module.exports = {
   slug: 'gas-me-up',
   owner: 'mmcardle',
   originalFullName: '@mmcardle/GasMeUp',
-  version: '1.1.2',
+  version: '1.2.0',
   orientation: 'portrait',
   icon: './assets/car.png',
   updates: {
@@ -49,7 +49,7 @@ module.exports = {
   ios: {
     supportsTablet: false,
     bundleIdentifier: 'com.Virintus.GasMeUp',
-    buildNumber: '1.1.2',
+    buildNumber: '1.2.0',
     appleTeamId: '2Q4CXG64VY',
     config: {
       usesNonExemptEncryption: false,
@@ -92,7 +92,7 @@ module.exports = {
     },
     package: 'com.Virintus.GasMeUp',
     googleServicesFile: `./google-services-${firebaseFileSuffix}.json`,
-    versionCode: 470010102,
+    versionCode: 470010200,
   },
   extra: {
     eas: {

@@ -35,7 +35,8 @@
         "image": "macos-tahoe-26.5-xcode-26.6"
       },
       "env": {
-        "FIREBASE_ENV": "prod"
+        "FIREBASE_ENV": "prod",
+        "USE_DEV_API": "false"
       }
     }
   },

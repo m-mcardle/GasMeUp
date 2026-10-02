@@ -51,7 +51,7 @@ if (process.env.NODE_ENV === 'development') {
     checkDevAPI();
   }
 } else if (ENV.USE_DEV_API === 'true') {
-  console.error('USE_DEV_API is enabled in production. This should not happen.');
+  console.warn('USE_DEV_API is set in a release build; ignoring it and using the production server.');
 }
 
 export default ENV;

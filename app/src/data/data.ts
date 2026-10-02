@@ -1,8 +1,10 @@
-import { ENV } from '../helpers/env';
+import { DEV, ENV } from '../helpers/env';
 import { getConfig } from '../helpers/featureHelper';
 
 function serverUrl() {
-  return ENV.USE_DEV_API === 'true' && ENV.DEV_API_URL
+  // The dev API override only applies to development builds; release builds always use the
+  // Remote Config server URL, even if USE_DEV_API leaks into a production environment.
+  return DEV && ENV.USE_DEV_API === 'true' && ENV.DEV_API_URL
     ? ENV.DEV_API_URL
     : getConfig('server_url');
 }
