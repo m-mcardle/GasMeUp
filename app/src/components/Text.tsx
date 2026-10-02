@@ -1,31 +1,50 @@
 /* eslint-disable react/jsx-props-no-spreading */
 
 import React, { ReactNode } from 'react';
-import { Text } from 'react-native';
+import {
+  Text, TextProps, StyleProp, TextStyle,
+} from 'react-native';
 
-import { globalStyles } from '../styles/styles';
+import { color, type, TypeVariant } from '../styles/theme';
 
-interface Props {
+export type TextTone = 'primary' | 'secondary' | 'tertiary' | 'brand' | 'success' | 'danger' | 'onPrimary';
+
+const toneColor: Record<TextTone, string> = {
+  primary: color.text,
+  secondary: color.textSecondary,
+  tertiary: color.textTertiary,
+  brand: color.primaryText,
+  success: color.success,
+  danger: color.danger,
+  onPrimary: color.textOnPrimary,
+};
+
+interface Props extends Omit<TextProps, 'style'> {
   children?: ReactNode[] | ReactNode,
-  style?: object,
-  onPress?: () => void,
-  numberOfLines?: number,
+  variant?: TypeVariant,
+  tone?: TextTone,
+  align?: TextStyle['textAlign'],
+  style?: StyleProp<TextStyle>,
 }
 
-export default function AppText(props: Props) {
-  const {
-    children,
-    style,
-    numberOfLines,
-    onPress,
-  } = props;
-
+export default function AppText({
+  children,
+  variant = 'body',
+  tone = 'primary',
+  align,
+  style,
+  ...rest
+}: Props) {
   return (
     <Text
-      {...props}
-      style={[globalStyles.text, style]}
-      onPress={onPress}
-      numberOfLines={numberOfLines}
+      maxFontSizeMultiplier={1.4}
+      {...rest}
+      style={[
+        type[variant],
+        { color: toneColor[tone] },
+        align ? { textAlign: align } : null,
+        style,
+      ]}
     >
       {children}
     </Text>

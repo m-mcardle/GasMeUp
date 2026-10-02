@@ -1,5 +1,5 @@
 import React from 'react';
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 interface TabIconProps {
   name: string,
@@ -14,31 +14,17 @@ export default function TabIcon({
   color,
   size,
 } : TabIconProps) {
-  let iconName: React.ComponentProps<typeof Ionicons>['name'] = 'square';
-
+  const iconSize = size - 2;
   switch (name) {
     case 'Home':
-      iconName = focused
-        ? 'calculator'
-        : 'calculator-outline';
-      break;
+      return <Ionicons name={focused ? 'calculator' : 'calculator-outline'} size={iconSize} color={color} />;
     case 'Friends/Login':
-      iconName = focused
-        ? 'people'
-        : 'people-outline';
-      break;
+      return <Ionicons name={focused ? 'people' : 'people-outline'} size={iconSize} color={color} />;
     case 'Car':
-      iconName = focused
-        ? 'car'
-        : 'car-outline';
-      break;
+      return <Ionicons name={focused ? 'car-sport' : 'car-sport-outline'} size={iconSize} color={color} />;
     case 'Gas Prices':
-      return <FontAwesome5 name="gas-pump" size={size} color={color} />;
+      return <MaterialCommunityIcons name={focused ? 'gas-station' : 'gas-station-outline'} size={iconSize} color={color} />;
     default:
-      iconName = 'square';
+      return <Ionicons name="square-outline" size={iconSize} color={color} />;
   }
-
-  return (
-    <Ionicons name={iconName} size={size} color={color} />
-  );
 }

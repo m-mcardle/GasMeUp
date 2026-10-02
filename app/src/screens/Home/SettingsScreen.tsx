@@ -1,16 +1,13 @@
 // React
-import React, { useMemo, useState } from 'react';
-import {
-  View,
-  Switch,
-} from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 
-// External Components
-import { Portal, SegmentedButtons } from 'react-native-paper';
+import Constants from 'expo-constants';
+import { Ionicons } from '@expo/vector-icons';
 
 // Firebase
 import {
-  AuthCredential, deleteUser, reauthenticateWithCredential, sendEmailVerification,
+  AuthCredential, deleteUser, reauthenticateWithCredential, sendEmailVerification, signOut,
 } from 'firebase/auth';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -19,9 +16,14 @@ import { auth, db } from '../../../firebase';
 // Components
 import Page from '../../components/Page';
 import Text from '../../components/Text';
-import Button from '../../components/Button';
 import MyModal from '../../components/Modal';
 import Alert from '../../components/Alert';
+import Avatar from '../../components/Avatar';
+import Badge from '../../components/Badge';
+import Card from '../../components/Card';
+import ListRow from '../../components/ListRow';
+import SectionHeader from '../../components/SectionHeader';
+import SegmentedControl from '../../components/SegmentedControl';
 
 import LoginSection from '../Auth/components/LoginSection';
 
@@ -35,10 +37,51 @@ import { DEV } from '../../helpers/env';
 import { logEvent } from '../../helpers/analyticsHelper';
 
 // Styles
-import styles from '../../styles/SettingsScreen.styles';
-import { colors, globalStyles } from '../../styles/styles';
+import { color, radius, space } from '../../styles/theme';
 
-export default function SettingsScreen() {
+const styles = StyleSheet.create({
+  account: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.lg,
+  },
+  rowIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footer: {
+    marginTop: space.xxl,
+    alignItems: 'center',
+    gap: space.xs,
+  },
+});
+
+const unitLabels: Record<string, string> = {
+  CA: 'Metric · L, km',
+  US: 'Imperial · gal, mi',
+};
+
+function RowIcon({ name, tone = 'brand' }: { name: React.ComponentProps<typeof Ionicons>['name'], tone?: 'brand' | 'danger' }) {
+  const isDanger = tone === 'danger';
+  return (
+    <View
+      style={[styles.rowIcon, { backgroundColor: isDanger ? color.dangerSoft : color.primarySoft }]}
+    >
+      <Ionicons name={name} size={17} color={isDanger ? color.danger : color.primaryText} />
+    </View>
+  );
+}
+
+interface Props {
+  navigation: {
+    navigate: (str: string) => void,
+  },
+}
+
+export default function SettingsScreen({ navigation }: Props) {
   const [user] = useAuthState(auth);
   const [modalVisible, setModalVisible] = useState(false);
   const [globalState, updateGlobalState] = useGlobalState();
@@ -99,15 +142,35 @@ export default function SettingsScreen() {
     logEvent('request_email_verification');
 
     sendEmailVerification(user).then(() => {
-      Alert('Email Verification Sent', 'A verification email has been sent to your email address.');
+      Alert('Check your inbox', `We sent a verification link to ${user.email}.`);
     }).catch((error) => {
       console.log(error);
     });
   };
 
+  const showSignOutAlert = () => Alert(
+    'Sign out?',
+    'You can sign back in at any time.',
+    [
+      {
+        text: 'Sign out',
+        onPress: () => {
+          logEvent('sign_out');
+          signOut(auth).catch((exception) => Alert('Couldn’t sign out', exception.message));
+        },
+        style: 'destructive',
+      },
+      {
+        text: 'Cancel',
+        onPress: () => {},
+        style: 'cancel',
+      },
+    ],
+  );
+
   const showDeleteConfirmationAlert = () => Alert(
-    'Delete Account',
-    'Are you sure you want to delete your account? This action cannot be undone.',
+    'Delete your account?',
+    'Your trips and balances will be permanently removed. This can’t be undone.',
     [
       {
         text: 'Delete',
@@ -122,114 +185,90 @@ export default function SettingsScreen() {
     ],
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const SettingsSwitch = ({ name = '', value = false }) => useMemo(() => (
-    <View style={styles.settingItem}>
-      <Switch
-        value={value}
-        onValueChange={(val) => changeSetting(name, val, updateGlobalState)}
-        trackColor={{ false: colors.primary, true: colors.action }}
-        ios_backgroundColor={colors.primary}
-      />
-    </View>
-  ), [value, name, globalState]);
+  const version = Constants.expoConfig?.version;
 
   return (
-    <Page keyboardAvoiding={false}>
-      <Portal>
-        <MyModal
-          visible={modalVisible}
-          onDismiss={() => setModalVisible(false)}
-        >
-          <View style={globalStyles.centered}>
-            <Text style={globalStyles.h2}>Please login again before you delete your account</Text>
-            <LoginSection onLogin={deleteAccount} mode="refresh" />
-          </View>
-        </MyModal>
-      </Portal>
-      <View style={styles.mainContainer}>
-        {user && (
-        <View style={styles.settingGroup}>
-          <View style={styles.settingContainer}>
-            <Text style={styles.settingHeader}>User Details</Text>
-          </View>
-          <View style={styles.settingContainer}>
-            <Text style={styles.settingsText}>Name:</Text>
-            <View style={styles.settingItem}>
-              <Text style={styles.settingValueText} numberOfLines={1}>{user?.displayName ?? 'Unknown'}</Text>
-            </View>
-          </View>
-          <View style={styles.settingContainer}>
-            <Text style={styles.settingsText}>UID:</Text>
-            <View style={styles.settingItem}>
-              <Text style={styles.settingValueText} numberOfLines={1}>{user?.uid ?? 'Unknown'}</Text>
-            </View>
-          </View>
-          <View style={styles.settingContainer}>
-            <Text style={styles.settingsText}>Email:</Text>
-            <View style={styles.settingItem}>
-              <Text style={styles.settingValueText} numberOfLines={1}>{user?.email ?? 'Unknown'}</Text>
-            </View>
-          </View>
-          <View style={styles.settingContainer}>
-            <Text style={styles.settingsText}>Email Verified</Text>
-            <View style={styles.settingItem}>
-              <Text style={styles.settingValueText}>{user?.emailVerified === true ? 'Yes' : 'No'}</Text>
-            </View>
-          </View>
-        </View>
-        )}
+    <Page scroll safeTop={false} keyboardAvoiding={false}>
+      <MyModal
+        visible={modalVisible}
+        title="Confirm it’s you"
+        subtitle="Sign in again to delete your account."
+        onDismiss={() => setModalVisible(false)}
+      >
+        <LoginSection onLogin={deleteAccount} mode="refresh" />
+      </MyModal>
 
-        <View style={styles.settingGroup}>
-          {Object.keys(OPTIONS_SETTINGS).map((setting) => (
-            <View key={setting} style={styles.settingContainer}>
-              <Text style={styles.settingsText}>{`${OPTIONS_SETTINGS[setting].label ?? setting}:`}</Text>
-              <View style={styles.settingItem}>
-                <SegmentedButtons
-                  buttons={OPTIONS_SETTINGS[setting].options.map((option) => ({
-                    label: option.toString(),
-                    value: option.toString(),
-                    style: {
-                      backgroundColor: (option === globalState[setting]
-                        ? colors.action
-                        : colors.primary
-                      ),
-                    },
-                  }))}
-                  value={globalState[setting]}
-                  onValueChange={(val: any) => changeSetting(setting, val, updateGlobalState)}
-                  style={styles.settingItem}
-                />
-              </View>
-            </View>
-          ))}
-          {user && !user.emailVerified && (
-          <View style={styles.settingContainer}>
-            <Text style={styles.settingsText}>Resend Email Verification:</Text>
-            <View style={styles.settingItem}>
-              <Button
-                style={{ margin: 0, paddingHorizontal: 32 }}
-                onPress={sendEmailVerificationEmail}
-              >
-                <Text style={{ color: 'white' }}>Request</Text>
-              </Button>
+      {user ? (
+        <Card style={[styles.account, { marginTop: space.sm }]}>
+          <Avatar name={user.displayName ?? user.email ?? '?'} email={user.email ?? undefined} size={56} />
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="title3" numberOfLines={1}>{user.displayName ?? 'GasMeUp user'}</Text>
+            <Text variant="footnote" tone="secondary" numberOfLines={1}>{user.email}</Text>
+            <View style={{ marginTop: space.xs }}>
+              {user.emailVerified
+                ? <Badge label="Verified" tone="success" />
+                : <Badge label="Email not verified" tone="warning" />}
             </View>
           </View>
-          )}
-          {user && (
-          <View style={styles.settingContainer}>
-            <Text style={styles.settingsText}>Delete Account:</Text>
-            <View style={styles.settingItem}>
-              <Button
-                style={{ backgroundColor: 'red', margin: 0, paddingHorizontal: 32 }}
-                onPress={showDeleteConfirmationAlert}
-              >
-                <Text style={{ color: 'white' }}>Delete</Text>
-              </Button>
-            </View>
-          </View>
-          )}
+        </Card>
+      ) : (
+        <Card padded={false} style={{ marginTop: space.sm }}>
+          <ListRow
+            title="Sign in"
+            subtitle="Save trips and split them with friends"
+            separator={false}
+            leading={<RowIcon name="person-circle-outline" />}
+            chevron
+            onPress={() => navigation.navigate('Friends/Login')}
+          />
+        </Card>
+      )}
+
+      {Object.keys(OPTIONS_SETTINGS).map((setting) => (
+        <View key={setting}>
+          <SectionHeader title="Units" />
+          <SegmentedControl
+            options={OPTIONS_SETTINGS[setting].options.map((option) => ({
+              value: option.toString(),
+              label: unitLabels[option.toString()] ?? option.toString(),
+            }))}
+            value={globalState[setting]}
+            onChange={(val) => changeSetting(setting, val, updateGlobalState)}
+          />
         </View>
+      ))}
+
+      {user && (
+        <>
+          <SectionHeader title="Account" />
+          <Card padded={false}>
+            {!user.emailVerified && (
+              <ListRow
+                title="Resend verification email"
+                leading={<RowIcon name="mail-outline" />}
+                chevron
+                onPress={sendEmailVerificationEmail}
+              />
+            )}
+            <ListRow
+              title="Sign out"
+              leading={<RowIcon name="log-out-outline" />}
+              onPress={showSignOutAlert}
+            />
+            <ListRow
+              title="Delete account"
+              destructive
+              separator={false}
+              leading={<RowIcon name="trash-outline" tone="danger" />}
+              onPress={showDeleteConfirmationAlert}
+            />
+          </Card>
+        </>
+      )}
+
+      <View style={styles.footer}>
+        <Text variant="footnote" tone="tertiary">{`GasMeUp${version ? ` ${version}` : ''}`}</Text>
+        {user && <Text variant="caption" tone="tertiary" selectable style={{ fontSize: 10 }}>{`ID ${user.uid}`}</Text>}
       </View>
     </Page>
   );

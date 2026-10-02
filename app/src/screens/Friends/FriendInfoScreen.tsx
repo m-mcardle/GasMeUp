@@ -1,12 +1,10 @@
 // React
 import React, { useCallback, useState } from 'react';
 import {
-  Image, ScrollView, View, Platform,
+  ActivityIndicator, StyleSheet, View,
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
-
-import { ActivityIndicator, DataTable, Portal } from 'react-native-paper';
 
 // Firebase
 import {
@@ -23,17 +21,46 @@ import MapModal from '../../components/MapModal';
 import Modal from '../../components/Modal';
 import Page from '../../components/Page';
 import Alert from '../../components/Alert';
+import Avatar from '../../components/Avatar';
+import Card from '../../components/Card';
+import EmptyState from '../../components/EmptyState';
+import ListRow from '../../components/ListRow';
+import SectionHeader from '../../components/SectionHeader';
 
 import TripDetailsModal from './components/TripDetailsModal';
+import { balanceLabel } from './components/FriendRow';
 
 // Styles
-import styles from '../../styles/FriendsScreen.styles';
-import { colors, boldFont } from '../../styles/styles';
+import { color, radius, space } from '../../styles/theme';
 
 // Helpers
 import { createTransaction } from '../../helpers/firestoreHelper';
-import { getIcon } from '../../helpers/iconHelper';
 import { logEvent } from '../../helpers/analyticsHelper';
+
+const styles = StyleSheet.create({
+  profile: {
+    alignItems: 'center',
+    paddingTop: space.sm,
+    paddingBottom: space.xl,
+  },
+  balance: {
+    alignItems: 'center',
+    gap: space.xs,
+  },
+  tripIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: color.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loading: {
+    paddingVertical: space.huge,
+  },
+});
+
+const firstPart = (address: string | undefined) => (address ?? 'Unknown').split(',')[0];
 
 const transactionsRef = collection(db, 'Transactions');
 
@@ -51,7 +78,8 @@ interface Props {
 export default function FriendInfoScreen({
   uid, name, amount, email, navigation,
 }: Props) {
-  const formattedAmount = amount < 0 ? `-$${Math.abs(amount).toFixed(2)}` : `$${amount.toFixed(2)}`;
+  const formattedAmount = `$${Math.abs(amount).toFixed(2)}`;
+  const firstName = name.split(' ')[0];
 
   const [currentUser] = useAuthState(auth);
   const [mapVisible, setMapVisible] = useState(false);
@@ -126,11 +154,11 @@ export default function FriendInfoScreen({
   };
 
   const showSettleConfirmationAlert = () => Alert(
-    'Settle Up',
-    `Are you sure you want to settle up with ${name} for ${formattedAmount}?`,
+    `Settle up with ${firstName}?`,
+    `This clears your ${formattedAmount} balance and starts a fresh trip history.`,
     [
       {
-        text: 'OK',
+        text: 'Settle up',
         onPress: () => settleUp(),
         style: 'default',
       },
@@ -142,151 +170,102 @@ export default function FriendInfoScreen({
     ],
   );
 
+  const { label: balanceText, tone: balanceTone } = balanceLabel(amount);
+  let balanceSentence = 'You’re all settled up';
+  if (balanceTone === 'success') balanceSentence = `${firstName} owes you`;
+  if (balanceTone === 'danger') balanceSentence = `You owe ${firstName}`;
+
   return (
-    <Page>
-      <Portal>
-        <Modal
-          visible={viewMoreVisible}
-          onDismiss={() => setViewMoreVisible(false)}
-        >
-          <TripDetailsModal
-            transaction={selectedTransaction}
-            setMapVisible={() => setMapVisible(true)}
-            transactionAmount={getTransactionAmount(selectedTransaction)}
-            transactionWaypoints={transactionWaypoints}
-          />
-        </Modal>
-
-        <Modal
-          visible={mapVisible}
-          onDismiss={() => setMapVisible(false)}
-        >
-          {transactionWaypoints.length > 0 && (
-            <MapModal
-              showUserLocation={false}
-              waypoints={transactionWaypoints}
-            />
-          )}
-        </Modal>
-      </Portal>
-      <View style={{ width: '100%', alignItems: 'center' }}>
-        <Image
-          style={{ width: 64, height: 64, marginHorizontal: 'auto' }}
-          source={getIcon({ email, name })}
-        />
-      </View>
-      <Text style={styles.friendInfoTitle}>
-        {name}
-      </Text>
-      <Text style={styles.friendInfoSubtitle}>
-        {email}
-      </Text>
-
-      <DataTable>
-        <DataTable.Header>
-          <DataTable.Title style={{ maxWidth: '10%' }}> </DataTable.Title>
-          <DataTable.Title style={{ minWidth: '35%' }}>Start/End</DataTable.Title>
-          <DataTable.Title numeric>Date</DataTable.Title>
-          <DataTable.Title numeric>Amount</DataTable.Title>
-        </DataTable.Header>
-
-        {transactionsLoading && (
-          <DataTable.Row style={{ minHeight: 150, alignContent: 'center' }}>
-            <DataTable.Cell style={{ alignContent: 'center', justifyContent: 'center' }}>
-              <ActivityIndicator animating color={colors.action} size="large" />
-            </DataTable.Cell>
-          </DataTable.Row>
-        )}
-
-        <ScrollView style={{ maxHeight: 300 }}>
-          {transactionsSinceLastSettle?.map((transaction) => (
-            <DataTable.Row
-              key={transaction.payeeUID + transaction.amount + transaction.date}
-              onPress={() => openTransactionViewMore(transaction)}
-            >
-              <DataTable.Cell
-                style={{ maxWidth: '10%' }}
-                onPress={() => {
-                  setSelectedTransaction(transaction);
-                  setMapVisible(true);
-                }}
-                disabled={!(transaction?.waypoints?.length > 0)}
-              >
-                {transaction?.waypoints?.length > 0 && (
-                <View style={{ justifyContent: 'center', minWidth: 20, alignItems: 'center' }}>
-                  <Ionicons name="map" size={18} color={colors.action} />
-                </View>
-                )}
-              </DataTable.Cell>
-              <DataTable.Cell
-                style={{ minWidth: '35%' }}
-              >
-                <View style={{ justifyContent: 'center' }}>
-                  <Text style={{ fontSize: 8 }} numberOfLines={1}>
-                    {`Start: ${Platform.OS !== 'ios' && transaction.startLocation.length > 35 ? `${transaction.startLocation.slice(0, 32)}...` : transaction.startLocation}`}
-                  </Text>
-                  <Text style={{ fontSize: 8, paddingTop: 4 }} numberOfLines={1}>
-                    {`End: ${Platform.OS !== 'ios' && transaction.endLocation.length > 35 ? `${transaction.endLocation.slice(0, 32)}...` : transaction.endLocation}`}
-                  </Text>
-                </View>
-              </DataTable.Cell>
-              <DataTable.Cell
-                textStyle={{ fontSize: 8 }}
-                numeric
-              >
-                {transaction.date.toDate().toLocaleDateString()}
-              </DataTable.Cell>
-              <DataTable.Cell
-                textStyle={{
-                  fontSize: 10,
-                  color: getTransactionAmount(transaction) > 0 ? colors.white : colors.red,
-                }}
-                numeric
-              >
-                $
-                {getTransactionAmount(transaction) > 0
-                  ? getTransactionAmount(transaction).toFixed(2)
-                  : (getTransactionAmount(transaction) * -1).toFixed(2)}
-              </DataTable.Cell>
-            </DataTable.Row>
-          ))}
-        </ScrollView>
-
-        {!transactionsLoading && transactionsSinceLastSettle.length === 0 && (
-        <View style={{ justifyContent: 'center', alignItems: 'center', marginVertical: 24 }}>
-          <Text style={{ color: colors.secondary, fontSize: 24 }}>No Trips</Text>
-          <Text style={{ color: colors.secondary, fontSize: 10 }}>
-            You and this friend are all settled up!
-          </Text>
-        </View>
-        )}
-
-        <DataTable.Row
-          style={{
-            borderTopWidth: 1,
-            borderTopColor: colors.darkestGray,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.darkestGray,
+    <Page scroll safeTop={false}>
+      <Modal
+        visible={viewMoreVisible}
+        title="Trip details"
+        onDismiss={() => setViewMoreVisible(false)}
+      >
+        <TripDetailsModal
+          transaction={selectedTransaction}
+          setMapVisible={() => {
+            // Only one sheet can be presented at a time.
+            setViewMoreVisible(false);
+            setTimeout(() => setMapVisible(true), 350);
           }}
-        >
-          <DataTable.Cell textStyle={{ fontFamily: boldFont }}>
-            Balance
-          </DataTable.Cell>
-          <DataTable.Cell textStyle={{ fontFamily: boldFont }} numeric>
-            {formattedAmount}
-          </DataTable.Cell>
-        </DataTable.Row>
-      </DataTable>
+          transactionAmount={getTransactionAmount(selectedTransaction)}
+          transactionWaypoints={transactionWaypoints}
+        />
+      </Modal>
 
-      <View style={styles.friendInfoButtonSection}>
+      <Modal
+        visible={mapVisible}
+        title="Route"
+        tall
+        onDismiss={() => setMapVisible(false)}
+      >
+        {transactionWaypoints.length > 0 && (
+          <MapModal
+            showUserLocation={false}
+            waypoints={transactionWaypoints}
+            startAddress={selectedTransaction.startLocation}
+            endAddress={selectedTransaction.endLocation}
+          />
+        )}
+      </Modal>
+
+      <View style={styles.profile}>
+        <Avatar name={name} email={email} size={76} />
+        <Text variant="title2" align="center" style={{ marginTop: space.md }}>{name}</Text>
+        {!!email && <Text variant="footnote" tone="tertiary" align="center">{email}</Text>}
+      </View>
+
+      <Card style={styles.balance}>
+        <Text variant="overline" tone="tertiary">{balanceText}</Text>
+        <Text variant="display" tone={balanceTone === 'tertiary' ? 'primary' : balanceTone}>{formattedAmount}</Text>
+        <Text variant="subhead" tone="secondary">{balanceSentence}</Text>
         <Button
-          style={styles.friendInfoButton}
+          title="Settle up"
+          icon="checkmark-done"
+          fullWidth
+          style={{ marginTop: space.lg }}
           disabled={transactionsSinceLastSettle.length === 0 && amount === 0}
           onPress={showSettleConfirmationAlert}
-        >
-          <Text style={{ color: 'white' }}>Settle Up</Text>
-        </Button>
-      </View>
+        />
+      </Card>
+
+      <SectionHeader title="Trips since last settle-up" />
+      {transactionsLoading && (
+        <ActivityIndicator style={styles.loading} color={color.primaryText} size="large" />
+      )}
+      {!transactionsLoading && transactionsSinceLastSettle.length === 0 && (
+        <Card>
+          <EmptyState icon="car-outline" title="No trips yet" message={`Trips you share with ${firstName} will show up here.`} style={{ paddingVertical: space.lg }} />
+        </Card>
+      )}
+      {!transactionsLoading && transactionsSinceLastSettle.length > 0 && (
+        <Card padded={false}>
+          {transactionsSinceLastSettle.map((transaction, index) => {
+            const transactionAmount = getTransactionAmount(transaction);
+            const hasRoute = transaction?.waypoints?.length > 0;
+            return (
+              <ListRow
+                key={transaction.payeeUID + transaction.amount + transaction.date}
+                title={`${firstPart(transaction.startLocation)} → ${firstPart(transaction.endLocation)}`}
+                subtitle={transaction.date.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                separator={index < transactionsSinceLastSettle.length - 1}
+                leading={(
+                  <View style={styles.tripIcon}>
+                    <Ionicons name={hasRoute ? 'map-outline' : 'car-outline'} size={20} color={color.primaryText} />
+                  </View>
+                )}
+                trailing={(
+                  <Text variant="headline" tone={transactionAmount > 0 ? 'success' : 'danger'}>
+                    {`${transactionAmount > 0 ? '+' : '−'}$${Math.abs(transactionAmount).toFixed(2)}`}
+                  </Text>
+                )}
+                onPress={() => openTransactionViewMore(transaction)}
+              />
+            );
+          })}
+        </Card>
+      )}
     </Page>
   );
 }

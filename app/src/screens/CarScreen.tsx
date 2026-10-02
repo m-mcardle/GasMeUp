@@ -3,13 +3,13 @@ import React, {
   useState, useEffect, useRef,
 } from 'react';
 import {
-  View,
+  ActivityIndicator,
+  StyleSheet,
   TextInput,
+  View,
 } from 'react-native';
 
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-
-import { DataTable } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
 
 // Global State Stuff
 import { useGlobalState, changeSetting } from '../hooks/hooks';
@@ -18,7 +18,10 @@ import { useGlobalState, changeSetting } from '../hooks/hooks';
 import Page from '../components/Page';
 import Text from '../components/Text';
 import Button from '../components/Button';
-import Table from '../components/Table';
+import Card from '../components/Card';
+import Badge from '../components/Badge';
+import ScreenHeader from '../components/ScreenHeader';
+import SectionHeader from '../components/SectionHeader';
 import AutocompleteInput from '../components/AutocompleteInput';
 import Alert from '../components/Alert';
 
@@ -30,59 +33,38 @@ import { convertFuelEfficiency, convertFuelEfficiencyToString } from '../helpers
 import { logEvent } from '../helpers/analyticsHelper';
 
 // Styles
-import styles from '../styles/CarScreen.styles';
-import { colors, globalStyles } from '../styles/styles';
+import { color, radius, space } from '../styles/theme';
 
-function Row({
-  label, text, value, useAsFuelEfficiency, locale,
-}: any) {
-  const canadianFuelEfficiency = convertFuelEfficiency(value, locale, 'CA');
-  return (
-    <DataTable.Row
-      key={text}
-    >
-      <DataTable.Cell>
-        {label}
-      </DataTable.Cell>
-      <DataTable.Cell numeric>
-        {text}
-      </DataTable.Cell>
-      <DataTable.Cell style={{ maxWidth: 64, justifyContent: 'center' }} numeric>
-        <Button
-          style={{ paddingHorizontal: 8, padding: 2, margin: 0 }}
-          onPress={() => useAsFuelEfficiency(canadianFuelEfficiency, label)}
-        >
-          <Text>Use</Text>
-        </Button>
-      </DataTable.Cell>
-    </DataTable.Row>
-  );
-}
+const styles = StyleSheet.create({
+  form: {
+    gap: space.lg,
+  },
+  resultHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: space.lg,
+    gap: space.md,
+  },
+  tiles: {
+    gap: space.sm,
+  },
+  tile: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: color.surfaceRaised,
+    borderRadius: radius.md,
+    paddingVertical: space.md,
+    paddingHorizontal: space.md,
+    gap: space.md,
+  },
+  loading: {
+    paddingVertical: space.xxl,
+  },
+});
 
-function FooterRow({ label, text }: any) {
-  return (
-    <DataTable.Row
-      key={text}
-    >
-      <DataTable.Cell>
-        {label}
-      </DataTable.Cell>
-      <DataTable.Cell numeric>
-        {' '}
-      </DataTable.Cell>
-      <DataTable.Cell style={{ maxWidth: 64, justifyContent: 'center' }} numeric>
-        {text}
-      </DataTable.Cell>
-    </DataTable.Row>
-  );
-}
-
-function EmptyState() {
-  return (
-    <Text>
-      No vehicle selected
-    </Text>
-  );
+function FieldIcon({ name }: { name: React.ComponentProps<typeof Ionicons>['name'] }) {
+  return <Ionicons name={name} size={18} color={color.textTertiary} />;
 }
 
 enum ActiveInput {
@@ -250,12 +232,6 @@ export default function CarScreen({ navigation }: any) {
     }
   };
 
-  const headers = [
-    { text: 'Statistic', numeric: false },
-    { text: 'Value', numeric: true },
-    { text: 'Use', numeric: true, style: { justifyContent: 'center', maxWidth: 64 } },
-  ];
-
   const fuelEfficiencyString = vehicle.mpg ? convertFuelEfficiencyToString(vehicle.mpg, 'US', globalState.Locale) : '';
   const cityFuelEfficiencyString = vehicle.city ? convertFuelEfficiencyToString(vehicle.city, 'US', globalState.Locale) : '';
   const highwayFuelEfficiencyString = vehicle.highway ? convertFuelEfficiencyToString(vehicle.highway, 'US', globalState.Locale) : '';
@@ -267,19 +243,19 @@ export default function CarScreen({ navigation }: any) {
   const tableData = vehicle.mpg
     ? [
       {
-        label: 'Milage',
+        label: 'Combined',
         text: fuelEfficiencyString,
         value: fuelEfficiency,
         key: 'Milage',
       },
       {
-        label: 'Milage (City)',
+        label: 'City',
         text: cityFuelEfficiencyString,
         value: cityFuelEfficiency,
         key: 'City',
       },
       {
-        label: 'Milage (Highway)',
+        label: 'Highway',
         text: highwayFuelEfficiencyString,
         value: highwayFuelEfficiency,
         key: 'Highway',
@@ -292,55 +268,29 @@ export default function CarScreen({ navigation }: any) {
       logEvent('use_as_fuel_efficiency', { type });
 
       changeSetting('Gas Mileage', value, updateGlobalState);
-      Alert('Gas Mileage Updated', `Your gas milage has been updated to ${convertFuelEfficiencyToString(value, 'CA', globalState.Locale)}`, [
+      Alert('Fuel efficiency updated', `Trips will now use ${convertFuelEfficiencyToString(value, 'CA', globalState.Locale)}.`, [
         {
-          text: 'OK',
+          text: 'Done',
           onPress: () => navigation.navigate('Home', { screen: 'Calculate', pop: true }),
         },
       ]);
     }
   };
 
-  const MyRow = ({
-    label,
-    text,
-    value,
-  }: any) => Row({
-    label,
-    text,
-    value,
-    locale: globalState.Locale,
-    useAsFuelEfficiency,
-  });
-
-  const getBorderColor = (previousInputCompleted: boolean, inputCompleted: boolean) => {
-    if (previousInputCompleted && inputCompleted) {
-      return colors.action;
-    } if (previousInputCompleted) {
-      return colors.white;
-    }
-    return colors.black;
-  };
+  const vehicleName = [selectedYear, selectedMake, selectedModel].filter(Boolean).join(' ');
+  const showResult = selectedYear && selectedMake && selectedModel && selectedTrim.value;
 
   return (
-    <Page>
-      <View style={styles.main}>
-        <Text style={styles.title}>Car Selection</Text>
-        <Text style={globalStyles.h3}>
-          Search for your car to get an accurate list of it&apos;s gas mileage
-        </Text>
+    <Page scroll>
+      <ScreenHeader
+        title="Your car"
+        subtitle="Look up your car’s official fuel economy and use it for trips."
+      />
+      <Card style={styles.form}>
         <AutocompleteInput
-          z={4}
-          labelStyle={{ paddingLeft: 0 }}
-          containerStyle={{
-            width: '100%',
-          }}
-          viewStyle={{
-            borderColor: (selectedYear ? colors.action : colors.white),
-            borderWidth: 1,
-            maxHeight: 300,
-            marginBottom: 16,
-          }}
+          label="Year"
+          placeholder="e.g. 2021"
+          keyboardType="number-pad"
           onPressIn={() => setActiveInput(ActiveInput.Year)}
           suggestions={(
             !loading && activeInput === ActiveInput.Year && !selectedYear
@@ -348,8 +298,8 @@ export default function CarScreen({ navigation }: any) {
               : []
           )}
           suggestionsLoading={loading && activeInput === ActiveInput.Year}
+          suggestionIcon="calendar-outline"
           onSuggestionPress={(newYear) => { setSelectedYear(newYear); selectNextInput(); }}
-          placeholder="Year"
           onChangeText={setYearInput}
           value={selectedYear || yearInput}
           clearButton
@@ -358,28 +308,14 @@ export default function CarScreen({ navigation }: any) {
           returnKeyType="next"
           editable={!selectedYear}
           showRedundantSuggestion
-          icon={(
-            <Ionicons
-              name="calendar"
-              size={30}
-              color={colors.action}
-            />
-           )}
+          icon={<FieldIcon name="calendar-outline" />}
         />
-        {selectedYear && (
+        {!!selectedYear && (
         <AutocompleteInput
           myRef={makeRef}
-          z={3}
-          labelStyle={{ paddingLeft: 0 }}
-          containerStyle={{
-            width: '100%',
-          }}
-          viewStyle={{
-            borderColor: getBorderColor(!!selectedYear, !!selectedMake),
-            borderWidth: 1,
-            maxHeight: 300,
-            marginBottom: 16,
-          }}
+          autoFocus
+          label="Make"
+          placeholder="e.g. Toyota"
           onPressIn={() => setActiveInput(ActiveInput.Make)}
           suggestions={(
             !loading && activeInput === ActiveInput.Make && selectedYear && !selectedMake
@@ -387,8 +323,8 @@ export default function CarScreen({ navigation }: any) {
               : []
           )}
           suggestionsLoading={loading && activeInput === ActiveInput.Make}
+          suggestionIcon="business-outline"
           onSuggestionPress={(newMake) => { setSelectedMake(newMake); selectNextInput(); }}
-          placeholder="Make"
           onChangeText={setMakeInput}
           value={selectedMake || makeInput}
           clearButton
@@ -397,29 +333,15 @@ export default function CarScreen({ navigation }: any) {
           returnKeyType="next"
           editable={!!selectedYear && !selectedMake}
           showRedundantSuggestion
-          icon={(
-            <FontAwesome5
-              name="building"
-              size={30}
-              color={colors.action}
-            />
-           )}
+          icon={<FieldIcon name="business-outline" />}
         />
         )}
-        {selectedYear && selectedMake && (
+        {!!selectedYear && !!selectedMake && (
         <AutocompleteInput
           myRef={modelRef}
-          z={2}
-          labelStyle={{ paddingLeft: 0 }}
-          containerStyle={{
-            width: '100%',
-          }}
-          viewStyle={{
-            borderColor: getBorderColor(!!selectedMake, !!selectedModel),
-            borderWidth: 1,
-            maxHeight: 300,
-            marginBottom: 16,
-          }}
+          autoFocus
+          label="Model"
+          placeholder="e.g. Corolla"
           onPressIn={() => setActiveInput(ActiveInput.Model)}
           suggestions={(
             !loading && activeInput === ActiveInput.Model && selectedMake && !selectedModel
@@ -427,8 +349,8 @@ export default function CarScreen({ navigation }: any) {
               : []
           )}
           suggestionsLoading={loading && activeInput === ActiveInput.Model}
+          suggestionIcon="car-outline"
           onSuggestionPress={(newModel) => { setSelectedModel(newModel); selectNextInput(); }}
-          placeholder="Model"
           onChangeText={setModelInput}
           value={selectedModel || modelInput}
           clearButton
@@ -437,29 +359,15 @@ export default function CarScreen({ navigation }: any) {
           returnKeyType="next"
           editable={!!selectedYear && !!selectedMake && !selectedModel}
           showRedundantSuggestion
-          icon={(
-            <Ionicons
-              name="car"
-              size={30}
-              color={colors.action}
-            />
-           )}
+          icon={<FieldIcon name="car-outline" />}
         />
         )}
-        {selectedYear && selectedMake && selectedModel && (
+        {!!selectedYear && !!selectedMake && !!selectedModel && (
         <AutocompleteInput
           myRef={trimRef}
-          z={1}
-          labelStyle={{ paddingLeft: 0 }}
-          containerStyle={{
-            width: '100%',
-          }}
-          viewStyle={{
-            borderColor: getBorderColor(!!selectedModel, !!selectedTrim.text),
-            borderWidth: 1,
-            maxHeight: 300,
-            marginBottom: 16,
-          }}
+          autoFocus
+          label="Trim"
+          placeholder="Choose a version"
           onPressIn={() => setActiveInput(ActiveInput.Trim)}
           suggestions={(
             !loading && activeInput === ActiveInput.Trim && selectedModel && !selectedTrim.text
@@ -468,13 +376,13 @@ export default function CarScreen({ navigation }: any) {
               : []
           )}
           suggestionsLoading={loading && activeInput === ActiveInput.Trim}
+          suggestionIcon="options-outline"
           onSuggestionPress={(newTrim) => {
             setSelectedTrim(
               trims.find((trim) => trim.text === newTrim),
             );
             selectNextInput();
           }}
-          placeholder="Trim"
           onChangeText={setTrimInput}
           value={selectedTrim.text || trimInput}
           clearButton
@@ -483,31 +391,49 @@ export default function CarScreen({ navigation }: any) {
           returnKeyType="done"
           editable={!!selectedYear && !!selectedMake && !!selectedModel && !selectedTrim.text}
           showRedundantSuggestion
-          icon={(
-            <Ionicons
-              name="settings"
-              size={30}
-              color={colors.action}
-            />
-           )}
+          icon={<FieldIcon name="options-outline" />}
         />
         )}
-        {selectedYear && selectedMake && selectedModel && selectedTrim.value && (
-          <Table
-            headers={headers}
-            data={tableData}
-            Row={MyRow}
-            EmptyState={EmptyState}
-            FooterRow={(vehicle.fuelType
-              ? () => FooterRow({ label: 'Fuel Type', text: vehicle.fuelType })
-              : undefined
+      </Card>
+
+      {showResult && (
+        <>
+          <SectionHeader title="Fuel economy" />
+          <Card>
+            <View style={styles.resultHeader}>
+              <View style={{ flex: 1 }}>
+                <Text variant="headline" numberOfLines={1}>{vehicleName}</Text>
+                <Text variant="footnote" tone="tertiary" numberOfLines={1}>{selectedTrim.text}</Text>
+              </View>
+              {!!vehicle.fuelType && <Badge label={vehicle.fuelType} tone="neutral" />}
+            </View>
+            {loading ? (
+              <ActivityIndicator style={styles.loading} color={color.primaryText} />
+            ) : (
+              <View style={styles.tiles}>
+                {tableData.length === 0 && (
+                  <Text variant="subhead" tone="secondary">No fuel economy data for this trim.</Text>
+                )}
+                {tableData.map(({ label, text, value }) => (
+                  <View key={label} style={styles.tile}>
+                    <View style={{ flex: 1 }}>
+                      <Text variant="caption" tone="tertiary">{label}</Text>
+                      <Text variant="title3">{text}</Text>
+                    </View>
+                    <Button
+                      title="Use"
+                      size="sm"
+                      variant={label === 'Combined' ? 'primary' : 'secondary'}
+                      accessibilityLabel={`Use ${label.toLowerCase()} fuel efficiency`}
+                      onPress={() => useAsFuelEfficiency(convertFuelEfficiency(value, globalState.Locale, 'CA'), label)}
+                    />
+                  </View>
+                ))}
+              </View>
             )}
-            style={{ height: '35%', width: '90%', marginTop: 48 }}
-            loading={loading && selectedTrim.value}
-            scrollable
-          />
-        )}
-      </View>
+          </Card>
+        </>
+      )}
     </Page>
   );
 }

@@ -1,15 +1,11 @@
 // React
 import React, { useEffect, useState } from 'react';
 import {
-  Image,
-  TouchableOpacity, View,
+  StyleSheet,
+  View,
 } from 'react-native';
 
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-
-import {
-  DataTable, Portal, SegmentedButtons,
-} from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
 
 // Firebase
 import {
@@ -17,7 +13,6 @@ import {
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
-import { signOut } from 'firebase/auth';
 import { auth, db } from '../../../firebase';
 
 // Global State
@@ -33,80 +28,53 @@ import Page from '../../components/Page';
 import Table from '../../components/Table';
 import Text from '../../components/Text';
 import Modal from '../../components/Modal';
-import Alert from '../../components/Alert';
+import Button from '../../components/Button';
+import IconButton from '../../components/IconButton';
+import ScreenHeader from '../../components/ScreenHeader';
+import SectionHeader from '../../components/SectionHeader';
+import EmptyState from '../../components/EmptyState';
+import Card from '../../components/Card';
+import ListRow from '../../components/ListRow';
+import SegmentedControl from '../../components/SegmentedControl';
 
 import AddFriendsSection from './components/AddFriendsSection';
 import FriendRequestsSection from './components/FriendRequestsSection';
 import Row from './components/FriendRow';
 
 // Styles
-import styles from '../../styles/FriendsScreen.styles';
-import { boldFont, colors, globalStyles } from '../../styles/styles';
+import { color, radius, space } from '../../styles/theme';
 
-// @ts-ignore
-import SplitwiseLogo from '../../../assets/splitwise-logo.png';
-// @ts-ignore
-import GasMeUpLogo from '../../../assets/car.png';
-
-function FooterRow(onPress: () => void) {
-  return (
-    <DataTable.Row
-      style={{
-        borderTopWidth: 1,
-        borderTopColor: colors.darkestGray,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.darkestGray,
-      }}
-      onPress={onPress}
-    >
-      <DataTable.Cell textStyle={{ color: colors.secondary, fontFamily: boldFont }}>
-        Add Friend
-      </DataTable.Cell>
-      <DataTable.Cell textStyle={{ color: colors.secondary }} numeric>
-        <Ionicons name="person-add" size={24} color={colors.secondary} />
-      </DataTable.Cell>
-    </DataTable.Row>
-  );
-}
-
-function TableEmptyState() {
-  return (
-    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ color: colors.secondary, fontSize: 24 }}>No Friends</Text>
-      <Text style={{ color: colors.secondary, fontSize: 10 }}>
-        Add some friends and then they will show up here!
-      </Text>
-    </View>
-  );
-}
-
-const logout = () => {
-  signOut(auth)
-    .then(() => {
-      console.log('signed out!');
-    })
-    .catch((exception) => {
-      Alert('Error', exception.message);
-    });
-};
+const styles = StyleSheet.create({
+  summary: {
+    flexDirection: 'row',
+    gap: space.md,
+  },
+  summaryTile: {
+    flex: 1,
+    gap: space.xs,
+  },
+  requestIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.pill,
+    backgroundColor: color.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  toggle: {
+    marginTop: space.xl,
+  },
+});
 
 const usersRef = collection(db, 'Users');
 
 interface Props {
   setFriend: (friend: FriendObject) => void,
   navigation: {
-    navigate: (str: string) => {},
+    navigate: (str: string, params?: object) => {},
     replace: (str: string) => {},
     goBack: () => {}
   },
-}
-
-function GasMeUpIconComponent({ size }: { size: number }) {
-  return <Image source={GasMeUpLogo} style={{ width: size, height: size }} />;
-}
-
-function SplitwiseIconComponent({ size }: { size: number }) {
-  return <Image source={SplitwiseLogo} style={{ width: size, height: size }} />;
 }
 
 export default function FriendsScreen({ navigation, setFriend }: Props) {
@@ -181,22 +149,18 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
     console.log(errorUserDB, errorFriendsDB, error);
   }
 
-  const headers = [
-    { text: '', numeric: false, style: { maxWidth: '15%' } },
-    { text: 'Friend', numeric: false },
-    { text: 'Amount Owed', numeric: true },
-  ];
-
   const MyRow = ({
     name,
     amount,
     uid,
     email,
+    isLast,
   }: any) => Row({
     email,
     name,
     amount,
     uid,
+    isLast,
     onPress: (friend: FriendObject) => {
       logEvent('view_friend');
 
@@ -204,83 +168,123 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
       navigation.navigate('Friend');
     },
   });
-  const Footer = () => FooterRow(() => validateCurrentUser(user) && openAddFriend());
+
+  const addFriend = () => validateCurrentUser(user) && openAddFriend();
+
+  const friendsEmptyState = (
+    <EmptyState
+      icon="people-outline"
+      title="No friends yet"
+      message="Add friends by email to split the cost of trips you take together."
+      action={<Button title="Add a friend" icon="person-add" size="sm" onPress={addFriend} />}
+    />
+  );
 
   const friendRequestUIDs = Object.keys(userDocument?.friends ?? {})
     .filter((uid: string) => userDocument?.friends[uid]?.status === 'incoming') ?? [];
 
   const hasFriendRequests = friendRequestUIDs.length > 0;
+
+  const balances = formattedBalances as Array<{ amount: number }>;
+  const owedToYou = balances.reduce((sum, { amount }) => (amount > 0 ? sum + amount : sum), 0);
+  const youOwe = balances.reduce((sum, { amount }) => (amount < 0 ? sum - amount : sum), 0);
+  const loadingFriends = friendsDataLoading || !friendsUIDs;
+
   return (
-    <Page keyboardAvoiding={false}>
-      <Portal>
-        <Modal
-          visible={addFriendVisible}
-          onDismiss={() => setAddFriendVisible(false)}
-        >
-          <AddFriendsSection
-            close={() => setAddFriendVisible(false)}
-          />
-        </Modal>
-        <Modal
-          visible={friendRequestsVisible}
-          onDismiss={() => setFriendRequestsVisible((state) => !state)}
-        >
-          <FriendRequestsSection
-            friendRequestUIDs={friendRequestUIDs}
-            friendEmails={Object.fromEntries(friendRequestUIDs.map(
-              (uid: string) => [uid, userDocument?.friends[uid]?.email],
-            ))}
-            closeModal={() => setFriendRequestsVisible(false)}
-          />
-        </Modal>
-      </Portal>
+    <Page scroll keyboardAvoiding={false}>
+      <Modal
+        visible={addFriendVisible}
+        title="Add a friend"
+        subtitle="We’ll send them a friend request if they have a GasMeUp account."
+        onDismiss={() => setAddFriendVisible(false)}
+      >
+        <AddFriendsSection
+          close={() => setAddFriendVisible(false)}
+        />
+      </Modal>
+      <Modal
+        visible={friendRequestsVisible}
+        title="Friend requests"
+        subtitle="Accept to start splitting trips together."
+        onDismiss={() => setFriendRequestsVisible(false)}
+      >
+        <FriendRequestsSection
+          friendRequestUIDs={friendRequestUIDs}
+          friendEmails={Object.fromEntries(friendRequestUIDs.map(
+            (uid: string) => [uid, userDocument?.friends[uid]?.email],
+          ))}
+          closeModal={() => setFriendRequestsVisible(false)}
+        />
+      </Modal>
 
-      <View style={globalStyles.headerSection}>
-        <TouchableOpacity
-          onPress={logout}
-        >
-          <Ionicons name="log-out" size={24} color="white" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{ flexDirection: 'row' }}
-          onPress={
-            () => validateCurrentUser(user) && hasFriendRequests && openFriendRequests()
-          }
-        >
-          <Text style={{ color: colors.white }}>{friendRequestUIDs.length}</Text>
-          <FontAwesome5 name="user-friends" size={18} color="white" />
-        </TouchableOpacity>
-      </View>
-      <Table
+      <ScreenHeader
         title="Friends"
-        data={formattedBalances}
-        headers={headers}
-        Row={MyRow}
-        FooterRow={Footer}
-        loading={friendsDataLoading || !friendsUIDs}
-        style={styles.table}
-        EmptyState={TableEmptyState}
-        scrollable
+        subtitle={user?.displayName ? `Signed in as ${user.displayName}` : undefined}
+        actions={(
+          <>
+            <IconButton
+              icon="person-add-outline"
+              accessibilityLabel="Add a friend"
+              onPress={addFriend}
+            />
+            <IconButton
+              icon="settings-outline"
+              accessibilityLabel="Settings"
+              onPress={() => navigation.navigate('Home', { screen: 'Settings', initial: false })}
+            />
+          </>
+        )}
       />
+
+      <View style={styles.summary}>
+        <Card style={styles.summaryTile}>
+          <Text variant="caption" tone="secondary">You’re owed</Text>
+          <Text variant="title2" tone={owedToYou > 0 ? 'success' : 'primary'}>{`$${owedToYou.toFixed(2)}`}</Text>
+        </Card>
+        <Card style={styles.summaryTile}>
+          <Text variant="caption" tone="secondary">You owe</Text>
+          <Text variant="title2" tone={youOwe > 0 ? 'danger' : 'primary'}>{`$${youOwe.toFixed(2)}`}</Text>
+        </Card>
+      </View>
+
+      {hasFriendRequests && (
+        <Card padded={false} style={{ marginTop: space.lg }}>
+          <ListRow
+            title={`${friendRequestUIDs.length} friend request${friendRequestUIDs.length === 1 ? '' : 's'}`}
+            subtitle="Review who wants to split trips with you"
+            separator={false}
+            leading={(
+              <View style={styles.requestIcon}>
+                <Ionicons name="mail-unread-outline" size={20} color={color.primaryText} />
+              </View>
+            )}
+            chevron
+            onPress={() => validateCurrentUser(user) && openFriendRequests()}
+          />
+        </Card>
+      )}
+
+      <SectionHeader title="Balances" />
+      <Table
+        data={formattedBalances}
+        Row={MyRow}
+        loading={loadingFriends}
+        emptyState={friendsEmptyState}
+      />
+      {!loadingFriends && formattedBalances.length > 0 && (
+        <Text variant="footnote" tone="tertiary" align="center" style={{ marginTop: space.md }}>
+          Swipe left on a friend to remove them.
+        </Text>
+      )}
+
       {isFeatureEnabled('splitwise_screen') && (
-      <SegmentedButtons
-        style={styles.toggleButton}
-        buttons={[
-          {
-            value: 'GasMeUp',
-            label: 'GasMeUp',
-            icon: GasMeUpIconComponent,
-            style: { backgroundColor: colors.action },
-          },
-          {
-            value: 'Splitwise',
-            label: 'Splitwise',
-            style: { backgroundColor: colors.primary },
-            icon: SplitwiseIconComponent,
-          },
+      <SegmentedControl
+        style={styles.toggle}
+        options={[
+          { value: 'GasMeUp', label: 'GasMeUp' },
+          { value: 'Splitwise', label: 'Splitwise' },
         ]}
-        onValueChange={(value) => (value === 'Splitwise' ? navigation.replace('Splitwise') : null)}
+        onChange={(value) => (value === 'Splitwise' ? navigation.replace('Splitwise') : null)}
         value="GasMeUp"
       />
       )}

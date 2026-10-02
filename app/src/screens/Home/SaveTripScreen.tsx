@@ -1,11 +1,10 @@
 // React
 import React, { useCallback, useState } from 'react';
-import { View, Image } from 'react-native';
+import {
+  Image, StyleSheet, Switch, View,
+} from 'react-native';
 
-import { FontAwesome5 } from '@expo/vector-icons';
-
-import Checkbox from 'expo-checkbox';
-import { DataTable, Portal } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
 
 // Firebase
 import {
@@ -22,6 +21,11 @@ import Button from '../../components/Button';
 import Modal from '../../components/Modal';
 import Page from '../../components/Page';
 import Alert from '../../components/Alert';
+import Avatar from '../../components/Avatar';
+import Card from '../../components/Card';
+import ListRow from '../../components/ListRow';
+import EmptyState from '../../components/EmptyState';
+import SectionHeader from '../../components/SectionHeader';
 
 import TripSettingsModal from './components/TripSettingsModal';
 
@@ -31,16 +35,55 @@ import { convertGasPrice, convertKMtoMiles, convertLtoGallons } from '../../help
 
 // Helpers
 import { createTransaction } from '../../helpers/firestoreHelper';
-import { getIcon } from '../../helpers/iconHelper';
 import { logEvent } from '../../helpers/analyticsHelper';
 import { isFeatureEnabled } from '../../helpers/featureHelper';
 
 // Styles
-import styles from '../../styles/HomeScreen.styles';
-import { boldFont, colors, globalStyles } from '../../styles/styles';
+import { color, radius, space } from '../../styles/theme';
 
 // @ts-ignore
 import SplitwiseLogo from '../../../assets/splitwise-logo.png';
+
+const styles = StyleSheet.create({
+  route: {
+    gap: space.sm,
+  },
+  endpoint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.sm,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  stats: {
+    flexDirection: 'row',
+    marginTop: space.lg,
+    paddingTop: space.lg,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: color.border,
+  },
+  stat: {
+    flex: 1,
+    gap: 2,
+  },
+  splitwise: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.md,
+    marginTop: space.lg,
+  },
+  check: {
+    width: 24,
+    height: 24,
+    borderRadius: radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+  },
+});
 
 function RowBuilder(
   selectedFriends: Array<User>,
@@ -51,6 +94,7 @@ function RowBuilder(
     lastName,
     uid,
     email,
+    isLast,
   }: DocumentData) {
     const updateSelectedFriends = (friend: User) => {
       const friendIndex = selectedFriends.findIndex((el) => el.uid === friend.uid);
@@ -65,48 +109,31 @@ function RowBuilder(
 
     const isSelected = !!selectedFriends.find((friend: DocumentData) => friend.uid === uid);
     return (
-      <DataTable.Row
-        key={firstName + lastName + uid}
+      <ListRow
+        title={name}
+        separator={!isLast}
+        leading={<Avatar name={name} email={email} />}
+        accessibilityLabel={`${name}${isSelected ? ', selected' : ''}`}
+        trailing={(
+          <View
+            style={[
+              styles.check,
+              isSelected
+                ? { backgroundColor: color.primary, borderColor: color.primary }
+                : { borderColor: color.borderStrong },
+            ]}
+          >
+            {isSelected && <Ionicons name="checkmark" size={16} color={color.textOnPrimary} />}
+          </View>
+        )}
         onPress={() => updateSelectedFriends({
           firstName, lastName, uid, email,
         })}
-      >
-        <DataTable.Cell style={{ maxWidth: '15%', justifyContent: 'center', alignContent: 'center' }}>
-          <View>
-            <Image
-              style={{ width: 32, height: 32, borderRadius: 64 }}
-              source={getIcon({ email, name })}
-            />
-          </View>
-        </DataTable.Cell>
-        <DataTable.Cell>
-          {name}
-        </DataTable.Cell>
-        <DataTable.Cell numeric>
-          <Checkbox
-            onValueChange={() => updateSelectedFriends({
-              firstName, lastName, uid, email,
-            })}
-            value={isSelected}
-            color={colors.action}
-          />
-        </DataTable.Cell>
-      </DataTable.Row>
+      />
     );
   }
 
   return Row;
-}
-
-function TableEmptyState() {
-  return (
-    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ color: colors.secondary, fontSize: 24 }}>No Friends</Text>
-      <Text style={{ color: colors.secondary, fontSize: 10 }}>
-        Add some friends to start saving your trips!
-      </Text>
-    </View>
-  );
 }
 
 const usersRef = collection(db, 'Users');
@@ -291,7 +318,7 @@ export default function SaveTripScreen({
         console.log('Splitwise Response:', json);
       }
 
-      Alert('Success', 'Trip was saved!');
+      Alert('Trip saved', 'Your friends’ balances have been updated.');
       navigation.goBack();
     } catch (exception) {
       console.log(exception);
@@ -304,129 +331,105 @@ export default function SaveTripScreen({
     console.log(errorUsersDB);
   }
 
-  const headers = [
-    { text: '', numeric: false, style: { maxWidth: '15%' } },
-    { text: 'Name', numeric: false },
-    { text: 'Split Trip', numeric: true },
-  ];
   const useCanadianUnits = globalState.Locale === Locale.CA;
   const gasUsed = (distance * gasMileage) / 100;
   const convertedGasPrice = convertGasPrice(gasPrice, globalState.country, useCanadianUnits ? 'CA' : 'US');
 
   const gasPriceString = useCanadianUnits ? `$${convertedGasPrice.toFixed(2)}/L` : `$${convertedGasPrice.toFixed(2)}/gal`;
-  const gasUsageString = useCanadianUnits ? `${(gasUsed).toFixed(1)}L` : `${convertLtoGallons(gasUsed).toFixed(1)}gal`;
-  const distanceString = useCanadianUnits ? `${distance.toFixed(1)}km` : `${convertKMtoMiles(distance).toFixed(1)}mi`;
+  const gasUsageString = useCanadianUnits ? `${(gasUsed).toFixed(1)} L` : `${convertLtoGallons(gasUsed).toFixed(1)} gal`;
+  const distanceString = useCanadianUnits ? `${distance.toFixed(1)} km` : `${convertKMtoMiles(distance).toFixed(1)} mi`;
+
+  const friendCount = selectedFriends.length;
+
+  const friendsEmptyState = (
+    <EmptyState
+      icon="people-outline"
+      title="No friends yet"
+      message="Add friends from the Friends tab to split trips with them."
+      action={<Button title="Go to Friends" size="sm" variant="secondary" onPress={() => navigation.navigate('Friends/Login')} />}
+    />
+  );
+
   return (
-    <Page>
-      <Portal>
-        <Modal
-          visible={splitTypeVisible}
-          onDismiss={() => setSplitTypeVisible(false)}
-        >
-          {userDocument && (
-            <TripSettingsModal
-              cost={cost}
-              closeModal={() => setSplitTypeVisible(false)}
-              saveTrip={saveTrip}
-              selectedFriends={selectedFriends}
-              currentUser={userDocument as User}
-            />
-          )}
-        </Modal>
-      </Portal>
-      <Text
-        style={{ ...globalStyles.h2, marginBottom: 12 }}
+    <Page
+      scroll
+      safeTop={false}
+      footer={(
+        <Button
+          title={friendCount ? `Continue with ${friendCount} friend${friendCount === 1 ? '' : 's'}` : 'Select who was on this trip'}
+          icon={friendCount ? 'arrow-forward' : undefined}
+          fullWidth
+          disabled={friendCount < 1}
+          onPress={() => setSplitTypeVisible(true)}
+        />
+      )}
+    >
+      <Modal
+        visible={splitTypeVisible}
+        title="Who drove?"
+        subtitle="Everyone else pays the driver back."
+        onDismiss={() => setSplitTypeVisible(false)}
       >
-        Select your friends who were on this trip
-      </Text>
-      <View style={styles.saveTripLocationHeaderContainer}>
-        <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
-          {'Start: '}
-        </Text>
-        <Text style={globalStyles.smallText} numberOfLines={1}>
-          {start}
-        </Text>
-      </View>
-      <View style={styles.saveTripLocationHeaderContainer}>
-        <Text style={{ ...globalStyles.smallText, fontFamily: boldFont }}>
-          {'End: '}
-        </Text>
-        <Text style={globalStyles.smallText} numberOfLines={1}>
-          {end}
-        </Text>
-      </View>
-      <View style={[styles.saveTripHeaderContainer, { marginTop: 8 }]}>
-        <View style={{ flexDirection: 'row' }}>
-          <FontAwesome5 name="gas-pump" size={12} color={colors.secondary} />
-          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont, paddingLeft: 4 }}>
-            {'Gas Used: '}
-          </Text>
-          <Text style={globalStyles.smallText}>
-            {gasUsageString}
-          </Text>
+        {userDocument && (
+          <TripSettingsModal
+            cost={cost}
+            closeModal={() => setSplitTypeVisible(false)}
+            saveTrip={saveTrip}
+            selectedFriends={selectedFriends}
+            currentUser={userDocument as User}
+          />
+        )}
+      </Modal>
+
+      <Card style={{ marginTop: space.sm }}>
+        <Text variant="overline" tone="tertiary">Trip total</Text>
+        <Text variant="title1" style={{ marginBottom: space.md }}>{`$${cost.toFixed(2)}`}</Text>
+        <View style={styles.route}>
+          <View style={styles.endpoint}>
+            <View style={[styles.dot, { backgroundColor: color.primaryText }]} />
+            <Text variant="footnote" tone="secondary" numberOfLines={1} style={{ flex: 1 }}>{start}</Text>
+          </View>
+          <View style={styles.endpoint}>
+            <View style={[styles.dot, { backgroundColor: color.success }]} />
+            <Text variant="footnote" tone="secondary" numberOfLines={1} style={{ flex: 1 }}>{end}</Text>
+          </View>
         </View>
-        <View style={{ flexDirection: 'row' }}>
-          <FontAwesome5 name="gas-pump" size={12} color={colors.secondary} />
-          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont, paddingLeft: 4 }}>
-            {'Gas Price: '}
-          </Text>
-          <Text style={globalStyles.smallText}>
-            {gasPriceString}
-          </Text>
+        <View style={styles.stats}>
+          <View style={styles.stat}>
+            <Text variant="caption" tone="tertiary">Distance</Text>
+            <Text variant="callout">{distanceString}</Text>
+          </View>
+          <View style={styles.stat}>
+            <Text variant="caption" tone="tertiary">Fuel</Text>
+            <Text variant="callout">{gasUsageString}</Text>
+          </View>
+          <View style={styles.stat}>
+            <Text variant="caption" tone="tertiary">Gas price</Text>
+            <Text variant="callout">{gasPriceString}</Text>
+          </View>
         </View>
-      </View>
-      <View style={styles.saveTripHeaderContainer}>
-        <View style={{ flexDirection: 'row' }}>
-          <FontAwesome5 name="money-bill-alt" size={12} color={colors.secondary} />
-          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont, paddingLeft: 4 }}>
-            {'Cost: '}
-          </Text>
-          <Text style={globalStyles.smallText}>
-            {`$${cost.toFixed(2)}`}
-          </Text>
-        </View>
-        <View style={{ flexDirection: 'row' }}>
-          <FontAwesome5 name="route" size={12} color={colors.secondary} />
-          <Text style={{ ...globalStyles.smallText, fontFamily: boldFont, paddingLeft: 4 }}>
-            {'Distance: '}
-          </Text>
-          <Text style={globalStyles.smallText}>
-            {distanceString}
-          </Text>
-        </View>
-      </View>
+      </Card>
+
+      <SectionHeader title="Who was in the car?" />
       <Table
-        itemsPerPage={5}
         data={usersData}
-        headers={headers}
         Row={RowBuilder(selectedFriends, setSelectedFriends)}
         loading={usersDataLoading}
-        style={{ marginTop: 4, maxHeight: '60%' }}
-        EmptyState={TableEmptyState}
-        scrollable
+        emptyState={friendsEmptyState}
       />
+
       {splitwiseEnabled && splitwiseToken && userDocument?.splitwiseUID && (
-      <View style={styles.checkBoxSection}>
-        <Image source={SplitwiseLogo} style={{ width: 16, height: 16 }} />
-        <Text style={{ color: colors.secondary, fontSize: 14 }}>Save on Splitwise:</Text>
-        <Checkbox
-          color={colors.action}
+      <Card style={styles.splitwise}>
+        <Image source={SplitwiseLogo} style={{ width: 24, height: 24 }} />
+        <Text variant="callout" style={{ flex: 1 }}>Also add to Splitwise</Text>
+        <Switch
           value={useSplitwise}
           onValueChange={setUseSplitwise}
-          style={styles.modalCheckBox}
+          trackColor={{ false: color.surfacePressed, true: color.primary }}
+          ios_backgroundColor={color.surfacePressed}
         />
-      </View>
+      </Card>
       )}
-      <View style={styles.saveTripButtonSection}>
-        <Button
-          disabled={selectedFriends.length < 1}
-          onPress={() => setSplitTypeVisible(true)}
-        >
-          <Text>
-            Save
-          </Text>
-        </Button>
-      </View>
     </Page>
   );
 }

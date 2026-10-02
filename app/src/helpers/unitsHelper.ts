@@ -96,7 +96,7 @@ export function convertAllToString(
   );
 
   return {
-    distance: `${distanceConverted.toFixed(2)} ${outputCountry === 'CA' ? 'km' : 'mi'}`,
+    distance: `${distanceConverted.toFixed(1)} ${outputCountry === 'CA' ? 'km' : 'mi'}`,
     fuelEfficiency: `${fuelEfficiencyConverted.toFixed(1)} ${outputCountry === 'CA' ? 'L/100km' : 'mpg'}`,
     gasPrice: `$${gasPriceConverted.toFixed(2)}${outputCountry === 'CA' ? '/L' : '/gal'}`,
   };

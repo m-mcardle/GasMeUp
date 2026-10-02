@@ -1,36 +1,29 @@
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-
-import React, { ReactComponentElement, useState } from 'react';
-
+import React, { ReactNode, useState } from 'react';
 import {
-  TextInput, TouchableOpacity, View, ScrollView,
+  StyleProp, TextInput, View, ViewStyle,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-import Text from './Text';
 import Input from './Input';
-import AnimatedGradient from './AnimatedGradient';
-
-import { colors, globalStyles } from '../styles/styles';
+import SuggestionList from './SuggestionList';
 
 interface Props {
-  z?: number,
   value?: string,
+  label?: string,
   placeholder?: string,
-  viewStyle?: object,
-  containerStyle?: object,
-  style?: object,
-  labelStyle?: object,
-  password?: boolean,
+  viewStyle?: StyleProp<ViewStyle>,
   autoComplete?: TextInput['props']['autoComplete'],
   suggestions: Array<string>,
   keyboardType?: TextInput['props']['keyboardType'],
   returnKeyType?: TextInput['props']['returnKeyType'],
   clearButton?: boolean,
-  icon?: ReactComponentElement<typeof MaterialIcons>,
+  icon?: ReactNode,
+  suggestionIcon?: React.ComponentProps<typeof Ionicons>['name'],
   error?: boolean,
   blurOnSubmit?: boolean,
   showRedundantSuggestion?: boolean,
   editable?: boolean,
+  autoFocus?: boolean,
   myRef?: React.RefObject<TextInput | null>,
   suggestionsLoading?: boolean,
   onClear?: () => void,
@@ -40,130 +33,74 @@ interface Props {
   onSuggestionPress?: (str: string) => void,
 }
 
-export default function AutocompleteInput(props: Props) {
-  const {
-    onChangeText,
-    onPressIn = () => {},
-    onSubmitEditing,
-    onSuggestionPress = () => {},
-    onClear,
-    placeholder,
-    viewStyle,
-    labelStyle,
-    containerStyle,
-    style,
-    value,
-    password,
-    clearButton,
-    suggestions,
-    icon,
-    error,
-    returnKeyType,
-    z,
-    myRef = undefined,
-    suggestionsLoading = false,
-    blurOnSubmit = true,
-    keyboardType = 'default',
-    autoComplete = 'off',
-    showRedundantSuggestion = false,
-    editable = true,
-  } = props;
-
+export default function AutocompleteInput({
+  onChangeText,
+  onPressIn = () => {},
+  onSubmitEditing,
+  onSuggestionPress = () => {},
+  onClear,
+  label,
+  placeholder,
+  viewStyle,
+  value,
+  clearButton,
+  suggestions,
+  icon,
+  suggestionIcon,
+  error,
+  returnKeyType,
+  myRef = undefined,
+  suggestionsLoading = false,
+  blurOnSubmit = true,
+  keyboardType = 'default',
+  autoComplete = 'off',
+  showRedundantSuggestion = false,
+  editable = true,
+  autoFocus = false,
+}: Props) {
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
-  const handleFocus = () => {
-    setDropdownVisible(true);
-    onPressIn();
-  };
-
-  const handleBlur = () => {
-    setDropdownVisible(false);
-  };
-
-  const handleSuggestionPress = (suggestion: string) => {
-    onSuggestionPress(suggestion);
-    setDropdownVisible(false);
-  };
-
-  const loadingGradientColors = [
-    colors.tertiary,
-    colors.darkestGray,
-    colors.tertiary,
-    colors.tertiary,
-    colors.darkestGray,
-    colors.tertiary,
-  ];
-
-  // Google can return several predictions with identical text; showing them twice adds nothing
-  // and would give two rows the same React key.
-  const overriddenSuggestions = suggestionsLoading ? ['Loading...'] : Array.from(new Set(suggestions));
-
-  const internalSuggestions = ((
-    overriddenSuggestions.length === 1
-    && overriddenSuggestions[0] === value
-    && !showRedundantSuggestion
-  )
-    ? []
-    : overriddenSuggestions.map((s) => ({ title: s, id: s }))
-  );
+  // Google can return several predictions with identical text; showing them twice adds nothing.
+  const unique = Array.from(new Set(suggestions));
+  const redundant = unique.length === 1 && unique[0] === value && !showRedundantSuggestion;
 
   return (
-    <View style={[globalStyles.autocompleteInputView, { zIndex: z }]}>
-      <View style={[globalStyles.autocompleteContainer, { zIndex: z }]}>
-        <Input
-          myRef={myRef}
-          style={{ backgroundColor: colors.darkestGray, ...style }}
-          viewStyle={[globalStyles.autocompleteInput, viewStyle]}
-          labelStyle={labelStyle}
-          containerStyle={containerStyle}
-          placeholder={placeholder}
-          onChangeText={onChangeText}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          value={value}
-          icon={icon}
-          clearButton={clearButton}
-          onClear={onClear}
-          error={error}
-          blurOnSubmit={blurOnSubmit}
-          autoComplete={autoComplete}
-          onSubmitEditing={onSubmitEditing}
-          returnKeyType={returnKeyType}
-          keyboardType={keyboardType}
-          editable={editable}
-          password={password}
+    <View style={viewStyle}>
+      <Input
+        myRef={myRef}
+        label={label}
+        placeholder={placeholder}
+        onChangeText={onChangeText}
+        onFocus={() => {
+          setDropdownVisible(true);
+          onPressIn();
+        }}
+        onBlur={() => setDropdownVisible(false)}
+        value={value}
+        icon={icon}
+        clearButton={clearButton}
+        onClear={onClear}
+        error={error}
+        blurOnSubmit={blurOnSubmit}
+        autoComplete={autoComplete}
+        onSubmitEditing={onSubmitEditing}
+        returnKeyType={returnKeyType}
+        keyboardType={keyboardType}
+        editable={editable}
+        autoFocus={autoFocus}
+      />
+      {dropdownVisible && !redundant && (
+        <SuggestionList
+          items={unique}
+          loading={suggestionsLoading}
+          icon={suggestionIcon}
+          max={8}
+          onSelect={(item) => {
+            onSuggestionPress(item);
+            setDropdownVisible(false);
+          }}
         />
-        {dropdownVisible && internalSuggestions.length > 0 && (
-          <ScrollView
-            style={globalStyles.dropdown}
-            keyboardShouldPersistTaps="always"
-          >
-            {overriddenSuggestions.map((suggestion) => (suggestionsLoading
-              ? (
-                <AnimatedGradient
-                  key="loading"
-                  animate={suggestionsLoading}
-                  colors={loadingGradientColors}
-                  speed={1000}
-                  style={globalStyles.autocompleteListItem}
-                >
-                  <Text style={{ padding: 8 }}>
-                    Loading...
-                  </Text>
-                </AnimatedGradient>
-              )
-              : (
-                <TouchableOpacity
-                  key={suggestion}
-                  onPress={() => handleSuggestionPress(suggestion)}
-                  style={globalStyles.suggestion}
-                >
-                  <Text style={{ color: colors.gray }}>{suggestion}</Text>
-                </TouchableOpacity>
-              )))}
-          </ScrollView>
-        )}
-      </View>
+      )}
     </View>
   );
 }

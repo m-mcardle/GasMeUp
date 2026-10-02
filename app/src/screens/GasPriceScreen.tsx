@@ -2,12 +2,7 @@
 import React, {
   useCallback, useState, useEffect,
 } from 'react';
-import {
-  View,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-
-import { DataTable, SegmentedButtons } from 'react-native-paper';
+import { StyleSheet, View } from 'react-native';
 
 // Global State Stuff
 import { useGlobalState, changeSetting } from '../hooks/hooks';
@@ -18,10 +13,14 @@ import Table from '../components/Table';
 import Text from '../components/Text';
 import Button from '../components/Button';
 import Alert from '../components/Alert';
+import ListRow from '../components/ListRow';
+import EmptyState from '../components/EmptyState';
+import ScreenHeader from '../components/ScreenHeader';
+import SectionHeader from '../components/SectionHeader';
+import SegmentedControl from '../components/SegmentedControl';
 
 // Styles
-import styles from '../styles/GasPriceScreen.styles';
-import { colors } from '../styles/styles';
+import { space } from '../styles/theme';
 
 // Mock Data
 import { fetchData } from '../data/data';
@@ -35,45 +34,46 @@ import {
 } from '../helpers/unitsHelper';
 import { logEvent } from '../helpers/analyticsHelper';
 import { provinces } from '../helpers/locationHelper';
+import { friendlyError } from '../helpers/errorHelper';
 
 interface RequestLookup {
   [key: string]: Array<any>
 }
 
+const styles = StyleSheet.create({
+  back: {
+    alignSelf: 'flex-start',
+    marginLeft: -space.md,
+    marginTop: space.md,
+  },
+});
+
 function Row({
-  text, price, useAsGasPrice, locale, setSelectedRegion, selectedCountry,
+  text, price, useAsGasPrice, locale, unit, setSelectedRegion, selectedCountry, isLast,
 }: any) {
   const isCanada = selectedCountry === 'CA';
   const isProvince = isCanada && provinces.includes(text);
-  const roundedPrice = price.toFixed(2);
   const roundedCanadianPrice = Number(convertGasPrice(price, locale, 'CA').toFixed(2));
   return (
-    <DataTable.Row
-      key={text}
-      onPress={() => (isProvince ? setSelectedRegion(text) : setSelectedRegion(''))}
-    >
-      <DataTable.Cell style={{ minWidth: 150 }}>
-        {isCanada && !isProvince && <Ionicons name="chevron-back" size={12} color={colors.secondary} />}
-        {text}
-        {isCanada && isProvince && <Ionicons name="chevron-forward" size={12} color={colors.secondary} />}
-      </DataTable.Cell>
-      <DataTable.Cell numeric>
-        $
-        {roundedPrice}
-      </DataTable.Cell>
-      <DataTable.Cell
-        style={{ maxWidth: 64, justifyContent: 'center' }}
-        onPress={() => useAsGasPrice(roundedCanadianPrice)}
-        numeric
-      >
-        <Button
-          style={{ paddingHorizontal: 8, padding: 2, margin: 0 }}
-          onPress={() => useAsGasPrice(roundedCanadianPrice)}
-        >
-          <Text>Use</Text>
-        </Button>
-      </DataTable.Cell>
-    </DataTable.Row>
+    <ListRow
+      title={text}
+      separator={!isLast}
+      chevron={isProvince}
+      accessibilityLabel={`${text}, $${price.toFixed(2)} ${unit}`}
+      onPress={isProvince ? () => setSelectedRegion(text) : undefined}
+      trailing={(
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+          <Text variant="headline">{`$${price.toFixed(2)}`}</Text>
+          <Button
+            title="Use"
+            size="sm"
+            variant="secondary"
+            accessibilityLabel={`Use ${text} price`}
+            onPress={() => useAsGasPrice(roundedCanadianPrice)}
+          />
+        </View>
+      )}
+    />
   );
 }
 
@@ -85,6 +85,7 @@ export default function GasPriceScreen({ navigation }: any) {
   ));
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [gasPrices, setGasPrices] = useState<Array<any>>([]);
   const [persistedGasPrices, setPersistedGasPrices] = useState<RequestLookup>({});
 
@@ -103,6 +104,7 @@ export default function GasPriceScreen({ navigation }: any) {
 
   const fetchGasPrices = useCallback(async () => {
     setLoading(true);
+    setError(null);
 
     logEvent('gas_price_screen_loaded', {
       country: selectedCountry,
@@ -120,8 +122,8 @@ export default function GasPriceScreen({ navigation }: any) {
 
       if (!gasPricesResponse?.ok || !gasPricesResponse) {
         console.log(`Request for gas prices failed (${gasPricesResponse.status})`);
-        const error = await gasPricesResponse.text();
-        throw new Error(`Error: ${error} (${gasPricesResponse.status})`);
+        const body = await gasPricesResponse.text();
+        throw new Error(`Error: ${body} (${gasPricesResponse.status})`);
       }
 
       const { prices } = (await gasPricesResponse.json());
@@ -151,7 +153,8 @@ export default function GasPriceScreen({ navigation }: any) {
         }));
       }
     } catch (err: any) {
-      Alert(err.message);
+      console.warn(err);
+      setError(friendlyError(err, 'Gas prices aren’t available right now.'));
       setGasPrices([]);
     }
     setLoading(false);
@@ -182,70 +185,78 @@ export default function GasPriceScreen({ navigation }: any) {
     });
 
     changeSetting('Custom Gas Price', { price, enabled: 'true' }, updateGlobalState);
-    Alert('Gas Price Updated', `Your gas price has been updated to ${convertGasPriceToString(price, 'CA', globalState.Locale)}`, [
+    Alert('Gas price updated', `Trips will now use ${convertGasPriceToString(price, 'CA', globalState.Locale)}. You can change this from the Calculate tab.`, [
       {
-        text: 'OK',
+        text: 'Done',
         onPress: () => navigation.navigate('Home', { screen: 'Calculate', pop: true }),
       },
     ]);
   };
 
+  const unit = globalState.Locale === 'CA' ? '$CAD/L' : '$USD/gal';
+  const regionNoun = { CA: 'Provinces', USA: 'States', WORLD: 'Countries' }[selectedCountry] ?? 'Regions';
+
+  const pricesEmptyState = error
+    ? (
+      <EmptyState
+        icon="cloud-offline-outline"
+        tone="danger"
+        title="Couldn’t load prices"
+        message={error}
+        action={<Button title="Try again" icon="refresh" size="sm" variant="secondary" onPress={fetchGasPrices} />}
+      />
+    )
+    : <EmptyState icon="pricetags-outline" title="No prices here yet" message="Try another region." />;
+
   return (
-    <Page>
-      <View style={styles.main}>
-        <Text style={styles.title}>Gas Prices</Text>
-        <Table
-          loading={loading}
-          data={gasPrices.map((obj) => (
-            {
-              ...obj,
-              price: gasPriceConversion(obj.price),
-            }
-          )).sort((a, b) => (a.text > b.text ? 1 : -1))}
-          headers={[
-            { text: 'Location', numeric: false, style: { minWidth: 150 } },
-            { text: (globalState.Locale === 'CA' ? 'Price ($/L)' : 'Price ($/gal)'), numeric: true },
-            { text: 'Use', numeric: true, style: { justifyContent: 'center', maxWidth: 64 } },
-          ]}
-          Row={(values) => Row({
-            ...values,
-            setSelectedRegion,
-            useAsGasPrice,
-            selectedCountry,
-            locale: globalState.Locale,
-          })}
-          style={styles.gasPriceTable}
-          scrollable
+    <Page scroll>
+      <ScreenHeader
+        title="Gas prices"
+        subtitle={`Average regular price, in ${unit}`}
+      />
+      <SegmentedControl
+        options={[
+          { value: 'CA', label: 'Canada' },
+          { value: 'USA', label: 'USA' },
+          { value: 'WORLD', label: 'World' },
+        ]}
+        onChange={(value) => setSelected({ selectedCountry: value, selectedRegion: '' })}
+        value={selectedCountry}
+      />
+      {selectedRegion ? (
+        <Button
+          variant="ghost"
+          size="sm"
+          icon="chevron-back"
+          title="All provinces"
+          style={styles.back}
+          onPress={() => setSelectedRegion('')}
         />
-        <View style={{ paddingTop: 4 }}>
-          <Text style={{ color: colors.gray }}>
-            Gas prices are in
-            {globalState.Locale === 'CA' ? ' $CAD' : ' $USD'}
-          </Text>
-        </View>
-        <SegmentedButtons
-          style={styles.selectionButtons}
-          buttons={[
-            {
-              value: 'CA',
-              label: 'Canada 🇨🇦',
-              style: { backgroundColor: selectedCountry === 'CA' ? colors.action : colors.primary },
-            },
-            {
-              value: 'USA',
-              label: 'USA 🇺🇸',
-              style: { backgroundColor: selectedCountry === 'USA' ? colors.action : colors.primary },
-            },
-            {
-              value: 'WORLD',
-              label: 'World 🌎',
-              style: { backgroundColor: selectedCountry === 'WORLD' ? colors.action : colors.primary },
-            },
-          ]}
-          onValueChange={(value) => setSelected({ selectedCountry: value, selectedRegion: '' })}
-          value={selectedCountry}
-        />
-      </View>
+      ) : null}
+      <SectionHeader title={selectedRegion ? `Cities in ${selectedRegion}` : regionNoun} />
+      <Table
+        loading={loading}
+        data={gasPrices.map((obj) => (
+          {
+            ...obj,
+            price: gasPriceConversion(obj.price),
+          }
+        )).sort((a, b) => (a.text > b.text ? 1 : -1))}
+        Row={(values: any) => Row({
+          ...values,
+          setSelectedRegion,
+          useAsGasPrice,
+          selectedCountry,
+          unit,
+          locale: globalState.Locale,
+        })}
+        emptyState={pricesEmptyState}
+      />
+      {!loading && gasPrices.length > 0 && (
+        <Text variant="footnote" tone="tertiary" align="center" style={{ marginTop: space.md }}>
+          Tap Use to make a price your default for trips.
+        </Text>
+      )}
     </Page>
   );
 }

@@ -14,7 +14,7 @@ import Alert from '../../../components/Alert';
 import { DEV } from '../../../helpers/env';
 import { logLogin } from '../../../helpers/analyticsHelper';
 
-import { isDarkMode } from '../../../styles/styles';
+import { radius, size } from '../../../styles/theme';
 
 interface Props {
   onLogin?: (credential: AuthCredential, refreshToken?: string) => void,
@@ -112,14 +112,14 @@ export default function AppleLogin({ onLogin, mode = 'login' }: Props) {
   };
 
   return (
-    <View style={{ paddingBottom: 4 }}>
+    <View>
       <AppleAuthentication.AppleAuthenticationButton
-        buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-        buttonStyle={isDarkMode
-          ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
-          : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-        cornerRadius={5}
-        style={{ width: 140, height: 30 }}
+        buttonType={mode === 'refresh'
+          ? AppleAuthentication.AppleAuthenticationButtonType.CONTINUE
+          : AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+        buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE}
+        cornerRadius={radius.lg}
+        style={{ width: '100%', height: size.control }}
         onPress={signInWithApple}
       />
     </View>

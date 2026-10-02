@@ -8,14 +8,12 @@ import React, {
 import {
   View,
   Keyboard,
+  StyleSheet,
   TextInput,
 } from 'react-native';
 
 // External Components
 import { MapPressEvent, PoiClickEvent } from 'react-native-maps';
-import {
-  Portal,
-} from 'react-native-paper';
 
 import { throttle, debounce } from 'throttle-debounce';
 import uuid from 'react-native-uuid';
@@ -43,24 +41,51 @@ import MapContainer from '../../components/MapContainer';
 import Modal from '../../components/Modal';
 import MapModal from '../../components/MapModal';
 import Alert from '../../components/Alert';
+import Card from '../../components/Card';
+import IconButton from '../../components/IconButton';
+import ScreenHeader from '../../components/ScreenHeader';
+import Badge from '../../components/Badge';
 
 import StatsSection from './components/StatsSection';
 import SettingsModal from './components/SettingsModal';
-import SaveTripButton from './components/SaveTripButton';
-import CalculateButton from './components/CalculateButton';
-// TODO: Fix this to use the new LocationInput
-import LocationInputV1 from './components/LocationInputOld';
-// import LocationInput from './components/LocationInput';
+import RouteField from './components/RouteField';
 import ManualTripTrackingSection from './components/ManualTripTrackingSection';
-import ClearManualTripButton from './components/ClearManualTripButton';
-import SettingsIcon from './components/SettingsIcon';
 
 // Styles
-import styles from '../../styles/HomeScreen.styles';
+import { color, space } from '../../styles/theme';
+import { friendlyError } from '../../helpers/errorHelper';
 
 // Mock Data
 import { fetchData } from '../../data/data';
 import { isFeatureEnabled } from '../../helpers/featureHelper';
+
+const styles = StyleSheet.create({
+  routeCard: {
+    gap: space.sm,
+  },
+  connector: {
+    width: 2,
+    height: 14,
+    marginLeft: 6,
+    marginVertical: -space.xs,
+    borderRadius: 1,
+    backgroundColor: color.borderStrong,
+  },
+  section: {
+    marginTop: space.lg,
+  },
+  trackingCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.md,
+  },
+  liveDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: color.danger,
+  },
+});
 
 enum InputEnum {
   None,
@@ -143,6 +168,10 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const [manualTripTrackingEnabled, setManualTripTrackingEnabled] = useState<boolean>(false);
 
+  // Set when the user commits a location (suggestion, current location, map tap); the trip is
+  // recalculated once both ends are known, so there is no separate Calculate step.
+  const [calculationPending, setCalculationPending] = useState<boolean>(false);
+
   const routeDistance = manualTripUsed ? currentCustomRoute.distance : distance;
 
   const GAS_MILEAGE = globalState['Gas Mileage'];
@@ -152,8 +181,9 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     * gasPrice // This gets the cost of the gas used (it should always be stored in $/L)
   );
 
+  // Editing the price means the user wants to use it, so it switches custom pricing on.
   const updateCustomGasPrice = (newPrice: number) => {
-    changeSetting('Custom Gas Price', { price: newPrice, enabled: String(useCustomGasPrice) }, updateGlobalState);
+    changeSetting('Custom Gas Price', { price: newPrice, enabled: 'true' }, updateGlobalState);
   };
 
   const configureCustomGasPrice = (value: boolean) => {
@@ -163,6 +193,10 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const openGasModal = () => {
     logEvent('open_gas_modal');
+    // Start the stepper from the live price rather than a stale custom value.
+    if (!useCustomGasPrice && fetchedGasPrice) {
+      changeSetting('Custom Gas Price', { price: Number(fetchedGasPrice.toFixed(2)), enabled: 'false' }, updateGlobalState);
+    }
     setGasModalVisible(true);
   };
 
@@ -325,7 +359,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       }));
     } catch (err: any) {
       console.warn(err);
-      Alert(err.message);
+      Alert('Couldn\u2019t calculate this trip', friendlyError(err, 'Check both locations and try again.'));
       setCostRequest((oldState) => ({
         ...oldState,
         loading: false,
@@ -377,8 +411,8 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       })
       .then((data) => setSuggestions(data.suggestions ?? []))
       .catch((err) => {
+        // Suggestions are best-effort; typing a full address still works.
         console.warn(err);
-        Alert(err.message);
       });
   }, [location]);
 
@@ -401,11 +435,13 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
 
   const updateStartLocation = (input: string) => {
     setLocations((state) => ({ ...state, startLocation: input }));
+    setStartLocationError(false);
     autocompleteSearch(input);
   };
 
   const updateEndLocation = (input: string) => {
     setLocations((state) => ({ ...state, endLocation: input }));
+    setEndLocationError(false);
     autocompleteSearch(input);
   };
 
@@ -427,6 +463,7 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     // Create new session token after selecting an autocomplete result
     setSessionToken(uuid.v4() as string);
 
+    setCalculationPending(true);
     if (activeInput === InputEnum.Start) {
       setLocations((state) => ({ ...state, startLocation: item }));
       setSuggestions([]);
@@ -476,9 +513,11 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
       setUsingCurrentLocation(currentLocationAlreadySet ? InputEnum.None : InputEnum.End);
     }
     setSuggestions([]);
+    setCalculationPending(true);
   };
 
   const setLocationToPressedLocation = (address: string, latitude: number, longitude: number) => {
+    setCalculationPending(true);
     if (!startLocation && !startIsCurrentLocation) {
       // If there is no start location, set the start location to the pressed location
       clearCurrentTrip();
@@ -527,6 +566,17 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     setLocationToPressedLocation(address, latitude, longitude);
   };
 
+  useEffect(() => {
+    if (!calculationPending) return;
+    // Evaluate once per commit: typing in the other field must never trigger a calculation.
+    setCalculationPending(false);
+    const hasStart = !!startLocation || startIsCurrentLocation;
+    const hasEnd = !!endLocation || endIsCurrentLocation;
+    if (hasStart && hasEnd) {
+      submit();
+    }
+  }, [calculationPending, startLocation, endLocation, usingCurrentLocation, submit]);
+
   // Update gas price each time the user changes custom gas price settings or fetched gas price
   useEffect(() => {
     if (!useCustomGasPrice) {
@@ -541,8 +591,8 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     // Initialize user's features
     setManualTripTrackingEnabled(isFeatureEnabled('manual_trip_tracking'));
 
-    // Fetch gas price from server
-    fetchGasPrice();
+    // Fetch gas price from server (the cost card shows "—" until it arrives)
+    fetchGasPrice().catch((e) => console.log('Initial gas price fetch failed', e));
   }, []);
 
   // Represents if the user has entered all the required data to save a trip's cost
@@ -608,11 +658,16 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
     }
   };
 
+  const routeWaypoints = manualTripInProgress
+    ? currentCustomRoute.route.map(convertLatLngToLocation)
+    : waypoints;
+
   return (
-    <Page>
+    <Page scroll>
       <SettingsModal
-        setting="Gas Price"
-        units="$/L"
+        setting="Gas price"
+        units={globalState.Locale === 'US' ? 'Stored in $/L, shown in $/gal elsewhere' : 'Dollars per litre'}
+        description="Set your own price instead of the regional average."
         visible={gasModalVisible}
         setVisible={setGasModalVisible}
         data={customGasPrice}
@@ -621,64 +676,66 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
         setUseCustomValue={configureCustomGasPrice}
       />
       <SettingsModal
-        setting="Fuel Efficiency"
-        units="L/100km"
+        setting="Fuel efficiency"
+        units="Litres per 100 km"
+        description="How much fuel your car uses. Find yours on the Car tab."
         visible={fuelModalVisible}
         setVisible={setFuelModalVisible}
         data={globalState['Gas Mileage']}
         setData={(value) => changeSetting('Gas Mileage', value, updateGlobalState)}
         inputStep={0.5}
       />
-      <Portal>
-        <Modal
-          visible={mapModalVisible}
-          onDismiss={() => setMapModalVisible(false)}
-        >
-          <MapModal
-            description="Tap on the map to manually set your start and end points"
-            showUserLocation={!startPoint.address || !endPoint.address}
-            waypoints={waypoints}
-            handleMapPress={setUnknownLocationToPressedLocation}
-            handlePoiPress={setLocationToPressedPOI}
-            customStart={startPoint}
-            customEnd={endPoint}
-            startAddress={startPoint.address}
-            endAddress={endPoint.address}
-          />
-        </Modal>
-      </Portal>
-      <SettingsIcon onPress={() => navigation.navigate('Settings')} />
-      <View style={styles.dataContainer}>
-        <MapContainer
-          waypoints={
-            manualTripInProgress
-              ? currentCustomRoute.route.map(convertLatLngToLocation)
-              : waypoints
-          }
-          showUserLocation={!startPoint.address && !endPoint.address && !manualTripInProgress}
-          style={{ ...styles.mapView, borderColor: manualTripInProgress ? 'red' : 'white' }}
-          onPress={openMapModal}
-          onPoiClick={openMapModal}
+      <Modal
+        visible={mapModalVisible}
+        title="Pick on map"
+        subtitle="Tap the map to set your start, then your destination."
+        tall
+        onDismiss={() => setMapModalVisible(false)}
+      >
+        <MapModal
+          showUserLocation={!startPoint.address || !endPoint.address}
+          waypoints={waypoints}
+          handleMapPress={setUnknownLocationToPressedLocation}
+          handlePoiPress={setLocationToPressedPOI}
           customStart={startPoint}
           customEnd={endPoint}
-          showFullscreenButton={!manualTripUsed}
+          startAddress={startPoint.address}
+          endAddress={endPoint.address}
         />
-        <StatsSection
-          loading={loading}
-          distance={manualTripUsed ? routeDistance : distance}
-          gasPrice={gasPrice}
-          useCustomGasPrice={useCustomGasPrice}
-          cost={cost}
-          gasMileage={GAS_MILEAGE}
-          locale={globalState.Locale}
-          openModal={openGasModal}
-          openFuelModal={openFuelEfficiencyModal}
-        />
-        {!manualTripUsed && (
-        <>
-          <LocationInputV1
-            z={2}
-            placeholder="Start Location"
+      </Modal>
+
+      <ScreenHeader
+        eyebrow="GasMeUp"
+        title="Trip cost"
+        actions={(
+          <IconButton
+            icon="settings-outline"
+            accessibilityLabel="Settings"
+            onPress={() => navigation.navigate('Settings')}
+          />
+        )}
+      />
+
+      {manualTripUsed ? (
+        <Card style={styles.trackingCard}>
+          {manualTripInProgress && <View style={styles.liveDot} />}
+          <View style={{ flex: 1 }}>
+            <Text variant="headline">{manualTripInProgress ? 'Tracking your trip' : 'Tracked trip'}</Text>
+            <Text variant="footnote" tone="secondary" numberOfLines={2}>
+              {manualTripInProgress
+                ? 'Drive as normal. Stop tracking when you arrive.'
+                : `${startPoint.address || 'Start'} \u2192 ${endPoint.address || 'End'}`}
+            </Text>
+          </View>
+          {manualTripInProgress
+            ? <Badge label="LIVE" tone="danger" />
+            : <IconButton icon="close" accessibilityLabel="Clear tracked trip" size={32} onPress={clearManualTrip} />}
+        </Card>
+      ) : (
+        <Card style={styles.routeCard}>
+          <RouteField
+            kind="start"
+            placeholder="Starting point"
             suggestions={activeInput === InputEnum.Start ? suggestions : []}
             onSuggestionPress={setInputToPickedLocation}
             onChangeText={updateStartLocation}
@@ -693,12 +750,13 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
             blurOnSubmit={false}
             returnKeyType="next"
           />
-          <LocationInputV1
+          <View style={styles.connector} />
+          <RouteField
+            kind="end"
             myRef={endLocationRef}
-            z={1}
             suggestions={activeInput === InputEnum.End ? suggestions : []}
             onSuggestionPress={setInputToPickedLocation}
-            placeholder="End Location"
+            placeholder="Destination"
             onChangeText={updateEndLocation}
             onPressIn={() => changeActiveInput(InputEnum.End)}
             value={endIsCurrentLocation ? 'Current Location' : endLocation}
@@ -708,50 +766,59 @@ export default function HomeScreen({ navigation, setTrip }: Props) {
             useCurrentLocationActive={endIsCurrentLocation}
             useCurrentLocationDisabled={startIsCurrentLocation}
             onUseCurrentLocationPress={() => useCurrentLocation(InputEnum.End)}
-            returnKeyType="done"
+            returnKeyType="go"
           />
-          {manualTripTrackingEnabled && (
-            <View>
-              <Text style={{ marginTop: 8 }}>- OR -</Text>
-            </View>
-          )}
-        </>
-        )}
-        {manualTripTrackingEnabled && (
-        <ManualTripTrackingSection
-          currentRoute={currentCustomRoute}
-          userLocation={globalState.userLocation}
-          manualTripInProgress={manualTripInProgress}
-          setCurrentRoute={setCurrentCustomRoute}
-          clearCurrentTrip={clearCurrentTrip}
-          setPoints={setPoints}
-          fetchGasPrice={fetchGasPrice}
-          setWaypoints={setWaypoints}
-          setSuggestions={setSuggestions}
-          setLocations={setLocations}
-          setManualTripUsed={setManualTripUsed}
-          setManualTripInProgress={setManualTripInProgress}
-          setDistanceToRouteDistance={() => setDistance(routeDistance)}
+        </Card>
+      )}
+
+      <View style={styles.section}>
+        <StatsSection
+          loading={loading}
+          distance={manualTripUsed ? routeDistance : distance}
+          gasPrice={gasPrice}
+          useCustomGasPrice={useCustomGasPrice}
+          cost={cost}
+          gasMileage={GAS_MILEAGE}
+          locale={globalState.Locale}
+          openModal={openGasModal}
+          openFuelModal={openFuelEfficiencyModal}
+          canSave={canSaveTrip && !manualTripInProgress}
+          onSave={handleSaveButtonPress}
         />
-        )}
-        <View style={styles.buttonSection}>
-          {manualTripUsed ? (
-            <ClearManualTripButton
-              onPress={clearManualTrip}
-              disabled={manualTripInProgress}
-            />
-          ) : (
-            <CalculateButton
-              onPress={submit}
-              disabled={manualTripInProgress}
-            />
-          )}
-          <SaveTripButton
-            onPress={handleSaveButtonPress}
-            canSaveTrip={canSaveTrip}
+      </View>
+
+      <View style={styles.section}>
+        <MapContainer
+          waypoints={routeWaypoints}
+          showUserLocation={!startPoint.address && !endPoint.address && !manualTripInProgress}
+          style={manualTripInProgress ? { borderColor: color.danger, borderWidth: 1 } : undefined}
+          onPress={openMapModal}
+          onPoiClick={openMapModal}
+          customStart={startPoint}
+          customEnd={endPoint}
+          showFullscreenButton={!manualTripUsed}
+        />
+      </View>
+
+      {manualTripTrackingEnabled && (
+        <View style={styles.section}>
+          <ManualTripTrackingSection
+            currentRoute={currentCustomRoute}
+            userLocation={globalState.userLocation}
+            manualTripInProgress={manualTripInProgress}
+            setCurrentRoute={setCurrentCustomRoute}
+            clearCurrentTrip={clearCurrentTrip}
+            setPoints={setPoints}
+            fetchGasPrice={fetchGasPrice}
+            setWaypoints={setWaypoints}
+            setSuggestions={setSuggestions}
+            setLocations={setLocations}
+            setManualTripUsed={setManualTripUsed}
+            setManualTripInProgress={setManualTripInProgress}
+            setDistanceToRouteDistance={() => setDistance(routeDistance)}
           />
         </View>
-      </View>
+      )}
     </Page>
   );
 }

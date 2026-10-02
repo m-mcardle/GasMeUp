@@ -26,6 +26,7 @@ interface Props {
   totalHeight?: number,
   rounded?: boolean,
   textColor?: string,
+  iconColor?: string,
   borderColor?: string,
   separatorWidth?: number,
   leftButtonBackgroundColor?: string,
@@ -75,6 +76,7 @@ export default function NumericInput({
   totalHeight,
   rounded = false,
   textColor = 'black',
+  iconColor = 'black',
   borderColor = '#d4d4d4',
   separatorWidth = 1,
   leftButtonBackgroundColor = 'white',
@@ -179,7 +181,7 @@ export default function NumericInput({
           rounded ? { borderTopLeftRadius: radius, borderBottomLeftRadius: radius } : null,
         ]}
       >
-        <Ionicons name="remove" size={fontSize} style={styles.icon} />
+        <Ionicons name="remove" size={fontSize} color={iconColor} style={styles.icon} />
       </TouchableOpacity>
       <View
         style={[
@@ -194,6 +196,7 @@ export default function NumericInput({
       >
         <TextInput
           returnKeyType="done"
+          keyboardAppearance="dark"
           underlineColorAndroid="rgba(0,0,0,0)"
           keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
           value={text}
@@ -230,7 +233,7 @@ export default function NumericInput({
           rounded ? { borderTopRightRadius: radius, borderBottomRightRadius: radius } : null,
         ]}
       >
-        <Ionicons name="add" size={fontSize} style={styles.icon} />
+        <Ionicons name="add" size={fontSize} color={iconColor} style={styles.icon} />
       </TouchableOpacity>
     </View>
   );

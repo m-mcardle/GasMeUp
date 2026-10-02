@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import {
+  StyleProp, StyleSheet, View, ViewStyle,
+} from 'react-native';
 
-import { FontAwesome5 } from '@expo/vector-icons';
 import MapView, {
   PROVIDER_GOOGLE, Marker, Polyline, MapPressEvent, PoiClickEvent,
 } from 'react-native-maps';
@@ -11,7 +12,28 @@ import { useGlobalState } from '../hooks/hooks';
 import { customMapStyle } from '../helpers/mapHelper';
 import { convertLocationToLatLng } from '../helpers/locationHelper';
 
-import { colors, globalStyles } from '../styles/styles';
+import IconButton from './IconButton';
+
+import {
+  color, palette, radius, space,
+} from '../styles/theme';
+
+const styles = StyleSheet.create({
+  container: {
+    height: 180,
+    width: '100%',
+    borderRadius: radius.xl,
+    overflow: 'hidden',
+    backgroundColor: color.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: color.border,
+  },
+  expand: {
+    position: 'absolute',
+    top: space.sm,
+    right: space.sm,
+  },
+});
 
 interface Props {
   customStart?: LatLng,
@@ -19,7 +41,7 @@ interface Props {
   showUserLocation: boolean;
   waypoints: Array<Location>,
   showFullscreenButton?: boolean,
-  style?: object,
+  style?: StyleProp<ViewStyle>,
   onPress?: (event?: MapPressEvent) => void,
   onPoiClick?: (event?: PoiClickEvent) => void,
 }
@@ -84,10 +106,10 @@ export default function MapContainer({
   );
 
   return (
-    <View style={[globalStyles.mapContainer, style]}>
+    <View style={[styles.container, style]}>
       <MapView
         provider={PROVIDER_GOOGLE}
-        style={globalStyles.map}
+        style={StyleSheet.absoluteFill}
         region={fallbackToUserRegion ? userLocationRegion : mapRegion}
         customMapStyle={customMapStyle}
         onPress={onPress}
@@ -101,7 +123,7 @@ export default function MapContainer({
             }}
             title="Start"
             description="Start Location of Trip"
-            pinColor={colors.action}
+            pinColor={color.primary}
           />
         )}
         {(!!end && !!end.lat && !!end.lng) && (
@@ -112,7 +134,7 @@ export default function MapContainer({
             }}
             title="End"
             description="End Location of Trip"
-            pinColor={colors.action}
+            pinColor={palette.mint400}
           />
         )}
         {showUserLocation && hasUserLocation && (
@@ -127,16 +149,17 @@ export default function MapContainer({
           />
         )}
         {waypoints.length > 0 && (
-          <Polyline coordinates={waypoints} strokeWidth={2} strokeColor={colors.action} />
+          <Polyline coordinates={waypoints} strokeWidth={4} strokeColor={palette.violet400} />
         )}
       </MapView>
       {showFullscreenButton && (
-      <TouchableOpacity
-        style={globalStyles.mapOverlay}
+      <IconButton
+        icon="expand"
+        accessibilityLabel="Open full map"
+        size={34}
+        style={styles.expand}
         onPress={() => onPress()}
-      >
-        <FontAwesome5 name="expand" size={16} color="white" />
-      </TouchableOpacity>
+      />
       )}
     </View>
   );

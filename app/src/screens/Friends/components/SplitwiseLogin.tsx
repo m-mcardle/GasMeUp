@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import {
-  Alert, Image, Text, View,
+  Alert, Image,
 } from 'react-native';
 
 import * as AuthSession from 'expo-auth-session';
@@ -20,11 +20,11 @@ import { postData } from '../../../data/data';
 
 // Components
 import Button from '../../../components/Button';
+import Card from '../../../components/Card';
+import EmptyState from '../../../components/EmptyState';
 
 // Styles
-import {
-  boldFont, colors, globalStyles,
-} from '../../../styles/styles';
+import { color } from '../../../styles/theme';
 
 // @ts-ignore
 import SplitwiseLogo from '../../../../assets/splitwise-logo.png';
@@ -117,22 +117,22 @@ export default function SplitwiseLogin() {
   }, [result]);
 
   return (
-    <View style={{ height: '80%', justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ ...globalStyles.h1, color: 'white' }}>Connect your Splitwise account</Text>
-      <Text style={{ ...globalStyles.h3, color: 'white' }}>Sign in to your Splitwise account to view your friends here</Text>
-      <Button
-        disabled={!request}
-        onPress={() => promptAsync()}
-        style={{
-          backgroundColor: colors.splitwiseGreen,
-          flexDirection: 'row',
-          justifyContent: 'space-evenly',
-          alignItems: 'center',
-        }}
-      >
-        <Text style={{ color: 'white', fontFamily: boldFont }}>Sign In</Text>
-        <Image source={SplitwiseLogo} style={{ width: 24, height: 24 }} />
-      </Button>
-    </View>
+    <Card>
+      <EmptyState
+        icon="link-outline"
+        title="Connect Splitwise"
+        message="Sign in to your Splitwise account to see your balances here."
+        action={(
+          <Button
+            title="Sign in with Splitwise"
+            disabled={!request}
+            onPress={() => promptAsync()}
+            style={{ backgroundColor: color.splitwise }}
+          >
+            <Image source={SplitwiseLogo} style={{ width: 20, height: 20 }} />
+          </Button>
+        )}
+      />
+    </Card>
   );
 }
