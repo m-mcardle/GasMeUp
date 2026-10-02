@@ -11,6 +11,7 @@ import {
 } from 'firebase/auth';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { useDocumentData } from 'react-firebase-hooks/firestore';
 import { auth, db } from '../../../firebase';
 
 // Components
@@ -35,6 +36,7 @@ import {
 // Helpers
 import { DEV } from '../../helpers/env';
 import { logEvent } from '../../helpers/analyticsHelper';
+import { getDisplayName } from '../../helpers/userHelper';
 
 // Styles
 import { color, radius, space } from '../../styles/theme';
@@ -87,6 +89,8 @@ export default function SettingsScreen({ navigation }: Props) {
   const [globalState, updateGlobalState] = useGlobalState();
 
   const userDoc = user?.uid ? doc(db, 'Users', user.uid) : undefined;
+  const [userDocument] = useDocumentData(userDoc);
+  const displayName = getDisplayName(user, userDocument);
   const secureUserDoc = user?.uid ? doc(db, 'SecureUsers', user.uid) : undefined;
 
   const deleteAccount = (credential: AuthCredential, refreshToken?: string) => {
@@ -200,9 +204,9 @@ export default function SettingsScreen({ navigation }: Props) {
 
       {user ? (
         <Card style={[styles.account, { marginTop: space.sm }]}>
-          <Avatar name={user.displayName ?? user.email ?? '?'} email={user.email ?? undefined} size={56} />
+          <Avatar name={displayName || '?'} email={user.email ?? undefined} size={56} />
           <View style={{ flex: 1, gap: 2 }}>
-            <Text variant="title3" numberOfLines={1}>{user.displayName ?? 'GasMeUp user'}</Text>
+            <Text variant="title3" numberOfLines={1}>{displayName}</Text>
             <Text variant="footnote" tone="secondary" numberOfLines={1}>{user.email}</Text>
             <View style={{ marginTop: space.xs }}>
               {user.emailVerified

@@ -22,6 +22,7 @@ import { useGlobalState } from '../../hooks/hooks';
 import { validateCurrentUser } from '../../helpers/authHelper';
 import { logEvent } from '../../helpers/analyticsHelper';
 import { isFeatureEnabled } from '../../helpers/featureHelper';
+import { getDisplayName } from '../../helpers/userHelper';
 
 // Components
 import Page from '../../components/Page';
@@ -219,7 +220,7 @@ export default function FriendsScreen({ navigation, setFriend }: Props) {
 
       <ScreenHeader
         title="Friends"
-        subtitle={user?.displayName ? `Signed in as ${user.displayName}` : undefined}
+        subtitle={getDisplayName(user, userDocument) ? `Signed in as ${getDisplayName(user, userDocument)}` : undefined}
         actions={(
           <>
             <IconButton
