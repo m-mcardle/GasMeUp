@@ -49,7 +49,7 @@ module.exports = {
   ios: {
     supportsTablet: false,
     bundleIdentifier: 'com.Virintus.GasMeUp',
-    buildNumber: '1.2.0',
+    buildNumber: '1.2.1',
     appleTeamId: '2Q4CXG64VY',
     config: {
       usesNonExemptEncryption: false,
