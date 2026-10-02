@@ -2,8 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
-import { Ionicons } from '@expo/vector-icons';
-
 // Firebase
 import {
   doc, DocumentData, getDoc,
@@ -16,12 +14,14 @@ import { updateFriend, removeFriend } from '../../../helpers/firestoreHelper';
 import { logEvent } from '../../../helpers/analyticsHelper';
 
 // Components
-import Text from '../../../components/Text';
-import Button from '../../../components/Button';
+import Avatar from '../../../components/Avatar';
+import Card from '../../../components/Card';
+import EmptyState from '../../../components/EmptyState';
+import IconButton from '../../../components/IconButton';
+import ListRow from '../../../components/ListRow';
 
 // Styles
-import styles from '../../../styles/FriendsScreen.styles';
-import { boldFont, colors, globalStyles } from '../../../styles/styles';
+import { color, space } from '../../../styles/theme';
 
 interface Props {
   friendRequestUIDs: string[],
@@ -106,44 +106,39 @@ export default function FriendRequestsSection({
     }
   };
 
+  if (friendRequestUIDs.length === 0) {
+    return <EmptyState icon="mail-open-outline" title="You’re all caught up" message="No pending friend requests." />;
+  }
+
   return (
-    <View style={{ height: '100%' }}>
-      <Text style={styles.friendInfoTitle}>Friend Requests</Text>
-      <Text style={globalStyles.h2}>
-        Add these users as friends and begin sharing trips with them!
-      </Text>
-      <View style={{ height: '80%', marginTop: 20 }}>
-        <View
-          style={styles.friendRequestsSection}
-        >
-          <Text style={{ fontFamily: boldFont, ...globalStyles.h3, width: '40%' }}>Name</Text>
-          <Text style={{ fontFamily: boldFont, ...globalStyles.h3, width: '40%' }}>Email</Text>
-          <View
-            style={styles.acceptFriendRequestButton}
-          />
-        </View>
-        {friendRequests.map((request: FriendObject) => (
-          <View
-            key={request.uid}
-            style={styles.friendRequestsSection}
-          >
-            <Text style={{ ...globalStyles.h3, width: '40%' }} numberOfLines={1}>{request.fullName}</Text>
-            <Text style={{ ...globalStyles.h3, width: '40%' }} numberOfLines={1}>{request.email}</Text>
-            <Button
-              style={styles.acceptFriendRequestButton}
-              onPress={() => acceptFriendRequest(request)}
-            >
-              <Ionicons name="checkmark" size={14} color={colors.white} />
-            </Button>
-            <Button
-              style={styles.removeFriendRequestButton}
-              onPress={() => removeFriendRequest(request)}
-            >
-              <Ionicons name="remove" size={14} color={colors.white} />
-            </Button>
-          </View>
-        ))}
-      </View>
-    </View>
+    <Card padded={false} style={{ marginBottom: space.sm, backgroundColor: color.surfaceRaised }}>
+      {friendRequests.map((request: FriendObject, index) => (
+        <ListRow
+          key={request.uid}
+          title={request.fullName || request.email}
+          subtitle={request.fullName !== request.email ? request.email : undefined}
+          separator={index < friendRequests.length - 1}
+          leading={<Avatar name={request.fullName || request.email} email={request.email} />}
+          trailing={(
+            <View style={{ flexDirection: 'row', gap: space.sm }}>
+              <IconButton
+                icon="close"
+                variant="danger"
+                size={36}
+                accessibilityLabel={`Decline ${request.fullName}`}
+                onPress={() => removeFriendRequest(request)}
+              />
+              <IconButton
+                icon="checkmark"
+                variant="success"
+                size={36}
+                accessibilityLabel={`Accept ${request.fullName}`}
+                onPress={() => acceptFriendRequest(request)}
+              />
+            </View>
+          )}
+        />
+      ))}
+    </Card>
   );
 }

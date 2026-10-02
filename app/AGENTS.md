@@ -19,6 +19,7 @@ This directory contains the Expo + React Native mobile client for GasMeUp.
 - Firebase client setup: `firebase.js`
 - Global app state: `src/hooks/hooks.tsx`
 - Shared UI components: `src/components/`
+- Design tokens: `src/styles/theme.ts` (see `DESIGN.md`); navigation chrome: `src/styles/navigation.ts`
 - Screens:
   - `src/screens/Home/`
   - `src/screens/Friends/`
@@ -70,6 +71,7 @@ If a new env var is needed:
 
 ## Editing Guidance
 
+- UI must use the theme tokens and shared components described in `DESIGN.md`; do not hardcode colours, sizes or fonts in screens.
 - Prefer keeping screen logic close to the relevant screen folder. Helpers belong in `src/helpers/` only when reused.
 - Preserve existing response expectations from the Express API. Search `fetchData(` callers before changing server contracts.
 - Keep `types.d.ts` up to date when changing trip, friend, or location payloads.
@@ -98,7 +100,7 @@ There are no checked-in app unit tests. When changing UI behavior, validate in E
 
 - Push notifications generally require a physical device.
 - Background location requires native permissions and is not fully testable in Expo Go.
-- `HomeScreen` still uses `LocationInputOld`, so avoid assuming the newer location input flow is active.
+- `HomeScreen` recalculates automatically when both route ends are committed (suggestion, current location, map tap or keyboard Go); there is no Calculate button.
 
 ## Native Projects (CNG)
 

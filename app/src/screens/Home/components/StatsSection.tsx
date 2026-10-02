@@ -1,12 +1,10 @@
-import React, {
-  useEffect, useRef,
-} from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
-  Animated, Easing, View,
+  Animated, Easing, Pressable, StyleSheet, View,
 } from 'react-native';
 
-import { FontAwesome5, Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator } from 'react-native-paper';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 // Helpers
 import {
@@ -15,11 +13,11 @@ import {
 
 // Components
 import Text from '../../../components/Text';
-import AnimatedGradient from '../../../components/AnimatedGradient';
 
 // Styles
-import styles from '../../../styles/HomeScreen.styles';
-import { colors } from '../../../styles/styles';
+import {
+  gradient, palette, radius, shadow, space,
+} from '../../../styles/theme';
 
 interface Props {
   loading: boolean,
@@ -31,48 +29,160 @@ interface Props {
   locale: 'CA' | 'US',
   openModal: () => void,
   openFuelModal: () => void,
+  canSave?: boolean,
+  onSave?: () => void,
 }
 
-export default function StatsSection(props: Props) {
-  const {
-    loading,
-    distance = 0,
-    gasPrice = 0,
-    gasMileage,
-    useCustomGasPrice,
-    cost,
-    locale,
-    openModal,
-    openFuelModal,
-  } = props;
+const onHero = 'rgba(255,255,255,0.72)';
 
-  const fadeAnim = useRef(new Animated.Value(0.5)).current;
-  const fadeIn = Animated.timing(fadeAnim, {
-    toValue: 1,
-    duration: 1500,
-    useNativeDriver: true,
-    easing: Easing.quad,
-  });
+const styles = StyleSheet.create({
+  card: {
+    borderRadius: radius.xl,
+    padding: space.lg,
+    ...shadow.glow,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  amount: {
+    marginTop: space.xs,
+    marginBottom: space.lg,
+    color: '#FFFFFF',
+  },
+  hint: {
+    color: 'rgba(255,255,255,0.72)',
+    marginTop: -space.sm,
+    marginBottom: space.lg,
+  },
+  save: {
+    marginTop: space.lg,
+    height: 50,
+    borderRadius: radius.lg,
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: space.sm,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: space.sm,
+  },
+  tile: {
+    flexBasis: '48%',
+    flexGrow: 1,
+    borderRadius: radius.md,
+    backgroundColor: 'rgba(255,255,255,0.10)',
+    paddingVertical: space.sm + 2,
+    paddingHorizontal: space.md,
+    gap: 2,
+  },
+  tileEditable: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.28)',
+  },
+  tileLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.xs,
+  },
+  customPill: {
+    marginLeft: 'auto',
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: radius.pill,
+    backgroundColor: 'rgba(255,255,255,0.22)',
+  },
+});
 
-  const fadeOut = Animated.timing(fadeAnim, {
-    toValue: 0.5,
-    duration: 1500,
-    useNativeDriver: true,
-    easing: Easing.quad,
-  });
+interface TileProps {
+  label: string,
+  value: string,
+  icon: React.ReactNode,
+  loading: boolean,
+  pulse: Animated.Value,
+  pulses?: boolean,
+  custom?: boolean,
+  onPress?: () => void,
+}
 
-  const sequence = Animated.sequence([fadeIn, fadeOut]);
-  const animation = Animated.loop(sequence);
+function StatTile({
+  label, value, icon, loading, pulse, pulses = false, custom = false, onPress,
+}: TileProps) {
+  const content = (
+    <>
+      <View style={styles.tileLabel}>
+        {icon}
+        <Text variant="caption" style={{ color: onHero }}>{label}</Text>
+        {onPress && !custom && <Ionicons name="pencil" size={11} color={onHero} style={{ marginLeft: 'auto' }} />}
+        {custom && (
+          <View style={styles.customPill}>
+            <Text variant="caption" tone="onPrimary" style={{ fontSize: 10, lineHeight: 13 }}>Custom</Text>
+          </View>
+        )}
+      </View>
+      {/* A view's opacity must stay bound to `pulse` for its whole life: swapping a
+          native-driven value for a literal leaves it stuck at the last animated opacity. */}
+      <Animated.View style={pulses ? { opacity: pulse } : null}>
+        <Text variant="headline" tone="onPrimary" numberOfLines={1}>{loading ? '—' : value}</Text>
+      </Animated.View>
+    </>
+  );
 
-  // Start the animation if the data is loading, otherwise stop it
+  if (onPress) {
+    return (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${label}: ${value}. Tap to change.`}
+        onPress={onPress}
+        style={({ pressed }) => [
+          styles.tile,
+          styles.tileEditable,
+          pressed ? { opacity: 0.7 } : null,
+        ]}
+      >
+        {content}
+      </Pressable>
+    );
+  }
+  return <View style={styles.tile}>{content}</View>;
+}
+
+// Hero card on the Calculate screen: the trip cost plus the four inputs that produce it.
+export default function StatsSection({
+  loading,
+  distance = 0,
+  gasPrice = 0,
+  gasMileage,
+  useCustomGasPrice,
+  cost,
+  locale,
+  openModal,
+  openFuelModal,
+  canSave = false,
+  onSave,
+}: Props) {
+  const pulse = useRef(new Animated.Value(1)).current;
+
   useEffect(() => {
-    if (loading) {
-      animation.start();
-    } else {
-      animation.stop();
-      fadeAnim.setValue(1);
+    if (!loading) {
+      pulse.setValue(1);
+      return undefined;
     }
-  }, [loading, fadeAnim]);
+    const animation = Animated.loop(Animated.sequence([
+      Animated.timing(pulse, {
+        toValue: 0.35, duration: 700, easing: Easing.inOut(Easing.quad), useNativeDriver: true,
+      }),
+      Animated.timing(pulse, {
+        toValue: 1, duration: 700, easing: Easing.inOut(Easing.quad), useNativeDriver: true,
+      }),
+    ]));
+    animation.start();
+    return () => animation.stop();
+  }, [loading, pulse]);
 
   // L
   const gasUsed = (distance * gasMileage) / 100;
@@ -84,152 +194,91 @@ export default function StatsSection(props: Props) {
     locale,
   );
   const gasUsedString = locale === 'CA'
-    ? `${gasUsed.toFixed(2)}L`
-    : `${(convertLtoGallons(gasUsed)).toFixed(2)}gal`;
-
-  const costSectionGradient = [
-    '#118C4F',
-    '#006241',
-    '#1b1c2c',
-    '#118C4F',
-    '#006241',
-  ];
-
-  const statBoxLoadingGradient = [
-    colors.tertiary,
-    colors.darkestGray,
-    colors.tertiary,
-    colors.tertiary,
-    colors.darkestGray,
-    colors.tertiary,
-  ];
-
-  const statBoxGradient = [
-    colors.tertiary,
-    colors.tertiary,
-  ];
+    ? `${gasUsed.toFixed(1)} L`
+    : `${(convertLtoGallons(gasUsed)).toFixed(1)} gal`;
 
   const formatter = new Intl.NumberFormat('en-CA', {
     style: 'currency',
     currency: 'CAD',
   });
   const costString = formatter.format(cost);
-  const costStringLength = costString.length;
+  const hasTrip = distance > 0;
 
-  // Set the font size based on the length of the cost
-  const costFontSize = 64 - Math.min(48, Math.max(0, costStringLength - 8) * 8);
+  const iconColor = onHero;
 
   return (
-    <View style={styles.statsSection}>
-      <AnimatedGradient
-        animate={loading}
-        style={styles.costSection}
-        colors={costSectionGradient}
-        speed={1000}
-      >
-        {loading
-          ? <ActivityIndicator animating size="large" />
-          : (
-            <Text style={{ ...styles.costText, fontSize: costFontSize }}>
-              {costString}
-            </Text>
-          )}
-      </AnimatedGradient>
-      <AnimatedGradient
-        animate={loading}
-        speed={4000}
-        colors={loading ? statBoxLoadingGradient : statBoxGradient}
-        x={0.1}
-        y={0.1}
-      >
-        <View style={styles.subStatsSection}>
-          <View
-            style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
-          >
-            <View style={styles.statText}>
-              <FontAwesome5 name="route" size={16} color={colors.gray} />
-              {loading
-                ? (
-                  <View style={styles.statBoxText}>
-                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
-                  </View>
-                )
-                : (
-                  <Text style={styles.statBoxText}>
-                    {convertedStats.distance}
-                  </Text>
-                )}
-            </View>
-          </View>
-          <View
-            style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
-          >
-            <View style={styles.statText}>
-              <FontAwesome5 name="gas-pump" size={16} color={colors.gray} />
-              {loading
-                ? (
-                  <View style={styles.statBoxText}>
-                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
-                  </View>
-                )
-                : (
-                  <Text style={styles.statBoxText}>
-                    {/* TODO */}
-                    {gasUsedString}
-                  </Text>
-                )}
-            </View>
-          </View>
-        </View>
-        <View style={styles.subStatsSection}>
-          <View
-            style={[styles.statBox, (loading ? { justifyContent: 'center' } : undefined)]}
-            onTouchEnd={() => openFuelModal()}
-          >
-            <View style={styles.statText}>
-              <FontAwesome5 name="car" size={16} color={colors.gray} />
-              {loading
-                ? (
-                  <View style={styles.statBoxText}>
-                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
-                  </View>
-                )
-                : (
-                  <Text style={styles.statBoxText}>
-                    {convertedStats.fuelEfficiency}
-                    {'  '}
-                    <Ionicons name="chevron-up-circle" size={12} color={colors.gray} />
-                  </Text>
-                )}
-            </View>
-          </View>
-          <View
-            style={[
-              styles.statBox,
-              (loading ? { justifyContent: 'center' } : undefined),
-              (useCustomGasPrice ? { borderColor: colors.secondaryAction, borderWidth: 1 } : {}),
-            ]}
-            onTouchEnd={() => openModal()}
-          >
-            <View style={styles.statText}>
-              <Ionicons name="pricetag" size={16} color={colors.gray} />
-              {loading
-                ? (
-                  <View style={styles.statBoxText}>
-                    <Animated.View style={[styles.skeleton, { opacity: fadeAnim }]} />
-                  </View>
-                )
-                : (
-                  <Text style={styles.statBoxText}>
-                    {convertedStats.gasPrice}
-                    {'  '}
-                    <Ionicons name="chevron-up-circle" size={12} color={useCustomGasPrice ? colors.action : colors.gray} />
-                  </Text>
-                )}
-            </View>
-          </View>
-        </View>
-      </AnimatedGradient>
-    </View>
+    <LinearGradient
+      colors={gradient.hero}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.card}
+    >
+      <View style={styles.header}>
+        <Text variant="overline" style={{ color: onHero }}>Estimated trip cost</Text>
+        {useCustomGasPrice && <Ionicons name="pricetag" size={14} color={onHero} />}
+      </View>
+      <Animated.View style={{ opacity: pulse }}>
+        <Text
+          variant="display"
+          style={[styles.amount, !hasTrip && !loading ? { color: 'rgba(255,255,255,0.55)' } : null]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          accessibilityLabel={`Estimated trip cost ${costString}`}
+        >
+          {costString}
+        </Text>
+      </Animated.View>
+      {!hasTrip && !loading && (
+        <Text variant="footnote" style={styles.hint}>
+          Choose a start and destination to see what the drive costs.
+        </Text>
+      )}
+      <View style={styles.grid}>
+        <StatTile
+          label="Distance"
+          value={hasTrip ? convertedStats.distance : '—'}
+          icon={<MaterialCommunityIcons name="map-marker-distance" size={13} color={iconColor} />}
+          loading={loading}
+          pulse={pulse}
+          pulses
+        />
+        <StatTile
+          label="Fuel used"
+          value={hasTrip ? gasUsedString : '—'}
+          icon={<MaterialCommunityIcons name="water-outline" size={13} color={iconColor} />}
+          loading={loading}
+          pulse={pulse}
+          pulses
+        />
+        <StatTile
+          label="Efficiency"
+          value={convertedStats.fuelEfficiency}
+          icon={<Ionicons name="speedometer-outline" size={13} color={iconColor} />}
+          loading={false}
+          pulse={pulse}
+          onPress={openFuelModal}
+        />
+        <StatTile
+          label="Gas price"
+          value={gasPrice ? convertedStats.gasPrice : '—'}
+          icon={<MaterialCommunityIcons name="gas-station-outline" size={13} color={iconColor} />}
+          loading={false}
+          pulse={pulse}
+          custom={useCustomGasPrice}
+          onPress={openModal}
+        />
+      </View>
+      {canSave && onSave && (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Save trip and split with friends"
+          onPress={onSave}
+          style={({ pressed }) => [styles.save, pressed ? { opacity: 0.85 } : null]}
+        >
+          <Ionicons name="people" size={18} color={palette.violet700} />
+          <Text variant="headline" style={{ color: palette.violet700 }}>Save &amp; split with friends</Text>
+        </Pressable>
+      )}
+    </LinearGradient>
   );
 }

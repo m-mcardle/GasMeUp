@@ -1,13 +1,8 @@
 // React
 import React, { useEffect, useState } from 'react';
-import {
-  View, Image, TouchableOpacity,
-} from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 
-import { Ionicons } from '@expo/vector-icons';
 import { openURL } from 'expo-linking';
-
-import { DataTable, SegmentedButtons } from 'react-native-paper';
 
 // Firebase
 import {
@@ -18,7 +13,6 @@ import { useDocumentData } from 'react-firebase-hooks/firestore';
 import { auth, db } from '../../../firebase';
 
 // Helpers
-import { getIcon } from '../../helpers/iconHelper';
 import { logEvent } from '../../helpers/analyticsHelper';
 
 // Components
@@ -26,90 +20,63 @@ import Page from '../../components/Page';
 import Table from '../../components/Table';
 import Text from '../../components/Text';
 import Button from '../../components/Button';
+import Avatar from '../../components/Avatar';
+import ListRow from '../../components/ListRow';
+import EmptyState from '../../components/EmptyState';
+import IconButton from '../../components/IconButton';
+import ScreenHeader from '../../components/ScreenHeader';
+import SegmentedControl from '../../components/SegmentedControl';
 
 import SplitwiseLogin from './components/SplitwiseLogin';
+import { balanceLabel } from './components/FriendRow';
 
 // Styles
-import styles from '../../styles/FriendsScreen.styles';
-import { colors, globalStyles } from '../../styles/styles';
+import { space } from '../../styles/theme';
 
 // @ts-ignore
 import SplitwiseLogo from '../../../assets/splitwise-logo.png';
-// @ts-ignore
-import GasMeUpLogo from '../../../assets/car.png';
+
+const styles = StyleSheet.create({
+  toggle: {
+    marginTop: space.xl,
+  },
+});
 
 function TableEmptyState() {
-  return (
-    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ color: colors.secondary, fontSize: 24 }}>No Friends</Text>
-      <Text style={{ color: colors.secondary, fontSize: 10 }}>
-        Add some friends and then they will show up here!
-      </Text>
-    </View>
-  );
+  return <EmptyState icon="people-outline" title="No Splitwise friends" message="Friends you add on Splitwise will show up here." />;
 }
 
-function Row({ name, email, amount }: any) {
+function Row({
+  name, email, amount, isLast,
+}: any) {
   const numericAmount = Number(amount);
+  const { label, tone } = balanceLabel(numericAmount);
   return (
-    <DataTable.Row
-      key={name}
-    >
-      <DataTable.Cell style={{ maxWidth: '15%', justifyContent: 'center', alignContent: 'center' }}>
-        <View>
-          <Image
-            style={{ width: 32, height: 32, borderRadius: 64 }}
-            source={getIcon({ email, name })}
-          />
-        </View>
-      </DataTable.Cell>
-      <DataTable.Cell textStyle={{ color: colors.secondary }}>
-        {name}
-      </DataTable.Cell>
-      <DataTable.Cell numeric>
-        <Text style={numericAmount < 0 ? { color: 'red' } : { color: colors.secondary }}>
-          $
-          {numericAmount < 0 ? (numericAmount * -1).toFixed(2) : numericAmount.toFixed(2)}
-        </Text>
-      </DataTable.Cell>
-    </DataTable.Row>
+    <ListRow
+      title={name}
+      subtitle={label}
+      separator={!isLast}
+      leading={<Avatar name={name} email={email} />}
+      trailing={tone === 'tertiary' ? undefined : (
+        <Text variant="headline" tone={tone}>{`$${Math.abs(numericAmount).toFixed(2)}`}</Text>
+      )}
+    />
   );
 }
 
 function FooterRow() {
   return (
-    <DataTable.Row
-      style={{
-        borderTopWidth: 1,
-        borderTopColor: colors.darkestGray,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.darkestGray,
-        height: 64,
-      }}
-    >
-      <View style={{ width: '100%', alignSelf: 'center' }}>
-        <Button
-          style={styles.splitwiseButton}
-          onPress={() => openURL('splitwise://app')}
-        >
-          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-            <Image source={SplitwiseLogo} style={{ width: 24, height: 24 }} />
-            <Text>
-              View More
-            </Text>
-          </View>
-        </Button>
-      </View>
-    </DataTable.Row>
+    <View style={{ padding: space.lg }}>
+      <Button
+        variant="secondary"
+        title="Open Splitwise"
+        fullWidth
+        onPress={() => openURL('splitwise://app')}
+      >
+        <Image source={SplitwiseLogo} style={{ width: 20, height: 20 }} />
+      </Button>
+    </View>
   );
-}
-
-function GasMeUpIconComponent({ size }: { size: number }) {
-  return <Image source={GasMeUpLogo} style={{ width: size, height: size }} />;
-}
-
-function SplitwiseIconComponent({ size }: { size: number }) {
-  return <Image source={SplitwiseLogo} style={{ width: size, height: size }} />;
 }
 
 interface Props {
@@ -183,55 +150,32 @@ export default function SplitwiseScreen({ navigation } : Props) {
     groups: friend.groups,
   })).sort((a: any, b: any) => a.amount - b.amount) ?? [];
 
-  const headers = [
-    { text: '', numeric: false, style: { maxWidth: '15%' } },
-    { text: 'Friend', numeric: false },
-    { text: 'Amount Owed', numeric: true },
-  ];
-
   return (
-    <Page keyboardAvoiding={false}>
+    <Page scroll keyboardAvoiding={false}>
+      <ScreenHeader
+        title="Splitwise"
+        actions={splitwiseToken ? (
+          <IconButton icon="log-out-outline" accessibilityLabel="Disconnect Splitwise" onPress={logout} />
+        ) : undefined}
+      />
       {secureUserDocLoading || splitwiseToken ? (
-        <>
-          <View style={globalStyles.headerSection}>
-            <TouchableOpacity
-              onPress={logout}
-            >
-              <Ionicons name="log-out" size={24} color="white" />
-            </TouchableOpacity>
-          </View>
-          <Table
-            title="Friends"
-            data={formattedBalances}
-            headers={headers}
-            Row={Row}
-            style={styles.table}
-            loading={loading || secureUserDocLoading}
-            EmptyState={TableEmptyState}
-            FooterRow={FooterRow}
-            scrollable
-          />
-        </>
+        <Table
+          data={formattedBalances}
+          Row={Row}
+          loading={loading || secureUserDocLoading}
+          EmptyState={TableEmptyState}
+          FooterRow={FooterRow}
+        />
       ) : (
         <SplitwiseLogin />
       )}
-      <SegmentedButtons
-        style={styles.toggleButton}
-        buttons={[
-          {
-            value: 'GasMeUp',
-            label: 'GasMeUp',
-            style: { backgroundColor: colors.primary },
-            icon: GasMeUpIconComponent,
-          },
-          {
-            value: 'Splitwise',
-            label: 'Splitwise',
-            style: { backgroundColor: colors.splitwiseGreen },
-            icon: SplitwiseIconComponent,
-          },
+      <SegmentedControl
+        style={styles.toggle}
+        options={[
+          { value: 'GasMeUp', label: 'GasMeUp' },
+          { value: 'Splitwise', label: 'Splitwise' },
         ]}
-        onValueChange={(value) => (value === 'GasMeUp' ? navigation.replace('Friends') : null)}
+        onChange={(value) => (value === 'GasMeUp' ? navigation.replace('Friends') : null)}
         value="Splitwise"
       />
     </Page>

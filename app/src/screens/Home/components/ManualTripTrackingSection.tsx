@@ -1,11 +1,5 @@
 // React imports
 import React from 'react';
-import {
-  View,
-} from 'react-native';
-
-// External Components
-import { FontAwesome5 } from '@expo/vector-icons';
 
 // Helpers
 import {
@@ -19,12 +13,8 @@ import {
 import { logEvent } from '../../../helpers/analyticsHelper';
 
 // Components
-import Text from '../../../components/Text';
 import Button from '../../../components/Button';
 import Alert from '../../../components/Alert';
-
-// Styles
-import { colors } from '../../../styles/styles';
 
 // Mock Data
 import { fetchData } from '../../../data/data';
@@ -166,26 +156,22 @@ export default function ManualTripTrackingSection({
   if (manualTripInProgress) {
     return (
       <Button
-        style={{ width: '60%', backgroundColor: colors.secondaryAction }}
+        variant="danger"
+        icon="stop-circle"
+        title="Stop tracking"
+        fullWidth
         onPress={() => showStopTrackingAlert()}
-      >
-        <View style={{ flexDirection: 'row' }}>
-          <FontAwesome5 name="stop-circle" size={16} color="red" />
-          <Text style={{ marginLeft: 4 }}>Stop Tracking</Text>
-        </View>
-      </Button>
+      />
     );
   }
 
   return (
     <Button
-      style={{ width: '60%', paddingHorizontal: 0, backgroundColor: colors.secondaryAction }}
+      variant="secondary"
+      icon="navigate-circle-outline"
+      title={currentRoute.route.length ? 'Track a new trip' : 'Track a trip with GPS'}
+      fullWidth
       onPress={() => showStartTrackingAlert()}
-    >
-      <View style={{ flexDirection: 'row' }}>
-        <FontAwesome5 name="route" size={16} color="white" />
-        <Text style={{ marginLeft: 4 }}>{`Start Tracking${currentRoute.route.length ? ' New Trip' : ''}`}</Text>
-      </View>
-    </Button>
+    />
   );
 }

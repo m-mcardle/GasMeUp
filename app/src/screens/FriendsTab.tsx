@@ -13,7 +13,7 @@ import LoginScreen from './Auth/LoginScreen';
 import FriendInfoScreen from './Friends/FriendInfoScreen';
 
 // Styles
-import { colors } from '../styles/styles';
+import { stackScreenOptions } from '../styles/navigation';
 
 const RootStack = createStackNavigator();
 
@@ -36,14 +36,7 @@ export default function FriendsTab() {
 
   return (
     <RootStack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colors.purple,
-          height: 80,
-        },
-        headerTitleStyle: { color: colors.white },
-        headerTintColor: colors.white,
-      }}
+      screenOptions={stackScreenOptions}
       initialRouteName="Friends"
     >
       <RootStack.Screen
@@ -67,7 +60,7 @@ export default function FriendsTab() {
       />
       <RootStack.Screen
         name="Friend"
-        options={{ headerShown: true }}
+        options={{ headerShown: true, title: '' }}
       >
         {({ navigation }) => (
           <FriendInfoScreen

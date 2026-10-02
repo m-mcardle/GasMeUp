@@ -1,19 +1,18 @@
 import React from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { MapPressEvent, PoiClickEvent } from 'react-native-maps';
 
 import Text from './Text';
 import MapContainer from './MapContainer';
 
-import { boldFont, globalStyles } from '../styles/styles';
+import { color, radius, space } from '../styles/theme';
 
 interface Props {
   customStart?: LatLng,
   customEnd?: LatLng,
   showUserLocation: boolean;
   waypoints: Array<Location>,
-  showTitle?: boolean,
   style?: object,
   startAddress?: string,
   endAddress?: string,
@@ -22,11 +21,38 @@ interface Props {
   handlePoiPress?: (event: PoiClickEvent) => void,
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    gap: space.md,
+  },
+  endpoints: {
+    backgroundColor: color.surfaceRaised,
+    borderRadius: radius.md,
+    paddingHorizontal: space.md,
+    paddingVertical: space.sm,
+    gap: space.xs,
+  },
+  endpoint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.sm,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  map: {
+    flex: 1,
+    height: undefined,
+  },
+});
+
 export default function MapModal({
   showUserLocation,
   waypoints,
   style,
-  showTitle = true,
   customStart,
   customEnd,
   startAddress,
@@ -36,26 +62,19 @@ export default function MapModal({
   handlePoiPress,
 }: Props) {
   return (
-    <View style={{ height: '100%', width: '100%' }}>
-      {showTitle && (
-      <Text style={globalStyles.title}>
-        Map View
-      </Text>
-      )}
-      {description && (
-      <Text style={{ ...globalStyles.h3, fontFamily: boldFont }}>
-        {description}
-      </Text>
-      )}
+    <View style={styles.container}>
+      {!!description && <Text variant="footnote" tone="secondary">{description}</Text>}
       {(!!startAddress || !!endAddress) && (
-      <View style={{ marginVertical: 8 }}>
-        <Text style={globalStyles.h3} numberOfLines={1}>
-          {`Start: ${startAddress || 'Not set'}`}
-        </Text>
-        <Text style={globalStyles.h3} numberOfLines={1}>
-          {`End: ${endAddress || 'Not set'}`}
-        </Text>
-      </View>
+        <View style={styles.endpoints}>
+          <View style={styles.endpoint}>
+            <View style={[styles.dot, { backgroundColor: color.primaryText }]} />
+            <Text variant="footnote" numberOfLines={1} style={{ flex: 1 }}>{startAddress || 'Start not set'}</Text>
+          </View>
+          <View style={styles.endpoint}>
+            <View style={[styles.dot, { backgroundColor: color.success }]} />
+            <Text variant="footnote" numberOfLines={1} style={{ flex: 1 }}>{endAddress || 'Destination not set'}</Text>
+          </View>
+        </View>
       )}
       <MapContainer
         showUserLocation={showUserLocation}
@@ -64,7 +83,7 @@ export default function MapModal({
         waypoints={waypoints}
         onPress={(event) => event && handleMapPress?.(event)}
         onPoiClick={(event) => event && handlePoiPress?.(event)}
-        style={style}
+        style={[styles.map, style]}
       />
     </View>
   );

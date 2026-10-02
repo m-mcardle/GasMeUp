@@ -1,6 +1,6 @@
 // React
 import React, { useState, useRef } from 'react';
-import { View, TextInput } from 'react-native';
+import { StyleSheet, View, TextInput } from 'react-native';
 import md5 from 'md5';
 
 // Firebase
@@ -25,8 +25,24 @@ import { maybeValidEmail } from '../../helpers/emailHelper';
 import { logSignUp } from '../../helpers/analyticsHelper';
 
 // Styles
-import styles from '../../styles/SignUpScreen.styles';
-import { globalStyles } from '../../styles/styles';
+import { space } from '../../styles/theme';
+
+const styles = StyleSheet.create({
+  intro: {
+    paddingTop: space.lg,
+    paddingBottom: space.xxl,
+  },
+  form: {
+    gap: space.lg,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    gap: space.md,
+  },
+  legal: {
+    marginTop: space.lg,
+  },
+});
 
 export default function SignUpScreen() {
   const [globalState] = useGlobalState();
@@ -38,10 +54,12 @@ export default function SignUpScreen() {
 
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const signUp = () => {
     setEmailError(false);
     setPasswordError(false);
+    setSubmitting(true);
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
         console.log('signed up!');
@@ -94,8 +112,9 @@ export default function SignUpScreen() {
         } else if (exception.code === 'auth/too-many-requests') {
           errorMessage = 'You have tried to log in too many times. Please try again later.';
         }
-        Alert('Error', errorMessage);
-      });
+        Alert('Couldn\u2019t create your account', errorMessage);
+      })
+      .finally(() => setSubmitting(false));
   };
 
   const invalidInputs = !firstName || !lastName || !maybeValidEmail(email) || !password;
@@ -104,58 +123,83 @@ export default function SignUpScreen() {
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
   return (
-    <Page keyboardAvoiding={false}>
-      <View style={styles.main}>
-        <View style={styles.headingSection}>
-          <Text style={globalStyles.h1}>Join GasMeUp</Text>
-          <Text style={globalStyles.h2}>To save your trips and split them with your friends!</Text>
+    <Page scroll safeTop={false}>
+      <View style={styles.intro}>
+        <Text variant="title2">Join GasMeUp</Text>
+        <Text variant="subhead" tone="secondary" style={{ marginTop: space.xs }}>
+          Save your trips and split the gas with friends.
+        </Text>
+      </View>
+      <View style={styles.form}>
+        <View style={styles.nameRow}>
+          <Input
+            viewStyle={{ flex: 1 }}
+            label="First name"
+            placeholder="Alex"
+            onChangeText={setFirstName}
+            value={firstName}
+            returnKeyType="next"
+            autoComplete="name-given"
+            textContentType="givenName"
+            autoCapitalize="words"
+            blurOnSubmit={false}
+            onSubmitEditing={() => lastNameRef?.current?.focus()}
+          />
+          <Input
+            viewStyle={{ flex: 1 }}
+            myRef={lastNameRef}
+            label="Last name"
+            placeholder="Rivera"
+            onChangeText={setLastName}
+            value={lastName}
+            returnKeyType="next"
+            autoComplete="name-family"
+            textContentType="familyName"
+            autoCapitalize="words"
+            blurOnSubmit={false}
+            onSubmitEditing={() => emailRef?.current?.focus()}
+          />
         </View>
         <Input
-          placeholder="First Name"
-          onChangeText={setFirstName}
-          value={firstName}
-          returnKeyType="next"
-          autoComplete="name-given"
-          onSubmitEditing={() => lastNameRef?.current?.focus()}
-        />
-        <Input
-          myRef={lastNameRef}
-          placeholder="Last Name"
-          onChangeText={setLastName}
-          value={lastName}
-          returnKeyType="next"
-          autoComplete="name-family"
-          onSubmitEditing={() => emailRef?.current?.focus()}
-        />
-        <Input
           myRef={emailRef}
-          placeholder="Email"
+          label="Email"
+          placeholder="you@example.com"
           error={emailError}
           onChangeText={setEmail}
           value={email}
           autoComplete="email"
+          textContentType="emailAddress"
           keyboardType="email-address"
           returnKeyType="next"
+          blurOnSubmit={false}
           onSubmitEditing={() => passwordRef?.current?.focus()}
         />
         <Input
           myRef={passwordRef}
-          placeholder="Password"
+          label="Password"
+          placeholder="At least 6 characters"
+          helperText={passwordError ? 'Password must be at least 6 characters.' : undefined}
           error={passwordError}
           onChangeText={setPassword}
           value={password}
           password
           autoComplete="password-new"
+          textContentType="newPassword"
           returnKeyType="done"
           onSubmitEditing={() => !invalidInputs && signUp()}
         />
         <Button
+          title="Create account"
+          fullWidth
+          loading={submitting}
           disabled={invalidInputs}
           onPress={() => signUp()}
-        >
-          <Text style={styles.signUpButtonText}>Sign Up</Text>
-        </Button>
+          style={{ marginTop: space.xs }}
+        />
       </View>
+      <Text variant="footnote" tone="tertiary" align="center" style={styles.legal}>
+        We’ll email you a link to verify your account before you can save trips.
+      </Text>
     </Page>
   );
 }

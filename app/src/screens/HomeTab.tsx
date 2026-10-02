@@ -8,7 +8,7 @@ import SettingsScreen from './Home/SettingsScreen';
 import SaveTripScreen from './Home/SaveTripScreen';
 
 // Styles
-import { colors } from '../styles/styles';
+import { stackScreenOptions } from '../styles/navigation';
 
 const RootStack = createStackNavigator();
 
@@ -33,14 +33,7 @@ export default function HomeTab() {
 
   return (
     <RootStack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colors.purple,
-          height: 80,
-        },
-        headerTitleStyle: { color: colors.white },
-        headerTintColor: colors.white,
-      }}
+      screenOptions={stackScreenOptions}
       initialRouteName="Calculate"
     >
       <RootStack.Screen
@@ -54,7 +47,7 @@ export default function HomeTab() {
       </RootStack.Screen>
       <RootStack.Screen
         name="Save Trip"
-        options={{ headerShown: true }}
+        options={{ headerShown: true, title: 'Save trip' }}
       >
         {({ navigation }) => (
           <SaveTripScreen

@@ -1,22 +1,22 @@
+import React from 'react';
 import {
-  View,
-  Modal,
-  TextStyle,
+  StyleSheet, Switch, TextStyle, View,
 } from 'react-native';
-import CheckBox from 'expo-checkbox';
 
 import NumericInput from '../../../components/NumericInput';
-
+import Sheet from '../../../components/Modal';
 import Text from '../../../components/Text';
 import Button from '../../../components/Button';
 
-import styles from '../../../styles/HomeScreen.styles';
-import { colors, globalStyles } from '../../../styles/styles';
+import {
+  color, radius, space, type,
+} from '../../../styles/theme';
 
 interface Props {
   setting: string,
   visible: boolean,
   units: string,
+  description?: string,
   maxValue?: number,
   setVisible: (_: any) => void,
   data: number,
@@ -26,71 +26,92 @@ interface Props {
   setUseCustomValue?: (_: any) => void,
 }
 
-export default function SettingModal(props: Props) {
-  const {
-    setting = 'Gas Price',
-    visible,
-    units,
-    maxValue,
-    setVisible,
-    data,
-    setData,
-    inputStep = 0.01,
-    useCustomValue,
-    setUseCustomValue,
-  } = props;
+const styles = StyleSheet.create({
+  stepper: {
+    alignItems: 'center',
+    paddingVertical: space.lg,
+  },
+  units: {
+    marginTop: space.sm,
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: color.surfaceRaised,
+    borderRadius: radius.lg,
+    paddingVertical: space.md,
+    paddingHorizontal: space.lg,
+    marginBottom: space.xl,
+    gap: space.md,
+  },
+});
 
+// Sheet for editing a numeric trip input (gas price or fuel efficiency).
+export default function SettingModal({
+  setting = 'Gas Price',
+  visible,
+  units,
+  description,
+  maxValue,
+  setVisible,
+  data,
+  setData,
+  inputStep = 0.01,
+  useCustomValue,
+  setUseCustomValue,
+}: Props) {
   const value = data === 0 ? 2.00 : data;
+  const invalid = (!!maxValue && data > maxValue) || data <= 0.1;
   return (
-    <Modal
-      animationType="fade"
-      transparent
+    <Sheet
       visible={visible}
+      title={setting}
+      subtitle={description}
+      onDismiss={() => !invalid && setVisible(false)}
     >
-      <View style={styles.modalContainer}>
-        <Text style={styles.heading}>
-          {`Configure ${setting}`}
-        </Text>
-        <Text style={styles.subHeading}>
-          {units}
-        </Text>
-        <View style={{ alignSelf: 'center', margin: 8 }}>
-          <NumericInput
-            rounded
-            step={inputStep}
-            totalHeight={25}
-            totalWidth={150}
-            containerStyle={{ backgroundColor: 'white' }}
-            inputStyle={globalStyles.numericInput as TextStyle}
-            valueType="real"
-            minValue={0.01}
-            maxValue={maxValue}
-            leftButtonBackgroundColor={colors.lightGray}
-            rightButtonBackgroundColor={colors.action}
-            textColor={colors.primary}
-            value={value}
-            onChange={setData}
-          />
-        </View>
-        {setUseCustomValue && (
-        <View style={styles.checkBoxSection}>
-          <Text style={{ color: colors.secondary, fontSize: 14 }}>Use custom gas price:</Text>
-          <CheckBox
-            color={colors.action}
+      <View style={styles.stepper}>
+        <NumericInput
+          rounded
+          step={inputStep}
+          totalHeight={60}
+          totalWidth={260}
+          containerStyle={{ backgroundColor: color.surfaceRaised, borderRadius: radius.lg }}
+          inputStyle={{ ...type.title2, fontSize: 24 } as TextStyle}
+          valueType="real"
+          minValue={0.01}
+          maxValue={maxValue}
+          separatorWidth={0}
+          borderColor={color.border}
+          leftButtonBackgroundColor={color.surfacePressed}
+          rightButtonBackgroundColor={color.primary}
+          textColor={color.text}
+          iconColor={color.text}
+          value={value}
+          onChange={setData}
+        />
+        <Text variant="footnote" tone="tertiary" style={styles.units}>{units}</Text>
+      </View>
+      {setUseCustomValue && (
+        <View style={styles.toggleRow}>
+          <View style={{ flex: 1 }}>
+            <Text variant="callout">Use this price</Text>
+            <Text variant="footnote" tone="tertiary">Off uses the live average for your region</Text>
+          </View>
+          <Switch
             value={useCustomValue}
             onValueChange={setUseCustomValue}
-            style={styles.modalCheckBox}
+            trackColor={{ false: color.surfacePressed, true: color.primary }}
+            ios_backgroundColor={color.surfacePressed}
           />
         </View>
-        )}
-        <Button
-          style={{ alignSelf: 'center' }}
-          onPress={() => setVisible(false)}
-          disabled={(!!maxValue && data > maxValue) || data <= 0.1}
-        >
-          <Text style={{ color: colors.secondary }}>Done</Text>
-        </Button>
-      </View>
-    </Modal>
+      )}
+      <Button
+        title="Done"
+        fullWidth
+        onPress={() => setVisible(false)}
+        disabled={invalid}
+      />
+    </Sheet>
   );
 }

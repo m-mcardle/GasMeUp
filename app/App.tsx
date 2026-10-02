@@ -17,7 +17,7 @@ import { LocationSubscription } from 'expo-location';
 import React, {
   useState, useMemo, useEffect, useRef,
 } from 'react';
-import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
+import { NavigationContainer, NavigationContainerRef, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 // Firebase
@@ -37,7 +37,8 @@ import MaintenanceScreen from './src/screens/MaintenanceScreen';
 import TabIcon from './src/components/TabIcon';
 
 // Styles
-import { colors } from './src/styles/styles';
+import { color } from './src/styles/theme';
+import { tabScreenOptions } from './src/styles/navigation';
 
 // Helpers
 import { getUserLocationSubscription } from './src/helpers/locationHelper';
@@ -45,6 +46,18 @@ import { registerForPushNotificationsAsync } from './src/helpers/notificationHel
 import { getExchangeRate } from './src/helpers/unitsHelper';
 import { logScreenView } from './src/helpers/analyticsHelper';
 import { getNumberConfig, initializeRemoteConfig, isFeatureEnabled } from './src/helpers/featureHelper';
+
+const navigationTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: color.primary,
+    background: color.bg,
+    card: color.bg,
+    text: color.text,
+    border: color.border,
+  },
+};
 
 SplashScreen.preventAutoHideAsync();
 
@@ -180,6 +193,7 @@ export default function App() {
     <GlobalContext.Provider value={state}>
       <NavigationContainer
         ref={navigationRef}
+        theme={navigationTheme}
         onReady={() => {
           routeNameRef.current = navigationRef?.current?.getCurrentRoute()?.name ?? 'Unknown';
         }}
@@ -196,19 +210,16 @@ export default function App() {
         <Tab.Navigator
           initialRouteName="Home"
           screenOptions={({ route }: { route: any }) => ({
-            headerShown: false,
-            tabBarIcon: ({ focused, color, size }:
+            ...tabScreenOptions,
+            tabBarIcon: ({ focused, color: tint, size }:
             { focused: boolean, color: string, size: number }) => TabIcon(
               {
                 name: route.name,
                 focused,
-                color,
+                color: tint,
                 size,
               },
             ),
-            tabBarActiveTintColor: colors.action,
-            tabBarInactiveTintColor: colors.secondary,
-            tabBarStyle: { backgroundColor: colors.primary },
           })}
         >
           {isFeatureEnabled('friends_screen') && <Tab.Screen name="Friends/Login" component={FriendsTab} options={{ title: 'Friends' }} />}

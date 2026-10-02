@@ -6,8 +6,6 @@
 import React, { useCallback, useState } from 'react';
 import { View } from 'react-native';
 
-import { Ionicons } from '@expo/vector-icons';
-
 import uuid from 'react-native-uuid';
 
 // Firebase
@@ -18,7 +16,6 @@ import { db, auth } from '../../../../firebase';
 
 // Components
 import Input from '../../../components/Input';
-import Text from '../../../components/Text';
 import Button from '../../../components/Button';
 import Alert from '../../../components/Alert';
 
@@ -28,7 +25,7 @@ import { updateFriend } from '../../../helpers/firestoreHelper';
 import { logEvent } from '../../../helpers/analyticsHelper';
 
 // Styles
-import { colors, globalStyles } from '../../../styles/styles';
+import { space } from '../../../styles/theme';
 
 interface Props {
   close: () => void,
@@ -53,7 +50,7 @@ export default function AddFriendsTable({ close }: Props) {
 
     setInputError(false);
     close();
-    Alert('Friend Request Sent', `If a user exists with the email: "${friendEmail}", they will receive a friend request.`);
+    Alert('Request sent', `If ${friendEmail} has a GasMeUp account, they’ll get your friend request.`);
   };
 
   const sendFriendRequest = useCallback(async () => {
@@ -95,37 +92,30 @@ export default function AddFriendsTable({ close }: Props) {
   }, [userDocument, currentUser, userFriendRequests, userFriends, friendEmail]);
 
   return (
-    <View style={globalStyles.centered}>
-      <Text style={globalStyles.h1}>
-        Add Friend
-      </Text>
-      <Text style={globalStyles.h3}>
-        Input your friends email to send them a friend request!
-      </Text>
+    <View style={{ gap: space.lg }}>
       <Input
-        viewStyle={{ marginTop: 40 }}
-        style={{ borderColor: 'white' }}
-        placeholder="Friend's Email"
+        label="Friend’s email"
+        placeholder="friend@example.com"
         autoComplete="email"
+        textContentType="emailAddress"
         keyboardType="email-address"
-        returnKeyType="done"
+        returnKeyType="send"
         value={friendEmail}
-        onChangeText={setFriendEmail}
+        onChangeText={(text) => {
+          setInputError(false);
+          setFriendEmail(text);
+        }}
         onSubmitEditing={sendFriendRequest}
         error={inputError}
         clearButton
       />
       <Button
+        title="Send request"
+        icon="paper-plane"
+        fullWidth
         disabled={!validEmail}
         onPress={sendFriendRequest}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Ionicons name="person-add" size={24} color={colors.secondary} />
-          <Text>
-            Send
-          </Text>
-        </View>
-      </Button>
+      />
     </View>
   );
 }

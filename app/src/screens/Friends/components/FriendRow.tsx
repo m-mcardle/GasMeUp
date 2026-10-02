@@ -1,18 +1,13 @@
 // React
 import React, { useRef } from 'react';
 import {
-  View,
   Animated,
-  Image,
+  StyleSheet,
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
 import { Swipeable, RectButton } from 'react-native-gesture-handler';
-
-import {
-  DataTable,
-} from 'react-native-paper';
 
 // Firebase
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -20,30 +15,52 @@ import { auth } from '../../../../firebase';
 
 // Helpers
 import { validateCurrentUser } from '../../../helpers/authHelper';
-import { getIcon } from '../../../helpers/iconHelper';
 import { removeFriend } from '../../../helpers/firestoreHelper';
+import { logEvent } from '../../../helpers/analyticsHelper';
 
 // Components
-import Text from '../../../components/Text';
 import Alert from '../../../components/Alert';
+import Avatar from '../../../components/Avatar';
+import ListRow from '../../../components/ListRow';
+import Text from '../../../components/Text';
 
 // Styles
-import styles from '../../../styles/FriendsScreen.styles';
-import { colors } from '../../../styles/styles';
-import { logEvent } from '../../../helpers/analyticsHelper';
+import { color, space } from '../../../styles/theme';
 
 interface Props {
   email: string,
   name: string,
   amount: number,
   uid: string,
+  isLast?: boolean,
   onPress: Function,
 }
 
+const styles = StyleSheet.create({
+  rightAction: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 88,
+    backgroundColor: color.danger,
+  },
+  amount: {
+    alignItems: 'flex-end',
+  },
+});
+
 const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
 
+export function balanceLabel(amount: number) {
+  if (Math.abs(amount) < 0.005) {
+    return { label: 'Settled up', tone: 'tertiary' as const };
+  }
+  return amount > 0
+    ? { label: 'Owes you', tone: 'success' as const }
+    : { label: 'You owe', tone: 'danger' as const };
+}
+
 export default function Row({
-  name, amount, uid, onPress, email,
+  name, amount, uid, onPress, email, isLast = false,
 }: Props) {
   const [user] = useAuthState(auth);
   const ref = useRef<Swipeable>(null);
@@ -58,20 +75,18 @@ export default function Row({
     dragX: Animated.AnimatedInterpolation<number>,
   ) => {
     const scale = dragX.interpolate({
-      inputRange: [-500, 0],
-      outputRange: [1, 0.25],
+      inputRange: [-120, 0],
+      outputRange: [1, 0.5],
       extrapolate: 'clamp',
     });
 
     return (
-      <RectButton
-        style={styles.rightAction}
-      >
+      <RectButton style={styles.rightAction}>
         <AnimatedIcon
-          name="remove-circle-outline"
-          size={30}
-          color="red"
-          style={[styles.actionIcon, { transform: [{ scale }] }]}
+          name="person-remove"
+          size={22}
+          color="#FFFFFF"
+          style={{ transform: [{ scale }] }}
         />
       </RectButton>
     );
@@ -79,8 +94,8 @@ export default function Row({
 
   const showRemoveConfirmationAlert = () => (user?.uid && uid
     ? Alert(
-      'Remove Friend',
-      `Are you sure you want to remove ${name} from your list of friends?`,
+      'Remove friend?',
+      `${name} will be removed from your friends list.`,
       [
         {
           text: 'Remove',
@@ -96,42 +111,37 @@ export default function Row({
     )
     : null);
 
+  const { label, tone } = balanceLabel(amount);
+  const settled = tone === 'tertiary';
+
   return (
     <Swipeable
       ref={ref}
       onSwipeableOpen={() => showRemoveConfirmationAlert()}
       renderRightActions={renderRightActions}
       friction={2}
-      overshootFriction={10}
-      rightThreshold={75}
+      overshootRight={false}
+      rightThreshold={60}
     >
-      <DataTable.Row
-        key={name}
+      <ListRow
+        title={name}
+        subtitle={label}
+        separator={!isLast}
+        leading={<Avatar name={name} email={email} />}
+        style={{ backgroundColor: color.surface }}
+        chevron
+        trailing={settled ? undefined : (
+          <Text variant="headline" tone={tone} style={{ marginRight: space.xxs }}>
+            {`$${Math.abs(amount).toFixed(2)}`}
+          </Text>
+        )}
         onPress={() => validateCurrentUser(user) && onPress({
           uid,
           name,
           amount,
           email,
         })}
-      >
-        <DataTable.Cell style={{ maxWidth: '15%', justifyContent: 'center', alignContent: 'center' }}>
-          <View>
-            <Image
-              style={{ width: 32, height: 32, borderRadius: 64 }}
-              source={getIcon({ email, name })}
-            />
-          </View>
-        </DataTable.Cell>
-        <DataTable.Cell textStyle={{ color: colors.secondary }}>
-          {name}
-        </DataTable.Cell>
-        <DataTable.Cell numeric>
-          <Text style={amount < 0 ? { color: 'red' } : { color: colors.secondary }}>
-            $
-            {amount < 0 ? (amount * -1).toFixed(2) : amount.toFixed(2)}
-          </Text>
-        </DataTable.Cell>
-      </DataTable.Row>
+      />
     </Swipeable>
   );
 }
