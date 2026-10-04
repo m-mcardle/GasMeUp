@@ -1,0 +1,543 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+@font-face{font-family:Inter;font-weight:400;src:url(assets/Inter_400Regular.ttf)}
+@font-face{font-family:Inter;font-weight:500;src:url(assets/Inter_500Medium.ttf)}
+@font-face{font-family:Inter;font-weight:600;src:url(assets/Inter_600SemiBold.ttf)}
+@font-face{font-family:Inter;font-weight:700;src:url(assets/Inter_700Bold.ttf)}
+@font-face{font-family:Inter;font-weight:800;src:url(assets/Inter_800ExtraBold.ttf)}
+@font-face{font-family:Ion;src:url(assets/Ionicons.ttf)}
+@font-face{font-family:MCI;src:url(assets/MaterialCommunityIcons.ttf)}
+:root{
+  --bg:#09080F;--surface:#151321;--raised:#1C192B;--pressed:#262238;
+  --border:rgba(255,255,255,0.07);--borderStrong:rgba(255,255,255,0.14);
+  --text:#F4F2FA;--text2:#A19DB4;--text3:#6E6A82;
+  --primary:#7C5CFF;--primaryText:#B3A1FF;--primarySoft:rgba(124,92,255,0.16);
+  --success:#3DDC97;--danger:#FF6B7A;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg);font-family:Inter;color:var(--text);-webkit-font-smoothing:antialiased}
+.ic{font-family:Ion;font-style:normal;line-height:1;display:inline-block}
+.mc{font-family:MCI;font-style:normal;line-height:1;display:inline-block}
+#stage{position:absolute;inset:0;overflow:hidden}
+#bgGlow{position:absolute;width:2200px;height:1400px;left:-140px;top:-500px;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(124,92,255,0.30),rgba(124,92,255,0.08) 55%,rgba(124,92,255,0) 100%)}
+#bgGlow2{position:absolute;width:1400px;height:1000px;left:900px;top:300px;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(91,54,230,0.18),rgba(91,54,230,0))}
+#grain{position:absolute;inset:0;opacity:.05;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+
+/* ---------- hook ---------- */
+#hook{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px}
+.hl{font-weight:800;font-size:132px;letter-spacing:-4px;line-height:1.08;white-space:nowrap}
+.w{display:inline-block;will-change:transform,opacity,filter}
+.grad{background:linear-gradient(135deg,#C9BBFF,#8A6CFF 45%,#7C5CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+#hookRoad{position:absolute;left:0;right:0;bottom:150px;height:6px;overflow:hidden;opacity:.5}
+#hookRoad i{position:absolute;top:0;width:80px;height:6px;border-radius:3px;background:rgba(179,161,255,.35)}
+
+/* ---------- captions ---------- */
+.cap{position:absolute;left:150px;top:0;bottom:0;width:690px;display:flex;flex-direction:column;justify-content:center}
+.cap .eb{font-weight:600;font-size:22px;letter-spacing:3px;text-transform:uppercase;color:var(--primaryText);margin-bottom:22px;display:flex;align-items:center;gap:14px}
+.cap .eb b{display:inline-flex;width:40px;height:40px;border-radius:20px;background:var(--primarySoft);align-items:center;justify-content:center;font-size:20px;color:var(--primaryText);letter-spacing:0}
+.cap .t{font-weight:800;font-size:76px;line-height:1.06;letter-spacing:-2.4px}
+.cap .t em{font-style:normal}
+
+/* ---------- phone ---------- */
+.phoneWrap{position:absolute;left:0;top:0;width:393px;height:852px;transform-origin:50% 50%}
+.phone{position:absolute;inset:-13px;border-radius:66px;background:#1d1b26;
+  box-shadow:0 0 0 2px #3a3648, 0 40px 120px rgba(0,0,0,.65), 0 0 160px rgba(124,92,255,.22)}
+.screen{position:absolute;left:13px;top:13px;width:393px;height:852px;border-radius:54px;overflow:hidden;background:var(--bg)}
+.island{position:absolute;left:50%;top:11px;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000;z-index:50}
+.status{position:absolute;left:0;right:0;top:0;height:54px;z-index:40;display:flex;justify-content:space-between;align-items:center;padding:6px 34px 0 50px;font-weight:600;font-size:17px}
+.status .r{display:flex;gap:6px;align-items:center}
+.bat{width:26px;height:12px;border-radius:4px;border:1.5px solid rgba(255,255,255,.5);position:relative}
+.bat:after{content:"";position:absolute;left:1.5px;top:1.5px;bottom:1.5px;width:17px;border-radius:2px;background:#fff}
+.sig{display:flex;gap:2px;align-items:flex-end;height:12px}.sig i{width:3px;background:#fff;border-radius:1px}
+.topGlow{position:absolute;left:0;right:0;top:0;height:320px;background:linear-gradient(rgba(124,92,255,.14),rgba(124,92,255,0))}
+.layer{position:absolute;inset:0}
+.content{position:absolute;left:0;right:0;top:54px;padding:0 20px}
+
+.eyebrow{font-weight:600;font-size:12px;line-height:16px;letter-spacing:.8px;text-transform:uppercase;color:var(--primaryText);margin-bottom:4px}
+.title1{font-weight:700;font-size:30px;line-height:36px;letter-spacing:-.6px}
+.title2{font-weight:700;font-size:22px;line-height:28px;letter-spacing:-.3px}
+.headline{font-weight:600;font-size:16px;line-height:22px;letter-spacing:-.1px}
+.callout{font-weight:500;font-size:15px;line-height:20px}
+.subhead{font-weight:400;font-size:14px;line-height:19px}
+.footnote{font-weight:400;font-size:13px;line-height:18px}
+.caption{font-weight:500;font-size:12px;line-height:16px}
+.overline{font-weight:600;font-size:12px;line-height:16px;letter-spacing:.8px;text-transform:uppercase}
+.t2{color:var(--text2)}.t3{color:var(--text3)}
+
+.sh{display:flex;align-items:flex-end;justify-content:space-between;padding:12px 0 16px}
+.iconBtn{width:40px;height:40px;border-radius:20px;background:var(--raised);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text)}
+.card{background:var(--surface);border-radius:22px;border:.5px solid var(--border);overflow:hidden}
+.pad{padding:16px}
+.rf{display:flex;align-items:center;gap:12px}
+.mk{width:14px;display:flex;justify-content:center}
+.mkS{width:12px;height:12px;border-radius:6px;border:3px solid var(--primaryText)}
+.mkE{width:12px;height:12px;border-radius:3px;background:var(--success)}
+.inp{flex:1;height:50px;border-radius:12px;background:var(--raised);border:1px solid var(--border);display:flex;align-items:center;padding:0 10px 0 14px;font-size:16px;gap:8px}
+.inp.focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(124,92,255,.18)}
+.inp .v{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inp .ph{color:var(--text3)}
+.caret{display:inline-block;width:2px;height:20px;background:var(--primaryText);vertical-align:-4px;margin-left:1px}
+.conn{width:2px;height:14px;margin:-4px 0 -4px 6px;border-radius:1px;background:var(--borderStrong)}
+.sugg{margin-left:26px;overflow:hidden}
+.sugg .in{margin-top:8px;background:var(--raised);border-radius:12px;border:1px solid var(--border);overflow:hidden}
+.sugg .it{display:flex;align-items:center;gap:10px;padding:11px 12px;font-size:14px;white-space:nowrap}
+.sugg .it+.it{border-top:.5px solid var(--border)}
+.sugg .it.pr{background:var(--pressed)}
+
+.hero{margin-top:16px;border-radius:22px;padding:16px;background:linear-gradient(135deg,#8A6CFF,#5B36E6 55%,#3A1F9E);
+  box-shadow:0 8px 18px rgba(124,92,255,.45)}
+.hero .hd{display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,.72)}
+.amount{font-weight:800;font-size:44px;line-height:50px;letter-spacing:-1.2px;margin:4px 0 16px;color:#fff;font-variant-numeric:tabular-nums}
+.hint{color:rgba(255,255,255,.72);margin:-8px 0 16px;font-size:13px;line-height:18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{border-radius:12px;background:rgba(255,255,255,.10);padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.tile.ed{border:.5px solid rgba(255,255,255,.28)}
+.tile .lb{display:flex;align-items:center;gap:4px;color:rgba(255,255,255,.72)}
+.tile .lb .pe{margin-left:auto}
+.tile .vv{font-weight:600;font-size:16px;line-height:22px;color:#fff}
+.saveWrap{overflow:hidden}
+.save{margin-top:16px;height:50px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;gap:8px;color:#5634D9;font-weight:600;font-size:16px}
+.map{margin-top:16px;height:210px;border-radius:22px;overflow:hidden;border:.5px solid var(--border);background:#12101c;position:relative}
+
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:83px;background:var(--bg);border-top:.5px solid var(--border);display:flex;padding-top:7px;z-index:30}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text3);font-size:10px;font-weight:500}
+.tab.on{color:var(--primaryText)}
+.home{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:#fff;z-index:60}
+
+.navh{position:absolute;left:0;right:0;top:54px;height:44px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:17px}
+.navh .bk{position:absolute;left:8px;display:flex;align-items:center;gap:2px;color:var(--primaryText);font-weight:400;font-size:17px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 16px;min-height:56px;position:relative}
+.row.sep:after{content:"";position:absolute;left:68px;right:0;bottom:0;height:.5px;background:var(--border)}
+.av{width:40px;height:40px;border-radius:20px;background:var(--primarySoft);display:flex;align-items:center;justify-content:center;color:var(--primaryText);font-weight:600;font-size:15px;flex:none}
+.chk{width:24px;height:24px;border-radius:12px;border:2px solid var(--borderStrong);display:flex;align-items:center;justify-content:center;color:#fff}
+.secH{padding:24px 0 8px}
+.btnP{height:50px;border-radius:16px;background:var(--primary);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:16px;color:#fff;box-shadow:0 8px 18px rgba(124,92,255,.45)}
+.btnP.dis{background:var(--raised);color:var(--text3);box-shadow:none}
+.footer{position:absolute;left:0;right:0;bottom:83px;padding:12px 20px;border-top:.5px solid var(--border);background:var(--bg)}
+.overlay{position:absolute;inset:0;background:rgba(5,4,10,.72);z-index:41}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:28px 28px 0 0;padding:0 20px 34px;z-index:42;border-top:.5px solid var(--borderStrong)}
+.handle{width:36px;height:5px;border-radius:3px;background:var(--borderStrong);margin:8px auto 0}
+.opts{display:flex;gap:12px}
+.opt{flex:1;background:var(--raised);border-radius:16px;border:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:4px}
+.opt.pr{border-color:var(--primary);background:var(--primarySoft)}
+.sum{display:flex;gap:12px}
+.sum .card{flex:1;padding:16px;display:flex;flex-direction:column;gap:2px}
+.tap{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:22px;background:rgba(255,255,255,.55);z-index:70;pointer-events:none}
+
+/* lock-screen phone */
+.lock{position:absolute;inset:0;background:radial-gradient(120% 80% at 30% 10%,#3a1f9e 0%,#24124F 40%,#09080F 100%)}
+.lock .time{position:absolute;left:0;right:0;top:110px;text-align:center;font-weight:600;font-size:88px;letter-spacing:-2px;color:rgba(255,255,255,.92)}
+.lock .date{position:absolute;left:0;right:0;top:86px;text-align:center;font-weight:600;font-size:20px;color:rgba(255,255,255,.8)}
+.banner{position:absolute;left:12px;right:12px;top:300px;border-radius:24px;background:rgba(48,42,70,.78);backdrop-filter:blur(20px);padding:14px 16px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.banner img{width:38px;height:38px;border-radius:9px}
+
+/* outro */
+#outro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#appIcon{width:200px;height:200px;border-radius:46px;overflow:hidden;box-shadow:0 30px 90px rgba(124,92,255,.55),0 0 0 1px rgba(255,255,255,.12)}
+#appIcon img{width:100%;height:100%;display:block}
+#oName{font-weight:800;font-size:140px;letter-spacing:-5px;margin-top:34px;line-height:1}
+#oLine{font-weight:500;font-size:40px;color:var(--text2);margin-top:26px;letter-spacing:-.5px}
+#oPill{margin-top:40px;display:flex;align-items:center;gap:12px;padding:16px 30px;border-radius:999px;background:var(--primarySoft);border:1px solid rgba(124,92,255,.45);color:var(--primaryText);font-weight:600;font-size:28px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bgGlow"></div><div id="bgGlow2"></div>
+
+  <!-- HOOK -->
+  <div id="hook">
+    <div class="hl" id="hl1"><span class="w">4</span> <span class="w">friends.</span> <span class="w">1</span> <span class="w">road</span> <span class="w">trip.</span></div>
+    <div class="hl" id="hl2"><span class="w">Who</span> <span class="w">owes</span> <span class="w">what</span> <span class="w">for</span> <span class="w grad">gas?</span></div>
+    <div id="hookRoad"></div>
+  </div>
+
+  <!-- CAPTIONS -->
+  <div class="cap" id="cap1"><div class="eb"><b>1</b>Your route</div><div class="t">Pick a start and a&nbsp;destination.</div></div>
+  <div class="cap" id="cap2"><div class="eb"><b>2</b>The cost</div><div class="t"><em class="grad">Live gas prices.</em><br>Your car’s fuel economy.</div></div>
+  <div class="cap" id="cap3"><div class="eb"><b>3</b>The split</div><div class="t">Tap who was in&nbsp;the&nbsp;car.</div></div>
+  <div class="cap" id="cap4"><div class="eb"><b>4</b>Done</div><div class="t">Everyone’s balance updates. <em class="grad">Nobody does the&nbsp;math.</em></div></div>
+
+  <!-- LOCK-SCREEN PHONE (friend's) -->
+  <div class="phoneWrap" id="lockWrap">
+    <div class="phone"></div>
+    <div class="screen">
+      <div class="lock">
+        <div class="date">Sunday, October 4</div>
+        <div class="time">9:41</div>
+        <div class="banner" id="banner">
+          <img src="assets/car.png">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;justify-content:space-between" class="caption"><span style="color:rgba(255,255,255,.7)">GASMEUP</span><span style="color:rgba(255,255,255,.55)">now</span></div>
+            <div class="headline" style="margin-top:2px;font-size:17px">New Trip</div>
+            <div class="subhead" style="color:rgba(255,255,255,.9);font-size:15px;line-height:20px">Riley Morgan added a new trip! You owe $19.23.</div>
+          </div>
+        </div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span class="r"><span class="sig"><i style="height:4px"></i><i style="height:6px"></i><i style="height:9px"></i><i style="height:12px"></i></span><span class="bat"></span></span></div>
+      <div class="home"></div>
+    </div>
+  </div>
+
+  <!-- MAIN PHONE -->
+  <div class="phoneWrap" id="phoneWrap">
+    <div class="phone"></div>
+    <div class="screen" id="screen">
+      <div class="topGlow"></div>
+
+      <!-- Calculate -->
+      <div class="layer" id="calc">
+        <div class="content">
+          <div class="sh">
+            <div><div class="eyebrow">GasMeUp</div><div class="title1">Trip cost</div></div>
+            <div class="iconBtn"><i class="ic" data-i="io:settings-outline" style="font-size:20px"></i></div>
+          </div>
+          <div class="card pad" style="display:flex;flex-direction:column;gap:8px">
+            <div>
+              <div class="rf"><div class="mk"><div class="mkS"></div></div>
+                <div class="inp" id="inS"><span class="v" id="vS"></span><i class="ic" data-i="io:navigate-outline" style="font-size:18px;color:var(--text2)"></i></div></div>
+              <div class="sugg" id="sgS"><div class="in">
+                <div class="it" id="sgS0"><i class="ic" data-i="io:location-outline" style="font-size:18px;color:var(--text3)"></i>Toronto, ON, Canada</div>
+                <div class="it"><i class="ic" data-i="io:location-outline" style="font-size:18px;color:var(--text3)"></i>Toronto Pearson International Airport</div>
+                <div class="it"><i class="ic" data-i="io:location-outline" style="font-size:18px;color:var(--text3)"></i>Toronto Island, Toronto, ON</div>
+              </div></div>
+            </div>
+            <div class="conn"></div>
+            <div>
+              <div class="rf"><div class="mk"><div class="mkE"></div></div>
+                <div class="inp" id="inE"><span class="v" id="vE"></span><i class="ic" data-i="io:navigate-outline" style="font-size:18px;color:var(--text2)"></i></div></div>
+              <div class="sugg" id="sgE"><div class="in">
+                <div class="it" id="sgE0"><i class="ic" data-i="io:location-outline" style="font-size:18px;color:var(--text3)"></i>Montréal, QC, Canada</div>
+                <div class="it"><i class="ic" data-i="io:location-outline" style="font-size:18px;color:var(--text3)"></i>Montréal-Trudeau Airport (YUL)</div>
+                <div class="it"><i class="ic" data-i="io:location-outline" style="font-size:18px;color:var(--text3)"></i>Montreal Street, Kingston, ON</div>
+              </div></div>
+            </div>
+          </div>
+
+          <div class="hero" id="hero">
+            <div class="hd"><span class="overline">Estimated trip cost</span></div>
+            <div class="amount" id="amount">$0.00</div>
+            <div class="hint" id="hint">Choose a start and destination to see what the drive costs.</div>
+            <div class="grid">
+              <div class="tile"><div class="lb"><i class="mc" data-i="mc:map-marker-distance" style="font-size:13px"></i><span class="caption">Distance</span></div><div class="vv" id="tDist">—</div></div>
+              <div class="tile"><div class="lb"><i class="mc" data-i="mc:water-outline" style="font-size:13px"></i><span class="caption">Fuel used</span></div><div class="vv" id="tFuel">—</div></div>
+              <div class="tile ed"><div class="lb"><i class="ic" data-i="io:speedometer-outline" style="font-size:13px"></i><span class="caption">Efficiency</span><i class="ic pe" data-i="io:pencil" style="font-size:11px"></i></div><div class="vv">10.0 L/100km</div></div>
+              <div class="tile ed"><div class="lb"><i class="mc" data-i="mc:gas-station-outline" style="font-size:13px"></i><span class="caption">Gas price</span><i class="ic pe" data-i="io:pencil" style="font-size:11px"></i></div><div class="vv">$1.42/L</div></div>
+            </div>
+            <div class="saveWrap" id="saveWrap"><div class="save" id="saveBtn"><i class="ic" data-i="io:people" style="font-size:18px"></i>Save &amp; split with friends</div></div>
+          </div>
+
+          <div class="map" id="map">
+            <svg width="353" height="210" viewBox="0 0 353 210" style="position:absolute;inset:0">
+              <defs><pattern id="g" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="rgba(255,255,255,.04)"/></pattern></defs>
+              <rect width="353" height="210" fill="url(#g)"/>
+              <path d="M0 160 C80 150 120 175 200 140 S300 90 353 70" stroke="rgba(255,255,255,.07)" stroke-width="8" fill="none"/>
+              <path d="M40 0 C60 60 30 120 70 210" stroke="rgba(255,255,255,.05)" stroke-width="5" fill="none"/>
+              <path d="M240 0 C230 80 280 150 260 210" stroke="rgba(255,255,255,.05)" stroke-width="5" fill="none"/>
+              <path d="M0 120 C120 135 200 60 353 30" stroke="rgba(61,120,220,.10)" stroke-width="18" fill="none"/>
+              <path id="route" d="M52 168 C92 150 120 158 160 128 S230 98 262 78 S300 52 306 46" stroke="#9479FF" stroke-width="5" stroke-linecap="round" fill="none"/>
+              <circle id="pinS" cx="52" cy="168" r="7" fill="#09080F" stroke="#B3A1FF" stroke-width="3"/>
+              <rect id="pinE" x="299" y="39" width="14" height="14" rx="3" fill="#3DDC97"/>
+              <circle id="me" cx="176" cy="105" r="7" fill="#7C5CFF" stroke="#fff" stroke-width="2.5"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Save trip -->
+      <div class="layer" id="save" style="background:var(--bg)">
+        <div class="navh"><span class="bk"><i class="ic" data-i="io:chevron-forward" style="font-size:22px;transform:scaleX(-1)"></i>Calculate</span>Save Trip</div>
+        <div class="content" style="top:98px">
+          <div class="card pad" style="margin-top:8px">
+            <div class="overline t3">Trip total</div>
+            <div class="title1" style="margin-bottom:12px">$76.91</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:4px;background:var(--primaryText)"></span><span class="footnote t2">Toronto, ON, Canada</span></div>
+              <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:4px;background:var(--success)"></span><span class="footnote t2">Montréal, QC, Canada</span></div>
+            </div>
+            <div style="display:flex;margin-top:16px;padding-top:16px;border-top:.5px solid var(--border)">
+              <div style="flex:1"><div class="caption t3">Distance</div><div class="callout">541.6 km</div></div>
+              <div style="flex:1"><div class="caption t3">Fuel</div><div class="callout">54.2 L</div></div>
+              <div style="flex:1"><div class="caption t3">Gas price</div><div class="callout">$1.42/L</div></div>
+            </div>
+          </div>
+          <div class="secH overline t3">Who was in the car?</div>
+          <div class="card" id="pickList"></div>
+        </div>
+        <div class="footer"><div class="btnP dis" id="contBtn">Select who was on this trip</div></div>
+
+      </div>
+
+      <!-- Friends -->
+      <div class="layer" id="friends" style="background:var(--bg)">
+        <div class="topGlow"></div>
+        <div class="content">
+          <div class="sh">
+            <div><div class="title1">Friends</div><div class="subhead t2" style="margin-top:4px">Signed in as Riley Morgan</div></div>
+            <div style="display:flex;gap:8px;padding-bottom:2px"><div class="iconBtn"><i class="ic" data-i="io:person-add-outline" style="font-size:20px"></i></div><div class="iconBtn"><i class="ic" data-i="io:settings-outline" style="font-size:20px"></i></div></div>
+          </div>
+          <div class="sum">
+            <div class="card"><span class="caption t2">You’re owed</span><span class="title2" id="owed" style="color:var(--success)">$57.69</span></div>
+            <div class="card"><span class="caption t2">You owe</span><span class="title2">$0.00</span></div>
+          </div>
+          <div class="secH overline t3">Balances</div>
+          <div class="card" id="balList"></div>
+          <div class="footnote t3" style="text-align:center;margin-top:12px" id="swipeHint">Swipe left on a friend to remove them.</div>
+        </div>
+      </div>
+
+      <div class="tabbar">
+        <div class="tab" id="tabF"><i class="ic" id="tabFi" data-i="io:people-outline" style="font-size:24px"></i>Friends</div>
+        <div class="tab on" id="tabC"><i class="ic" id="tabCi" data-i="io:calculator" style="font-size:24px"></i>Calculate</div>
+        <div class="tab"><i class="mc" data-i="mc:gas-station-outline" style="font-size:24px"></i>Gas Prices</div>
+        <div class="tab"><i class="ic" data-i="io:car-sport-outline" style="font-size:24px"></i>Car</div>
+      </div>
+
+      <div class="overlay" id="ov"></div>
+      <div class="sheet" id="sheet">
+        <div class="handle"></div>
+        <div style="padding:12px 0 16px"><div class="title2">Who drove?</div><div class="subhead t2" style="margin-top:4px">Everyone else pays the driver back.</div></div>
+        <div style="background:var(--raised);border-radius:16px;overflow:hidden" id="driverList"></div>
+        <div class="secH overline t3">How do you want to split it?</div>
+        <div class="opts">
+          <div class="opt" id="opt1"><span class="callout t2">Split evenly</span><span class="title2">$19.23</span><span class="caption t3">each, driver included</span></div>
+          <div class="opt" id="opt2"><span class="callout t2">Riders pay</span><span class="title2">$25.64</span><span class="caption t3">per rider, driver free</span></div>
+        </div>
+        <div class="footnote t3" style="text-align:center;margin-top:12px" id="sheetFoot">Pick who drove to continue.</div>
+      </div>
+      <div class="tap" id="tap"></div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span class="r"><span class="sig"><i style="height:4px"></i><i style="height:6px"></i><i style="height:9px"></i><i style="height:12px"></i></span><span class="bat"></span></span></div>
+      <div class="home"></div>
+    </div>
+  </div>
+
+  <!-- OUTRO -->
+  <div id="outro">
+    <div id="appIcon"><img src="assets/car.png"></div>
+    <div id="oName">GasMeUp</div>
+    <div id="oLine">Just put in your riders, your route, and we will do the rest.</div>
+    <div id="oPill"><i class="ic" data-i="io:logo-apple" style="font-size:30px;margin-top:-4px"></i>On the App Store</div>
+  </div>
+  <div id="grain"></div>
+</div>
+
+<script>
+const G={"io:calculator":61900,"io:calculator-outline":61901,"io:people":62623,"io:people-outline":62627,"io:car-sport-outline":61925,"io:settings-outline":62828,"io:navigate-outline":62576,"io:navigate":62572,"io:location-outline":62405,"io:close-circle":62027,"io:pencil":62620,"io:pricetag":62698,"io:checkmark":61981,"io:arrow-forward":61747,"io:person-add-outline":62631,"io:chevron-forward":62011,"io:radio-button-on":62723,"io:radio-button-off":62720,"io:speedometer-outline":62864,"io:notifications":62581,"io:close":62026,"io:logo-apple":62424,"mc:map-marker-distance":985328,"mc:water-outline":986634,"mc:gas-station-outline":986808};
+const icon=n=>String.fromCodePoint(G[n]);
+const ico=(n,s,c)=>`<i class="${n.startsWith('mc')?'mc':'ic'}" style="font-size:${s}px;${c?'color:'+c:''}">${icon(n)}</i>`;
+document.querySelectorAll('[data-i]').forEach(e=>e.textContent=icon(e.dataset.i));
+const $=id=>document.getElementById(id);
+
+// ---- build lists ----
+const pickPeople=[['Alex Chen','AC'],['Casey Wong','CW'],['Jordan Lee','JL'],['Sam Patel','SP']];
+$('pickList').innerHTML=pickPeople.map((p,i)=>`<div class="row ${i<3?'sep':''}"><div class="av">${p[1]}</div><div class="headline" style="flex:1">${p[0]}</div><div class="chk" id="chk${i}"></div></div>`).join('');
+const drivers=[['Riley Morgan (you)','RM'],['Alex Chen','AC'],['Jordan Lee','JL'],['Sam Patel','SP']];
+$('driverList').innerHTML=drivers.map((p,i)=>`<div class="row ${i<3?'sep':''}" style="min-height:52px;padding:8px 16px"><div class="av" style="width:36px;height:36px;font-size:14px">${p[1]}</div><div class="headline" style="flex:1">${p[0]}</div><span id="rad${i}">${ico('io:radio-button-off',22,'var(--text3)')}</span></div>`).join('');
+const bal=[['Alex Chen','AC',19.23],['Casey Wong','CW',0],['Jordan Lee','JL',19.23],['Sam Patel','SP',19.23]];
+$('balList').innerHTML=bal.map((p,i)=>`<div class="row ${i<3?'sep':''}" id="bal${i}"><div class="av">${p[1]}</div><div style="flex:1"><div class="headline">${p[0]}</div><div class="footnote" style="color:${p[2]?'var(--success)':'var(--text3)'}">${p[2]?'Owes you':'Settled up'}</div></div>${p[2]?`<span class="headline" style="color:var(--success)">$${p[2].toFixed(2)}</span>`:''}${ico('io:chevron-forward',18,'var(--text3)')}</div>`).join('');
+let roadHTML='';for(let i=0;i<16;i++)roadHTML+=`<i data-k="${i}"></i>`;$('hookRoad').innerHTML=roadHTML;
+
+// ---- helpers ----
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const p=(t,a,b)=>cl((t-a)/(b-a));
+const eo=x=>1-Math.pow(1-x,3);
+const eio=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const back=x=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+const lerp=(a,b,x)=>a+(b-a)*x;
+const set=(el,o)=>{for(const k in o)el.style[k]=o[k];};
+const fmt=v=>'$'+v.toFixed(2);
+const routeLen=$('route').getTotalLength();
+const S1='Toronto',S1F='Toronto, ON, Canada',E1='Montr',E1F='Montréal, QC, Canada';
+
+// fade window: in over [a,a+di], out over [b-do,b]
+function win(t,a,b,di=.3,dout=.3){return Math.min(eo(p(t,a,a+di)),1-eio(p(t,b-dout,b)));}
+function capShow(id,t,a,b){
+  const el=$(id),x=win(t,a,b,.45,.3);
+  const inP=eo(p(t,a,a+.45)),outP=eio(p(t,b-.3,b));
+  set(el,{opacity:x,transform:`translateY(${(1-inP)*40-outP*30}px)`,filter:`blur(${(1-inP)*8+outP*6}px)`,display:x<=0?'none':'flex'});
+}
+function tapAt(t,tt,x,y){ // tap ripple centered at screen coords
+  const k=p(t,tt-.08,tt+.32);
+  const el=$('tap');
+  if(k<=0||k>=1){el.style.opacity=0;return;}
+  set(el,{left:x+'px',top:y+'px',opacity:(k<.25?k/.25:1-(k-.25)/.75)*.6,transform:`scale(${.5+k*.9})`});
+}
+
+function render(t){
+  // background
+  set($('bgGlow'),{transform:`translate(${Math.sin(t*.35)*60}px,${Math.cos(t*.27)*30}px) scale(${1+.04*Math.sin(t*.5)})`});
+  set($('bgGlow2'),{transform:`translate(${Math.cos(t*.3)*-80}px,${Math.sin(t*.4)*40}px)`,opacity:.6+.4*p(t,2.6,4)});
+
+  // ---------- HOOK 0 – 2.95 ----------
+  const hookOut=eio(p(t,2.6,3.0));
+  const hk=$('hook');
+  set(hk,{display:t<3.05?'flex':'none',transform:`scale(${1+t*.012-hookOut*.04})`,opacity:1-hookOut,filter:`blur(${hookOut*10}px)`});
+  const words=[...document.querySelectorAll('#hook .w')];
+  const wt=[.05,.22,.5,.64,.78, 1.05,1.15,1.25,1.35,1.45];
+  words.forEach((w,i)=>{
+    const k=p(t,wt[i],wt[i]+.28),e=back(k);
+    set(w,{opacity:cl(k*2.2),transform:`translateY(${(1-e)*60}px) scale(${lerp(.86,1,e)})`,filter:`blur(${(1-cl(k*1.6))*12}px)`});
+  });
+  document.querySelectorAll('#hookRoad i').forEach((d,i)=>{
+    const x=((i*130 - t*520)%2080+2080)%2080-80; d.style.left=x+'px';
+  });
+  set($('hookRoad'),{opacity:.5*p(t,.2,.8)});
+
+  // ---------- PHONE camera ----------
+  const pw=$('phoneWrap');
+  const pin=eo(p(t,2.75,3.45)), pout=eio(p(t,17.3,17.85));
+  let cx=1450, cy=540, sc=1.14;
+  // punch-in on hero card during highlight 1
+  const zin=eio(p(t,6.3,7.0)), zout=eio(p(t,9.45,10.05)), z=zin*(1-zout);
+  sc*=1+.2*z; cy+= z*60; cx+= z*-10;
+  cx+=150*eio(p(t,14.6,15.3));
+  const ox=393/2, oy=852/2;
+  // phone y offset into frame
+  const enterY=(1-pin)*700, exitY=pout*140;
+  set(pw,{display:(t>2.7&&t<17.9)?'block':'none',
+    transform:`translate(${cx-ox}px,${cy-oy+enterY+exitY}px) scale(${sc*(1-pout*.12)}) rotate(${(1-pin)*6}deg)`,
+    opacity:Math.min(cl(pin*1.5),1-pout)});
+  // zoom focus point (hero card)
+  pw.style.transformOrigin=`50% ${lerp(50,52,z)}%`;
+
+  // ---------- CAPTIONS ----------
+  capShow('cap1',t,3.25,6.2);
+  capShow('cap2',t,6.4,9.95);
+  capShow('cap3',t,10.15,14.05);
+  capShow('cap4',t,14.35,17.45);
+
+  // ---------- CALCULATE screen ----------
+  // start field
+  const typS=Math.floor(cl((t-3.55)/.07,0,S1.length));
+  let vS='',vE='';
+  const sPicked=t>=4.38, ePicked=t>=5.33;
+  if(sPicked) vS=S1F; else if(t>=3.55) vS=S1.slice(0,typS);
+  const typE=Math.floor(cl((t-4.72)/.07,0,E1.length));
+  if(ePicked) vE=E1F; else if(t>=4.72) vE=E1.slice(0,typE);
+  const fS=t>=3.42&&t<4.45, fE=t>=4.6&&t<5.4;
+  const blink=(Math.floor(t*3)%2===0);
+  $('vS').innerHTML=(vS?vS:'<span class="ph">Starting point</span>')+(fS&&blink?'<span class="caret"></span>':'');
+  $('vE').innerHTML=(vE?vE:'<span class="ph">Destination</span>')+(fE&&blink?'<span class="caret"></span>':'');
+  $('inS').classList.toggle('focus',fS); $('inE').classList.toggle('focus',fE);
+  const sgS=eo(p(t,3.78,4.0))*(1-eio(p(t,4.42,4.62)));
+  const sgE=eo(p(t,4.9,5.12))*(1-eio(p(t,5.37,5.57)));
+  set($('sgS'),{height:(sgS*150)+'px',opacity:sgS});
+  set($('sgE'),{height:(sgE*150)+'px',opacity:sgE});
+  $('sgS0').classList.toggle('pr',t>4.3&&t<4.45);
+  $('sgE0').classList.toggle('pr',t>5.25&&t<5.4);
+
+  // hero card
+  const loading=t>=5.4&&t<6.6;
+  const cu=eo(p(t,6.6,7.5));
+  const cost=76.91*cu;
+  const amt=$('amount');
+  if(t<5.4){amt.textContent='$0.00';set(amt,{color:'rgba(255,255,255,.55)',opacity:1});}
+  else if(loading){amt.textContent='$0.00';set(amt,{color:'#fff',opacity:.35+.65*(.5+.5*Math.cos((t-5.4)*Math.PI/.7))});}
+  else {amt.textContent=fmt(cost);set(amt,{color:'#fff',opacity:1,transform:`scale(${1+.06*Math.sin(Math.PI*p(t,7.4,7.75))})`,transformOrigin:'0 50%'});}
+  const hintK=1-eio(p(t,5.4,5.65));
+  set($('hint'),{opacity:hintK,height:(hintK*36)+'px',marginBottom:(hintK*16-8*hintK)+'px',marginTop:(-8*hintK)+'px',overflow:'hidden'});
+  const tilesOn=t>=7.5;
+  $('tDist').textContent=tilesOn?'541.6 km':'—';
+  $('tFuel').textContent=tilesOn?'54.2 L':'—';
+  const tpulse=loading?.35+.65*(.5+.5*Math.cos((t-5.4)*Math.PI/.7)):1;
+  $('tDist').style.opacity=tpulse; $('tFuel').style.opacity=tpulse;
+  const sv=eo(p(t,7.6,8.0));
+  set($('saveWrap'),{height:(sv*66)+'px',opacity:sv});
+  $('saveBtn').style.opacity=(t>10.18&&t<10.4)?.85:1;
+  // map route
+  const rk=eio(p(t,6.6,7.9));
+  set($('route'),{strokeDasharray:routeLen,strokeDashoffset:routeLen*(1-rk)});
+  $('pinS').style.opacity=t>4.38?1:0; $('pinE').style.opacity=rk>.98?1:0; $('me').style.opacity=t<4.38?1:0;
+
+  // ---------- push to SAVE ----------
+  const push=eio(p(t,10.35,10.8));
+  const toFriends=eio(p(t,14.08,14.24)); const friendsIn=eo(p(t,14.24,14.5));
+  set($('calc'),{transform:`translateX(${-push*30}%)`,opacity:1-push*.6,display:push>=1?'none':'block'});
+  set($('save'),{transform:`translateX(${(1-push)*100}%)`,display:(push>0&&toFriends<1)?'block':'none',opacity:1-toFriends});
+  // checks
+  const ct=[11.0,null,11.35,11.7];
+  let n=0;
+  ct.forEach((c,i)=>{
+    const el=$('chk'+i);
+    const on=c!==null&&t>=c;
+    if(on)n++;
+    const k=c===null?0:back(p(t,c,c+.25));
+    el.style.background=on?'var(--primary)':'transparent';
+    el.style.borderColor=on?'var(--primary)':'var(--borderStrong)';
+    el.innerHTML=on?`<span style="display:inline-block;transform:scale(${k})">${ico('io:checkmark',16,'#fff')}</span>`:'';
+    el.style.transform=`scale(${on?1+.25*Math.sin(Math.PI*p(t,c,c+.25)):1})`;
+  });
+  const cb=$('contBtn');
+  if(n===0){cb.className='btnP dis';cb.textContent='Select who was on this trip';}
+  else {cb.className='btnP';cb.innerHTML=`Continue with ${n} friend${n===1?'':'s'} `+ico('io:arrow-forward',18);}
+  cb.style.opacity=(t>12.05&&t<12.25)?.85:1;
+  // sheet
+  const sh=eo(p(t,12.18,12.6))*(1-eio(p(t,13.75,14.1)));
+  set($('ov'),{opacity:sh,display:sh>0?'block':'none'});
+  set($('sheet'),{transform:`translateY(${(1-sh)*105}%)`,display:sh>0?'block':'none'});
+  const drv=t>=12.85;
+  $('rad0').innerHTML=ico(drv?'io:radio-button-on':'io:radio-button-off',22,drv?'var(--primaryText)':'var(--text3)');
+  $('rad0').style.display='inline-block';
+  $('rad0').style.transform=`scale(${1+.3*Math.sin(Math.PI*p(t,12.85,13.1))})`;
+  ['opt1','opt2'].forEach(o=>$(o).style.opacity=drv?1:.4);
+  $('opt1').classList.toggle('pr',t>=13.42&&t<13.9);
+  $('sheetFoot').textContent=drv?'Trip total $76.91':'Pick who drove to continue.';
+
+  // ---------- FRIENDS ----------
+  set($('friends'),{display:friendsIn>0?'block':'none',opacity:friendsIn,transform:`translateY(${(1-friendsIn)*14}px)`});
+  const tabF=t>=14.25;
+  $('tabF').classList.toggle('on',tabF); $('tabC').classList.toggle('on',!tabF);
+  $('tabFi').textContent=icon(tabF?'io:people':'io:people-outline');
+  $('tabCi').textContent=icon(tabF?'io:calculator-outline':'io:calculator');
+  $('owed').textContent=fmt(57.69*eo(p(t,14.55,15.3)));
+  for(let i=0;i<4;i++){
+    const k=eo(p(t,14.5+i*.1,14.85+i*.1));
+    set($('bal'+i),{opacity:k,transform:`translateX(${(1-k)*40}px)`});
+  }
+  $('swipeHint').style.opacity=eo(p(t,15.0,15.4));
+
+  // taps (screen coordinates)
+  const tapEl=$('tap'); tapEl.style.opacity=0;
+  const taps=[[3.42,'inS'],[4.35,'sgS0'],[5.3,'sgE0'],[10.25,'saveBtn'],[11.0,'chk0'],[11.35,'chk2'],[11.7,'chk3'],[12.1,'contBtn'],[12.85,'rad0'],[13.45,'opt1']];
+  for(const [tt,id] of taps){ if(t>tt-.08&&t<tt+.32){
+    const sr=$('screen').getBoundingClientRect(), k=sr.width/393, r=$(id).getBoundingClientRect();
+    const x=(r.left+r.width/2-sr.left)/k, y=(r.top+r.height/2-sr.top)/k;
+    tapAt(t,tt,x,y);} }
+
+  // ---------- LOCK-SCREEN PHONE ----------
+  const lw=$('lockWrap');
+  const li=eo(p(t,14.85,15.45)), lo=eio(p(t,17.25,17.8));
+  set(lw,{display:(t>14.8&&t<17.9)?'block':'none',
+    transform:`translate(${1150-393/2}px,${560-852/2+(1-li)*700+lo*140}px) scale(${.96*(1-lo*.12)}) rotate(${-5+(1-li)*-8}deg)`,zIndex:5,
+    opacity:Math.min(cl(li*1.4),1-lo)});
+  const bn=back(p(t,15.5,15.9));
+  set($('banner'),{transform:`translateY(${(1-bn)*-260}px) scale(${lerp(.9,1,bn)})`,opacity:cl(p(t,15.5,15.7))});
+  // main phone shifts right a touch to make room
+  // (handled by z-order: lock phone sits behind main phone)
+
+  // ---------- OUTRO ----------
+  const oi=t>=17.55;
+  set($('outro'),{display:oi?'flex':'none'});
+  const ik=back(p(t,17.6,18.05));
+  set($('appIcon'),{transform:`scale(${lerp(.3,1,ik)*(1+.015*Math.sin((t-18)*2))}) rotate(${(1-ik)*-12}deg)`,opacity:cl(p(t,17.6,17.8))});
+  const nk=eo(p(t,18.0,18.45));
+  set($('oName'),{opacity:nk,transform:`translateY(${(1-nk)*40}px)`,filter:`blur(${(1-nk)*10}px)`});
+  const lk=eo(p(t,18.25,18.7));
+  set($('oLine'),{opacity:lk,transform:`translateY(${(1-lk)*30}px)`});
+  const pk=back(p(t,18.6,19.0));
+  set($('oPill'),{opacity:cl(p(t,18.6,18.8)),transform:`scale(${lerp(.7,1,pk)})`});
+  // final gentle fade
+  $('stage').style.opacity=1-p(t,21.6,22.0);
+}
+window.render=render;
+window.ready=Promise.all([document.fonts.ready,...[...document.images].map(i=>i.decode().catch(()=>{}))]);
+render(0);
+</script>
+</body>
+</html>
