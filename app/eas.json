@@ -38,6 +38,14 @@
         "FIREBASE_ENV": "prod",
         "USE_DEV_API": "false"
       }
+    },
+    "production-simulator": {
+      "extends": "production",
+      "environment": "production",
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      }
     }
   },
   "submit": {
