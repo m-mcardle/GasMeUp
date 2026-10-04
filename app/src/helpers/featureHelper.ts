@@ -24,11 +24,26 @@ export const initializeRemoteConfig = async () => {
   return response;
 };
 
-export const isFeatureEnabled = (feature: string) => getValue(remoteConfig, feature).asBoolean();
+// Until initializeRemoteConfig() has run (e.g. the first render of a fresh install),
+// Remote Config has no values at all and every key reads as the static false/''/0.
+// Fall back to the bundled defaults so the first render matches them.
+const getString = (feature: string) => {
+  const value = getValue(remoteConfig, feature);
+  if (value.getSource() === 'static' && feature in defaultValues) {
+    return (defaultValues as Record<string, string>)[feature];
+  }
+  return value.asString();
+};
 
-export const getConfig = (feature: string) => getValue(remoteConfig, feature).asString();
+const BOOLEAN_TRUE = ['1', 'true', 't', 'yes', 'y', 'on'];
 
-export const getNumberConfig = (feature: string) => getValue(remoteConfig, feature).asNumber();
+export const isFeatureEnabled = (feature: string) => (
+  BOOLEAN_TRUE.includes(getString(feature).toLowerCase())
+);
+
+export const getConfig = (feature: string) => getString(feature);
+
+export const getNumberConfig = (feature: string) => Number(getString(feature)) || 0;
 
 export const getAllFeatures = () => getAll(remoteConfig);
 
